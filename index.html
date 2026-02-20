@@ -1,0 +1,3428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeamwearOS</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; }
+        .glass { background: rgba(20,20,20,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+        .hide { display: none !important; }
+        input, select, textarea { background: #111; border: 1px solid #222; color: #fff; transition: all 0.2s ease; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20,184,166,0.15); }
+        input::placeholder { color: #555; }
+        
+        /* Brand colors */
+        .text-brand-400 { color: #2dd4bf; }
+        .text-brand-500 { color: #14b8a6; }
+        .text-brand-600 { color: #0d9488; }
+        .bg-brand-400 { background-color: #2dd4bf; }
+        .bg-brand-500 { background-color: #14b8a6; }
+        .bg-brand-600 { background-color: #0d9488; }
+        .bg-brand-500\/20 { background-color: rgba(20,184,166,0.2); }
+        .hover\:bg-brand-600:hover { background-color: #0d9488; }
+        .hover\:text-brand-300:hover { color: #5eead4; }
+        .hover\:text-brand-400:hover { color: #2dd4bf; }
+        .hover\:border-brand-500:hover { border-color: #14b8a6; }
+        .border-brand-500 { border-color: #14b8a6; }
+        
+        /* Modern button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+            color: white;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(20,184,166,0.4);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            color: #999;
+            font-weight: 500;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        /* Card styles */
+        .card {
+            background: rgba(20,20,20,0.6);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            border-color: rgba(20,184,166,0.3);
+        }
+        .card-interactive {
+            cursor: pointer;
+        }
+        .card-interactive:hover {
+            background: rgba(20,184,166,0.05);
+            transform: translateY(-2px);
+        }
+        
+        /* Dropzone */
+        .dropzone {
+            border: 2px dashed rgba(255,255,255,0.15);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.02);
+        }
+        .dropzone:hover {
+            border-color: #14b8a6;
+            background: rgba(20,184,166,0.08);
+        }
+        .dropzone.drag-over {
+            border-color: #14b8a6;
+            background: rgba(20,184,166,0.15);
+            transform: scale(1.01);
+        }
+        
+        /* Loading spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: #14b8a6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Progress bar */
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        /* Tooltip / Help popup */
+        .help-trigger {
+            color: #666;
+            cursor: help;
+            transition: color 0.2s;
+        }
+        .help-trigger:hover {
+            color: #14b8a6;
+        }
+        .tooltip {
+            position: absolute;
+            background: #1a1a1a;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            z-index: 100;
+            max-width: 320px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Club card */
+        .club-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s ease;
+        }
+        .club-card:hover {
+            background: rgba(20,184,166,0.08);
+            border-color: rgba(20,184,166,0.3);
+        }
+        
+        /* Status badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-success {
+            background: rgba(34,197,94,0.15);
+            color: #22c55e;
+        }
+        .badge-warning {
+            background: rgba(234,179,8,0.15);
+            color: #eab308;
+        }
+        .badge-info {
+            background: rgba(20,184,166,0.15);
+            color: #14b8a6;
+        }
+        
+        /* Image grid item */
+        .image-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #111;
+            transition: all 0.2s ease;
+        }
+        .image-item:hover {
+            transform: scale(1.03);
+        }
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-item .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .image-item:hover .overlay {
+            opacity: 1;
+        }
+        
+        /* Section divider */
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+        }
+        
+        /* Pulse animation for active states */
+        .pulse-border {
+            animation: pulseBorder 2s infinite;
+        }
+        @keyframes pulseBorder {
+            0%, 100% { border-color: rgba(20,184,166,0.3); }
+            50% { border-color: rgba(20,184,166,0.6); }
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-4 right-4 z-50 hide">
+        <div class="glass rounded-lg px-4 py-3 text-sm"></div>
+    </div>
+
+    <!-- AUTH SCREEN -->
+    <div id="auth-screen" class="min-h-screen flex items-center justify-center p-4">
+        <div class="glass rounded-2xl p-8 w-full max-w-md">
+            <h1 class="text-3xl font-bold text-center mb-2 text-brand-400">TeamwearOS</h1>
+            <p class="text-gray-400 text-center mb-8">Sign in to continue</p>
+            
+            <div id="login-form">
+                <input type="email" id="login-email" placeholder="Email" class="w-full px-4 py-3 rounded-lg mb-3">
+                <input type="password" id="login-password" placeholder="Password" class="w-full px-4 py-3 rounded-lg mb-4">
+                <button onclick="handleLogin()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-lg transition">
+                    Sign In
+                </button>
+                <p class="text-center text-gray-500 mt-4 text-sm">
+                    Don't have an account? <a href="#" onclick="showSignup()" class="text-brand-400 hover:underline">Sign up</a>
+                </p>
+            </div>
+
+            <div id="signup-form" class="hide">
+                <input type="email" id="signup-email" placeholder="Email" class="w-full px-4 py-3 rounded-lg mb-3">
+                <input type="password" id="signup-password" placeholder="Password" class="w-full px-4 py-3 rounded-lg mb-3">
+                <input type="password" id="signup-confirm" placeholder="Confirm Password" class="w-full px-4 py-3 rounded-lg mb-4">
+                <button onclick="handleSignup()" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-lg transition">
+                    Create Account
+                </button>
+                <p class="text-center text-gray-500 mt-4 text-sm">
+                    Already have an account? <a href="#" onclick="showLogin()" class="text-brand-400 hover:underline">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="main-app" class="hide">
+        <!-- Header -->
+        <header class="glass sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="showLaunchpad()" class="text-2xl font-bold text-brand-400 hover:text-brand-300">TeamwearOS</button>
+                <div id="brand-selector" class="hide flex items-center gap-2">
+                    <select id="brand-select" onchange="switchBrand(this.value)" class="bg-gray-900 border border-gray-700 text-brand-400 text-sm px-3 py-1 rounded-lg">
+                    </select>
+                    <button onclick="showCreateBrand()" class="text-brand-400 hover:text-brand-300 text-sm px-2">+ New</button>
+                </div>
+                <span id="brand-badge" class="bg-brand-500/20 text-brand-400 text-xs px-2 py-1 rounded-full"></span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span id="user-role" class="text-purple-400 text-xs hide">SUPER ADMIN</span>
+                <span id="user-email" class="text-gray-400 text-sm"></span>
+                <button onclick="handleLogout()" class="text-gray-400 hover:text-white text-sm">Logout</button>
+            </div>
+        </header>
+
+        <!-- Create Brand Modal -->
+        <div id="create-brand-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-md">
+                <h3 class="text-xl font-bold mb-4">Create New Brand</h3>
+                <input type="text" id="new-brand-name" placeholder="Brand name (e.g. ROKOR Teamwear)" class="w-full px-4 py-3 rounded-lg mb-3">
+                <input type="text" id="new-brand-slug" placeholder="Slug (e.g. rokor-teamwear)" class="w-full px-4 py-3 rounded-lg mb-4">
+                <div class="flex gap-3">
+                    <button onclick="hideCreateBrand()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-3 rounded-lg">Cancel</button>
+                    <button onclick="createBrand()" class="flex-1 bg-brand-500 hover:bg-brand-600 py-3 rounded-lg font-semibold">Create Brand</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Launchpad -->
+        <div id="launchpad" class="p-8 max-w-6xl mx-auto">
+            <h2 class="text-2xl font-bold mb-8">Welcome to TeamwearOS</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Product Database -->
+                <div onclick="showTool('products')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
+                    <div class="w-12 h-12 bg-brand-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📦</div>
+                    <h3 class="font-semibold text-lg mb-2">Product Database</h3>
+                    <p class="text-gray-400 text-sm">Import and manage your master product list</p>
+                </div>
+                <!-- Club Mock-Ups -->
+                <div onclick="showTool('mockups')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🎨</div>
+                    <h3 class="font-semibold text-lg mb-2">Club Mock-Ups</h3>
+                    <p class="text-gray-400 text-sm">Upload product images for clubs</p>
+                </div>
+                <!-- Store Generator -->
+                <div onclick="showTool('generator')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
+                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🏪</div>
+                    <h3 class="font-semibold text-lg mb-2">Store Generator</h3>
+                    <p class="text-gray-400 text-sm">Generate Shopify CSV files</p>
+                </div>
+                <!-- Factory Orders -->
+                <div onclick="showTool('orders')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
+                    <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📋</div>
+                    <h3 class="font-semibold text-lg mb-2">Factory Orders</h3>
+                    <p class="text-gray-400 text-sm">Create purchase orders</p>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="grid md:grid-cols-4 gap-4 mt-8">
+                <div class="glass rounded-xl p-4">
+                    <p class="text-gray-400 text-sm">Products</p>
+                    <p id="stat-products" class="text-2xl font-bold text-brand-400">0</p>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <p class="text-gray-400 text-sm">Clubs</p>
+                    <p id="stat-clubs" class="text-2xl font-bold text-purple-400">0</p>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <p class="text-gray-400 text-sm">Orders</p>
+                    <p id="stat-orders" class="text-2xl font-bold text-blue-400">0</p>
+                </div>
+                <div class="glass rounded-xl p-4">
+                    <p class="text-gray-400 text-sm">Salespeople</p>
+                    <p id="stat-salespeople" class="text-2xl font-bold text-orange-400">0</p>
+                </div>
+            </div>
+
+            <!-- Super Admin Section -->
+            <div id="admin-section" class="hide mt-8">
+                <h3 class="text-lg font-semibold text-purple-400 mb-4">⚡ Super Admin Tools</h3>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Brand Settings -->
+                    <div onclick="showTool('settings')" class="glass rounded-2xl p-6 cursor-pointer hover:border-purple-500 border border-transparent transition">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">⚙️</div>
+                        <h3 class="font-semibold text-lg mb-2">Brand Settings</h3>
+                        <p class="text-gray-400 text-sm">Manage salespeople & brand config</p>
+                    </div>
+                    <!-- User Management -->
+                    <div onclick="showTool('users')" class="glass rounded-2xl p-6 cursor-pointer hover:border-purple-500 border border-transparent transition">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">👥</div>
+                        <h3 class="font-semibold text-lg mb-2">User Management</h3>
+                        <p class="text-gray-400 text-sm">Assign users to brands</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOL: Product Database -->
+        <div id="tool-products" class="hide p-8 max-w-7xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
+                ← Back to Launchpad
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Product Database</h2>
+            
+            <!-- Action Bar -->
+            <div class="flex flex-wrap gap-4 mb-6">
+                <button onclick="showAddProductModal()" class="bg-brand-500 hover:bg-brand-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                    + Add Product
+                </button>
+                <button onclick="document.getElementById('csv-upload').click()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                    📄 Import CSV
+                </button>
+                <input type="file" id="csv-upload" accept=".csv" class="hide" onchange="handleCSVUpload(event)">
+                <button onclick="exportProductsCSV()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                    📥 Export CSV
+                </button>
+                <div class="flex-1"></div>
+                <button onclick="showBulkDeleteModal()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 border border-red-500/50">
+                    🗑️ Delete All Products
+                </button>
+            </div>
+
+            <!-- Import Status -->
+            <div id="import-status" class="mb-6 hide">
+                <div class="bg-brand-500/20 rounded-lg p-4">
+                    <p id="import-message" class="text-brand-400"></p>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="glass rounded-2xl p-4 mb-6">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                    <div>
+                        <label class="text-gray-400 text-xs mb-1 block">Search</label>
+                        <input type="text" id="product-search" placeholder="Code or name..." class="w-full px-3 py-2 rounded-lg text-sm" oninput="filterProducts()">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-xs mb-1 block">Category</label>
+                        <select id="filter-category" class="w-full px-3 py-2 rounded-lg text-sm" onchange="filterProducts()">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-xs mb-1 block">Range</label>
+                        <select id="filter-range" class="w-full px-3 py-2 rounded-lg text-sm" onchange="filterProducts()">
+                            <option value="">All Ranges</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-xs mb-1 block">Fit Type</label>
+                        <select id="filter-fit" class="w-full px-3 py-2 rounded-lg text-sm" onchange="filterProducts()">
+                            <option value="">All</option>
+                            <option value="Adult / Youth">Adult / Youth</option>
+                            <option value="One Size Only">One Size Only</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-xs mb-1 block">Has Addons</label>
+                        <select id="filter-addons" class="w-full px-3 py-2 rounded-lg text-sm" onchange="filterProducts()">
+                            <option value="">All</option>
+                            <option value="true">Yes (Cut & Sew)</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-between items-center mt-3">
+                    <span class="text-gray-400 text-sm">Showing <span id="filtered-count">0</span> of <span id="product-count">0</span> products</span>
+                    <button onclick="clearFilters()" class="text-brand-400 hover:text-brand-300 text-sm">Clear Filters</button>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="glass rounded-2xl p-6 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-400 border-b border-gray-800">
+                                <th class="pb-3 pr-3 whitespace-nowrap">Code</th>
+                                <th class="pb-3 pr-3">Name</th>
+                                <th class="pb-3 pr-3">Category</th>
+                                <th class="pb-3 pr-3">Range</th>
+                                <th class="pb-3 pr-3 text-right">Youth Retail</th>
+                                <th class="pb-3 pr-3 text-right">Youth Partner</th>
+                                <th class="pb-3 pr-3 text-right">Adult Retail</th>
+                                <th class="pb-3 pr-3 text-right">Adult Partner</th>
+                                <th class="pb-3 pr-3 text-center">Addons</th>
+                                <th class="pb-3 text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add/Edit Product Modal -->
+        <div id="product-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
+            <div class="glass rounded-2xl p-6 w-full max-w-4xl mx-4 my-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="product-modal-title" class="text-xl font-bold">Add Product</h3>
+                    <button onclick="hideProductModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <input type="hidden" id="edit-product-id">
+                
+                <!-- Basic Info -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Product Code *</label>
+                        <input type="text" id="prod-code" placeholder="APX/ATL/001" class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Item Name *</label>
+                        <input type="text" id="prod-name" placeholder="Zipped Hoodie" class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Category *</label>
+                        <select id="prod-category" class="w-full px-3 py-2 rounded-lg">
+                            <option value="">Select...</option>
+                            <option value="Cut & Sew Teamwear">Cut & Sew Teamwear</option>
+                            <option value="Sublimated Training">Sublimated Training</option>
+                            <option value="Jackets">Jackets</option>
+                            <option value="Football Match Kit">Football Match Kit</option>
+                            <option value="Football Socks">Football Socks</option>
+                            <option value="Rugby Match Kit">Rugby Match Kit</option>
+                            <option value="Basketball Match Kit">Basketball Match Kit</option>
+                            <option value="Netball">Netball</option>
+                            <option value="Cricket">Cricket</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Range *</label>
+                        <input type="text" id="prod-range" placeholder="Atlas, Warrior, etc." class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                </div>
+
+                <!-- Pricing -->
+                <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
+                    <h4 class="font-semibold mb-3 text-brand-400">Pricing</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Youth Retail</label>
+                            <input type="number" step="0.01" id="prod-youth-retail" placeholder="35.95" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Youth Partner</label>
+                            <input type="number" step="0.01" id="prod-youth-partner" placeholder="29.95" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Adult Retail</label>
+                            <input type="number" step="0.01" id="prod-adult-retail" placeholder="42.95" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Adult Partner</label>
+                            <input type="number" step="0.01" id="prod-adult-partner" placeholder="35.95" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="prod-single-price" onchange="toggleSinglePrice()" class="rounded">
+                            <span class="text-gray-300">Single price item (accessories/socks)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Product Details -->
+                <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
+                    <h4 class="font-semibold mb-3 text-brand-400">Product Details</h4>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-3">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Fit Type</label>
+                            <select id="prod-fit-type" class="w-full px-3 py-2 rounded-lg">
+                                <option value="Adult / Youth">Adult / Youth</option>
+                                <option value="One Size Only">One Size Only</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Weight (grams)</label>
+                            <input type="number" id="prod-weight" placeholder="450" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Sizes (comma separated)</label>
+                            <input type="text" id="prod-sizes" placeholder="YXXS,YXS,YS,YM,YL,YXL,S,M,L,XL,2XL,3XL" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="prod-has-addons" class="rounded">
+                            <span class="text-gray-300">Has addons (apx-with-addons tag for Cut & Sew)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-6">
+                    <label class="text-gray-400 text-sm mb-1 block">Product Description (for Shopify)</label>
+                    <textarea id="prod-description" rows="4" placeholder="*ADD CLUB NAME + RANGE* Full Zipped Hoodie&#10;&#10;Stay warm and comfortable..." class="w-full px-3 py-2 rounded-lg"></textarea>
+                    <p class="text-gray-500 text-xs mt-1">Use *ADD CLUB NAME* or *ADD CLUB NAME + RANGE* as placeholders</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button onclick="hideProductModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-3 rounded-lg">Cancel</button>
+                    <button onclick="saveProduct()" class="flex-1 bg-brand-500 hover:bg-brand-600 py-3 rounded-lg font-semibold">Save Product</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="delete-product-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-md mx-4">
+                <h3 class="text-xl font-bold mb-4">Delete Product</h3>
+                <p class="text-gray-400 mb-6">Are you sure you want to delete <span id="delete-product-name" class="text-white font-semibold"></span>? This cannot be undone.</p>
+                <input type="hidden" id="delete-product-id">
+                <div class="flex gap-3">
+                    <button onclick="hideDeleteModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-3 rounded-lg">Cancel</button>
+                    <button onclick="confirmDeleteProduct()" class="flex-1 bg-red-500 hover:bg-red-600 py-3 rounded-lg font-semibold">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Delete Modal -->
+        <div id="bulk-delete-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-md mx-4">
+                <h3 class="text-xl font-bold mb-4 text-red-400">⚠️ Delete All Products</h3>
+                <p class="text-gray-400 mb-4">This will permanently delete <span id="bulk-delete-count" class="text-white font-semibold">0</span> products from <span id="bulk-delete-brand" class="text-brand-400 font-semibold"></span>.</p>
+                <p class="text-gray-400 mb-4">This action <span class="text-red-400 font-semibold">cannot be undone</span>.</p>
+                <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+                    <p class="text-sm text-gray-300 mb-2">Type <span class="text-red-400 font-mono">DELETE ALL</span> to confirm:</p>
+                    <input type="text" id="bulk-delete-confirm" placeholder="DELETE ALL" class="w-full px-3 py-2 rounded-lg bg-gray-900 border border-red-500/50">
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="hideBulkDeleteModal()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-3 rounded-lg">Cancel</button>
+                    <button onclick="confirmBulkDelete()" class="flex-1 bg-red-500 hover:bg-red-600 py-3 rounded-lg font-semibold">Delete All</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOL: Club Mock-Ups -->
+        <div id="tool-mockups" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Launchpad
+            </button>
+            
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold">Club Mock-Ups</h2>
+                    <p class="text-gray-500 text-sm mt-1">Create clubs and upload product images</p>
+                </div>
+            </div>
+
+            <!-- Step 1: Create or Select Club -->
+            <div class="card mb-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-sm font-bold">1</div>
+                        <h3 class="font-semibold text-lg">Create or Select Club</h3>
+                    </div>
+                </div>
+                
+                <!-- Create New Club - Inline Form -->
+                <div class="flex flex-col md:flex-row gap-3 mb-6">
+                    <div class="flex-1">
+                        <input type="text" id="new-club-name" placeholder="Enter club name (e.g. Liphook United FC)" 
+                            class="w-full px-4 py-3 rounded-xl text-sm" oninput="generateSuffix()">
+                    </div>
+                    <div class="w-full md:w-32">
+                        <input type="text" id="generated-suffix" placeholder="SUFFIX" 
+                            class="w-full px-4 py-3 rounded-xl text-sm font-mono text-center text-brand-400 uppercase" maxlength="6">
+                    </div>
+                    <button id="create-club-btn" onclick="createClub()" class="btn-primary whitespace-nowrap flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Create Club
+                    </button>
+                </div>
+                
+                <!-- Clubs List -->
+                <div id="clubs-loading" class="flex items-center justify-center py-8 hide">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-gray-500 text-sm">Loading clubs...</span>
+                </div>
+                
+                <div id="clubs-empty" class="text-center py-8 hide">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <p class="text-gray-500">No clubs yet. Create your first club above.</p>
+                </div>
+                
+                <div id="clubs-list" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Step 2: Upload Images (shown when club selected) -->
+            <div id="upload-section" class="card mb-6 hide">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-sm font-bold">2</div>
+                        <div>
+                            <h3 class="font-semibold text-lg">Upload Images</h3>
+                            <p class="text-gray-500 text-sm">for <span id="selected-club-name" class="text-brand-400 font-medium"></span> <span id="selected-club-suffix" class="text-gray-600 font-mono text-xs"></span></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="showNamingHelp(event)" class="help-trigger flex items-center gap-1 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Naming Help
+                        </button>
+                        <button onclick="closeUploadSection()" class="text-gray-500 hover:text-white p-1 rounded transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Upload Area -->
+                <div id="dropzone" class="dropzone p-8 text-center cursor-pointer" 
+                    onclick="document.getElementById('image-upload').click()"
+                    ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+                    <input type="file" id="image-upload" accept="image/*" multiple class="hide" onchange="handleImageUpload(event)">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-brand-500/10 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    </div>
+                    <p class="text-white font-medium mb-1">Drop images here or click to browse</p>
+                    <p class="text-gray-500 text-sm">PNG, JPG, WEBP • Product images + collection image</p>
+                </div>
+                
+                <!-- Upload Progress -->
+                <div id="upload-progress" class="mt-4 hide">
+                    <div class="flex items-center justify-between mb-2">
+                        <span id="upload-status-text" class="text-sm text-gray-400">Uploading...</span>
+                        <span id="upload-count-text" class="text-sm text-brand-400 font-medium">0/0</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="upload-progress-bar" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Uploaded Images (shown when club has images) -->
+            <div id="images-section" class="card hide">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-sm font-bold">3</div>
+                        <h3 class="font-semibold text-lg">Uploaded Images</h3>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span id="images-count-badge" class="badge badge-info">0 images</span>
+                        <span id="collection-status-badge" class="badge"></span>
+                    </div>
+                </div>
+                
+                <!-- Collection Image -->
+                <div id="collection-image-section" class="mb-6 pb-6 border-b border-gray-800">
+                    <p class="section-title">Collection Image</p>
+                    <div id="collection-image-empty" class="flex items-center gap-4 p-4 rounded-xl bg-gray-900/50 border border-dashed border-gray-800">
+                        <div class="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 text-sm">No collection image uploaded</p>
+                            <p class="text-gray-600 text-xs">Upload a file named <span class="font-mono text-brand-400">collection-image.png</span></p>
+                        </div>
+                    </div>
+                    <div id="collection-image-preview" class="hide">
+                        <div class="flex items-center gap-4">
+                            <img id="collection-image-img" src="" class="w-20 h-20 rounded-xl object-cover border-2 border-brand-500">
+                            <div class="flex-1">
+                                <p class="text-white font-medium">Collection Image</p>
+                                <p class="text-gray-500 text-sm">Used as the Shopify collection thumbnail</p>
+                            </div>
+                            <button onclick="deleteCollectionImage()" class="btn-secondary text-red-400 hover:text-red-300 text-sm">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product Images Grid -->
+                <p class="section-title">Product Images (<span id="images-count">0</span>)</p>
+                <div id="images-loading" class="flex items-center justify-center py-12 hide">
+                    <div class="spinner"></div>
+                    <span class="ml-3 text-gray-500 text-sm">Loading images...</span>
+                </div>
+                <div id="images-empty" class="text-center py-12 hide">
+                    <p class="text-gray-500">No product images uploaded yet</p>
+                </div>
+                <div id="images-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            
+            <!-- Naming Help Tooltip (positioned dynamically) -->
+            <div id="naming-help-tooltip" class="tooltip hide" style="display: none;">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-semibold text-brand-400">Image Naming Guide</h4>
+                    <button onclick="hideNamingHelp()" class="text-gray-500 hover:text-white">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <p class="text-gray-400 mb-1">Product Images:</p>
+                        <div class="bg-black/50 rounded-lg p-2 font-mono text-xs">
+                            <span class="text-gray-500">Code:</span> <span class="text-brand-400">APX/ATL/001</span><br>
+                            <span class="text-gray-500">File:</span> <span class="text-green-400">APX-ATL-001.png</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 mb-1">Collection Image:</p>
+                        <div class="bg-black/50 rounded-lg p-2 font-mono text-xs">
+                            <span class="text-green-400">collection-image.png</span>
+                        </div>
+                    </div>
+                    <p class="text-gray-500 text-xs">Replace / with - in product codes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOL: Store Generator -->
+        <div id="tool-generator" class="hide p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
+                ← Back to Launchpad
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Store Generator</h2>
+
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-4">Generate Shopify CSV</h3>
+                
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">Salesperson</label>
+                        <select id="gen-salesperson" class="w-full px-4 py-3 rounded-lg">
+                            <option value="">Select salesperson...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">Club (with uploaded images)</label>
+                        <div class="relative">
+                            <input type="text" id="gen-club-search" placeholder="Type to search clubs..." class="w-full px-4 py-3 rounded-lg" oninput="filterClubDropdown()" onfocus="showClubDropdown()" onblur="hideClubDropdown()">
+                            <input type="hidden" id="gen-club" value="">
+                            <div id="gen-club-dropdown" class="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg max-h-60 overflow-y-auto hide">
+                                <!-- Club options populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="gen-preview" class="hide mb-6">
+                    <div class="bg-gray-900 rounded-lg p-4">
+                        <div class="grid grid-cols-2 gap-4 mb-3">
+                            <div>
+                                <p class="text-gray-400 text-sm">Selected Club:</p>
+                                <p id="gen-selected-club" class="text-xl font-bold text-white">-</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-400 text-sm">Products with images:</p>
+                                <p id="gen-product-count" class="text-3xl font-bold text-brand-400">0</p>
+                            </div>
+                        </div>
+                        <div class="border-t border-gray-800 pt-3">
+                            <p class="text-gray-500 text-sm">Collection: <span id="gen-collection-name" class="text-brand-400 font-semibold"></span></p>
+                            <p id="gen-collection-image-info" class="text-sm mt-1"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="generateShopifyCSV()" class="w-full bg-brand-500 hover:bg-brand-600 py-4 rounded-lg font-semibold text-lg transition">
+                    Generate Shopify CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- TOOL: Factory Orders -->
+        <div id="tool-orders" class="hide p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
+                ← Back to Launchpad
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Factory Order Form</h2>
+
+            <div class="glass rounded-2xl p-6 mb-6">
+                <!-- Order Header -->
+                <div class="grid md:grid-cols-4 gap-4 mb-6">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">Club</label>
+                        <select id="order-club" class="w-full px-4 py-3 rounded-lg" onchange="updateOrderClub()">
+                            <option value="">Select or create club...</option>
+                            <option value="new">+ Create New Club</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">Club Suffix</label>
+                        <input type="text" id="order-suffix" class="w-full px-4 py-3 rounded-lg bg-gray-900" readonly>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">PO Number</label>
+                        <input type="text" id="order-po" class="w-full px-4 py-3 rounded-lg bg-gray-900" readonly>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">Pricing</label>
+                        <select id="order-pricing" class="w-full px-4 py-3 rounded-lg" onchange="recalculateOrder()">
+                            <option value="partner">Partner Price</option>
+                            <option value="retail">Retail Price</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Order Lines -->
+                <div id="order-lines" class="space-y-4 mb-6">
+                    <!-- Lines will be added here -->
+                </div>
+
+                <button onclick="addOrderLine()" class="w-full border border-dashed border-gray-600 hover:border-brand-500 py-3 rounded-lg text-gray-400 hover:text-brand-400 transition">
+                    + Add Product Line
+                </button>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="glass rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-400">Subtotal</span>
+                    <span id="order-subtotal" class="text-xl font-semibold">£0.00</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-400">VAT (20% on adult items)</span>
+                    <span id="order-vat" class="text-xl font-semibold">£0.00</span>
+                </div>
+                <div class="flex justify-between items-center mb-6 pt-4 border-t border-gray-800">
+                    <span class="text-lg font-semibold">Total</span>
+                    <span id="order-total" class="text-3xl font-bold text-brand-400">£0.00</span>
+                </div>
+                <button onclick="generateOrderPDF()" class="w-full bg-brand-500 hover:bg-brand-600 py-4 rounded-lg font-semibold text-lg transition">
+                    Generate Purchase Order PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- TOOL: Brand Settings (Super Admin Only) -->
+        <div id="tool-settings" class="hide p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
+                ← Back to Launchpad
+            </button>
+            <h2 class="text-2xl font-bold mb-6">Brand Settings</h2>
+            <p class="text-purple-400 mb-6">Managing: <span id="settings-brand-name" class="font-semibold"></span></p>
+
+            <!-- Salespeople Management -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-4">Salespeople</h3>
+                <div class="flex gap-4 mb-4">
+                    <input type="text" id="new-sp-first" placeholder="First name" class="flex-1 px-4 py-3 rounded-lg">
+                    <input type="text" id="new-sp-last" placeholder="Last name" class="flex-1 px-4 py-3 rounded-lg">
+                    <input type="email" id="new-sp-email" placeholder="Email (optional)" class="flex-1 px-4 py-3 rounded-lg">
+                    <button onclick="addSalesperson()" class="bg-brand-500 hover:bg-brand-600 px-6 py-3 rounded-lg font-semibold">Add</button>
+                </div>
+                <div id="salespeople-list" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Brand Info -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-4">Brand Information</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">Brand Name</label>
+                        <input type="text" id="edit-brand-name" class="w-full px-4 py-3 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">Brand Slug</label>
+                        <input type="text" id="edit-brand-slug" class="w-full px-4 py-3 rounded-lg bg-gray-800" readonly>
+                    </div>
+                </div>
+                <button onclick="updateBrandInfo()" class="mt-4 bg-brand-500 hover:bg-brand-600 px-6 py-3 rounded-lg font-semibold">Save Changes</button>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="glass rounded-2xl p-6 border border-red-500/30">
+                <h3 class="font-semibold mb-4 text-red-400">Danger Zone</h3>
+                <p class="text-gray-400 text-sm mb-4">Deleting a brand will remove all its products, clubs, images, and orders. This cannot be undone.</p>
+                <button onclick="confirmDeleteBrand()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-6 py-3 rounded-lg font-semibold border border-red-500/50">
+                    Delete Brand
+                </button>
+            </div>
+        </div>
+
+        <!-- TOOL: User Management (Super Admin Only) -->
+        <div id="tool-users" class="hide p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
+                ← Back to Launchpad
+            </button>
+            <h2 class="text-2xl font-bold mb-6">User Management</h2>
+
+            <!-- All Users -->
+            <div class="glass rounded-2xl p-6">
+                <h3 class="font-semibold mb-4">All Users</h3>
+                <p class="text-gray-400 text-sm mb-4">Assign users to brands. Users can only see data for their assigned brand.</p>
+                <div id="users-list" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // SUPABASE CONFIG
+        // =============================================
+        const SUPABASE_URL = 'https://odfpmwgwnyexuxqbusvi.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kZnBtd2d3bnlleHV4cWJ1c3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNzk5ODcsImV4cCI6MjA4NTk1NTk4N30.HWndMOL2InGTbE_Mb96qtcjgcyQPOhV8VnuX6AP_8eM';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // =============================================
+        // APP STATE
+        // =============================================
+        let currentUser = null;
+        let currentBrand = null;
+        let currentUserProfile = null;
+        let allBrands = [];
+        let isSuperAdmin = false;
+        let products = [];
+        let clubs = [];
+        let salespeople = [];
+        let clubImages = [];
+        let orderLines = [];
+        let poSequence = 1;
+
+        // =============================================
+        // TOAST NOTIFICATIONS
+        // =============================================
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const inner = toast.querySelector('div');
+            inner.textContent = message;
+            inner.className = `glass rounded-lg px-4 py-3 text-sm ${type === 'error' ? 'border-red-500 text-red-400' : 'border-brand-500 text-brand-400'}`;
+            toast.classList.remove('hide');
+            setTimeout(() => toast.classList.add('hide'), 3000);
+        }
+
+        // =============================================
+        // AUTH FUNCTIONS
+        // =============================================
+        function showSignup() {
+            document.getElementById('login-form').classList.add('hide');
+            document.getElementById('signup-form').classList.remove('hide');
+        }
+
+        function showLogin() {
+            document.getElementById('signup-form').classList.add('hide');
+            document.getElementById('login-form').classList.remove('hide');
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            if (!email || !password) {
+                showToast('Please enter email and password', 'error');
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+
+            await initApp(data.user);
+        }
+
+        async function handleSignup() {
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirm = document.getElementById('signup-confirm').value;
+
+            if (!email || !password) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (password !== confirm) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            const { data, error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+
+            showToast('Account created! Please sign in.');
+            showLogin();
+        }
+
+        async function handleLogout() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            currentBrand = null;
+            isSuperAdmin = false;
+            allBrands = [];
+            document.getElementById('main-app').classList.add('hide');
+            document.getElementById('auth-screen').classList.remove('hide');
+        }
+
+        // =============================================
+        // APP INITIALIZATION
+        // =============================================
+        async function initApp(user) {
+            currentUser = user;
+            document.getElementById('user-email').textContent = user.email;
+
+            // Get user profile
+            const { data: profile } = await supabase
+                .from('user_profiles')
+                .select('*, brands(*)')
+                .eq('id', user.id)
+                .single();
+
+            currentUserProfile = profile;
+            isSuperAdmin = profile?.role === 'super_admin';
+
+            // Show super admin badge if applicable
+            if (isSuperAdmin) {
+                document.getElementById('user-role').classList.remove('hide');
+                document.getElementById('brand-selector').classList.remove('hide');
+                
+                // Load all brands for super admin
+                const { data: brands } = await supabase
+                    .from('brands')
+                    .select('*')
+                    .order('name');
+                allBrands = brands || [];
+                
+                // Populate brand selector
+                const brandSelect = document.getElementById('brand-select');
+                brandSelect.innerHTML = allBrands.map(b => 
+                    `<option value="${b.id}">${b.name}</option>`
+                ).join('');
+                
+                // Set current brand (from profile or first brand)
+                if (profile?.brands) {
+                    currentBrand = profile.brands;
+                } else if (allBrands.length) {
+                    currentBrand = allBrands[0];
+                }
+                
+                if (currentBrand) {
+                    brandSelect.value = currentBrand.id;
+                }
+            } else {
+                // Regular user - use their assigned brand
+                if (profile?.brands) {
+                    currentBrand = profile.brands;
+                }
+            }
+
+            if (currentBrand) {
+                document.getElementById('brand-badge').textContent = currentBrand.name;
+            } else {
+                document.getElementById('brand-badge').textContent = 'No Brand';
+            }
+
+            // Show main app
+            document.getElementById('auth-screen').classList.add('hide');
+            document.getElementById('main-app').classList.remove('hide');
+
+            // Load data
+            await loadAllData();
+            showLaunchpad();
+        }
+
+        // =============================================
+        // BRAND MANAGEMENT (Super Admin)
+        // =============================================
+        async function switchBrand(brandId) {
+            const brand = allBrands.find(b => b.id === brandId);
+            if (!brand) return;
+            
+            currentBrand = brand;
+            document.getElementById('brand-badge').textContent = brand.name;
+            
+            // Reload all data for new brand
+            await loadAllData();
+            showLaunchpad();
+            showToast(`Switched to ${brand.name}`);
+        }
+
+        function showCreateBrand() {
+            document.getElementById('create-brand-modal').classList.remove('hide');
+            document.getElementById('new-brand-name').value = '';
+            document.getElementById('new-brand-slug').value = '';
+        }
+
+        function hideCreateBrand() {
+            document.getElementById('create-brand-modal').classList.add('hide');
+        }
+
+        async function createBrand() {
+            const name = document.getElementById('new-brand-name').value.trim();
+            let slug = document.getElementById('new-brand-slug').value.trim();
+            
+            if (!name) {
+                showToast('Please enter a brand name', 'error');
+                return;
+            }
+            
+            // Auto-generate slug if not provided
+            if (!slug) {
+                slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            }
+            
+            const { data, error } = await supabase
+                .from('brands')
+                .insert({ name, slug })
+                .select()
+                .single();
+            
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+            
+            // Add to brands list and select it
+            allBrands.push(data);
+            const brandSelect = document.getElementById('brand-select');
+            brandSelect.innerHTML = allBrands.map(b => 
+                `<option value="${b.id}">${b.name}</option>`
+            ).join('');
+            brandSelect.value = data.id;
+            
+            hideCreateBrand();
+            await switchBrand(data.id);
+            showToast(`Brand "${name}" created!`);
+        }
+
+        async function loadAllData() {
+            if (!currentBrand) return;
+
+            // Load products
+            const { data: prods } = await supabase
+                .from('products')
+                .select('*')
+                .eq('brand_id', currentBrand.id)
+                .order('product_code');
+            products = prods || [];
+
+            // Load clubs
+            const { data: clbs } = await supabase
+                .from('clubs')
+                .select('*')
+                .eq('brand_id', currentBrand.id)
+                .order('name');
+            clubs = clbs || [];
+
+            // Load salespeople
+            const { data: sales } = await supabase
+                .from('salespeople')
+                .select('*')
+                .eq('brand_id', currentBrand.id)
+                .eq('is_active', true);
+            salespeople = sales || [];
+
+            // Load PO count for sequence
+            const { count } = await supabase
+                .from('purchase_orders')
+                .select('*', { count: 'exact', head: true })
+                .eq('brand_id', currentBrand.id);
+            poSequence = (count || 0) + 1;
+
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('stat-products').textContent = products.length;
+            document.getElementById('stat-clubs').textContent = clubs.length;
+            document.getElementById('stat-salespeople').textContent = salespeople.length;
+            
+            supabase
+                .from('purchase_orders')
+                .select('*', { count: 'exact', head: true })
+                .eq('brand_id', currentBrand?.id)
+                .then(({ count }) => {
+                    document.getElementById('stat-orders').textContent = count || 0;
+                });
+        }
+
+        // =============================================
+        // NAVIGATION
+        // =============================================
+        function showLaunchpad() {
+            document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
+            document.getElementById('launchpad').classList.remove('hide');
+            
+            // Show admin section only for super admins
+            if (isSuperAdmin) {
+                document.getElementById('admin-section').classList.remove('hide');
+            } else {
+                document.getElementById('admin-section').classList.add('hide');
+            }
+        }
+
+        function showTool(tool) {
+            // Check if admin tools and user is not super admin
+            if ((tool === 'settings' || tool === 'users') && !isSuperAdmin) {
+                showToast('Access denied. Super admin only.', 'error');
+                return;
+            }
+            
+            document.getElementById('launchpad').classList.add('hide');
+            document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
+            document.getElementById(`tool-${tool}`).classList.remove('hide');
+
+            // Initialize tool
+            switch(tool) {
+                case 'products':
+                    renderProductsTable();
+                    break;
+                case 'mockups':
+                    populateClubSelect();
+                    break;
+                case 'generator':
+                    populateGeneratorSelects();
+                    break;
+                case 'orders':
+                    populateOrderSelects();
+                    initOrderForm();
+                    break;
+                case 'settings':
+                    loadBrandSettings();
+                    break;
+                case 'users':
+                    loadAllUsers();
+                    break;
+            }
+        }
+
+        // =============================================
+        // ADMIN: BRAND SETTINGS
+        // =============================================
+        function loadBrandSettings() {
+            if (!currentBrand) return;
+            
+            document.getElementById('settings-brand-name').textContent = currentBrand.name;
+            document.getElementById('edit-brand-name').value = currentBrand.name;
+            document.getElementById('edit-brand-slug').value = currentBrand.slug;
+            
+            renderSalespeopleList();
+        }
+
+        function renderSalespeopleList() {
+            const container = document.getElementById('salespeople-list');
+            
+            if (salespeople.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No salespeople added yet</p>';
+                return;
+            }
+            
+            container.innerHTML = salespeople.map(sp => `
+                <div class="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
+                    <div>
+                        <span class="font-medium">${sp.first_name} ${sp.last_name}</span>
+                        ${sp.email ? `<span class="text-gray-400 text-sm ml-2">${sp.email}</span>` : ''}
+                    </div>
+                    <button onclick="removeSalesperson('${sp.id}')" class="text-red-400 hover:text-red-300 text-sm">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        async function addSalesperson() {
+            const firstName = document.getElementById('new-sp-first').value.trim();
+            const lastName = document.getElementById('new-sp-last').value.trim();
+            const email = document.getElementById('new-sp-email').value.trim();
+            
+            if (!firstName || !lastName) {
+                showToast('Please enter first and last name', 'error');
+                return;
+            }
+            
+            const { data, error } = await supabase
+                .from('salespeople')
+                .insert({
+                    brand_id: currentBrand.id,
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email || null
+                })
+                .select()
+                .single();
+            
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+            
+            salespeople.push(data);
+            document.getElementById('new-sp-first').value = '';
+            document.getElementById('new-sp-last').value = '';
+            document.getElementById('new-sp-email').value = '';
+            
+            renderSalespeopleList();
+            updateStats();
+            showToast(`Added ${firstName} ${lastName}`);
+        }
+
+        async function removeSalesperson(id) {
+            if (!confirm('Remove this salesperson?')) return;
+            
+            const { error } = await supabase
+                .from('salespeople')
+                .update({ is_active: false })
+                .eq('id', id);
+            
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+            
+            salespeople = salespeople.filter(sp => sp.id !== id);
+            renderSalespeopleList();
+            updateStats();
+            showToast('Salesperson removed');
+        }
+
+        async function updateBrandInfo() {
+            const name = document.getElementById('edit-brand-name').value.trim();
+            
+            if (!name) {
+                showToast('Brand name is required', 'error');
+                return;
+            }
+            
+            const { error } = await supabase
+                .from('brands')
+                .update({ name })
+                .eq('id', currentBrand.id);
+            
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+            
+            currentBrand.name = name;
+            document.getElementById('brand-badge').textContent = name;
+            document.getElementById('settings-brand-name').textContent = name;
+            
+            // Update brand selector
+            const brandSelect = document.getElementById('brand-select');
+            const option = brandSelect.querySelector(`option[value="${currentBrand.id}"]`);
+            if (option) option.textContent = name;
+            
+            showToast('Brand updated');
+        }
+
+        async function confirmDeleteBrand() {
+            if (allBrands.length <= 1) {
+                showToast('Cannot delete the only brand', 'error');
+                return;
+            }
+            
+            const confirmName = prompt(`Type "${currentBrand.name}" to confirm deletion:`);
+            if (confirmName !== currentBrand.name) {
+                showToast('Deletion cancelled', 'error');
+                return;
+            }
+            
+            const { error } = await supabase
+                .from('brands')
+                .delete()
+                .eq('id', currentBrand.id);
+            
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+            
+            allBrands = allBrands.filter(b => b.id !== currentBrand.id);
+            
+            // Switch to another brand
+            if (allBrands.length > 0) {
+                await switchBrand(allBrands[0].id);
+            }
+            
+            // Update brand selector
+            const brandSelect = document.getElementById('brand-select');
+            brandSelect.innerHTML = allBrands.map(b => 
+                `<option value="${b.id}">${b.name}</option>`
+            ).join('');
+            
+            showToast('Brand deleted');
+            showLaunchpad();
+        }
+
+        // =============================================
+        // ADMIN: USER MANAGEMENT
+        // =============================================
+        async function loadAllUsers() {
+            const { data: users } = await supabase
+                .from('user_profiles')
+                .select('*, brands(name)')
+                .order('email');
+            
+            const container = document.getElementById('users-list');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = '<p class="text-gray-500">No users found</p>';
+                return;
+            }
+            
+            container.innerHTML = users.map(user => `
+                <div class="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
+                    <div>
+                        <span class="font-medium">${user.email}</span>
+                        ${user.role === 'super_admin' ? '<span class="text-purple-400 text-xs ml-2">SUPER ADMIN</span>' : ''}
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select onchange="assignUserToBrand('${user.id}', this.value)" class="bg-gray-700 border border-gray-600 px-3 py-1 rounded text-sm" ${user.role === 'super_admin' ? 'disabled' : ''}>
+                            <option value="">No brand</option>
+                            ${allBrands.map(b => `<option value="${b.id}" ${user.brand_id === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function assignUserToBrand(userId, brandId) {
+            const { error } = await supabase
+                .from('user_profiles')
+                .update({ brand_id: brandId || null })
+                .eq('id', userId);
+            
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+            
+            showToast('User updated');
+        }
+
+        // =============================================
+        // PRODUCT DATABASE
+        // =============================================
+        async function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showToast('Parsing CSV...');
+
+            Papa.parse(file, {
+                complete: async function(results) {
+                    const rows = results.data;
+                    let imported = 0;
+                    let currentRange = '';
+                    let currentCategory = '';
+
+                    // Determine if it's cut & sew based on range
+                    const cutAndSewRanges = ['ATLAS', 'CENTURION', 'ELITE', 'SPARTAN', 'VANGUARD', 'WARRIOR', 'ACADEMY', 'ESSENTIALS'];
+
+                    for (const row of rows) {
+                        // Check for range header
+                        if (row[0] && !row[0].includes('/') && row[0].toUpperCase() === row[0] && row[0].length > 2) {
+                            const possibleRange = row[0].trim().toUpperCase();
+                            if (cutAndSewRanges.includes(possibleRange)) {
+                                currentRange = row[0].trim();
+                                currentCategory = 'Cut & Sew Teamwear';
+                            } else if (possibleRange.includes('SUBLIMATED')) {
+                                currentRange = 'Sublimated';
+                                currentCategory = 'Sublimated Training';
+                            } else if (possibleRange.includes('JACKET')) {
+                                currentRange = 'Jackets';
+                                currentCategory = 'Jackets';
+                            } else if (possibleRange.includes('FOOTBALL MATCH')) {
+                                currentRange = 'Football';
+                                currentCategory = 'Football Match Kit';
+                            } else if (possibleRange.includes('FOOTBALL SOCK')) {
+                                currentRange = 'Football Socks';
+                                currentCategory = 'Football Socks';
+                            } else if (possibleRange.includes('RUGBY')) {
+                                currentRange = 'Rugby';
+                                currentCategory = 'Rugby Match Kit';
+                            } else if (possibleRange.includes('BASKETBALL')) {
+                                currentRange = 'Basketball';
+                                currentCategory = 'Basketball Match Kit';
+                            } else if (possibleRange.includes('NETBALL')) {
+                                currentRange = 'Netball';
+                                currentCategory = 'Netball';
+                            } else if (possibleRange.includes('CRICKET')) {
+                                currentRange = 'Cricket';
+                                currentCategory = 'Cricket';
+                            } else if (possibleRange.includes('ACCESSOR')) {
+                                currentRange = 'Accessories';
+                                currentCategory = 'Accessories';
+                            }
+                            continue;
+                        }
+
+                        // Check for product row (starts with APX/)
+                        if (row[0] && row[0].startsWith('APX/')) {
+                            const productCode = row[0].trim();
+                            const itemName = row[2]?.trim() || '';
+                            
+                            // Parse prices (remove £ and convert to number)
+                            const parsePrice = (val) => {
+                                if (!val) return null;
+                                return parseFloat(val.replace('£', '').replace(',', '').trim()) || null;
+                            };
+
+                            const youthRetail = parsePrice(row[6]);
+                            const youthPartner = parsePrice(row[8]);
+                            const adultRetail = parsePrice(row[10]);
+                            const adultPartner = parsePrice(row[12]);
+
+                            // Get description (column 14)
+                            const description = row[14]?.trim() || '';
+
+                            // Get sizes (last column with sizes)
+                            let sizes = 'YXXS,YXS,YS,YM,YL,YXL,S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+                            const lastCol = row[row.length - 1];
+                            if (lastCol && lastCol.includes(',')) {
+                                sizes = lastCol.trim();
+                            } else if (lastCol && lastCol.includes('One Size')) {
+                                sizes = 'One Size';
+                            }
+
+                            // Determine if single price (accessories)
+                            const isSinglePrice = currentCategory === 'Accessories' || currentCategory === 'Football Socks';
+
+                            // Determine if has addons
+                            const hasAddons = cutAndSewRanges.includes(currentRange.toUpperCase());
+
+                            // Extract range from product code if not set
+                            let rangeFromCode = currentRange;
+                            const codeParts = productCode.split('/');
+                            if (codeParts.length >= 2) {
+                                const rangeCode = codeParts[1];
+                                const rangeMap = {
+                                    'ATL': 'Atlas', 'CEN': 'Centurion', 'ELI': 'Elite', 
+                                    'SPA': 'Spartan', 'VAN': 'Vanguard', 'WAR': 'Warrior',
+                                    'ACA': 'Academy', 'ESS': 'Essentials', 'SUB': 'Sublimated',
+                                    'JKT': 'Jackets', 'FOT': 'Football', 'SOC': 'Football Socks',
+                                    'RUG': 'Rugby', 'BAS': 'Basketball', 'NET': 'Netball',
+                                    'CRI': 'Cricket', 'ACC': 'Accessories'
+                                };
+                                rangeFromCode = rangeMap[rangeCode] || currentRange;
+                            }
+
+                            // Insert or update product
+                            const { error } = await supabase
+                                .from('products')
+                                .upsert({
+                                    brand_id: currentBrand.id,
+                                    product_code: productCode,
+                                    range_name: rangeFromCode,
+                                    category: currentCategory,
+                                    item_name: itemName,
+                                    youth_retail_price: youthRetail,
+                                    youth_partner_price: youthPartner,
+                                    adult_retail_price: adultRetail,
+                                    adult_partner_price: adultPartner,
+                                    is_single_price: isSinglePrice,
+                                    single_retail_price: isSinglePrice ? youthRetail : null,
+                                    single_partner_price: isSinglePrice ? youthPartner : null,
+                                    description: description,
+                                    sizes: sizes,
+                                    has_addons: hasAddons,
+                                    fit_type: isSinglePrice ? 'One Size Only' : 'Adult / Youth'
+                                }, { 
+                                    onConflict: 'brand_id,product_code' 
+                                });
+
+                            if (!error) imported++;
+                        }
+                    }
+
+                    // Reload products
+                    await loadAllData();
+                    renderProductsTable();
+
+                    document.getElementById('import-status').classList.remove('hide');
+                    document.getElementById('import-message').textContent = `Successfully imported ${imported} products`;
+                    showToast(`Imported ${imported} products`);
+                },
+                error: function(error) {
+                    showToast('Error parsing CSV: ' + error.message, 'error');
+                }
+            });
+        }
+
+        function renderProductsTable() {
+            const tbody = document.getElementById('products-table');
+            const filtered = getFilteredProducts();
+
+            document.getElementById('product-count').textContent = products.length;
+            document.getElementById('filtered-count').textContent = filtered.length;
+
+            // Populate filter dropdowns
+            populateFilterDropdowns();
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" class="py-8 text-center text-gray-500">No products found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(p => `
+                <tr class="border-b border-gray-800 hover:bg-gray-900/50">
+                    <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap">${p.product_code}</td>
+                    <td class="py-3 pr-3">${p.item_name}</td>
+                    <td class="py-3 pr-3 text-gray-400 text-xs">${p.category || '-'}</td>
+                    <td class="py-3 pr-3 text-gray-400">${p.range_name}</td>
+                    <td class="py-3 pr-3 text-right">${p.youth_retail_price ? '£' + Number(p.youth_retail_price).toFixed(2) : '-'}</td>
+                    <td class="py-3 pr-3 text-right">${p.youth_partner_price ? '£' + Number(p.youth_partner_price).toFixed(2) : '-'}</td>
+                    <td class="py-3 pr-3 text-right">${p.adult_retail_price ? '£' + Number(p.adult_retail_price).toFixed(2) : '-'}</td>
+                    <td class="py-3 pr-3 text-right">${p.adult_partner_price ? '£' + Number(p.adult_partner_price).toFixed(2) : '-'}</td>
+                    <td class="py-3 pr-3 text-center">${p.has_addons ? '<span class="text-green-400">✓</span>' : '<span class="text-gray-600">-</span>'}</td>
+                    <td class="py-3 text-center whitespace-nowrap">
+                        <button onclick="editProduct('${p.id}')" class="text-brand-400 hover:text-brand-300 text-sm mr-2">Edit</button>
+                        <button onclick="showDeleteProductModal('${p.id}')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getFilteredProducts() {
+            const search = document.getElementById('product-search')?.value?.toLowerCase() || '';
+            const categoryFilter = document.getElementById('filter-category')?.value || '';
+            const rangeFilter = document.getElementById('filter-range')?.value || '';
+            const fitFilter = document.getElementById('filter-fit')?.value || '';
+            const addonsFilter = document.getElementById('filter-addons')?.value || '';
+
+            return products.filter(p => {
+                // Search filter
+                if (search && !p.product_code.toLowerCase().includes(search) && 
+                    !p.item_name.toLowerCase().includes(search) &&
+                    !(p.range_name && p.range_name.toLowerCase().includes(search))) {
+                    return false;
+                }
+                // Category filter
+                if (categoryFilter && p.category !== categoryFilter) return false;
+                // Range filter
+                if (rangeFilter && p.range_name !== rangeFilter) return false;
+                // Fit type filter
+                if (fitFilter && p.fit_type !== fitFilter) return false;
+                // Addons filter
+                if (addonsFilter === 'true' && !p.has_addons) return false;
+                if (addonsFilter === 'false' && p.has_addons) return false;
+
+                return true;
+            });
+        }
+
+        function populateFilterDropdowns() {
+            // Get unique categories and ranges
+            const categories = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
+            const ranges = [...new Set(products.map(p => p.range_name).filter(Boolean))].sort();
+
+            // Preserve current selections
+            const currentCategory = document.getElementById('filter-category')?.value || '';
+            const currentRange = document.getElementById('filter-range')?.value || '';
+
+            // Populate category dropdown
+            const categorySelect = document.getElementById('filter-category');
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="">All Categories</option>' +
+                    categories.map(c => `<option value="${c}" ${c === currentCategory ? 'selected' : ''}>${c}</option>`).join('');
+            }
+
+            // Populate range dropdown
+            const rangeSelect = document.getElementById('filter-range');
+            if (rangeSelect) {
+                rangeSelect.innerHTML = '<option value="">All Ranges</option>' +
+                    ranges.map(r => `<option value="${r}" ${r === currentRange ? 'selected' : ''}>${r}</option>`).join('');
+            }
+        }
+
+        function filterProducts() {
+            renderProductsTable();
+        }
+
+        function clearFilters() {
+            document.getElementById('product-search').value = '';
+            document.getElementById('filter-category').value = '';
+            document.getElementById('filter-range').value = '';
+            document.getElementById('filter-fit').value = '';
+            document.getElementById('filter-addons').value = '';
+            renderProductsTable();
+        }
+
+        function toggleSinglePrice() {
+            const isSingle = document.getElementById('prod-single-price').checked;
+            const youthFields = document.querySelectorAll('#prod-youth-retail, #prod-youth-partner');
+            const adultFields = document.querySelectorAll('#prod-adult-retail, #prod-adult-partner');
+            
+            if (isSingle) {
+                // For single price, we'll use youth fields as the single price
+                adultFields.forEach(f => f.disabled = true);
+                adultFields.forEach(f => f.value = '');
+                document.getElementById('prod-fit-type').value = 'One Size Only';
+            } else {
+                adultFields.forEach(f => f.disabled = false);
+                document.getElementById('prod-fit-type').value = 'Adult / Youth';
+            }
+        }
+
+        function showAddProductModal() {
+            document.getElementById('product-modal-title').textContent = 'Add Product';
+            document.getElementById('edit-product-id').value = '';
+            
+            // Clear all fields
+            document.getElementById('prod-code').value = '';
+            document.getElementById('prod-name').value = '';
+            document.getElementById('prod-category').value = '';
+            document.getElementById('prod-range').value = '';
+            document.getElementById('prod-youth-retail').value = '';
+            document.getElementById('prod-youth-partner').value = '';
+            document.getElementById('prod-adult-retail').value = '';
+            document.getElementById('prod-adult-partner').value = '';
+            document.getElementById('prod-single-price').checked = false;
+            document.getElementById('prod-fit-type').value = 'Adult / Youth';
+            document.getElementById('prod-weight').value = '450';
+            document.getElementById('prod-sizes').value = 'YXXS,YXS,YS,YM,YL,YXL,S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+            document.getElementById('prod-has-addons').checked = false;
+            document.getElementById('prod-description').value = '';
+            
+            // Enable all fields
+            document.querySelectorAll('#prod-adult-retail, #prod-adult-partner').forEach(f => f.disabled = false);
+            
+            document.getElementById('product-modal').classList.remove('hide');
+        }
+
+        function editProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('product-modal-title').textContent = 'Edit Product';
+            document.getElementById('edit-product-id').value = productId;
+            
+            // Populate fields
+            document.getElementById('prod-code').value = product.product_code || '';
+            document.getElementById('prod-name').value = product.item_name || '';
+            document.getElementById('prod-category').value = product.category || '';
+            document.getElementById('prod-range').value = product.range_name || '';
+            document.getElementById('prod-youth-retail').value = product.youth_retail_price || '';
+            document.getElementById('prod-youth-partner').value = product.youth_partner_price || '';
+            document.getElementById('prod-adult-retail').value = product.adult_retail_price || '';
+            document.getElementById('prod-adult-partner').value = product.adult_partner_price || '';
+            document.getElementById('prod-single-price').checked = product.is_single_price || false;
+            document.getElementById('prod-fit-type').value = product.fit_type || 'Adult / Youth';
+            document.getElementById('prod-weight').value = product.weight_grams || 450;
+            document.getElementById('prod-sizes').value = product.sizes || '';
+            document.getElementById('prod-has-addons').checked = product.has_addons || false;
+            document.getElementById('prod-description').value = product.description || '';
+            
+            // Handle single price state
+            toggleSinglePrice();
+            
+            document.getElementById('product-modal').classList.remove('hide');
+        }
+
+        function hideProductModal() {
+            document.getElementById('product-modal').classList.add('hide');
+        }
+
+        async function saveProduct() {
+            const productId = document.getElementById('edit-product-id').value;
+            const isSinglePrice = document.getElementById('prod-single-price').checked;
+            
+            const productData = {
+                brand_id: currentBrand.id,
+                product_code: document.getElementById('prod-code').value.trim(),
+                item_name: document.getElementById('prod-name').value.trim(),
+                category: document.getElementById('prod-category').value,
+                range_name: document.getElementById('prod-range').value.trim(),
+                youth_retail_price: parseFloat(document.getElementById('prod-youth-retail').value) || null,
+                youth_partner_price: parseFloat(document.getElementById('prod-youth-partner').value) || null,
+                adult_retail_price: isSinglePrice ? null : (parseFloat(document.getElementById('prod-adult-retail').value) || null),
+                adult_partner_price: isSinglePrice ? null : (parseFloat(document.getElementById('prod-adult-partner').value) || null),
+                is_single_price: isSinglePrice,
+                single_retail_price: isSinglePrice ? parseFloat(document.getElementById('prod-youth-retail').value) || null : null,
+                single_partner_price: isSinglePrice ? parseFloat(document.getElementById('prod-youth-partner').value) || null : null,
+                fit_type: document.getElementById('prod-fit-type').value,
+                weight_grams: parseInt(document.getElementById('prod-weight').value) || 450,
+                sizes: document.getElementById('prod-sizes').value.trim(),
+                has_addons: document.getElementById('prod-has-addons').checked,
+                description: document.getElementById('prod-description').value.trim()
+            };
+
+            // Validation
+            if (!productData.product_code || !productData.item_name || !productData.category || !productData.range_name) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            let result;
+            if (productId) {
+                // Update existing
+                result = await supabase
+                    .from('products')
+                    .update(productData)
+                    .eq('id', productId)
+                    .select()
+                    .single();
+            } else {
+                // Insert new
+                result = await supabase
+                    .from('products')
+                    .insert(productData)
+                    .select()
+                    .single();
+            }
+
+            if (result.error) {
+                showToast(result.error.message, 'error');
+                return;
+            }
+
+            // Update local state
+            if (productId) {
+                const index = products.findIndex(p => p.id === productId);
+                if (index !== -1) products[index] = result.data;
+            } else {
+                products.push(result.data);
+            }
+
+            hideProductModal();
+            renderProductsTable();
+            updateStats();
+            showToast(productId ? 'Product updated' : 'Product added');
+        }
+
+        function showDeleteProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('delete-product-id').value = productId;
+            document.getElementById('delete-product-name').textContent = `${product.product_code} - ${product.item_name}`;
+            document.getElementById('delete-product-modal').classList.remove('hide');
+        }
+
+        function hideDeleteModal() {
+            document.getElementById('delete-product-modal').classList.add('hide');
+        }
+
+        async function confirmDeleteProduct() {
+            const productId = document.getElementById('delete-product-id').value;
+
+            const { error } = await supabase
+                .from('products')
+                .delete()
+                .eq('id', productId);
+
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+
+            products = products.filter(p => p.id !== productId);
+            hideDeleteModal();
+            renderProductsTable();
+            updateStats();
+            showToast('Product deleted');
+        }
+
+        function exportProductsCSV() {
+            if (products.length === 0) {
+                showToast('No products to export', 'error');
+                return;
+            }
+
+            const headers = [
+                'Product Code', 'Item Name', 'Category', 'Range', 
+                'Youth Retail', 'Youth Partner', 'Adult Retail', 'Adult Partner',
+                'Fit Type', 'Sizes', 'Weight (g)', 'Has Addons', 'Description'
+            ];
+
+            const rows = products.map(p => [
+                p.product_code,
+                p.item_name,
+                p.category,
+                p.range_name,
+                p.youth_retail_price || '',
+                p.youth_partner_price || '',
+                p.adult_retail_price || '',
+                p.adult_partner_price || '',
+                p.fit_type,
+                p.sizes,
+                p.weight_grams,
+                p.has_addons ? 'Yes' : 'No',
+                p.description || ''
+            ]);
+
+            const csv = Papa.unparse({ fields: headers, data: rows });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentBrand.slug}_products_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+
+            showToast('Products exported');
+        }
+
+        function showBulkDeleteModal() {
+            if (products.length === 0) {
+                showToast('No products to delete', 'error');
+                return;
+            }
+            
+            document.getElementById('bulk-delete-count').textContent = products.length;
+            document.getElementById('bulk-delete-brand').textContent = currentBrand.name;
+            document.getElementById('bulk-delete-confirm').value = '';
+            document.getElementById('bulk-delete-modal').classList.remove('hide');
+        }
+
+        function hideBulkDeleteModal() {
+            document.getElementById('bulk-delete-modal').classList.add('hide');
+        }
+
+        async function confirmBulkDelete() {
+            const confirmText = document.getElementById('bulk-delete-confirm').value.trim();
+            
+            if (confirmText !== 'DELETE ALL') {
+                showToast('Please type DELETE ALL to confirm', 'error');
+                return;
+            }
+
+            showToast('Deleting all products...');
+
+            const { error } = await supabase
+                .from('products')
+                .delete()
+                .eq('brand_id', currentBrand.id);
+
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+
+            products = [];
+            hideBulkDeleteModal();
+            renderProductsTable();
+            updateStats();
+            showToast('All products deleted');
+        }
+
+        // =============================================
+        // CLUB MOCK-UPS
+        // =============================================
+        let selectedClubId = null;
+
+        function populateClubSelect() {
+            // For backward compatibility with other sections
+            const select = document.getElementById('club-select');
+            if (select) {
+                select.innerHTML = '<option value="">Select a club...</option>' +
+                    clubs.map(c => `<option value="${c.id}">${c.name} (${c.suffix})</option>`).join('');
+            }
+            renderClubsList();
+        }
+
+        function renderClubsList() {
+            const container = document.getElementById('clubs-list');
+            const emptyEl = document.getElementById('clubs-empty');
+            const loadingEl = document.getElementById('clubs-loading');
+            
+            if (!container) return;
+            
+            loadingEl?.classList.add('hide');
+
+            if (clubs.length === 0) {
+                container.innerHTML = '';
+                emptyEl?.classList.remove('hide');
+                return;
+            }
+
+            emptyEl?.classList.add('hide');
+            
+            container.innerHTML = clubs.map(club => {
+                const imageCount = club.image_count || 0;
+                const hasCollection = club.collection_image_url;
+                
+                return `
+                <div class="club-card ${selectedClubId === club.id ? 'pulse-border border-brand-500' : ''}">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center">
+                            <span class="text-brand-400 font-bold text-sm">${club.suffix.substring(0, 2)}</span>
+                        </div>
+                        <div>
+                            <p class="font-medium text-white">${club.name}</p>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-gray-500 font-mono text-xs">${club.suffix}</span>
+                                ${club.has_images ? '<span class="badge badge-success text-xs">Images</span>' : ''}
+                                ${hasCollection ? '<span class="badge badge-info text-xs">Collection</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="selectClubForUpload('${club.id}')" class="btn-primary text-sm py-2 px-4">
+                            ${selectedClubId === club.id ? 'Selected' : 'Manage'}
+                        </button>
+                        <button onclick="deleteClub('${club.id}')" class="btn-secondary text-red-400 hover:text-red-300 p-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function generateSuffix() {
+            const name = document.getElementById('new-club-name').value.trim();
+            const suffixInput = document.getElementById('generated-suffix');
+            
+            if (!name) {
+                suffixInput.value = '';
+                return;
+            }
+
+            const words = name.toUpperCase().split(/\s+/).filter(w => w.length > 0);
+            let suffix = '';
+
+            const lastWord = words[words.length - 1];
+            if (lastWord === 'FC') {
+                suffix = words.slice(0, -1).map(w => w[0]).join('') + 'FC';
+            } else if (lastWord === 'AFC') {
+                suffix = words.slice(0, -1).map(w => w[0]).join('') + 'AFC';
+            } else if (lastWord === 'UNITED') {
+                suffix = words.slice(0, -1).map(w => w[0]).join('') + 'UTD';
+            } else if (lastWord === 'CITY') {
+                suffix = words.slice(0, -1).map(w => w[0]).join('') + 'C';
+            } else if (lastWord === 'TOWN') {
+                suffix = words.slice(0, -1).map(w => w[0]).join('') + 'T';
+            } else if (words.length > 1) {
+                suffix = words.map(w => w[0]).join('');
+            } else {
+                suffix = name.substring(0, 4).toUpperCase();
+            }
+
+            suffixInput.value = suffix.substring(0, 6);
+        }
+
+        async function createClub() {
+            const name = document.getElementById('new-club-name').value.trim();
+            const suffix = document.getElementById('generated-suffix').value.trim().toUpperCase();
+            const btn = document.getElementById('create-club-btn');
+
+            if (!name) {
+                showToast('Please enter a club name', 'error');
+                return;
+            }
+
+            if (!suffix || suffix.length < 2) {
+                showToast('Suffix must be at least 2 characters', 'error');
+                return;
+            }
+
+            // Check for existing suffix
+            const existing = clubs.find(c => c.suffix.toUpperCase() === suffix);
+            if (existing) {
+                showToast(`Suffix "${suffix}" already used by ${existing.name}`, 'error');
+                return;
+            }
+
+            // Show loading state
+            btn.disabled = true;
+            btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div><span>Creating...</span>';
+
+            const { data, error } = await supabase
+                .from('clubs')
+                .insert({
+                    brand_id: currentBrand.id,
+                    name: name,
+                    suffix: suffix
+                })
+                .select()
+                .single();
+
+            // Reset button
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Create Club';
+
+            if (error) {
+                showToast('Error: ' + error.message, 'error');
+                return;
+            }
+
+            clubs.push(data);
+            document.getElementById('new-club-name').value = '';
+            document.getElementById('generated-suffix').value = '';
+            renderClubsList();
+            updateStats();
+            showToast(`${name} created successfully`);
+            
+            // Auto-select the new club
+            selectClubForUpload(data.id);
+        }
+
+        async function deleteClub(clubId) {
+            const club = clubs.find(c => c.id === clubId);
+            if (!club) return;
+
+            if (!confirm(`Delete "${club.name}"?\n\nThis will also delete all uploaded images.`)) return;
+
+            // Delete images from storage
+            const { data: images } = await supabase
+                .from('club_images')
+                .select('storage_path')
+                .eq('club_id', clubId);
+
+            if (images?.length > 0) {
+                await supabase.storage
+                    .from('club-images')
+                    .remove(images.map(i => i.storage_path));
+            }
+
+            // Delete collection image if exists
+            if (club.collection_image_url) {
+                const urlParts = club.collection_image_url.split('/club-images/');
+                if (urlParts.length > 1) {
+                    await supabase.storage.from('club-images').remove([urlParts[1]]);
+                }
+            }
+
+            const { error } = await supabase
+                .from('clubs')
+                .delete()
+                .eq('id', clubId);
+
+            if (error) {
+                showToast(error.message, 'error');
+                return;
+            }
+
+            clubs = clubs.filter(c => c.id !== clubId);
+            if (selectedClubId === clubId) closeUploadSection();
+            renderClubsList();
+            updateStats();
+            showToast('Club deleted');
+        }
+
+        function selectClubForUpload(clubId) {
+            const club = clubs.find(c => c.id === clubId);
+            if (!club) return;
+
+            selectedClubId = clubId;
+            
+            document.getElementById('selected-club-name').textContent = club.name;
+            document.getElementById('selected-club-suffix').textContent = `(${club.suffix})`;
+            document.getElementById('upload-section').classList.remove('hide');
+            document.getElementById('images-section').classList.remove('hide');
+            
+            renderClubsList(); // Update selected state
+            updateCollectionImageDisplay(club);
+            loadClubImages();
+            
+            setTimeout(() => {
+                document.getElementById('upload-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function closeUploadSection() {
+            selectedClubId = null;
+            document.getElementById('upload-section').classList.add('hide');
+            document.getElementById('images-section').classList.add('hide');
+            renderClubsList();
+        }
+
+        function updateCollectionImageDisplay(club) {
+            const emptyEl = document.getElementById('collection-image-empty');
+            const previewEl = document.getElementById('collection-image-preview');
+            const imgEl = document.getElementById('collection-image-img');
+            const badgeEl = document.getElementById('collection-status-badge');
+            
+            if (club?.collection_image_url) {
+                emptyEl?.classList.add('hide');
+                previewEl?.classList.remove('hide');
+                if (imgEl) imgEl.src = club.collection_image_url;
+                if (badgeEl) {
+                    badgeEl.className = 'badge badge-success';
+                    badgeEl.textContent = '✓ Collection';
+                }
+            } else {
+                emptyEl?.classList.remove('hide');
+                previewEl?.classList.add('hide');
+                if (badgeEl) {
+                    badgeEl.className = 'badge badge-warning';
+                    badgeEl.textContent = 'No collection';
+                }
+            }
+        }
+
+        async function deleteCollectionImage() {
+            if (!selectedClubId) return;
+            
+            const club = clubs.find(c => c.id === selectedClubId);
+            if (!club?.collection_image_url) return;
+
+            // Delete from storage
+            const urlParts = club.collection_image_url.split('/club-images/');
+            if (urlParts.length > 1) {
+                await supabase.storage.from('club-images').remove([urlParts[1]]);
+            }
+
+            // Update database
+            await supabase
+                .from('clubs')
+                .update({ collection_image_url: null })
+                .eq('id', selectedClubId);
+
+            // Update local
+            const idx = clubs.findIndex(c => c.id === selectedClubId);
+            if (idx !== -1) clubs[idx].collection_image_url = null;
+
+            updateCollectionImageDisplay(clubs[idx]);
+            renderClubsList();
+            showToast('Collection image deleted');
+        }
+
+        async function loadClubImages() {
+            if (!selectedClubId) return;
+
+            const grid = document.getElementById('images-grid');
+            const countEl = document.getElementById('images-count');
+            const countBadge = document.getElementById('images-count-badge');
+            const loadingEl = document.getElementById('images-loading');
+            const emptyEl = document.getElementById('images-empty');
+
+            // Show loading
+            loadingEl?.classList.remove('hide');
+            emptyEl?.classList.add('hide');
+            grid.innerHTML = '';
+
+            const { data, error } = await supabase
+                .from('club_images')
+                .select('*, products(item_name, product_code)')
+                .eq('club_id', selectedClubId);
+
+            loadingEl?.classList.add('hide');
+
+            if (error) {
+                grid.innerHTML = '<p class="text-red-400 col-span-full text-center py-8">Error loading images</p>';
+                return;
+            }
+
+            clubImages = data || [];
+            if (countEl) countEl.textContent = clubImages.length;
+            if (countBadge) countBadge.textContent = `${clubImages.length} image${clubImages.length !== 1 ? 's' : ''}`;
+
+            if (clubImages.length === 0) {
+                emptyEl?.classList.remove('hide');
+                return;
+            }
+
+            grid.innerHTML = clubImages.map(img => `
+                <div class="image-item">
+                    <img src="${img.public_url}" alt="${img.file_name}" loading="lazy" 
+                        onerror="this.parentElement.innerHTML='<div class=\\'flex items-center justify-center h-full text-gray-600 text-xs\\'>Error</div>'">
+                    <div class="overlay">
+                        <p class="text-xs text-white text-center px-2 mb-2 line-clamp-2">${img.products?.item_name || 'Unknown'}</p>
+                        <button onclick="deleteClubImage('${img.id}')" class="text-red-400 hover:text-red-300 text-xs">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Drag and drop handlers
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('image-upload').files = files;
+                handleImageUpload({ target: { files } });
+            }
+        }
+
+        // Help tooltip
+        function showNamingHelp(e) {
+            e.stopPropagation();
+            const tooltip = document.getElementById('naming-help-tooltip');
+            tooltip.style.display = 'block';
+            tooltip.classList.remove('hide');
+            
+            // Position near the button
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.top = (rect.bottom + 10) + 'px';
+            tooltip.style.right = '20px';
+        }
+
+        function hideNamingHelp() {
+            const tooltip = document.getElementById('naming-help-tooltip');
+            tooltip.classList.add('hide');
+            tooltip.style.display = 'none';
+        }
+
+        // Close tooltip when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#naming-help-tooltip') && !e.target.closest('.help-trigger')) {
+                hideNamingHelp();
+            }
+        });
+
+        async function handleImageUpload(event) {
+            const files = event.target.files;
+            
+            if (!selectedClubId || !files.length) {
+                showToast('Please select a club first', 'error');
+                return;
+            }
+
+            const club = clubs.find(c => c.id === selectedClubId);
+            if (!club) return;
+
+            // Show progress
+            const progressEl = document.getElementById('upload-progress');
+            const progressBar = document.getElementById('upload-progress-bar');
+            const statusText = document.getElementById('upload-status-text');
+            const countText = document.getElementById('upload-count-text');
+            
+            progressEl.classList.remove('hide');
+            progressBar.style.width = '0%';
+
+            let uploaded = 0;
+            let failed = 0;
+            const total = files.length;
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const progress = Math.round(((i + 1) / total) * 100);
+                
+                statusText.textContent = `Uploading ${file.name}...`;
+                countText.textContent = `${i + 1}/${total}`;
+                progressBar.style.width = `${progress}%`;
+
+                const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').toLowerCase();
+                
+                // Collection image
+                if (nameWithoutExt === 'collection-image') {
+                    try {
+                        const storagePath = `${currentBrand.slug}/${club.suffix}/collection-image${file.name.substring(file.name.lastIndexOf('.'))}`;
+                        
+                        const { error: uploadError } = await supabase.storage
+                            .from('club-images')
+                            .upload(storagePath, file, { upsert: true });
+
+                        if (!uploadError) {
+                            const { data: urlData } = supabase.storage
+                                .from('club-images')
+                                .getPublicUrl(storagePath);
+
+                            await supabase
+                                .from('clubs')
+                                .update({ collection_image_url: urlData.publicUrl })
+                                .eq('id', selectedClubId);
+
+                            const clubIdx = clubs.findIndex(c => c.id === selectedClubId);
+                            if (clubIdx !== -1) clubs[clubIdx].collection_image_url = urlData.publicUrl;
+                            
+                            updateCollectionImageDisplay(clubs[clubIdx]);
+                            uploaded++;
+                        } else {
+                            failed++;
+                        }
+                    } catch (err) {
+                        failed++;
+                    }
+                    continue;
+                }
+
+                // Product image
+                const productCode = nameWithoutExt.replace(/-/g, '/').toUpperCase();
+                const product = products.find(p => p.product_code.toUpperCase() === productCode);
+                
+                if (!product) {
+                    showToast(`No product: ${nameWithoutExt}`, 'error');
+                    failed++;
+                    continue;
+                }
+
+                try {
+                    const storagePath = `${currentBrand.slug}/${club.suffix}/${file.name}`;
+                    
+                    const { error: uploadError } = await supabase.storage
+                        .from('club-images')
+                        .upload(storagePath, file, { upsert: true });
+
+                    if (uploadError) {
+                        failed++;
+                        continue;
+                    }
+
+                    const { data: urlData } = supabase.storage
+                        .from('club-images')
+                        .getPublicUrl(storagePath);
+
+                    await supabase
+                        .from('club_images')
+                        .upsert({
+                            club_id: selectedClubId,
+                            product_id: product.id,
+                            file_name: file.name,
+                            storage_path: storagePath,
+                            public_url: urlData.publicUrl,
+                            uploaded_by: currentUser.id
+                        }, { onConflict: 'club_id,product_id' });
+
+                    uploaded++;
+                } catch (err) {
+                    failed++;
+                }
+            }
+
+            // Update club has_images
+            if (uploaded > 0) {
+                await supabase
+                    .from('clubs')
+                    .update({ has_images: true })
+                    .eq('id', selectedClubId);
+
+                const clubIdx = clubs.findIndex(c => c.id === selectedClubId);
+                if (clubIdx !== -1) clubs[clubIdx].has_images = true;
+                renderClubsList();
+            }
+
+            // Complete
+            statusText.textContent = 'Complete!';
+            progressBar.style.width = '100%';
+            
+            setTimeout(() => {
+                progressEl.classList.add('hide');
+            }, 1500);
+
+            loadClubImages();
+            event.target.value = '';
+
+            if (failed > 0) {
+                showToast(`${uploaded} uploaded, ${failed} failed`, uploaded > 0 ? 'success' : 'error');
+            } else {
+                showToast(`${uploaded} images uploaded`);
+            }
+        }
+
+        async function deleteClubImage(imageId) {
+            const image = clubImages.find(i => i.id === imageId);
+            if (!image) return;
+
+            await supabase.storage
+                .from('club-images')
+                .remove([image.storage_path]);
+
+            await supabase
+                .from('club_images')
+                .delete()
+                .eq('id', imageId);
+
+            // Check remaining images
+            const { count } = await supabase
+                .from('club_images')
+                .select('*', { count: 'exact', head: true })
+                .eq('club_id', selectedClubId);
+
+            if (count === 0) {
+                await supabase
+                    .from('clubs')
+                    .update({ has_images: false })
+                    .eq('id', selectedClubId);
+
+                const clubIdx = clubs.findIndex(c => c.id === selectedClubId);
+                if (clubIdx !== -1) clubs[clubIdx].has_images = false;
+                renderClubsList();
+            }
+
+            loadClubImages();
+            showToast('Image deleted');
+        }
+
+        // =============================================
+        // STORE GENERATOR
+        // =============================================
+        let clubsWithImages = [];
+
+        function populateGeneratorSelects() {
+            // Salespeople
+            const spSelect = document.getElementById('gen-salesperson');
+            spSelect.innerHTML = '<option value="">Select salesperson...</option>' +
+                salespeople.map(s => `<option value="${s.id}">${s.first_name} ${s.last_name}</option>`).join('');
+
+            // Clubs with images - for searchable dropdown
+            clubsWithImages = clubs.filter(c => c.has_images);
+            
+            // Clear any previous selection
+            document.getElementById('gen-club').value = '';
+            document.getElementById('gen-club-search').value = '';
+            document.getElementById('gen-preview').classList.add('hide');
+            
+            // Populate the dropdown
+            renderClubDropdown(clubsWithImages);
+        }
+
+        function renderClubDropdown(filteredClubs) {
+            const dropdown = document.getElementById('gen-club-dropdown');
+            
+            if (filteredClubs.length === 0) {
+                dropdown.innerHTML = '<div class="px-4 py-3 text-gray-500 text-sm">No clubs with images found</div>';
+                return;
+            }
+            
+            dropdown.innerHTML = filteredClubs.map(c => `
+                <div class="px-4 py-3 hover:bg-gray-700 cursor-pointer flex justify-between items-center" onclick="selectClub('${c.id}')">
+                    <div>
+                        <span class="text-white">${c.name}</span>
+                        <span class="text-brand-400 font-mono text-sm ml-2">${c.suffix}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterClubDropdown() {
+            const search = document.getElementById('gen-club-search').value.toLowerCase();
+            const filtered = clubsWithImages.filter(c => 
+                c.name.toLowerCase().includes(search) || 
+                c.suffix.toLowerCase().includes(search)
+            );
+            renderClubDropdown(filtered);
+            showClubDropdown();
+        }
+
+        function showClubDropdown() {
+            document.getElementById('gen-club-dropdown').classList.remove('hide');
+        }
+
+        function hideClubDropdown() {
+            setTimeout(() => {
+                document.getElementById('gen-club-dropdown').classList.add('hide');
+            }, 200);
+        }
+
+        function selectClub(clubId) {
+            const club = clubs.find(c => c.id === clubId);
+            if (!club) return;
+            
+            document.getElementById('gen-club').value = clubId;
+            document.getElementById('gen-club-search').value = `${club.name} (${club.suffix})`;
+            document.getElementById('gen-club-dropdown').classList.add('hide');
+            
+            loadClubProducts();
+        }
+
+        async function loadClubProducts() {
+            const clubId = document.getElementById('gen-club').value;
+            const preview = document.getElementById('gen-preview');
+
+            if (!clubId) {
+                preview.classList.add('hide');
+                return;
+            }
+
+            const club = clubs.find(c => c.id === clubId);
+
+            const { data } = await supabase
+                .from('club_images')
+                .select('product_id')
+                .eq('club_id', clubId);
+
+            document.getElementById('gen-product-count').textContent = data?.length || 0;
+            document.getElementById('gen-selected-club').textContent = club?.name || '-';
+            document.getElementById('gen-collection-name').textContent = club?.name || '-';
+            
+            // Show collection image status
+            const collectionImageInfo = document.getElementById('gen-collection-image-info');
+            if (collectionImageInfo) {
+                if (club?.collection_image_url) {
+                    collectionImageInfo.innerHTML = `<span class="text-green-400">✓ Collection image ready</span>`;
+                } else {
+                    collectionImageInfo.innerHTML = `<span class="text-yellow-400">⚠ No collection image uploaded</span>`;
+                }
+            }
+            
+            preview.classList.remove('hide');
+        }
+
+        async function generateShopifyCSV() {
+            const salespersonId = document.getElementById('gen-salesperson').value;
+            const clubId = document.getElementById('gen-club').value;
+
+            if (!salespersonId || !clubId) {
+                showToast('Please select salesperson and club', 'error');
+                return;
+            }
+
+            const club = clubs.find(c => c.id === clubId);
+            const salesperson = salespeople.find(s => s.id === salespersonId);
+
+            // Get club images with products
+            const { data: images } = await supabase
+                .from('club_images')
+                .select('*, products(*)')
+                .eq('club_id', clubId);
+
+            if (!images?.length) {
+                showToast('No products with images found', 'error');
+                return;
+            }
+
+            // CSV Headers - Shopify required format
+            const headers = [
+                'Title', 'URL handle', 'Description', 'Vendor', 'Product category', 'Type',
+                'Tags', 'Published on online store', 'Status', 'Collection', 'SKU', 'Barcode',
+                'Option1 name', 'Option1 value', 'Option2 name', 'Option2 value',
+                'Option3 name', 'Option3 value', 'Price', 'Compare-at price', 'Cost per item',
+                'Charge tax', 'Tax code', 'Inventory policy', 'Inventory tracker',
+                'Inventory quantity', 'Continue selling when out of stock', 'Weight value (grams)',
+                'Weight unit for display', 'Requires shipping', 'Fulfillment service',
+                'Product image URL', 'Image position', 'Image alt text', 'Variant image URL',
+                'Gift card', 'SEO title', 'SEO description', 'Google Shopping / Google product category',
+                'Google Shopping / Gender', 'Google Shopping / Age group', 'Google Shopping / MPN',
+                'Google Shopping / AdWords Grouping', 'Google Shopping / AdWords labels',
+                'Google Shopping / Condition', 'Google Shopping / Custom product',
+                'Google Shopping / Custom label 0', 'Google Shopping / Custom label 1',
+                'Google Shopping / Custom label 2', 'Google Shopping / Custom label 3',
+                'Google Shopping / Custom label 4'
+            ];
+
+            const rows = [];
+
+            for (const img of images) {
+                const product = img.products;
+                if (!product) continue;
+
+                // Parse sizes
+                const sizes = product.sizes?.split(',').map(s => s.trim()) || [];
+                const youthSizes = sizes.filter(s => s.startsWith('Y'));
+                const adultSizes = sizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+
+                // Build description - just replace placeholders and format for HTML
+                let description = product.description || '';
+                description = description
+                    .replace(/\*ADD CLUB NAME \+ RANGE\*/g, `${club.name} ${product.range_name}`)
+                    .replace(/\*ADD CLUB \+ RANGE\*/g, `${club.name} ${product.range_name}`)
+                    .replace(/\*ADD CLUB NAME\*/g, club.name);
+                // Convert line breaks to paragraphs for HTML
+                description = description.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p.trim()}</p>`).join('');
+
+                // Build tags
+                const tags = [
+                    club.name,
+                    `${salesperson.first_name}-${salesperson.last_name}`.toLowerCase(),
+                    product.range_name,
+                    product.category
+                ];
+                if (product.has_addons) {
+                    tags.push('apx-with-addons');
+                }
+
+                // URL handle
+                const handle = `${club.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${product.range_name.toLowerCase()}-${product.item_name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+
+                // Product title
+                const title = `${club.name} ${product.item_name}`;
+
+                // Generate rows for each variant
+                let variantIndex = 0;
+                
+                if (product.is_single_price) {
+                    // Single price item (accessories) - just one size option
+                    const row = {
+                        'Title': title,
+                        'URL handle': handle,
+                        'Description': description,
+                        'Vendor': currentBrand.name,
+                        'Product category': 'Apparel & Accessories > Clothing',
+                        'Type': product.category,
+                        'Tags': tags.join(','),
+                        'Published on online store': 'TRUE',
+                        'Status': 'active',
+                        'Collection': club.name,
+                        'SKU': `${product.product_code}/${club.suffix}-OS`,
+                        'Barcode': '',
+                        'Option1 name': 'Size',
+                        'Option1 value': 'One Size',
+                        'Option2 name': '',
+                        'Option2 value': '',
+                        'Option3 name': '',
+                        'Option3 value': '',
+                        'Price': product.single_retail_price?.toFixed(2) || '',
+                        'Compare-at price': '',
+                        'Cost per item': '',
+                        'Charge tax': 'FALSE',
+                        'Tax code': '',
+                        'Inventory policy': 'continue',
+                        'Inventory tracker': 'shopify',
+                        'Inventory quantity': '0',
+                        'Continue selling when out of stock': 'TRUE',
+                        'Weight value (grams)': product.weight_grams || '450',
+                        'Weight unit for display': 'g',
+                        'Requires shipping': 'TRUE',
+                        'Fulfillment service': 'manual',
+                        'Product image URL': img.public_url,
+                        'Image position': '1',
+                        'Image alt text': title,
+                        'Variant image URL': '',
+                        'Gift card': 'FALSE',
+                        'SEO title': `${title} | Official ${club.name} Merchandise`,
+                        'SEO description': `Shop the official ${title}. Premium quality teamwear.`,
+                        'Google Shopping / Google product category': 'Apparel & Accessories > Clothing',
+                        'Google Shopping / Gender': 'Unisex',
+                        'Google Shopping / Age group': 'Adult',
+                        'Google Shopping / MPN': `${product.product_code}/${club.suffix}-OS`,
+                        'Google Shopping / AdWords Grouping': 'Teamwear',
+                        'Google Shopping / AdWords labels': '',
+                        'Google Shopping / Condition': 'new',
+                        'Google Shopping / Custom product': 'FALSE',
+                        'Google Shopping / Custom label 0': club.name,
+                        'Google Shopping / Custom label 1': product.range_name,
+                        'Google Shopping / Custom label 2': product.category,
+                        'Google Shopping / Custom label 3': '',
+                        'Google Shopping / Custom label 4': ''
+                    };
+                    rows.push(row);
+                } else {
+                    // Products with Youth and Adult sizes - use Fit as Option1, Size as Option2
+                    // Keep original size labels (YXXS, YXS, etc.) for clarity
+                    
+                    // Generate Youth variants first
+                    youthSizes.forEach((size, idx) => {
+                        const sku = `${product.product_code}/${club.suffix}-${size}`;
+                        const isFirst = variantIndex === 0;
+                        
+                        const row = {
+                            'Title': isFirst ? title : '',
+                            'URL handle': handle,
+                            'Description': isFirst ? description : '',
+                            'Vendor': isFirst ? currentBrand.name : '',
+                            'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
+                            'Type': isFirst ? product.category : '',
+                            'Tags': isFirst ? tags.join(',') : '',
+                            'Published on online store': isFirst ? 'TRUE' : '',
+                            'Status': 'active',
+                            'Collection': isFirst ? club.name : '',
+                            'SKU': sku,
+                            'Barcode': '',
+                            'Option1 name': 'Fit',
+                            'Option1 value': 'Youth',
+                            'Option2 name': 'Size',
+                            'Option2 value': size,
+                            'Option3 name': '',
+                            'Option3 value': '',
+                            'Price': product.youth_retail_price?.toFixed(2) || '',
+                            'Compare-at price': '',
+                            'Cost per item': '',
+                            'Charge tax': 'FALSE',
+                            'Tax code': '',
+                            'Inventory policy': 'continue',
+                            'Inventory tracker': 'shopify',
+                            'Inventory quantity': '0',
+                            'Continue selling when out of stock': 'TRUE',
+                            'Weight value (grams)': product.weight_grams || '450',
+                            'Weight unit for display': 'g',
+                            'Requires shipping': 'TRUE',
+                            'Fulfillment service': 'manual',
+                            'Product image URL': isFirst ? img.public_url : '',
+                            'Image position': isFirst ? '1' : '',
+                            'Image alt text': isFirst ? title : '',
+                            'Variant image URL': '',
+                            'Gift card': 'FALSE',
+                            'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
+                            'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : '',
+                            'Google Shopping / Google product category': 'Apparel & Accessories > Clothing',
+                            'Google Shopping / Gender': 'Unisex',
+                            'Google Shopping / Age group': 'Kids',
+                            'Google Shopping / MPN': sku,
+                            'Google Shopping / AdWords Grouping': 'Teamwear',
+                            'Google Shopping / AdWords labels': '',
+                            'Google Shopping / Condition': 'new',
+                            'Google Shopping / Custom product': 'FALSE',
+                            'Google Shopping / Custom label 0': club.name,
+                            'Google Shopping / Custom label 1': product.range_name,
+                            'Google Shopping / Custom label 2': product.category,
+                            'Google Shopping / Custom label 3': '',
+                            'Google Shopping / Custom label 4': ''
+                        };
+                        rows.push(row);
+                        variantIndex++;
+                    });
+                    
+                    // Generate Adult variants
+                    adultSizes.forEach((size, idx) => {
+                        const sku = `${product.product_code}/${club.suffix}-${size}`;
+                        const isFirst = variantIndex === 0;
+                        
+                        const row = {
+                            'Title': isFirst ? title : '',
+                            'URL handle': handle,
+                            'Description': isFirst ? description : '',
+                            'Vendor': isFirst ? currentBrand.name : '',
+                            'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
+                            'Type': isFirst ? product.category : '',
+                            'Tags': isFirst ? tags.join(',') : '',
+                            'Published on online store': isFirst ? 'TRUE' : '',
+                            'Status': 'active',
+                            'Collection': isFirst ? club.name : '',
+                            'SKU': sku,
+                            'Barcode': '',
+                            'Option1 name': 'Fit',
+                            'Option1 value': 'Adult',
+                            'Option2 name': 'Size',
+                            'Option2 value': size,
+                            'Option3 name': '',
+                            'Option3 value': '',
+                            'Price': product.adult_retail_price?.toFixed(2) || '',
+                            'Compare-at price': '',
+                            'Cost per item': '',
+                            'Charge tax': 'TRUE',
+                            'Tax code': '',
+                            'Inventory policy': 'continue',
+                            'Inventory tracker': 'shopify',
+                            'Inventory quantity': '0',
+                            'Continue selling when out of stock': 'TRUE',
+                            'Weight value (grams)': product.weight_grams || '450',
+                            'Weight unit for display': 'g',
+                            'Requires shipping': 'TRUE',
+                            'Fulfillment service': 'manual',
+                            'Product image URL': isFirst ? img.public_url : '',
+                            'Image position': isFirst ? '1' : '',
+                            'Image alt text': isFirst ? title : '',
+                            'Variant image URL': '',
+                            'Gift card': 'FALSE',
+                            'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
+                            'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : '',
+                            'Google Shopping / Google product category': 'Apparel & Accessories > Clothing',
+                            'Google Shopping / Gender': 'Unisex',
+                            'Google Shopping / Age group': 'Adult',
+                            'Google Shopping / MPN': sku,
+                            'Google Shopping / AdWords Grouping': 'Teamwear',
+                            'Google Shopping / AdWords labels': '',
+                            'Google Shopping / Condition': 'new',
+                            'Google Shopping / Custom product': 'FALSE',
+                            'Google Shopping / Custom label 0': club.name,
+                            'Google Shopping / Custom label 1': product.range_name,
+                            'Google Shopping / Custom label 2': product.category,
+                            'Google Shopping / Custom label 3': '',
+                            'Google Shopping / Custom label 4': ''
+                        };
+                        rows.push(row);
+                        variantIndex++;
+                    });
+                }
+            }
+
+            // Generate CSV
+            const csv = Papa.unparse({
+                fields: headers,
+                data: rows.map(row => headers.map(h => row[h] || ''))
+            });
+
+            // Download
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${club.suffix}_shopify_products.csv`;
+            a.click();
+
+            // Save to generated stores
+            await supabase.from('generated_stores').insert({
+                brand_id: currentBrand.id,
+                club_id: clubId,
+                salesperson_id: salespersonId,
+                products_count: images.length,
+                generated_by: currentUser.id
+            });
+
+            showToast(`CSV generated with ${images.length} products`);
+        }
+
+        // =============================================
+        // FACTORY ORDERS
+        // =============================================
+        function populateOrderSelects() {
+            const clubSelect = document.getElementById('order-club');
+            clubSelect.innerHTML = '<option value="">Select club...</option>' +
+                '<option value="new">+ Create New Club</option>' +
+                clubs.map(c => `<option value="${c.id}">${c.name} (${c.suffix})</option>`).join('');
+
+            document.getElementById('order-po').value = `APX/PO-${String(poSequence).padStart(3, '0')}`;
+        }
+
+        function updateOrderClub() {
+            const clubId = document.getElementById('order-club').value;
+            
+            if (clubId === 'new') {
+                const name = prompt('Enter new club name:');
+                if (name) {
+                    createOrderClub(name);
+                }
+                return;
+            }
+
+            const club = clubs.find(c => c.id === clubId);
+            document.getElementById('order-suffix').value = club?.suffix || '';
+        }
+
+        async function createOrderClub(name) {
+            const words = name.toUpperCase().split(/\s+/);
+            let suffix = '';
+
+            if (words[words.length - 1] === 'FC') {
+                suffix = words.slice(0, -1).map(w => w[0]).join('') + 'FC';
+            } else if (words[words.length - 1] === 'AFC') {
+                suffix = words.slice(0, -1).map(w => w[0]).join('') + 'AFC';
+            } else if (words.length > 1) {
+                suffix = words.map(w => w[0]).join('');
+            } else {
+                suffix = name.substring(0, 4).toUpperCase();
+            }
+
+            const { data, error } = await supabase
+                .from('clubs')
+                .insert({
+                    brand_id: currentBrand.id,
+                    name: name,
+                    suffix: suffix
+                })
+                .select()
+                .single();
+
+            if (!error) {
+                clubs.push(data);
+                populateOrderSelects();
+                document.getElementById('order-club').value = data.id;
+                document.getElementById('order-suffix').value = suffix;
+                showToast(`Club "${name}" created`);
+            }
+        }
+
+        function initOrderForm() {
+            orderLines = [];
+            document.getElementById('order-lines').innerHTML = '';
+            addOrderLine();
+        }
+
+        function addOrderLine() {
+            const lineId = Date.now();
+            orderLines.push({
+                id: lineId,
+                productId: '',
+                range: '',
+                fit: 'Youth',
+                size: '',
+                quantity: 1,
+                customType: 'none',
+                customValue: ''
+            });
+
+            const container = document.getElementById('order-lines');
+            const lineHtml = `
+                <div id="line-${lineId}" class="glass rounded-xl p-4">
+                    <div class="grid grid-cols-6 gap-3 mb-3">
+                        <select onchange="updateLineRange(${lineId}, this.value)" class="px-3 py-2 rounded-lg text-sm">
+                            <option value="">Range...</option>
+                            ${getUniqueRanges().map(r => `<option value="${r}">${r}</option>`).join('')}
+                        </select>
+                        <select id="line-product-${lineId}" onchange="updateLineProduct(${lineId}, this.value)" class="px-3 py-2 rounded-lg text-sm col-span-2">
+                            <option value="">Select product...</option>
+                        </select>
+                        <select onchange="updateLineFit(${lineId}, this.value)" class="px-3 py-2 rounded-lg text-sm">
+                            <option value="Youth">Youth</option>
+                            <option value="Adult">Adult</option>
+                        </select>
+                        <select id="line-size-${lineId}" onchange="updateLineSize(${lineId}, this.value)" class="px-3 py-2 rounded-lg text-sm">
+                            <option value="">Size...</option>
+                        </select>
+                        <input type="number" min="1" value="1" onchange="updateLineQty(${lineId}, this.value)" class="px-3 py-2 rounded-lg text-sm text-center">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select onchange="updateLineCustom(${lineId}, this.value)" class="px-3 py-2 rounded-lg text-sm">
+                            <option value="none">No Customisation</option>
+                            <option value="initials">Initials</option>
+                            <option value="number">Number</option>
+                            <option value="name">Name + Number</option>
+                        </select>
+                        <input type="text" id="line-custom-${lineId}" placeholder="Custom value..." class="flex-1 px-3 py-2 rounded-lg text-sm hide" onchange="updateLineCustomValue(${lineId}, this.value)">
+                        <span id="line-total-${lineId}" class="text-brand-400 font-semibold">£0.00</span>
+                        <button onclick="removeLine(${lineId})" class="text-red-400 hover:text-red-300 px-2">✕</button>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', lineHtml);
+        }
+
+        function getUniqueRanges() {
+            return [...new Set(products.map(p => p.range_name))].sort();
+        }
+
+        function updateLineRange(lineId, range) {
+            const line = orderLines.find(l => l.id === lineId);
+            line.range = range;
+            
+            const productSelect = document.getElementById(`line-product-${lineId}`);
+            const rangeProducts = products.filter(p => p.range_name === range);
+            productSelect.innerHTML = '<option value="">Select product...</option>' +
+                rangeProducts.map(p => `<option value="${p.id}">${p.item_name} - ${p.product_code}</option>`).join('');
+        }
+
+        function updateLineProduct(lineId, productId) {
+            const line = orderLines.find(l => l.id === lineId);
+            line.productId = productId;
+            updateLineSizes(lineId);
+            recalculateOrder();
+        }
+
+        function updateLineFit(lineId, fit) {
+            const line = orderLines.find(l => l.id === lineId);
+            line.fit = fit;
+            updateLineSizes(lineId);
+            recalculateOrder();
+        }
+
+        function updateLineSizes(lineId) {
+            const line = orderLines.find(l => l.id === lineId);
+            const product = products.find(p => p.id === line.productId);
+            const sizeSelect = document.getElementById(`line-size-${lineId}`);
+            
+            if (!product) {
+                sizeSelect.innerHTML = '<option value="">Size...</option>';
+                return;
+            }
+
+            const allSizes = product.sizes?.split(',').map(s => s.trim()) || [];
+            let sizes;
+            
+            if (line.fit === 'Youth') {
+                sizes = allSizes.filter(s => s.startsWith('Y'));
+            } else {
+                sizes = allSizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+            }
+
+            if (product.is_single_price) {
+                sizes = ['One Size'];
+            }
+
+            sizeSelect.innerHTML = '<option value="">Size...</option>' +
+                sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        function updateLineSize(lineId, size) {
+            const line = orderLines.find(l => l.id === lineId);
+            line.size = size;
+            recalculateOrder();
+        }
+
+        function updateLineQty(lineId, qty) {
+            const line = orderLines.find(l => l.id === lineId);
+            line.quantity = parseInt(qty) || 1;
+            recalculateOrder();
+        }
+
+        function updateLineCustom(lineId, customType) {
+            const line = orderLines.find(l => l.id === lineId);
+            line.customType = customType;
+            
+            const input = document.getElementById(`line-custom-${lineId}`);
+            if (customType !== 'none') {
+                input.classList.remove('hide');
+                input.placeholder = customType === 'initials' ? 'e.g. JKS' : customType === 'number' ? 'e.g. 10' : 'e.g. Smith 7, Jones 10';
+            } else {
+                input.classList.add('hide');
+            }
+        }
+
+        function updateLineCustomValue(lineId, value) {
+            const line = orderLines.find(l => l.id === lineId);
+            line.customValue = value;
+        }
+
+        function removeLine(lineId) {
+            orderLines = orderLines.filter(l => l.id !== lineId);
+            document.getElementById(`line-${lineId}`)?.remove();
+            recalculateOrder();
+        }
+
+        function recalculateOrder() {
+            const pricing = document.getElementById('order-pricing').value;
+            let subtotal = 0;
+            let vatAmount = 0;
+
+            for (const line of orderLines) {
+                const product = products.find(p => p.id === line.productId);
+                if (!product || !line.size) continue;
+
+                let price;
+                if (product.is_single_price) {
+                    price = pricing === 'partner' ? product.single_partner_price : product.single_retail_price;
+                } else if (line.fit === 'Youth') {
+                    price = pricing === 'partner' ? product.youth_partner_price : product.youth_retail_price;
+                } else {
+                    price = pricing === 'partner' ? product.adult_partner_price : product.adult_retail_price;
+                }
+
+                const lineTotal = (price || 0) * line.quantity;
+                subtotal += lineTotal;
+
+                // VAT only on adult
+                if (line.fit === 'Adult' && !product.is_single_price) {
+                    vatAmount += lineTotal * 0.2;
+                }
+
+                // Update line total display
+                const totalEl = document.getElementById(`line-total-${line.id}`);
+                if (totalEl) totalEl.textContent = `£${lineTotal.toFixed(2)}`;
+            }
+
+            document.getElementById('order-subtotal').textContent = `£${subtotal.toFixed(2)}`;
+            document.getElementById('order-vat').textContent = `£${vatAmount.toFixed(2)}`;
+            document.getElementById('order-total').textContent = `£${(subtotal + vatAmount).toFixed(2)}`;
+        }
+
+        async function generateOrderPDF() {
+            const clubId = document.getElementById('order-club').value;
+            const suffix = document.getElementById('order-suffix').value;
+            const poNumber = document.getElementById('order-po').value;
+
+            if (!clubId || clubId === 'new') {
+                showToast('Please select a club', 'error');
+                return;
+            }
+
+            const club = clubs.find(c => c.id === clubId);
+            const validLines = orderLines.filter(l => l.productId && l.size);
+
+            if (!validLines.length) {
+                showToast('Please add at least one product', 'error');
+                return;
+            }
+
+            // Create PDF using jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Header
+            doc.setFontSize(24);
+            doc.setTextColor(20, 184, 166);
+            doc.text('APX TEAMWEAR', 20, 25);
+
+            doc.setFontSize(12);
+            doc.setTextColor(100);
+            doc.text('PURCHASE ORDER', 20, 35);
+
+            doc.setFontSize(10);
+            doc.setTextColor(50);
+            doc.text(`PO Number: ${poNumber}`, 140, 25);
+            doc.text(`Date: ${new Date().toLocaleDateString()}`, 140, 32);
+            doc.text(`Club: ${club.name}`, 140, 39);
+            doc.text(`Suffix: ${suffix}`, 140, 46);
+
+            // Line items table
+            const tableData = validLines.map(line => {
+                const product = products.find(p => p.id === line.productId);
+                return [
+                    product?.product_code || '',
+                    product?.item_name || '',
+                    line.fit,
+                    line.size,
+                    line.quantity,
+                    line.customType !== 'none' ? `${line.customType}: ${line.customValue}` : '-'
+                ];
+            });
+
+            doc.autoTable({
+                startY: 60,
+                head: [['Code', 'Product', 'Fit', 'Size', 'Qty', 'Customisation']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: { fillColor: [20, 184, 166] },
+                styles: { fontSize: 9 }
+            });
+
+            // Product summary
+            const summaryY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(12);
+            doc.setTextColor(20, 184, 166);
+            doc.text('PRODUCT SUMMARY', 20, summaryY);
+
+            const summary = {};
+            for (const line of validLines) {
+                const product = products.find(p => p.id === line.productId);
+                const key = `${product?.product_code}-${line.size}`;
+                if (!summary[key]) {
+                    summary[key] = { code: product?.product_code, name: product?.item_name, size: line.size, qty: 0 };
+                }
+                summary[key].qty += line.quantity;
+            }
+
+            const summaryData = Object.values(summary).map(s => [s.code, s.name, s.size, s.qty]);
+            
+            doc.autoTable({
+                startY: summaryY + 5,
+                head: [['Code', 'Product', 'Size', 'Total Qty']],
+                body: summaryData,
+                theme: 'grid',
+                headStyles: { fillColor: [100, 100, 100] },
+                styles: { fontSize: 9 }
+            });
+
+            // Save PDF
+            doc.save(`${poNumber.replace(/\//g, '-')}.pdf`);
+
+            // Calculate totals
+            const pricing = document.getElementById('order-pricing').value;
+            let subtotal = 0;
+            let vatAmount = 0;
+            
+            for (const line of validLines) {
+                const product = products.find(p => p.id === line.productId);
+                if (!product) continue;
+                
+                let price;
+                if (product.is_single_price) {
+                    price = pricing === 'partner' ? product.single_partner_price : product.single_retail_price;
+                } else if (line.fit === 'Youth') {
+                    price = pricing === 'partner' ? product.youth_partner_price : product.youth_retail_price;
+                } else {
+                    price = pricing === 'partner' ? product.adult_partner_price : product.adult_retail_price;
+                }
+                
+                const lineTotal = (price || 0) * line.quantity;
+                subtotal += lineTotal;
+                
+                if (line.fit === 'Adult' && !product.is_single_price) {
+                    vatAmount += lineTotal * 0.2;
+                }
+            }
+
+            // Save PO to database
+            const { data: poData, error: poError } = await supabase
+                .from('purchase_orders')
+                .insert({
+                    brand_id: currentBrand.id,
+                    po_number: poNumber,
+                    po_sequence: poSequence,
+                    club_id: clubId,
+                    club_name: club.name,
+                    club_suffix: suffix,
+                    pricing_type: pricing,
+                    subtotal: subtotal,
+                    vat_amount: vatAmount,
+                    total: subtotal + vatAmount,
+                    status: 'confirmed',
+                    created_by: currentUser.id
+                })
+                .select()
+                .single();
+
+            if (poError) {
+                showToast('Error saving order: ' + poError.message, 'error');
+                return;
+            }
+
+            // Save PO lines to database
+            const lineInserts = validLines.map((line, index) => {
+                const product = products.find(p => p.id === line.productId);
+                let price;
+                if (product.is_single_price) {
+                    price = pricing === 'partner' ? product.single_partner_price : product.single_retail_price;
+                } else if (line.fit === 'Youth') {
+                    price = pricing === 'partner' ? product.youth_partner_price : product.youth_retail_price;
+                } else {
+                    price = pricing === 'partner' ? product.adult_partner_price : product.adult_retail_price;
+                }
+                
+                return {
+                    purchase_order_id: poData.id,
+                    product_id: line.productId,
+                    product_code: product?.product_code || '',
+                    product_name: product?.item_name || '',
+                    range_name: product?.range_name || '',
+                    fit: line.fit,
+                    size: line.size,
+                    quantity: line.quantity,
+                    custom_type: line.customType,
+                    custom_value: line.customValue || null,
+                    unit_price: price || 0,
+                    line_total: (price || 0) * line.quantity,
+                    line_order: index + 1
+                };
+            });
+
+            await supabase.from('purchase_order_lines').insert(lineInserts);
+
+            poSequence++;
+            showToast('Purchase order created and saved');
+            
+            // Reset form for next order
+            initOrderForm();
+            document.getElementById('order-po').value = `APX/PO-${String(poSequence).padStart(3, '0')}`;
+        }
+
+        // =============================================
+        // INIT
+        // =============================================
+        async function init() {
+            const { data: { session } } = await supabase.auth.getSession();
+            
+            if (session?.user) {
+                await initApp(session.user);
+            }
+
+            // Listen for auth changes
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'SIGNED_IN' && session?.user) {
+                    await initApp(session.user);
+                } else if (event === 'SIGNED_OUT') {
+                    document.getElementById('main-app').classList.add('hide');
+                    document.getElementById('auth-screen').classList.remove('hide');
+                }
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
