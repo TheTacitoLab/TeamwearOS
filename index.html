@@ -248,6 +248,177 @@
             0%, 100% { border-color: rgba(20,184,166,0.3); }
             50% { border-color: rgba(20,184,166,0.6); }
         }
+
+        /* =============================================
+           NEW STYLES: Club Dashboard, Order Forms etc.
+           ============================================= */
+
+        /* Tab navigation */
+        .tab-nav {
+            display: flex;
+            gap: 4px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 24px;
+        }
+        .tab-nav button {
+            padding: 10px 18px;
+            border-radius: 8px 8px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .tab-nav button:hover {
+            color: #ccc;
+            background: rgba(255,255,255,0.04);
+        }
+        .tab-nav button.active {
+            color: #14b8a6;
+            background: rgba(20,184,166,0.1);
+            border-bottom: 2px solid #14b8a6;
+        }
+
+        /* Club list card (enhanced) */
+        .club-list-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 16px 20px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .club-list-card:hover {
+            background: rgba(20,184,166,0.05);
+            border-color: rgba(20,184,166,0.3);
+        }
+
+        /* Partner / Non-partner badge */
+        .badge-partner {
+            background: rgba(20,184,166,0.15);
+            color: #14b8a6;
+        }
+        .badge-nonpartner {
+            background: rgba(100,100,100,0.15);
+            color: #888;
+        }
+        .badge-danger {
+            background: rgba(239,68,68,0.15);
+            color: #f87171;
+        }
+
+        /* Price tier card */
+        .price-tier-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 10px;
+            padding: 14px;
+        }
+
+        /* Club product card */
+        .club-product-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        .club-product-card:hover {
+            border-color: rgba(20,184,166,0.2);
+        }
+
+        /* Shopify sync status */
+        .sync-status-synced {
+            color: #22c55e;
+        }
+        .sync-status-pending {
+            color: #eab308;
+        }
+        .sync-status-none {
+            color: #555;
+        }
+
+        /* Order form card */
+        .order-form-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 18px 20px;
+            transition: all 0.2s ease;
+        }
+        .order-form-card:hover {
+            border-color: rgba(20,184,166,0.2);
+        }
+
+        /* Submission card */
+        .submission-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        /* Public order form styles */
+        #public-form-view {
+            min-height: 100vh;
+            background: #0a0a0a;
+        }
+        .public-form-header {
+            background: rgba(20,20,20,0.9);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 20px 24px;
+        }
+        .player-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 60px 1fr 80px auto;
+            gap: 8px;
+            align-items: center;
+        }
+        @media (max-width: 768px) {
+            .player-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Submission items table */
+        .items-table th {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 8px 10px;
+        }
+        .items-table td {
+            padding: 10px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            font-size: 13px;
+        }
+
+        /* Section header with action */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        /* Info row */
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 14px;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label { color: #666; }
+        .info-value { color: #ddd; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -323,30 +494,42 @@
         <!-- Launchpad -->
         <div id="launchpad" class="p-8 max-w-6xl mx-auto">
             <h2 class="text-2xl font-bold mb-8">Welcome to TeamwearOS</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Product Database -->
                 <div onclick="showTool('products')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
                     <div class="w-12 h-12 bg-brand-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📦</div>
                     <h3 class="font-semibold text-lg mb-2">Product Database</h3>
-                    <p class="text-gray-400 text-sm">Import and manage your master product list</p>
+                    <p class="text-gray-400 text-sm">Import and manage your master product catalogue</p>
                 </div>
-                <!-- Club Mock-Ups -->
-                <div onclick="showTool('mockups')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
-                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🎨</div>
-                    <h3 class="font-semibold text-lg mb-2">Club Mock-Ups</h3>
-                    <p class="text-gray-400 text-sm">Upload product images for clubs</p>
+                <!-- Clubs (enhanced) -->
+                <div onclick="showTool('clubs')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
+                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🏟️</div>
+                    <h3 class="font-semibold text-lg mb-2">Clubs</h3>
+                    <p class="text-gray-400 text-sm">Manage clubs, products, order forms and pricing</p>
+                </div>
+                <!-- Order Forms -->
+                <div onclick="showTool('order-forms')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
+                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📝</div>
+                    <h3 class="font-semibold text-lg mb-2">Order Forms</h3>
+                    <p class="text-gray-400 text-sm">View all direct order form submissions</p>
                 </div>
                 <!-- Store Generator -->
                 <div onclick="showTool('generator')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
                     <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🏪</div>
                     <h3 class="font-semibold text-lg mb-2">Store Generator</h3>
-                    <p class="text-gray-400 text-sm">Generate Shopify CSV files</p>
+                    <p class="text-gray-400 text-sm">Generate Shopify CSV import files</p>
                 </div>
-                <!-- Factory Orders -->
+                <!-- Factory Orders (POs) -->
                 <div onclick="showTool('orders')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
                     <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📋</div>
                     <h3 class="font-semibold text-lg mb-2">Factory Orders</h3>
-                    <p class="text-gray-400 text-sm">Create purchase orders</p>
+                    <p class="text-gray-400 text-sm">Create and manage purchase orders</p>
+                </div>
+                <!-- Club Mock-Ups (legacy - image upload) -->
+                <div onclick="showTool('mockups')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition opacity-70">
+                    <div class="w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🎨</div>
+                    <h3 class="font-semibold text-lg mb-2">Image Uploads</h3>
+                    <p class="text-gray-400 text-sm">Upload mock-up images for Shopify CSV export</p>
                 </div>
             </div>
 
@@ -970,6 +1153,47 @@
                 <button onclick="updateBrandInfo()" class="mt-4 bg-brand-500 hover:bg-brand-600 px-6 py-3 rounded-lg font-semibold">Save Changes</button>
             </div>
 
+            <!-- Shopify API Configuration -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-1">Shopify API Configuration</h3>
+                <p class="text-gray-500 text-sm mb-4">Connect this brand to your Shopify store for direct product sync and draft order creation.</p>
+
+                <div class="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3 mb-4">
+                    <p class="text-yellow-400 text-xs font-medium mb-1">Setup Instructions</p>
+                    <ol class="text-gray-400 text-xs space-y-1 list-decimal list-inside">
+                        <li>Create a Shopify Custom App in your Shopify Admin → Settings → Apps and sales channels</li>
+                        <li>Grant permissions: read/write products, read/write draft orders, read/write collections</li>
+                        <li>Add this app's domain to the Custom App's allowed CORS origins</li>
+                        <li>Copy the Admin API access token and paste it below</li>
+                    </ol>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Shopify Store Domain</label>
+                        <input type="text" id="shopify-domain" placeholder="yourstore.myshopify.com" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Admin API Access Token</label>
+                        <input type="password" id="shopify-token" placeholder="shpat_xxxxxxxxxxxxxxxx" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">API Version</label>
+                        <select id="shopify-api-version" class="w-full px-3 py-2 rounded-lg text-sm">
+                            <option value="2024-01">2024-01</option>
+                            <option value="2024-04">2024-04</option>
+                            <option value="2024-07">2024-07</option>
+                            <option value="2024-10">2024-10</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="saveShopifyConfig()" class="btn-primary text-sm">Save Shopify Config</button>
+                    <button onclick="testShopifyConnection()" class="btn-secondary text-sm">Test Connection</button>
+                </div>
+                <div id="shopify-config-status" class="mt-3 text-sm hide"></div>
+            </div>
+
             <!-- Danger Zone -->
             <div class="glass rounded-2xl p-6 border border-red-500/30">
                 <h3 class="font-semibold mb-4 text-red-400">Danger Zone</h3>
@@ -994,6 +1218,636 @@
                 <div id="users-list" class="space-y-3">
                     <!-- Populated by JS -->
                 </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             TOOL: CLUBS (Enhanced)
+             ============================================================ -->
+        <div id="tool-clubs" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Launchpad
+            </button>
+
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold">Clubs</h2>
+                    <p class="text-gray-500 text-sm mt-1">Create and manage clubs, products, order forms and Shopify sync</p>
+                </div>
+                <button onclick="showCreateClubModal()" class="btn-primary flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    New Club
+                </button>
+            </div>
+
+            <!-- Club search/filter bar -->
+            <div class="glass rounded-xl p-4 mb-6 flex flex-wrap gap-4">
+                <input type="text" id="clubs-search" placeholder="Search clubs..." class="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm" oninput="renderClubsEnhanced()">
+                <select id="clubs-filter-sport" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
+                    <option value="">All Sports</option>
+                    <option value="Football">Football</option>
+                    <option value="Rugby">Rugby</option>
+                    <option value="Cricket">Cricket</option>
+                    <option value="Basketball">Basketball</option>
+                    <option value="Netball">Netball</option>
+                    <option value="Hockey">Hockey</option>
+                    <option value="Athletics">Athletics</option>
+                    <option value="Other">Other</option>
+                </select>
+                <select id="clubs-filter-partner" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
+                    <option value="">All Types</option>
+                    <option value="partner">Partner</option>
+                    <option value="nonpartner">Non-Partner</option>
+                </select>
+            </div>
+
+            <!-- Clubs list -->
+            <div id="clubs-enhanced-list" class="space-y-3">
+                <!-- Populated by JS -->
+            </div>
+            <div id="clubs-enhanced-empty" class="hide text-center py-16">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center text-3xl">🏟️</div>
+                <p class="text-gray-400 font-medium mb-2">No clubs yet</p>
+                <p class="text-gray-600 text-sm">Create your first club to get started</p>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             TOOL: CLUB DETAIL DASHBOARD
+             ============================================================ -->
+        <div id="tool-club-detail" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+            <button onclick="showTool('clubs')" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Clubs
+            </button>
+
+            <!-- Club header -->
+            <div class="flex items-start justify-between mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl bg-brand-500/10 flex items-center justify-center">
+                        <span id="club-detail-initials" class="text-brand-400 font-bold text-xl"></span>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-3">
+                            <h2 id="club-detail-name" class="text-2xl font-bold"></h2>
+                            <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                        </div>
+                        <div class="flex items-center gap-3 mt-1">
+                            <span id="club-detail-sport" class="text-gray-500 text-sm"></span>
+                            <span id="club-detail-suffix" class="text-gray-600 font-mono text-xs"></span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="showEditClubModal()" class="btn-secondary text-sm">Edit Club Info</button>
+            </div>
+
+            <!-- Tab navigation -->
+            <div class="tab-nav">
+                <button id="tab-btn-overview" onclick="showClubTab('overview')" class="active">Overview</button>
+                <button id="tab-btn-products" onclick="showClubTab('products')">Products</button>
+                <button id="tab-btn-orderforms" onclick="showClubTab('orderforms')">Order Forms</button>
+                <button id="tab-btn-shopify" onclick="showClubTab('shopify')">Shopify Sync</button>
+                <button id="tab-btn-images" onclick="showClubTab('images')">Images</button>
+            </div>
+
+            <!-- TAB: Overview -->
+            <div id="club-tab-overview" class="club-tab-content">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Club info card -->
+                    <div class="card">
+                        <h3 class="font-semibold text-brand-400 mb-4">Club Details</h3>
+                        <div id="club-overview-info">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                    <!-- Stats card -->
+                    <div class="card">
+                        <h3 class="font-semibold text-brand-400 mb-4">Overview</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">Club Products</span>
+                                <span id="overview-stat-products" class="font-semibold text-brand-400">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">Active Order Forms</span>
+                                <span id="overview-stat-forms" class="font-semibold text-green-400">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">Total Submissions</span>
+                                <span id="overview-stat-submissions" class="font-semibold text-blue-400">0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400">Shopify Synced Products</span>
+                                <span id="overview-stat-synced" class="font-semibold text-purple-400">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Products -->
+            <div id="club-tab-products" class="club-tab-content hide">
+                <div class="section-header">
+                    <div>
+                        <h3 class="font-semibold text-lg">Club Products</h3>
+                        <p class="text-gray-500 text-sm mt-1">Assign master products and set club-specific pricing</p>
+                    </div>
+                    <button onclick="showAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Product
+                    </button>
+                </div>
+                <div id="club-products-list" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="club-products-empty" class="hide text-center py-12">
+                    <p class="text-gray-500">No products assigned yet. Add products from the master catalogue.</p>
+                </div>
+            </div>
+
+            <!-- TAB: Order Forms -->
+            <div id="club-tab-orderforms" class="club-tab-content hide">
+                <div class="section-header">
+                    <div>
+                        <h3 class="font-semibold text-lg">Order Forms</h3>
+                        <p class="text-gray-500 text-sm mt-1">Direct order forms for this club</p>
+                    </div>
+                    <button onclick="showCreateOrderFormModal()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        New Order Form
+                    </button>
+                </div>
+                <div id="club-order-forms-list" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="club-order-forms-empty" class="hide text-center py-12">
+                    <p class="text-gray-500">No order forms yet. Create one to get a shareable link for the club.</p>
+                </div>
+            </div>
+
+            <!-- TAB: Shopify Sync -->
+            <div id="club-tab-shopify" class="club-tab-content hide">
+                <div class="card mb-6">
+                    <h3 class="font-semibold text-brand-400 mb-4">Shopify Collection</h3>
+                    <div id="club-shopify-collection-status" class="mb-4">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="syncClubCollection()" class="btn-primary text-sm">
+                            Sync Collection to Shopify
+                        </button>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3 class="font-semibold text-brand-400 mb-4">Product Sync Status</h3>
+                    <p class="text-gray-500 text-sm mb-4">Sync individual club products to Shopify as products with variants.</p>
+                    <div id="club-shopify-products-status" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-800">
+                        <button onclick="syncAllClubProducts()" class="btn-primary text-sm">
+                            Sync All Products to Shopify
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-4 card border border-yellow-500/20">
+                    <h4 class="font-medium text-yellow-400 mb-2">Setup Required</h4>
+                    <p class="text-gray-400 text-sm">Shopify API credentials must be configured in Brand Settings before syncing. You'll also need a Shopify Custom App with CORS enabled for this application's domain.</p>
+                </div>
+            </div>
+
+            <!-- TAB: Images (embedded mockups) -->
+            <div id="club-tab-images" class="club-tab-content hide">
+                <p class="text-gray-500 text-sm mb-4">Upload product images for Shopify CSV export. Images are matched to master products by filename.</p>
+                <div class="card mb-4">
+                    <div class="section-header mb-4">
+                        <h3 class="font-semibold">Upload Images</h3>
+                        <button onclick="showNamingHelp(event)" class="help-trigger text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Naming Help
+                        </button>
+                    </div>
+                    <div id="club-detail-dropzone" class="dropzone p-8 text-center cursor-pointer"
+                        onclick="document.getElementById('club-image-upload').click()"
+                        ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleClubDetailDrop(event)">
+                        <input type="file" id="club-image-upload" accept="image/*" multiple class="hide" onchange="handleClubDetailImageUpload(event)">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-brand-500/10 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <p class="text-white text-sm font-medium mb-1">Drop images or click to browse</p>
+                        <p class="text-gray-600 text-xs">Name files as product code (e.g. APX-ATL-001.png)</p>
+                    </div>
+                    <div id="club-detail-upload-progress" class="mt-3 hide">
+                        <div class="flex justify-between mb-1 text-xs text-gray-400">
+                            <span id="club-detail-upload-text">Uploading...</span>
+                            <span id="club-detail-upload-count"></span>
+                        </div>
+                        <div class="progress-bar"><div id="club-detail-upload-bar" class="progress-fill" style="width:0%"></div></div>
+                    </div>
+                </div>
+                <!-- Images grid -->
+                <div id="club-detail-images-section" class="card">
+                    <div class="section-header mb-4">
+                        <h3 class="font-semibold">Uploaded Images (<span id="club-detail-image-count">0</span>)</h3>
+                        <span id="club-detail-collection-badge" class="badge"></span>
+                    </div>
+                    <div id="club-detail-images-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div id="club-detail-images-empty" class="hide text-center py-8 text-gray-600 text-sm">No images uploaded yet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             TOOL: ORDER FORMS (Global view - all submissions)
+             ============================================================ -->
+        <div id="tool-order-forms" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Launchpad
+            </button>
+
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold">Order Forms</h2>
+                    <p class="text-gray-500 text-sm mt-1">All direct order submissions across all clubs</p>
+                </div>
+            </div>
+
+            <!-- Filter bar -->
+            <div class="glass rounded-xl p-4 mb-6 flex flex-wrap gap-4 items-center">
+                <select id="global-forms-club-filter" class="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm" onchange="loadAllSubmissions()">
+                    <option value="">All Clubs</option>
+                </select>
+                <select id="global-forms-status-filter" class="px-3 py-2 rounded-lg text-sm" onchange="loadAllSubmissions()">
+                    <option value="">All Statuses</option>
+                    <option value="new">New (no draft order)</option>
+                    <option value="drafted">Draft Order Created</option>
+                </select>
+                <span class="text-gray-500 text-sm">Total: <span id="global-submissions-count" class="text-white font-semibold">0</span></span>
+            </div>
+
+            <div id="global-submissions-list" class="space-y-3">
+                <!-- Populated by JS -->
+            </div>
+            <div id="global-submissions-empty" class="hide text-center py-16">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center text-3xl">📝</div>
+                <p class="text-gray-400 font-medium">No submissions yet</p>
+                <p class="text-gray-600 text-sm mt-1">Submissions will appear here when clubs submit their order forms</p>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Create Club (Enhanced)
+             ============================================================ -->
+        <div id="create-club-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
+            <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4 my-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="club-modal-title" class="text-xl font-bold">Create New Club</h3>
+                    <button onclick="hideCreateClubModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <input type="hidden" id="edit-club-id">
+
+                <!-- Basic info -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Club Name *</label>
+                        <input type="text" id="club-name" placeholder="Liphook Cricket Club" class="w-full px-3 py-2 rounded-lg" oninput="generateClubSlugAndSuffix()">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Suffix *</label>
+                        <input type="text" id="club-suffix" placeholder="LCC" class="w-full px-3 py-2 rounded-lg uppercase font-mono" maxlength="6">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Sport</label>
+                        <select id="club-sport" class="w-full px-3 py-2 rounded-lg">
+                            <option value="">Select sport...</option>
+                            <option value="Football">Football</option>
+                            <option value="Rugby">Rugby</option>
+                            <option value="Cricket">Cricket</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Netball">Netball</option>
+                            <option value="Hockey">Hockey</option>
+                            <option value="Athletics">Athletics</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">URL Slug</label>
+                        <input type="text" id="club-slug" placeholder="liphook-cc" class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                </div>
+
+                <!-- Partner status -->
+                <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" id="club-is-partner" class="w-4 h-4 rounded">
+                        <div>
+                            <p class="font-medium">Partner Club</p>
+                            <p class="text-gray-500 text-xs">Partner clubs receive preferential direct pricing on orders</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Contact details -->
+                <div class="bg-gray-800/50 rounded-xl p-4 mb-6">
+                    <h4 class="font-semibold text-sm mb-3 text-brand-400">Main Contact</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Contact Name</label>
+                            <input type="text" id="club-contact-name" placeholder="John Smith" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Email</label>
+                            <input type="email" id="club-contact-email" placeholder="john@club.com" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Phone</label>
+                            <input type="tel" id="club-contact-phone" placeholder="+44 7700 000000" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="hideCreateClubModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="saveClubEnhanced()" class="flex-1 btn-primary py-3">Save Club</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Add/Edit Club Product
+             ============================================================ -->
+        <div id="club-product-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
+            <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4 my-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="club-product-modal-title" class="text-xl font-bold">Add Club Product</h3>
+                    <button onclick="hideClubProductModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <input type="hidden" id="edit-club-product-id">
+
+                <!-- Select master product -->
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Master Product *</label>
+                    <select id="cp-master-product" class="w-full px-3 py-2 rounded-lg" onchange="onMasterProductChange()">
+                        <option value="">Select from master catalogue...</option>
+                    </select>
+                </div>
+
+                <!-- Custom name -->
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Club Product Name *</label>
+                    <input type="text" id="cp-custom-name" placeholder="e.g. U11s Match Jersey – TLC Driving Sponsor" class="w-full px-3 py-2 rounded-lg">
+                    <p class="text-gray-600 text-xs mt-1">Give it a specific name for this club (e.g. include sponsor or team name)</p>
+                </div>
+
+                <!-- Pricing -->
+                <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
+                    <h4 class="font-semibold text-sm mb-3 text-brand-400">Price Tiers</h4>
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="price-tier-card">
+                            <p class="text-xs text-gray-500 mb-1 font-medium">Web Price</p>
+                            <p class="text-xs text-gray-600 mb-2">Public Shopify price</p>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">£</span>
+                                <input type="number" step="0.01" id="cp-web-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm">
+                            </div>
+                        </div>
+                        <div class="price-tier-card">
+                            <p class="text-xs text-green-400 mb-1 font-medium">Partner Price</p>
+                            <p class="text-xs text-gray-600 mb-2">Direct partner orders</p>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">£</span>
+                                <input type="number" step="0.01" id="cp-partner-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm">
+                            </div>
+                        </div>
+                        <div class="price-tier-card">
+                            <p class="text-xs text-gray-400 mb-1 font-medium">Non-Partner Price</p>
+                            <p class="text-xs text-gray-600 mb-2">Direct non-partner orders</p>
+                            <div class="flex items-center gap-1">
+                                <span class="text-gray-400">£</span>
+                                <input type="number" step="0.01" id="cp-non-partner-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-xs mt-3">Note: Web price is stored in Shopify. Internal prices are stored here and used when creating draft orders.</p>
+                </div>
+
+                <!-- Sizes from master product -->
+                <div id="cp-sizes-info" class="bg-gray-900/50 rounded-lg p-3 mb-4 hide">
+                    <p class="text-xs text-gray-500 mb-1">Available sizes (from master product):</p>
+                    <p id="cp-sizes-display" class="text-sm text-brand-400 font-mono"></p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="hideClubProductModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="saveClubProduct()" class="flex-1 btn-primary py-3">Save Product</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Create Order Form
+             ============================================================ -->
+        <div id="order-form-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-lg mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">Create Order Form</h3>
+                    <button onclick="hideOrderFormModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Form Title *</label>
+                    <input type="text" id="of-title" placeholder="e.g. 2024/25 Season Kit Order" class="w-full px-3 py-2 rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Season</label>
+                    <input type="text" id="of-season" placeholder="e.g. 2024/25" class="w-full px-3 py-2 rounded-lg">
+                </div>
+                <div class="mb-6">
+                    <label class="text-gray-400 text-sm mb-1 block">Description / Instructions</label>
+                    <textarea id="of-description" rows="3" placeholder="Any notes or instructions for the club contact..." class="w-full px-3 py-2 rounded-lg"></textarea>
+                </div>
+                <div class="bg-brand-500/10 rounded-lg p-3 mb-6">
+                    <p class="text-brand-400 text-xs">A unique shareable link will be generated. The club contact opens this link to fill in their order — no login required.</p>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="hideOrderFormModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="createOrderForm()" class="flex-1 btn-primary py-3">Create Form</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: View Submission (with draft order creation)
+             ============================================================ -->
+        <div id="submission-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8">
+            <div class="glass rounded-2xl p-6 w-full max-w-3xl mx-4 my-auto hide" id="submission-modal-inner">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">Order Submission</h3>
+                    <button onclick="hideSubmissionModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <!-- Contact info -->
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="card">
+                        <h4 class="font-semibold text-brand-400 mb-3 text-sm">Contact Details</h4>
+                        <div id="sub-contact-info" class="space-y-2"></div>
+                    </div>
+                    <div class="card">
+                        <h4 class="font-semibold text-brand-400 mb-3 text-sm">Order Info</h4>
+                        <div id="sub-order-info" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Line items -->
+                <div class="card mb-6">
+                    <h4 class="font-semibold text-brand-400 mb-3 text-sm">Items (<span id="sub-items-count">0</span>)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full items-table">
+                            <thead>
+                                <tr class="text-left">
+                                    <th>Product</th>
+                                    <th>Size</th>
+                                    <th>Qty</th>
+                                    <th>Player Name</th>
+                                    <th>No.</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sub-items-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Draft order section -->
+                <div class="card border border-brand-500/20">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-semibold mb-1">Shopify Draft Order</h4>
+                            <p id="sub-draft-status" class="text-gray-500 text-sm"></p>
+                        </div>
+                        <button id="sub-create-draft-btn" onclick="createDraftOrderFromSubmission()" class="btn-primary text-sm">
+                            Create Draft Order
+                        </button>
+                    </div>
+                    <div id="sub-draft-link" class="mt-3 hide">
+                        <a id="sub-draft-url" href="#" target="_blank" class="text-brand-400 text-sm hover:underline">Open Draft Order in Shopify →</a>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex justify-end">
+                    <button onclick="hideSubmissionModal()" class="btn-secondary">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PUBLIC ORDER FORM VIEW (shown when ?form=TOKEN in URL)
+         ============================================================ -->
+    <div id="public-form-view" class="hide">
+        <div class="public-form-header">
+            <div class="max-w-3xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span id="pf-brand-logo" class="text-brand-400 font-bold text-xl">TeamwearOS</span>
+                    <span class="text-gray-600">|</span>
+                    <span id="pf-club-name" class="text-white font-semibold"></span>
+                </div>
+                <span class="text-gray-500 text-sm">Order Form</span>
+            </div>
+        </div>
+
+        <div class="max-w-3xl mx-auto p-6">
+            <!-- Loading state -->
+            <div id="pf-loading" class="text-center py-16">
+                <div class="spinner mx-auto mb-4"></div>
+                <p class="text-gray-500">Loading order form...</p>
+            </div>
+
+            <!-- Error state -->
+            <div id="pf-error" class="hide text-center py-16">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/10 flex items-center justify-center text-3xl">❌</div>
+                <h2 class="text-xl font-bold mb-2">Form Not Found</h2>
+                <p class="text-gray-500">This order form is no longer active or the link is invalid.</p>
+            </div>
+
+            <!-- Success state (after submit) -->
+            <div id="pf-success" class="hide text-center py-16">
+                <div class="w-20 h-20 mx-auto mb-6 rounded-full bg-green-500/10 flex items-center justify-center text-4xl">✅</div>
+                <h2 class="text-2xl font-bold mb-3">Order Submitted!</h2>
+                <p class="text-gray-400 max-w-sm mx-auto">Thank you. Your order has been received and our team will be in touch shortly.</p>
+            </div>
+
+            <!-- Form content -->
+            <div id="pf-content" class="hide">
+                <!-- Form header -->
+                <div class="card mb-6">
+                    <h1 id="pf-form-title" class="text-2xl font-bold mb-1"></h1>
+                    <p id="pf-form-season" class="text-brand-400 text-sm mb-3"></p>
+                    <p id="pf-form-description" class="text-gray-400 text-sm"></p>
+                </div>
+
+                <!-- Contact details -->
+                <div class="card mb-6">
+                    <h3 class="font-semibold mb-4">Contact Details</h3>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Your Name *</label>
+                            <input type="text" id="pf-contact-name" placeholder="Full name" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Email *</label>
+                            <input type="email" id="pf-contact-email" placeholder="your@email.com" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Phone</label>
+                            <input type="tel" id="pf-contact-phone" placeholder="+44 7700 000000" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Team Name / Age Group</label>
+                            <input type="text" id="pf-team-name" placeholder="e.g. U11s Boys" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="text-gray-400 text-sm mb-1 block">Notes / Special Requests</label>
+                        <textarea id="pf-notes" rows="2" placeholder="Any special requests or additional information..." class="w-full px-3 py-2 rounded-lg"></textarea>
+                    </div>
+                </div>
+
+                <!-- Order items -->
+                <div class="card mb-6">
+                    <div class="section-header mb-4">
+                        <h3 class="font-semibold">Items</h3>
+                        <button onclick="addPublicFormRow()" class="btn-primary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Row
+                        </button>
+                    </div>
+
+                    <!-- Column headers -->
+                    <div class="player-row mb-2 px-2">
+                        <span class="text-gray-500 text-xs font-medium">Product *</span>
+                        <span class="text-gray-500 text-xs font-medium">Size *</span>
+                        <span class="text-gray-500 text-xs font-medium">Qty *</span>
+                        <span class="text-gray-500 text-xs font-medium">Player Name</span>
+                        <span class="text-gray-500 text-xs font-medium">No.</span>
+                        <span></span>
+                    </div>
+
+                    <div id="pf-items-container" class="space-y-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <button onclick="submitPublicOrderForm()" class="w-full btn-primary py-4 text-lg">
+                    Submit Order
+                </button>
+                <p class="text-gray-600 text-xs text-center mt-3">By submitting this form you agree to our standard terms and conditions.</p>
             </div>
         </div>
     </div>
@@ -1304,18 +2158,25 @@
                 showToast('Access denied. Super admin only.', 'error');
                 return;
             }
-            
+
             document.getElementById('launchpad').classList.add('hide');
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
-            document.getElementById(`tool-${tool}`).classList.remove('hide');
+            const toolEl = document.getElementById(`tool-${tool}`);
+            if (toolEl) toolEl.classList.remove('hide');
 
             // Initialize tool
             switch(tool) {
                 case 'products':
                     renderProductsTable();
                     break;
+                case 'clubs':
+                    renderClubsEnhanced();
+                    break;
                 case 'mockups':
                     populateClubSelect();
+                    break;
+                case 'order-forms':
+                    loadAllSubmissions();
                     break;
                 case 'generator':
                     populateGeneratorSelects();
@@ -1338,12 +2199,13 @@
         // =============================================
         function loadBrandSettings() {
             if (!currentBrand) return;
-            
+
             document.getElementById('settings-brand-name').textContent = currentBrand.name;
             document.getElementById('edit-brand-name').value = currentBrand.name;
             document.getElementById('edit-brand-slug').value = currentBrand.slug;
-            
+
             renderSalespeopleList();
+            loadShopifyConfigUI();
         }
 
         function renderSalespeopleList() {
@@ -3405,8 +4267,18 @@
         // INIT
         // =============================================
         async function init() {
+            // Check for public order form URL (?form=TOKEN)
+            const urlParams = new URLSearchParams(window.location.search);
+            const formToken = urlParams.get('form');
+            if (formToken) {
+                document.getElementById('auth-screen').classList.add('hide');
+                document.getElementById('public-form-view').classList.remove('hide');
+                await loadPublicForm(formToken);
+                return;
+            }
+
             const { data: { session } } = await supabase.auth.getSession();
-            
+
             if (session?.user) {
                 await initApp(session.user);
             }
@@ -3420,6 +4292,1173 @@
                     document.getElementById('auth-screen').classList.remove('hide');
                 }
             });
+        }
+
+        // =============================================
+        // ENHANCED CLUBS STATE
+        // =============================================
+        let currentClub = null;
+        let currentClubProducts = [];
+        let currentOrderForms = [];
+        let currentClubTab = 'overview';
+
+        // =============================================
+        // CLUBS: LIST VIEW
+        // =============================================
+        function renderClubsEnhanced() {
+            const search = (document.getElementById('clubs-search')?.value || '').toLowerCase();
+            const sportFilter = document.getElementById('clubs-filter-sport')?.value || '';
+            const partnerFilter = document.getElementById('clubs-filter-partner')?.value || '';
+
+            let filtered = clubs.filter(c => {
+                if (search && !c.name.toLowerCase().includes(search) && !(c.suffix || '').toLowerCase().includes(search)) return false;
+                if (sportFilter && c.sport !== sportFilter) return false;
+                if (partnerFilter === 'partner' && !c.is_partner) return false;
+                if (partnerFilter === 'nonpartner' && c.is_partner) return false;
+                return true;
+            });
+
+            const container = document.getElementById('clubs-enhanced-list');
+            const emptyEl = document.getElementById('clubs-enhanced-empty');
+            if (!container) return;
+
+            if (!filtered.length) {
+                container.innerHTML = '';
+                emptyEl.classList.remove('hide');
+                return;
+            }
+            emptyEl.classList.add('hide');
+
+            container.innerHTML = filtered.map(club => `
+                <div class="club-list-card" onclick="openClubDashboard('${club.id}')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+                                <span class="text-brand-400 font-bold text-sm">${((club.suffix || club.name.substring(0,2))).substring(0,2)}</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-semibold text-white">${club.name}</span>
+                                    <span class="badge ${club.is_partner ? 'badge-partner' : 'badge-nonpartner'} text-xs">${club.is_partner ? 'Partner' : 'Non-Partner'}</span>
+                                    ${club.sport ? `<span class="badge badge-info text-xs">${club.sport}</span>` : ''}
+                                </div>
+                                <div class="flex items-center gap-3 mt-0.5">
+                                    <span class="text-gray-600 font-mono text-xs">${club.suffix || ''}</span>
+                                    ${club.contact_name ? `<span class="text-gray-500 text-xs">${club.contact_name}</span>` : ''}
+                                    ${club.contact_email ? `<span class="text-gray-600 text-xs">${club.contact_email}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            ${club.has_images ? '<span class="badge badge-success text-xs">Images</span>' : ''}
+                            ${club.shopify_collection_id ? '<span class="badge badge-info text-xs">Shopify</span>' : ''}
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // =============================================
+        // CLUBS: CREATE / EDIT MODAL
+        // =============================================
+        function showCreateClubModal() {
+            document.getElementById('club-modal-title').textContent = 'Create New Club';
+            document.getElementById('edit-club-id').value = '';
+            document.getElementById('club-name').value = '';
+            document.getElementById('club-suffix').value = '';
+            document.getElementById('club-sport').value = '';
+            document.getElementById('club-slug').value = '';
+            document.getElementById('club-is-partner').checked = false;
+            document.getElementById('club-contact-name').value = '';
+            document.getElementById('club-contact-email').value = '';
+            document.getElementById('club-contact-phone').value = '';
+            document.getElementById('create-club-modal').classList.remove('hide');
+        }
+
+        function showEditClubModal() {
+            if (!currentClub) return;
+            document.getElementById('club-modal-title').textContent = 'Edit Club';
+            document.getElementById('edit-club-id').value = currentClub.id;
+            document.getElementById('club-name').value = currentClub.name || '';
+            document.getElementById('club-suffix').value = currentClub.suffix || '';
+            document.getElementById('club-sport').value = currentClub.sport || '';
+            document.getElementById('club-slug').value = currentClub.slug || '';
+            document.getElementById('club-is-partner').checked = currentClub.is_partner || false;
+            document.getElementById('club-contact-name').value = currentClub.contact_name || '';
+            document.getElementById('club-contact-email').value = currentClub.contact_email || '';
+            document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
+            document.getElementById('create-club-modal').classList.remove('hide');
+        }
+
+        function hideCreateClubModal() {
+            document.getElementById('create-club-modal').classList.add('hide');
+        }
+
+        function generateClubSlugAndSuffix() {
+            const name = document.getElementById('club-name').value.trim();
+            if (!name) return;
+            const words = name.toUpperCase().split(/\s+/).filter(w => w.length > 0);
+            let suffix = '';
+            const lastWord = words[words.length - 1];
+            if (lastWord === 'FC') suffix = words.slice(0, -1).map(w => w[0]).join('') + 'FC';
+            else if (lastWord === 'AFC') suffix = words.slice(0, -1).map(w => w[0]).join('') + 'AFC';
+            else if (lastWord === 'UNITED') suffix = words.slice(0, -1).map(w => w[0]).join('') + 'UTD';
+            else if (lastWord === 'CC') suffix = words.slice(0, -1).map(w => w[0]).join('') + 'CC';
+            else if (lastWord === 'RFC') suffix = words.slice(0, -1).map(w => w[0]).join('') + 'RFC';
+            else if (words.length > 1) suffix = words.map(w => w[0]).join('');
+            else suffix = name.substring(0, 4).toUpperCase();
+            if (!document.getElementById('club-suffix').value) {
+                document.getElementById('club-suffix').value = suffix.substring(0, 6);
+            }
+            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            if (!document.getElementById('club-slug').value) {
+                document.getElementById('club-slug').value = slug;
+            }
+        }
+
+        async function saveClubEnhanced() {
+            const clubId = document.getElementById('edit-club-id').value;
+            const name = document.getElementById('club-name').value.trim();
+            const suffix = document.getElementById('club-suffix').value.trim().toUpperCase();
+            if (!name) { showToast('Club name is required', 'error'); return; }
+            if (!suffix || suffix.length < 2) { showToast('Suffix must be at least 2 chars', 'error'); return; }
+            if (!clubId) {
+                const existing = clubs.find(c => c.suffix.toUpperCase() === suffix);
+                if (existing) { showToast(`Suffix "${suffix}" already used`, 'error'); return; }
+            }
+            const clubData = {
+                brand_id: currentBrand.id, name, suffix,
+                sport: document.getElementById('club-sport').value || null,
+                slug: document.getElementById('club-slug').value.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                is_partner: document.getElementById('club-is-partner').checked,
+                contact_name: document.getElementById('club-contact-name').value.trim() || null,
+                contact_email: document.getElementById('club-contact-email').value.trim() || null,
+                contact_phone: document.getElementById('club-contact-phone').value.trim() || null
+            };
+            let result;
+            if (clubId) {
+                result = await supabase.from('clubs').update(clubData).eq('id', clubId).select().single();
+            } else {
+                result = await supabase.from('clubs').insert(clubData).select().single();
+            }
+            if (result.error) { showToast(result.error.message, 'error'); return; }
+            if (clubId) {
+                const idx = clubs.findIndex(c => c.id === clubId);
+                if (idx !== -1) { clubs[idx] = { ...clubs[idx], ...result.data }; }
+                if (currentClub && currentClub.id === clubId) {
+                    currentClub = clubs.find(c => c.id === clubId);
+                    updateClubDetailHeader();
+                    renderClubOverviewInfo();
+                }
+            } else {
+                clubs.push(result.data);
+                updateStats();
+            }
+            hideCreateClubModal();
+            renderClubsEnhanced();
+            showToast(clubId ? 'Club updated' : `${name} created`);
+            if (!clubId) openClubDashboard(result.data.id);
+        }
+
+        // =============================================
+        // CLUB DASHBOARD
+        // =============================================
+        async function openClubDashboard(clubId) {
+            const club = clubs.find(c => c.id === clubId);
+            if (!club) return;
+            currentClub = club;
+            currentClubProducts = [];
+            currentOrderForms = [];
+            currentClubTab = 'overview';
+            document.getElementById('launchpad').classList.add('hide');
+            document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
+            document.getElementById('tool-club-detail').classList.remove('hide');
+            updateClubDetailHeader();
+            showClubTab('overview');
+            await Promise.all([loadCurrentClubProducts(), loadCurrentClubOrderForms()]);
+            renderClubOverviewInfo();
+            updateOverviewStats();
+        }
+
+        function updateClubDetailHeader() {
+            if (!currentClub) return;
+            const initials = ((currentClub.suffix || currentClub.name.substring(0, 2))).substring(0, 2);
+            document.getElementById('club-detail-initials').textContent = initials;
+            document.getElementById('club-detail-name').textContent = currentClub.name;
+            document.getElementById('club-detail-sport').textContent = currentClub.sport || '';
+            document.getElementById('club-detail-suffix').textContent = `(${currentClub.suffix || ''})`;
+            const badge = document.getElementById('club-detail-partner-badge');
+            badge.className = `badge ${currentClub.is_partner ? 'badge-partner' : 'badge-nonpartner'} text-xs`;
+            badge.textContent = currentClub.is_partner ? 'Partner' : 'Non-Partner';
+        }
+
+        function showClubTab(tab) {
+            currentClubTab = tab;
+            document.querySelectorAll('.club-tab-content').forEach(el => el.classList.add('hide'));
+            document.querySelectorAll('.tab-nav button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`club-tab-${tab}`)?.classList.remove('hide');
+            document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
+            if (tab === 'products') renderClubProducts();
+            if (tab === 'orderforms') renderClubOrderForms();
+            if (tab === 'shopify') renderShopifySyncStatus();
+            if (tab === 'images') loadClubDetailImages();
+        }
+
+        function renderClubOverviewInfo() {
+            const el = document.getElementById('club-overview-info');
+            if (!el || !currentClub) return;
+            const rows = [
+                ['Name', currentClub.name], ['Suffix', currentClub.suffix || '-'],
+                ['Sport', currentClub.sport || '-'], ['Status', currentClub.is_partner ? 'Partner' : 'Non-Partner'],
+                ['Slug', currentClub.slug || '-'], ['Contact', currentClub.contact_name || '-'],
+                ['Email', currentClub.contact_email || '-'], ['Phone', currentClub.contact_phone || '-']
+            ];
+            el.innerHTML = rows.map(([label, value]) =>
+                `<div class="info-row"><span class="info-label">${label}</span><span class="info-value">${value}</span></div>`
+            ).join('');
+        }
+
+        function updateOverviewStats() {
+            document.getElementById('overview-stat-products').textContent = currentClubProducts.length;
+            document.getElementById('overview-stat-forms').textContent = currentOrderForms.filter(f => f.is_active).length;
+            document.getElementById('overview-stat-synced').textContent = currentClubProducts.filter(p => p.shopify_product_id).length;
+            if (currentOrderForms.length > 0) {
+                supabase.from('order_submissions')
+                    .select('*', { count: 'exact', head: true })
+                    .in('form_id', currentOrderForms.map(f => f.id))
+                    .then(({ count }) => { document.getElementById('overview-stat-submissions').textContent = count || 0; });
+            } else {
+                document.getElementById('overview-stat-submissions').textContent = '0';
+            }
+        }
+
+        // =============================================
+        // CLUB PRODUCTS
+        // =============================================
+        async function loadCurrentClubProducts() {
+            if (!currentClub) return;
+            const { data } = await supabase.from('club_products')
+                .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, has_addons, weight_grams, description)')
+                .eq('club_id', currentClub.id).eq('is_active', true).order('created_at');
+            currentClubProducts = data || [];
+        }
+
+        function renderClubProducts() {
+            const container = document.getElementById('club-products-list');
+            const emptyEl = document.getElementById('club-products-empty');
+            if (!currentClubProducts.length) {
+                container.innerHTML = '';
+                emptyEl.classList.remove('hide');
+                return;
+            }
+            emptyEl.classList.add('hide');
+            container.innerHTML = currentClubProducts.map(cp => {
+                const syncBadge = cp.shopify_product_id
+                    ? `<span class="text-xs text-green-400">✓ Shopify #${cp.shopify_product_id}</span>`
+                    : '<span class="text-xs text-gray-600">Not synced</span>';
+                return `
+                <div class="club-product-card">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-semibold">${cp.custom_name}</span>
+                                ${syncBadge}
+                            </div>
+                            <div class="text-xs text-gray-500 mb-3">
+                                <span class="font-mono text-gray-600 mr-2">${cp.products?.product_code || ''}</span>
+                                <span>${cp.products?.item_name || ''}</span> ·
+                                <span>${cp.products?.range_name || ''}</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="price-tier-card">
+                                    <p class="text-xs text-gray-500 mb-0.5">Web Price</p>
+                                    <p class="font-semibold">${cp.web_price ? '£' + Number(cp.web_price).toFixed(2) : '-'}</p>
+                                </div>
+                                <div class="price-tier-card">
+                                    <p class="text-xs text-green-500 mb-0.5">Partner</p>
+                                    <p class="font-semibold">${cp.partner_price ? '£' + Number(cp.partner_price).toFixed(2) : '-'}</p>
+                                </div>
+                                <div class="price-tier-card">
+                                    <p class="text-xs text-gray-400 mb-0.5">Non-Partner</p>
+                                    <p class="font-semibold">${cp.non_partner_price ? '£' + Number(cp.non_partner_price).toFixed(2) : '-'}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0">
+                            <button onclick="editClubProduct('${cp.id}')" class="btn-secondary text-xs py-1 px-3">Edit</button>
+                            <button onclick="syncProductToShopify('${cp.id}')" class="btn-secondary text-xs py-1 px-3 text-brand-400">Sync</button>
+                            <button onclick="removeClubProduct('${cp.id}')" class="btn-secondary text-xs py-1 px-2 text-red-400">×</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function showAddClubProductModal() {
+            document.getElementById('club-product-modal-title').textContent = 'Add Club Product';
+            document.getElementById('edit-club-product-id').value = '';
+            document.getElementById('cp-custom-name').value = '';
+            document.getElementById('cp-web-price').value = '';
+            document.getElementById('cp-partner-price').value = '';
+            document.getElementById('cp-non-partner-price').value = '';
+            document.getElementById('cp-sizes-info').classList.add('hide');
+            const assignedIds = currentClubProducts.map(cp => cp.product_id);
+            const available = products.filter(p => !assignedIds.includes(p.id));
+            const select = document.getElementById('cp-master-product');
+            select.innerHTML = '<option value="">Select from master catalogue...</option>' +
+                available.map(p => `<option value="${p.id}">${p.product_code} – ${p.item_name} (${p.range_name})</option>`).join('');
+            select.disabled = false;
+            document.getElementById('club-product-modal').classList.remove('hide');
+        }
+
+        function editClubProduct(cpId) {
+            const cp = currentClubProducts.find(p => p.id === cpId);
+            if (!cp) return;
+            document.getElementById('club-product-modal-title').textContent = 'Edit Club Product';
+            document.getElementById('edit-club-product-id').value = cpId;
+            document.getElementById('cp-custom-name').value = cp.custom_name || '';
+            document.getElementById('cp-web-price').value = cp.web_price || '';
+            document.getElementById('cp-partner-price').value = cp.partner_price || '';
+            document.getElementById('cp-non-partner-price').value = cp.non_partner_price || '';
+            const select = document.getElementById('cp-master-product');
+            select.innerHTML = products.map(p =>
+                `<option value="${p.id}" ${p.id === cp.product_id ? 'selected' : ''}>${p.product_code} – ${p.item_name}</option>`
+            ).join('');
+            select.disabled = true;
+            onMasterProductChange();
+            document.getElementById('club-product-modal').classList.remove('hide');
+        }
+
+        function hideClubProductModal() {
+            document.getElementById('club-product-modal').classList.add('hide');
+            document.getElementById('cp-master-product').disabled = false;
+        }
+
+        function onMasterProductChange() {
+            const productId = document.getElementById('cp-master-product').value;
+            if (!productId) { document.getElementById('cp-sizes-info').classList.add('hide'); return; }
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            if (!document.getElementById('cp-custom-name').value && !document.getElementById('edit-club-product-id').value) {
+                document.getElementById('cp-custom-name').value = `${currentClub.name} ${product.item_name}`;
+            }
+            if (!document.getElementById('cp-web-price').value) {
+                const webPrice = product.is_single_price ? product.single_retail_price : product.adult_retail_price;
+                if (webPrice) document.getElementById('cp-web-price').value = Number(webPrice).toFixed(2);
+            }
+            if (!document.getElementById('cp-partner-price').value) {
+                const partnerPrice = product.is_single_price ? product.single_partner_price : product.adult_partner_price;
+                if (partnerPrice) document.getElementById('cp-partner-price').value = Number(partnerPrice).toFixed(2);
+            }
+            document.getElementById('cp-sizes-display').textContent = product.sizes || 'See master product';
+            document.getElementById('cp-sizes-info').classList.remove('hide');
+        }
+
+        async function saveClubProduct() {
+            const cpId = document.getElementById('edit-club-product-id').value;
+            const productId = document.getElementById('cp-master-product').value;
+            const customName = document.getElementById('cp-custom-name').value.trim();
+            if (!productId) { showToast('Please select a master product', 'error'); return; }
+            if (!customName) { showToast('Club product name is required', 'error'); return; }
+            const cpData = {
+                club_id: currentClub.id, product_id: productId, custom_name: customName,
+                web_price: parseFloat(document.getElementById('cp-web-price').value) || null,
+                partner_price: parseFloat(document.getElementById('cp-partner-price').value) || null,
+                non_partner_price: parseFloat(document.getElementById('cp-non-partner-price').value) || null,
+                is_active: true
+            };
+            let result;
+            if (cpId) {
+                result = await supabase.from('club_products')
+                    .update({ web_price: cpData.web_price, partner_price: cpData.partner_price, non_partner_price: cpData.non_partner_price, custom_name: cpData.custom_name, updated_at: new Date().toISOString() })
+                    .eq('id', cpId)
+                    .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, has_addons, weight_grams, description)').single();
+            } else {
+                result = await supabase.from('club_products').insert(cpData)
+                    .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, has_addons, weight_grams, description)').single();
+            }
+            if (result.error) { showToast(result.error.message, 'error'); return; }
+            if (cpId) {
+                const idx = currentClubProducts.findIndex(p => p.id === cpId);
+                if (idx !== -1) currentClubProducts[idx] = result.data;
+            } else {
+                currentClubProducts.push(result.data);
+            }
+            hideClubProductModal();
+            renderClubProducts();
+            updateOverviewStats();
+            showToast(cpId ? 'Product updated' : 'Product added to club');
+        }
+
+        async function removeClubProduct(cpId) {
+            if (!confirm('Remove this product from the club?')) return;
+            const { error } = await supabase.from('club_products').update({ is_active: false }).eq('id', cpId);
+            if (error) { showToast(error.message, 'error'); return; }
+            currentClubProducts = currentClubProducts.filter(p => p.id !== cpId);
+            renderClubProducts();
+            updateOverviewStats();
+            showToast('Product removed');
+        }
+
+        // =============================================
+        // SHOPIFY CONFIG
+        // =============================================
+        function loadShopifyConfigUI() {
+            if (!currentBrand) return;
+            document.getElementById('shopify-domain').value = currentBrand.shopify_domain || '';
+            document.getElementById('shopify-token').value = currentBrand.shopify_access_token || '';
+            document.getElementById('shopify-api-version').value = currentBrand.shopify_api_version || '2024-01';
+        }
+
+        async function saveShopifyConfig() {
+            const domain = document.getElementById('shopify-domain').value.trim();
+            const token = document.getElementById('shopify-token').value.trim();
+            const version = document.getElementById('shopify-api-version').value;
+            const { error } = await supabase.from('brands').update({
+                shopify_domain: domain || null,
+                shopify_access_token: token || null,
+                shopify_api_version: version
+            }).eq('id', currentBrand.id);
+            if (error) { showToast(error.message, 'error'); return; }
+            currentBrand.shopify_domain = domain;
+            currentBrand.shopify_access_token = token;
+            currentBrand.shopify_api_version = version;
+            showToast('Shopify config saved');
+            const statusEl = document.getElementById('shopify-config-status');
+            if (statusEl) {
+                statusEl.className = 'mt-3 text-sm text-green-400';
+                statusEl.textContent = domain ? `Connected to ${domain}` : 'Config cleared';
+                statusEl.classList.remove('hide');
+            }
+        }
+
+        async function testShopifyConnection() {
+            const domain = document.getElementById('shopify-domain').value.trim();
+            const token = document.getElementById('shopify-token').value.trim();
+            if (!domain || !token) { showToast('Enter domain and token first', 'error'); return; }
+            const statusEl = document.getElementById('shopify-config-status');
+            statusEl.className = 'mt-3 text-sm text-gray-400';
+            statusEl.textContent = 'Testing connection...';
+            statusEl.classList.remove('hide');
+            try {
+                const result = await shopifyApiRequest(domain, token, '2024-01', 'GET', 'shop.json');
+                if (result.shop) {
+                    statusEl.className = 'mt-3 text-sm text-green-400';
+                    statusEl.textContent = `✓ Connected to ${result.shop.name} (${result.shop.domain})`;
+                    showToast('Shopify connection successful!');
+                } else {
+                    statusEl.className = 'mt-3 text-sm text-red-400';
+                    statusEl.textContent = 'Connection failed – check credentials';
+                }
+            } catch (err) {
+                statusEl.className = 'mt-3 text-sm text-red-400';
+                statusEl.textContent = `Error: ${err.message}. Ensure CORS is enabled for this domain in your Shopify Custom App.`;
+            }
+        }
+
+        async function shopifyApiRequest(domain, token, version, method, endpoint, body = null) {
+            const url = `https://${domain}/admin/api/${version}/${endpoint}`;
+            const opts = { method, headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token } };
+            if (body) opts.body = JSON.stringify(body);
+            const res = await fetch(url, opts);
+            if (!res.ok) {
+                const errText = await res.text().catch(() => res.statusText);
+                throw new Error(`${res.status}: ${errText}`);
+            }
+            return res.json();
+        }
+
+        function getShopifyCredentials() {
+            const domain = currentBrand?.shopify_domain;
+            const token = currentBrand?.shopify_access_token;
+            const version = currentBrand?.shopify_api_version || '2024-01';
+            if (!domain || !token) {
+                showToast('Shopify credentials not configured. Go to Brand Settings → Shopify API.', 'error');
+                return null;
+            }
+            return { domain, token, version };
+        }
+
+        // =============================================
+        // SHOPIFY SYNC: COLLECTION
+        // =============================================
+        function renderShopifySyncStatus() {
+            const collEl = document.getElementById('club-shopify-collection-status');
+            if (collEl && currentClub) {
+                if (currentClub.shopify_collection_id) {
+                    collEl.innerHTML = `<div class="flex items-center gap-2 text-sm"><span class="text-green-400">✓</span><span>Collection synced – Shopify ID: <code class="text-brand-400">${currentClub.shopify_collection_id}</code></span></div>`;
+                } else {
+                    collEl.innerHTML = `<div class="text-yellow-400 text-sm">⚠ No Shopify collection yet</div>`;
+                }
+            }
+            const prodEl = document.getElementById('club-shopify-products-status');
+            if (prodEl) {
+                if (!currentClubProducts.length) {
+                    prodEl.innerHTML = '<p class="text-gray-600 text-sm">No club products. Add products in the Products tab first.</p>';
+                    return;
+                }
+                prodEl.innerHTML = currentClubProducts.map(cp => `
+                    <div class="flex items-center justify-between py-2 border-b border-gray-800 last:border-0">
+                        <div>
+                            <span class="text-sm">${cp.custom_name}</span>
+                            <span class="text-xs text-gray-600 ml-2">${cp.products?.product_code || ''}</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            ${cp.shopify_product_id ? `<span class="text-xs text-green-400">✓ #${cp.shopify_product_id}</span>` : '<span class="text-xs text-gray-600">Not synced</span>'}
+                            <button onclick="syncProductToShopify('${cp.id}')" class="text-xs text-brand-400 hover:text-brand-300">Sync</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        async function syncClubCollection() {
+            const creds = getShopifyCredentials();
+            if (!creds || !currentClub) return;
+            showToast('Syncing collection to Shopify...');
+            try {
+                const collectionData = {
+                    custom_collection: {
+                        title: currentClub.name,
+                        handle: currentClub.slug || currentClub.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                        body_html: `Official ${currentClub.name} teamwear collection.`,
+                        published: true
+                    }
+                };
+                if (currentClub.collection_image_url) {
+                    collectionData.custom_collection.image = { src: currentClub.collection_image_url };
+                }
+                let result;
+                if (currentClub.shopify_collection_id) {
+                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'PUT',
+                        `custom_collections/${currentClub.shopify_collection_id}.json`, collectionData);
+                } else {
+                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST',
+                        'custom_collections.json', collectionData);
+                }
+                const collectionId = result.custom_collection?.id?.toString();
+                if (!collectionId) throw new Error('No collection ID returned');
+                await supabase.from('clubs').update({ shopify_collection_id: collectionId }).eq('id', currentClub.id);
+                const idx = clubs.findIndex(c => c.id === currentClub.id);
+                if (idx !== -1) clubs[idx].shopify_collection_id = collectionId;
+                currentClub.shopify_collection_id = collectionId;
+                renderShopifySyncStatus();
+                showToast('Collection synced!');
+            } catch (err) { showToast('Sync failed: ' + err.message, 'error'); }
+        }
+
+        async function syncProductToShopify(cpId) {
+            const creds = getShopifyCredentials();
+            if (!creds || !currentClub) return;
+            const cp = currentClubProducts.find(p => p.id === cpId);
+            if (!cp) return;
+            const masterProduct = cp.products;
+            if (!masterProduct) { showToast('Master product data missing', 'error'); return; }
+            showToast(`Syncing "${cp.custom_name}"...`);
+            try {
+                const sizes = masterProduct.sizes?.split(',').map(s => s.trim()) || [];
+                const youthSizes = sizes.filter(s => s.startsWith('Y'));
+                const adultSizes = sizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+                const isSinglePrice = masterProduct.fit_type === 'One Size Only';
+                let variants = [];
+                if (isSinglePrice) {
+                    variants.push({ option1: 'One Size', price: (cp.web_price || 0).toFixed(2),
+                        sku: `${masterProduct.product_code}/${currentClub.suffix}-OS`,
+                        inventory_management: 'shopify', inventory_policy: 'continue',
+                        weight: masterProduct.weight_grams || 400, weight_unit: 'g', taxable: false });
+                } else {
+                    youthSizes.forEach(size => variants.push({ option1: 'Youth', option2: size,
+                        price: (cp.web_price || 0).toFixed(2), sku: `${masterProduct.product_code}/${currentClub.suffix}-${size}`,
+                        inventory_management: 'shopify', inventory_policy: 'continue',
+                        weight: masterProduct.weight_grams || 400, weight_unit: 'g', taxable: false }));
+                    adultSizes.forEach(size => variants.push({ option1: 'Adult', option2: size,
+                        price: (cp.web_price || 0).toFixed(2), sku: `${masterProduct.product_code}/${currentClub.suffix}-${size}`,
+                        inventory_management: 'shopify', inventory_policy: 'continue',
+                        weight: masterProduct.weight_grams || 400, weight_unit: 'g', taxable: true }));
+                }
+                const options = isSinglePrice ? [{ name: 'Size' }] : [{ name: 'Fit' }, { name: 'Size' }];
+                const tags = [`club:${currentClub.slug || currentClub.suffix.toLowerCase()}`, masterProduct.range_name, masterProduct.category].filter(Boolean).join(',');
+                const productPayload = { product: {
+                    title: cp.custom_name,
+                    body_html: masterProduct.description || '',
+                    vendor: currentBrand.name,
+                    product_type: masterProduct.category || '',
+                    tags, options, variants, published: true
+                }};
+                if (cp.image_url) productPayload.product.images = [{ src: cp.image_url, alt: cp.custom_name }];
+                let result;
+                if (cp.shopify_product_id) {
+                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'PUT',
+                        `products/${cp.shopify_product_id}.json`, productPayload);
+                } else {
+                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST',
+                        'products.json', productPayload);
+                }
+                const shopifyProduct = result.product;
+                if (!shopifyProduct) throw new Error('No product returned from Shopify');
+                const variantIds = shopifyProduct.variants?.map(v => ({ id: v.id, sku: v.sku, option1: v.option1, option2: v.option2 })) || [];
+                if (currentClub.shopify_collection_id && shopifyProduct.id) {
+                    try {
+                        await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST', 'collects.json',
+                            { collect: { product_id: shopifyProduct.id, collection_id: parseInt(currentClub.shopify_collection_id) } });
+                    } catch(e) { /* may already be in collection */ }
+                }
+                await supabase.from('club_products').update({
+                    shopify_product_id: shopifyProduct.id.toString(),
+                    shopify_variant_ids: variantIds,
+                    shopify_synced_at: new Date().toISOString()
+                }).eq('id', cpId);
+                const idx = currentClubProducts.findIndex(p => p.id === cpId);
+                if (idx !== -1) {
+                    currentClubProducts[idx].shopify_product_id = shopifyProduct.id.toString();
+                    currentClubProducts[idx].shopify_variant_ids = variantIds;
+                }
+                renderClubProducts();
+                if (currentClubTab === 'shopify') renderShopifySyncStatus();
+                updateOverviewStats();
+                showToast(`"${cp.custom_name}" synced to Shopify!`);
+            } catch (err) { showToast('Sync failed: ' + err.message, 'error'); }
+        }
+
+        async function syncAllClubProducts() {
+            for (const cp of currentClubProducts) {
+                await syncProductToShopify(cp.id);
+            }
+        }
+
+        // =============================================
+        // CLUB DETAIL: IMAGES TAB
+        // =============================================
+        async function loadClubDetailImages() {
+            if (!currentClub) return;
+            selectedClubId = currentClub.id;
+            const grid = document.getElementById('club-detail-images-grid');
+            const countEl = document.getElementById('club-detail-image-count');
+            const emptyEl = document.getElementById('club-detail-images-empty');
+            const { data } = await supabase.from('club_images')
+                .select('*, products(item_name, product_code)').eq('club_id', currentClub.id);
+            const images = data || [];
+            if (countEl) countEl.textContent = images.length;
+            if (!images.length) {
+                if (grid) grid.innerHTML = '';
+                if (emptyEl) emptyEl.classList.remove('hide');
+            } else {
+                if (emptyEl) emptyEl.classList.add('hide');
+                if (grid) {
+                    grid.innerHTML = images.map(img => `
+                        <div class="image-item">
+                            <img src="${img.public_url}" alt="${img.file_name}" loading="lazy">
+                            <div class="overlay">
+                                <p class="text-xs text-white text-center px-2 mb-2">${img.products?.item_name || 'Unknown'}</p>
+                                <button onclick="deleteClubImageFromDetail('${img.id}')" class="text-red-400 text-xs">Delete</button>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+            const badge = document.getElementById('club-detail-collection-badge');
+            if (badge) {
+                if (currentClub.collection_image_url) {
+                    badge.className = 'badge badge-success'; badge.textContent = '✓ Collection image';
+                } else {
+                    badge.className = 'badge badge-warning'; badge.textContent = 'No collection image';
+                }
+            }
+        }
+
+        function handleClubDetailDrop(e) {
+            e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleClubDetailImageUpload({ target: { files } });
+        }
+
+        async function handleClubDetailImageUpload(event) {
+            if (!currentClub) return;
+            selectedClubId = currentClub.id;
+            const files = event.target.files;
+            if (!files.length) return;
+            const progressEl = document.getElementById('club-detail-upload-progress');
+            const progressBar = document.getElementById('club-detail-upload-bar');
+            const statusText = document.getElementById('club-detail-upload-text');
+            const countText = document.getElementById('club-detail-upload-count');
+            progressEl.classList.remove('hide');
+            progressBar.style.width = '0%';
+            let uploaded = 0, failed = 0;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                statusText.textContent = `Uploading ${file.name}...`;
+                countText.textContent = `${i+1}/${files.length}`;
+                progressBar.style.width = `${Math.round(((i+1)/files.length)*100)}%`;
+                const nameWithoutExt = file.name.replace(/\.[^/.]+$/, '').toLowerCase();
+                if (nameWithoutExt === 'collection-image') {
+                    try {
+                        const storagePath = `${currentBrand.slug}/${currentClub.suffix}/collection-image${file.name.substring(file.name.lastIndexOf('.'))}`;
+                        const { error: uploadError } = await supabase.storage.from('club-images').upload(storagePath, file, { upsert: true });
+                        if (!uploadError) {
+                            const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+                            await supabase.from('clubs').update({ collection_image_url: urlData.publicUrl }).eq('id', currentClub.id);
+                            const cidx = clubs.findIndex(c => c.id === currentClub.id);
+                            if (cidx !== -1) { clubs[cidx].collection_image_url = urlData.publicUrl; }
+                            currentClub.collection_image_url = urlData.publicUrl;
+                            uploaded++;
+                        } else { failed++; }
+                    } catch { failed++; }
+                    continue;
+                }
+                const productCode = nameWithoutExt.replace(/-/g, '/').toUpperCase();
+                const product = products.find(p => p.product_code.toUpperCase() === productCode);
+                if (!product) { showToast(`No product matching: ${nameWithoutExt}`, 'error'); failed++; continue; }
+                try {
+                    const storagePath = `${currentBrand.slug}/${currentClub.suffix}/${file.name}`;
+                    const { error: uploadError } = await supabase.storage.from('club-images').upload(storagePath, file, { upsert: true });
+                    if (uploadError) { failed++; continue; }
+                    const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+                    await supabase.from('club_images').upsert({
+                        club_id: currentClub.id, product_id: product.id,
+                        file_name: file.name, storage_path: storagePath,
+                        public_url: urlData.publicUrl, uploaded_by: currentUser.id
+                    }, { onConflict: 'club_id,product_id' });
+                    uploaded++;
+                } catch { failed++; }
+            }
+            if (uploaded > 0) {
+                await supabase.from('clubs').update({ has_images: true }).eq('id', currentClub.id);
+                currentClub.has_images = true;
+            }
+            statusText.textContent = 'Complete!'; progressBar.style.width = '100%';
+            setTimeout(() => progressEl.classList.add('hide'), 1500);
+            if (event.target.value !== undefined) event.target.value = '';
+            loadClubDetailImages();
+            showToast(failed > 0 ? `${uploaded} uploaded, ${failed} failed` : `${uploaded} images uploaded`);
+        }
+
+        async function deleteClubImageFromDetail(imageId) {
+            const { data: image } = await supabase.from('club_images').select('storage_path').eq('id', imageId).single();
+            if (!image) return;
+            await supabase.storage.from('club-images').remove([image.storage_path]);
+            await supabase.from('club_images').delete().eq('id', imageId);
+            loadClubDetailImages();
+            showToast('Image deleted');
+        }
+
+        // =============================================
+        // ORDER FORMS
+        // =============================================
+        async function loadCurrentClubOrderForms() {
+            if (!currentClub) return;
+            const { data } = await supabase.from('order_forms')
+                .select('*').eq('club_id', currentClub.id).order('created_at', { ascending: false });
+            currentOrderForms = data || [];
+        }
+
+        function renderClubOrderForms() {
+            const container = document.getElementById('club-order-forms-list');
+            const emptyEl = document.getElementById('club-order-forms-empty');
+            if (!currentOrderForms.length) {
+                container.innerHTML = '';
+                emptyEl.classList.remove('hide');
+                return;
+            }
+            emptyEl.classList.add('hide');
+            container.innerHTML = currentOrderForms.map(form => {
+                const formUrl = `${window.location.origin}${window.location.pathname}?form=${form.token}`;
+                return `
+                <div class="order-form-card">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-semibold">${form.title}</span>
+                                <span class="badge ${form.is_active ? 'badge-success' : 'badge-danger'} text-xs">${form.is_active ? 'Active' : 'Closed'}</span>
+                            </div>
+                            ${form.season ? `<p class="text-gray-500 text-xs mb-1">Season: ${form.season}</p>` : ''}
+                            ${form.description ? `<p class="text-gray-400 text-xs mb-2">${form.description}</p>` : ''}
+                            <div class="flex items-center gap-2 bg-gray-900/50 rounded-lg px-3 py-2 mt-2">
+                                <span class="text-gray-600 text-xs flex-1 font-mono truncate">${formUrl}</span>
+                                <button onclick="copyFormLink('${formUrl}')" class="text-brand-400 hover:text-brand-300 text-xs whitespace-nowrap">Copy Link</button>
+                                <a href="${formUrl}" target="_blank" class="text-gray-500 hover:text-white text-xs whitespace-nowrap">Preview →</a>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2 flex-shrink-0">
+                            <button onclick="viewFormSubmissions('${form.id}')" class="btn-primary text-xs py-1 px-3 whitespace-nowrap">View Submissions</button>
+                            <button onclick="toggleFormStatus('${form.id}', ${!form.is_active})" class="btn-secondary text-xs py-1 px-3">
+                                ${form.is_active ? 'Close Form' : 'Reopen'}
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function showCreateOrderFormModal() {
+            if (!currentClub) return;
+            if (!currentClubProducts.length) {
+                showToast('Add club products first before creating an order form', 'error');
+                return;
+            }
+            document.getElementById('of-title').value = `${currentClub.name} Kit Order`;
+            document.getElementById('of-season').value = '';
+            document.getElementById('of-description').value = '';
+            document.getElementById('order-form-modal').classList.remove('hide');
+        }
+
+        function hideOrderFormModal() {
+            document.getElementById('order-form-modal').classList.add('hide');
+        }
+
+        function generateToken() {
+            const array = new Uint8Array(24);
+            crypto.getRandomValues(array);
+            return Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function createOrderForm() {
+            const title = document.getElementById('of-title').value.trim();
+            if (!title) { showToast('Form title is required', 'error'); return; }
+            const formData = {
+                club_id: currentClub.id, brand_id: currentBrand.id, title,
+                token: generateToken(),
+                season: document.getElementById('of-season').value.trim() || null,
+                description: document.getElementById('of-description').value.trim() || null,
+                is_active: true, created_by: currentUser.id
+            };
+            const { data, error } = await supabase.from('order_forms').insert(formData).select().single();
+            if (error) { showToast(error.message, 'error'); return; }
+            currentOrderForms.unshift(data);
+            hideOrderFormModal();
+            renderClubOrderForms();
+            updateOverviewStats();
+            showToast('Order form created! Share the link with the club.');
+        }
+
+        function copyFormLink(url) {
+            navigator.clipboard.writeText(url).then(() => showToast('Link copied!'));
+        }
+
+        async function toggleFormStatus(formId, newStatus) {
+            const { error } = await supabase.from('order_forms').update({ is_active: newStatus }).eq('id', formId);
+            if (error) { showToast(error.message, 'error'); return; }
+            const idx = currentOrderForms.findIndex(f => f.id === formId);
+            if (idx !== -1) currentOrderForms[idx].is_active = newStatus;
+            renderClubOrderForms();
+            showToast(newStatus ? 'Form reopened' : 'Form closed');
+        }
+
+        // =============================================
+        // SUBMISSIONS: GLOBAL VIEW + DETAIL
+        // =============================================
+        let currentSubmission = null;
+        let currentSubmissionItems = [];
+
+        async function viewFormSubmissions(formId) {
+            showTool('order-forms');
+            await loadAllSubmissions(formId);
+        }
+
+        async function loadAllSubmissions(filterFormId = null) {
+            if (!currentBrand) return;
+            const clubFilter = document.getElementById('global-forms-club-filter');
+            if (clubFilter && clubs.length) {
+                clubFilter.innerHTML = '<option value="">All Clubs</option>' +
+                    clubs.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
+            const { data: allForms } = await supabase.from('order_forms').select('*').eq('brand_id', currentBrand.id);
+            if (!allForms?.length) {
+                document.getElementById('global-submissions-list').innerHTML = '';
+                document.getElementById('global-submissions-empty').classList.remove('hide');
+                document.getElementById('global-submissions-count').textContent = '0';
+                return;
+            }
+            let formIds = allForms.map(f => f.id);
+            const selectedClubId_global = document.getElementById('global-forms-club-filter')?.value;
+            if (selectedClubId_global) {
+                formIds = allForms.filter(f => f.club_id === selectedClubId_global).map(f => f.id);
+            }
+            if (filterFormId) formIds = [filterFormId];
+            if (!formIds.length) {
+                document.getElementById('global-submissions-list').innerHTML = '<p class="text-gray-500 text-sm text-center py-8">No forms match your filter.</p>';
+                document.getElementById('global-submissions-count').textContent = '0';
+                return;
+            }
+            const { data: submissions } = await supabase.from('order_submissions')
+                .select('*').in('form_id', formIds).order('submitted_at', { ascending: false });
+            const statusFilter = document.getElementById('global-forms-status-filter')?.value || '';
+            let filtered = submissions || [];
+            if (statusFilter === 'new') filtered = filtered.filter(s => !s.shopify_draft_order_id);
+            if (statusFilter === 'drafted') filtered = filtered.filter(s => !!s.shopify_draft_order_id);
+            document.getElementById('global-submissions-count').textContent = filtered.length;
+            const emptyEl = document.getElementById('global-submissions-empty');
+            const listEl = document.getElementById('global-submissions-list');
+            if (!filtered.length) {
+                listEl.innerHTML = '';
+                emptyEl.classList.remove('hide');
+                return;
+            }
+            emptyEl.classList.add('hide');
+            const formLookup = {};
+            allForms.forEach(f => { formLookup[f.id] = f; });
+            const clubLookup = {};
+            clubs.forEach(c => { clubLookup[c.id] = c; });
+            listEl.innerHTML = filtered.map(sub => {
+                const form = formLookup[sub.form_id];
+                const club = form ? clubLookup[form.club_id] : null;
+                const date = new Date(sub.submitted_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                return `
+                <div class="submission-card flex items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 flex-wrap mb-1">
+                            <span class="font-semibold">${sub.contact_name}</span>
+                            ${sub.shopify_draft_order_id
+                                ? '<span class="badge badge-success text-xs">Draft Order Created</span>'
+                                : '<span class="badge badge-warning text-xs">Pending Review</span>'}
+                        </div>
+                        <div class="text-xs text-gray-500 space-x-2">
+                            <span>${club?.name || 'Unknown Club'}</span>·
+                            <span>${form?.title || ''}</span>·
+                            <span>${date}</span>
+                            ${sub.team_name ? `· <span>${sub.team_name}</span>` : ''}
+                        </div>
+                        ${sub.contact_email ? `<p class="text-xs text-gray-600 mt-1">${sub.contact_email}</p>` : ''}
+                    </div>
+                    <button onclick="openSubmission('${sub.id}')" class="btn-primary text-xs py-1 px-3 whitespace-nowrap flex-shrink-0">View</button>
+                </div>`;
+            }).join('');
+        }
+
+        async function openSubmission(submissionId) {
+            const { data: sub } = await supabase.from('order_submissions').select('*').eq('id', submissionId).single();
+            if (!sub) return;
+            currentSubmission = sub;
+            const { data: items } = await supabase.from('order_submission_items')
+                .select('*, club_products(custom_name, products(product_code))')
+                .eq('submission_id', submissionId).order('line_order');
+            currentSubmissionItems = items || [];
+            document.getElementById('sub-contact-info').innerHTML = [
+                ['Name', sub.contact_name], ['Email', sub.contact_email], ['Phone', sub.contact_phone || '-']
+            ].map(([k, v]) => `<div class="info-row"><span class="info-label">${k}</span><span class="info-value">${v}</span></div>`).join('');
+            document.getElementById('sub-order-info').innerHTML = [
+                ['Team', sub.team_name || '-'], ['Season', sub.season || '-'],
+                ['Submitted', new Date(sub.submitted_at).toLocaleString('en-GB')], ['Notes', sub.notes || '-']
+            ].map(([k, v]) => `<div class="info-row"><span class="info-label">${k}</span><span class="info-value">${v}</span></div>`).join('');
+            document.getElementById('sub-items-count').textContent = currentSubmissionItems.length;
+            document.getElementById('sub-items-table').innerHTML = currentSubmissionItems.map(item => `
+                <tr>
+                    <td>${item.club_products?.custom_name || '-'}</td>
+                    <td>${item.size}</td>
+                    <td class="font-semibold">${item.quantity}</td>
+                    <td>${item.player_name || '-'}</td>
+                    <td>${item.player_number || '-'}</td>
+                    <td class="text-gray-500 text-xs">${item.notes || '-'}</td>
+                </tr>`).join('');
+            const draftStatusEl = document.getElementById('sub-draft-status');
+            const draftLinkEl = document.getElementById('sub-draft-link');
+            const draftBtn = document.getElementById('sub-create-draft-btn');
+            if (sub.shopify_draft_order_id) {
+                draftStatusEl.textContent = `Draft Order #${sub.shopify_draft_order_id} created`;
+                draftStatusEl.className = 'text-green-400 text-sm';
+                draftBtn.textContent = 'Recreate Draft Order';
+                if (sub.shopify_draft_order_url) {
+                    draftLinkEl.classList.remove('hide');
+                    document.getElementById('sub-draft-url').href = sub.shopify_draft_order_url;
+                }
+            } else {
+                draftStatusEl.textContent = 'No draft order yet';
+                draftStatusEl.className = 'text-gray-500 text-sm';
+                draftBtn.textContent = 'Create Draft Order in Shopify';
+                draftLinkEl.classList.add('hide');
+            }
+            document.getElementById('submission-modal').classList.remove('hide');
+            document.getElementById('submission-modal-inner').classList.remove('hide');
+        }
+
+        function hideSubmissionModal() {
+            document.getElementById('submission-modal').classList.add('hide');
+            document.getElementById('submission-modal-inner').classList.add('hide');
+            currentSubmission = null;
+        }
+
+        // Close submission modal when clicking backdrop
+        document.getElementById('submission-modal').addEventListener('click', function(e) {
+            if (e.target === this) hideSubmissionModal();
+        });
+
+        // =============================================
+        // DRAFT ORDER CREATION
+        // =============================================
+        async function createDraftOrderFromSubmission() {
+            const creds = getShopifyCredentials();
+            if (!creds || !currentSubmission) return;
+            if (!currentSubmissionItems.length) { showToast('No items in this submission', 'error'); return; }
+            const { data: form } = await supabase.from('order_forms').select('*, clubs(*)').eq('id', currentSubmission.form_id).single();
+            if (!form) { showToast('Form not found', 'error'); return; }
+            const club = form.clubs;
+            const isPartner = club?.is_partner;
+            showToast('Creating Shopify draft order...');
+            try {
+                const lineItems = [];
+                for (const item of currentSubmissionItems) {
+                    const { data: cp } = await supabase.from('club_products')
+                        .select('*, products(*)').eq('id', item.club_product_id).single();
+                    if (!cp) continue;
+                    const price = isPartner
+                        ? (cp.partner_price || cp.web_price || 0)
+                        : (cp.non_partner_price || cp.web_price || 0);
+                    const variantIds = cp.shopify_variant_ids || [];
+                    let variantId = null;
+                    if (variantIds.length > 0) {
+                        const match = variantIds.find(v =>
+                            v.option2 === item.size || v.option1 === item.size ||
+                            (item.size.startsWith('Y') && v.option1 === 'Youth' && v.option2 === item.size) ||
+                            (!item.size.startsWith('Y') && v.option1 === 'Adult' && v.option2 === item.size)
+                        );
+                        if (match) variantId = match.id;
+                    }
+                    const lineItem = {
+                        title: cp.custom_name, quantity: item.quantity, price: price.toFixed(2), properties: []
+                    };
+                    if (variantId) lineItem.variant_id = variantId;
+                    if (item.player_name) lineItem.properties.push({ name: 'Player Name', value: item.player_name });
+                    if (item.player_number) lineItem.properties.push({ name: 'Player Number', value: item.player_number });
+                    if (currentSubmission.team_name) lineItem.properties.push({ name: 'Team', value: currentSubmission.team_name });
+                    lineItem.properties.push({ name: 'Size', value: item.size });
+                    if (item.notes) lineItem.properties.push({ name: 'Notes', value: item.notes });
+                    lineItems.push(lineItem);
+                }
+                if (!lineItems.length) { showToast('No line items to create. Ensure products are synced to Shopify.', 'error'); return; }
+                const nameParts = currentSubmission.contact_name.split(' ');
+                const draftOrderPayload = {
+                    draft_order: {
+                        line_items: lineItems,
+                        customer: { email: currentSubmission.contact_email, first_name: nameParts[0] || '', last_name: nameParts.slice(1).join(' ') || '-' },
+                        note: [`Club: ${club?.name || ''}`, `Team: ${currentSubmission.team_name || '-'}`, `Pricing: ${isPartner ? 'Partner' : 'Non-Partner'}`, currentSubmission.notes ? `Notes: ${currentSubmission.notes}` : ''].filter(Boolean).join('\n'),
+                        tags: `teamwearos,club:${club?.slug || ''},${isPartner ? 'partner' : 'non-partner'}`
+                    }
+                };
+                const result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST', 'draft_orders.json', draftOrderPayload);
+                const draftOrder = result.draft_order;
+                if (!draftOrder) throw new Error('No draft order returned');
+                await supabase.from('order_submissions').update({
+                    shopify_draft_order_id: draftOrder.id.toString(),
+                    shopify_draft_order_status: draftOrder.status,
+                    shopify_draft_order_url: draftOrder.invoice_url,
+                    reviewed_at: new Date().toISOString(),
+                    reviewed_by: currentUser.id
+                }).eq('id', currentSubmission.id);
+                document.getElementById('sub-draft-status').textContent = `Draft Order #${draftOrder.id} created`;
+                document.getElementById('sub-draft-status').className = 'text-green-400 text-sm';
+                document.getElementById('sub-create-draft-btn').textContent = 'Recreate Draft Order';
+                if (draftOrder.invoice_url) {
+                    document.getElementById('sub-draft-link').classList.remove('hide');
+                    document.getElementById('sub-draft-url').href = draftOrder.invoice_url;
+                }
+                showToast(`Draft Order #${draftOrder.id} created in Shopify!`);
+            } catch (err) { showToast('Draft order failed: ' + err.message, 'error'); }
+        }
+
+        // =============================================
+        // PUBLIC ORDER FORM
+        // =============================================
+        let publicFormData = null;
+        let publicFormProducts = [];
+        let publicFormRows = [];
+
+        async function loadPublicForm(token) {
+            const loadingEl = document.getElementById('pf-loading');
+            const errorEl = document.getElementById('pf-error');
+            const contentEl = document.getElementById('pf-content');
+            try {
+                const { data: form } = await supabase.from('order_forms')
+                    .select('*, clubs(id, name, slug, is_partner, brand_id, brands(name))')
+                    .eq('token', token).eq('is_active', true).single();
+                if (!form) { loadingEl.classList.add('hide'); errorEl.classList.remove('hide'); return; }
+                publicFormData = form;
+                const { data: clubProds } = await supabase.from('club_products')
+                    .select('*, products(fit_type, sizes)')
+                    .eq('club_id', form.clubs.id).eq('is_active', true);
+                publicFormProducts = clubProds || [];
+                if (!publicFormProducts.length) { loadingEl.classList.add('hide'); errorEl.classList.remove('hide'); return; }
+                document.getElementById('pf-club-name').textContent = form.clubs.name;
+                document.getElementById('pf-brand-logo').textContent = form.clubs.brands?.name || 'TeamwearOS';
+                document.getElementById('pf-form-title').textContent = form.title;
+                document.getElementById('pf-form-season').textContent = form.season ? `Season: ${form.season}` : '';
+                document.getElementById('pf-form-description').textContent = form.description || '';
+                loadingEl.classList.add('hide');
+                contentEl.classList.remove('hide');
+                addPublicFormRow();
+            } catch (err) {
+                loadingEl.classList.add('hide');
+                errorEl.classList.remove('hide');
+            }
+        }
+
+        function addPublicFormRow() {
+            const rowId = Date.now();
+            publicFormRows.push(rowId);
+            const productOptions = publicFormProducts.map(cp =>
+                `<option value="${cp.id}" data-sizes="${cp.products?.sizes || ''}">${cp.custom_name}</option>`
+            ).join('');
+            document.getElementById('pf-items-container').insertAdjacentHTML('beforeend', `
+                <div id="pf-row-${rowId}" class="player-row bg-gray-900/30 rounded-lg p-2">
+                    <select id="pf-product-${rowId}" onchange="updatePublicRowSizes(${rowId})" class="px-2 py-2 rounded-lg text-sm">
+                        <option value="">Product...</option>${productOptions}
+                    </select>
+                    <select id="pf-size-${rowId}" class="px-2 py-2 rounded-lg text-sm">
+                        <option value="">Size...</option>
+                    </select>
+                    <input type="number" id="pf-qty-${rowId}" value="1" min="1" class="px-2 py-2 rounded-lg text-sm text-center">
+                    <input type="text" id="pf-player-${rowId}" placeholder="Player name" class="px-2 py-2 rounded-lg text-sm">
+                    <input type="text" id="pf-num-${rowId}" placeholder="No." class="px-2 py-2 rounded-lg text-sm">
+                    <button onclick="removePublicFormRow(${rowId})" class="text-gray-600 hover:text-red-400 text-xl px-2">×</button>
+                </div>`);
+        }
+
+        function removePublicFormRow(rowId) {
+            document.getElementById(`pf-row-${rowId}`)?.remove();
+            publicFormRows = publicFormRows.filter(id => id !== rowId);
+        }
+
+        function updatePublicRowSizes(rowId) {
+            const productSelect = document.getElementById(`pf-product-${rowId}`);
+            const sizeSelect = document.getElementById(`pf-size-${rowId}`);
+            const selectedOpt = productSelect.options[productSelect.selectedIndex];
+            const sizesStr = selectedOpt.dataset.sizes || '';
+            const allSizes = sizesStr.split(',').map(s => s.trim()).filter(Boolean);
+            sizeSelect.innerHTML = '<option value="">Size...</option>' +
+                allSizes.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        async function submitPublicOrderForm() {
+            if (!publicFormData) return;
+            const contactName = document.getElementById('pf-contact-name').value.trim();
+            const contactEmail = document.getElementById('pf-contact-email').value.trim();
+            if (!contactName) { showToast('Please enter your name', 'error'); return; }
+            if (!contactEmail || !contactEmail.includes('@')) { showToast('Please enter a valid email', 'error'); return; }
+            const rowsData = [];
+            for (const rowId of publicFormRows) {
+                const productId = document.getElementById(`pf-product-${rowId}`)?.value;
+                const size = document.getElementById(`pf-size-${rowId}`)?.value;
+                const qty = parseInt(document.getElementById(`pf-qty-${rowId}`)?.value) || 1;
+                if (!productId || !size) continue;
+                rowsData.push({
+                    club_product_id: productId, size, quantity: qty,
+                    player_name: document.getElementById(`pf-player-${rowId}`)?.value.trim() || null,
+                    player_number: document.getElementById(`pf-num-${rowId}`)?.value.trim() || null,
+                    line_order: rowsData.length + 1
+                });
+            }
+            if (!rowsData.length) { showToast('Please add at least one item with a product and size', 'error'); return; }
+            const { data: submission, error: subError } = await supabase.from('order_submissions').insert({
+                form_id: publicFormData.id,
+                contact_name: contactName, contact_email: contactEmail,
+                contact_phone: document.getElementById('pf-contact-phone')?.value.trim() || null,
+                team_name: document.getElementById('pf-team-name')?.value.trim() || null,
+                notes: document.getElementById('pf-notes')?.value.trim() || null
+            }).select().single();
+            if (subError) { showToast('Submission failed: ' + subError.message, 'error'); return; }
+            const { error: itemsError } = await supabase.from('order_submission_items')
+                .insert(rowsData.map(r => ({ ...r, submission_id: submission.id })));
+            if (itemsError) { showToast('Error saving items: ' + itemsError.message, 'error'); return; }
+            document.getElementById('pf-content').classList.add('hide');
+            document.getElementById('pf-success').classList.remove('hide');
         }
 
         init();
