@@ -22,8 +22,9 @@ WHERE slug IS NULL;
 -- 2. Extend brands table (Shopify config)
 -- ----------------------------------------
 ALTER TABLE brands ADD COLUMN IF NOT EXISTS shopify_domain TEXT;
-ALTER TABLE brands ADD COLUMN IF NOT EXISTS shopify_access_token TEXT;
-ALTER TABLE brands ADD COLUMN IF NOT EXISTS shopify_api_version TEXT DEFAULT '2024-01';
+ALTER TABLE brands ADD COLUMN IF NOT EXISTS shopify_client_id TEXT;
+ALTER TABLE brands ADD COLUMN IF NOT EXISTS shopify_client_secret TEXT;
+ALTER TABLE brands ADD COLUMN IF NOT EXISTS shopify_api_version TEXT DEFAULT '2025-01';
 
 -- ----------------------------------------
 -- 3. Create club_products table

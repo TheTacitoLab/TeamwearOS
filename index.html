@@ -525,6 +525,12 @@
                     <h3 class="font-semibold text-lg mb-2">Factory Orders</h3>
                     <p class="text-gray-400 text-sm">Create and manage purchase orders</p>
                 </div>
+                <!-- PO Tracker V2 -->
+                <div onclick="showTool('po-tracker')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
+                    <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🚚</div>
+                    <h3 class="font-semibold text-lg mb-2">PO Tracker</h3>
+                    <p class="text-gray-400 text-sm">Track factory orders, link Shopify orders, manage delivery</p>
+                </div>
                 <!-- Club Mock-Ups (legacy - image upload) -->
                 <div onclick="showTool('mockups')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition opacity-70">
                     <div class="w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🎨</div>
@@ -1115,6 +1121,149 @@
             </div>
         </div>
 
+        <!-- TOOL: PO Tracker V2 -->
+        <div id="tool-po-tracker" class="hide p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
+                ← Back to Launchpad
+            </button>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">PO Tracker</h2>
+                <button onclick="openCreatePoModal()" class="bg-brand-500 hover:bg-brand-600 px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-2">
+                    + New PO
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="glass rounded-xl p-4 mb-6 flex flex-wrap gap-4 items-center">
+                <input type="text" id="po-search" placeholder="Search by PO number, factory, club..." class="flex-1 min-w-48 px-4 py-2 rounded-lg text-sm" oninput="renderPoList()">
+                <select id="po-status-filter" class="px-4 py-2 rounded-lg text-sm" onchange="renderPoList()">
+                    <option value="">All Statuses</option>
+                    <option value="draft">Draft</option>
+                    <option value="sent">Sent to Factory</option>
+                    <option value="acknowledged">Acknowledged</option>
+                    <option value="in_production">In Production</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+
+            <!-- PO List -->
+            <div id="po-list" class="space-y-3">
+                <p class="text-gray-400 text-center py-12">No purchase orders yet. Click "+ New PO" to create one.</p>
+            </div>
+        </div>
+
+        <!-- MODAL: Create / Edit PO -->
+        <div id="po-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-3xl mx-4 my-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold" id="po-modal-title">New Purchase Order</h3>
+                    <button onclick="hidePoModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <input type="hidden" id="po-edit-id">
+
+                <!-- PO Header fields -->
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">PO Number *</label>
+                        <input type="text" id="po-number" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. PO-2024-001">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Status</label>
+                        <select id="po-status" class="w-full px-4 py-3 rounded-lg">
+                            <option value="draft">Draft</option>
+                            <option value="sent">Sent to Factory</option>
+                            <option value="acknowledged">Acknowledged</option>
+                            <option value="in_production">In Production</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Factory Name</label>
+                        <input type="text" id="po-factory" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. Acme Manufacturing">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Club (optional)</label>
+                        <select id="po-club-id" class="w-full px-4 py-3 rounded-lg">
+                            <option value="">— No specific club —</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Expected Delivery</label>
+                        <input type="date" id="po-expected-delivery" class="w-full px-4 py-3 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Season / Reference</label>
+                        <input type="text" id="po-season" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. 2024/25">
+                    </div>
+                </div>
+
+                <!-- Shopify Order IDs -->
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Linked Shopify Order IDs <span class="text-gray-500">(comma-separated)</span></label>
+                    <input type="text" id="po-shopify-orders" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. 5001, 5002, 5003">
+                </div>
+
+                <!-- Notes -->
+                <div class="mb-6">
+                    <label class="text-gray-400 text-sm mb-1 block">Notes</label>
+                    <textarea id="po-notes" rows="2" class="w-full px-4 py-3 rounded-lg resize-none" placeholder="Internal notes…"></textarea>
+                </div>
+
+                <!-- Summary Line Items -->
+                <div class="mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h4 class="font-semibold text-gray-300">Summary Line Items</h4>
+                        <button onclick="addPoLineItem()" class="text-brand-400 hover:text-brand-300 text-sm font-medium">+ Add Line</button>
+                    </div>
+                    <div id="po-line-items" class="space-y-2">
+                        <!-- Lines added dynamically -->
+                    </div>
+                    <button onclick="addPoLineItem()" class="w-full border border-dashed border-gray-600 hover:border-brand-500 py-2 rounded-lg text-gray-400 hover:text-brand-400 transition text-sm mt-2">
+                        + Add Line Item
+                    </button>
+                </div>
+
+                <!-- PO Total -->
+                <div class="glass rounded-lg p-4 mb-6 flex justify-between items-center">
+                    <span class="text-gray-400">Estimated Total</span>
+                    <span id="po-total-display" class="text-xl font-bold text-brand-400">£0.00</span>
+                </div>
+
+                <div class="flex gap-3 justify-end">
+                    <button onclick="hidePoModal()" class="px-6 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Cancel</button>
+                    <button onclick="savePo()" class="bg-brand-500 hover:bg-brand-600 px-8 py-3 rounded-lg font-semibold transition">Save PO</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: PO Detail / View -->
+        <div id="po-detail-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-3xl mx-4 my-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold" id="po-detail-number">PO Detail</h3>
+                        <p class="text-gray-400 text-sm" id="po-detail-factory"></p>
+                    </div>
+                    <button onclick="hidePoDetailModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <div id="po-detail-body">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="flex gap-3 justify-end mt-6">
+                    <button onclick="hidePoDetailModal()" class="px-6 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Close</button>
+                    <button onclick="editCurrentPo()" class="bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-lg font-semibold transition">Edit PO</button>
+                    <button onclick="deleteCurrentPo()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold transition">Delete</button>
+                </div>
+            </div>
+        </div>
+
         <!-- TOOL: Brand Settings (Super Admin Only) -->
         <div id="tool-settings" class="hide p-8 max-w-6xl mx-auto">
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
@@ -1164,27 +1313,32 @@
                         <li>Create a Shopify Custom App in your Shopify Admin → Settings → Apps and sales channels</li>
                         <li>Grant permissions: read/write products, read/write draft orders, read/write collections</li>
                         <li>Add this app's domain to the Custom App's allowed CORS origins</li>
-                        <li>Copy the Admin API access token and paste it below</li>
+                        <li>Copy the <strong class="text-gray-300">API key (Client ID)</strong> and <strong class="text-gray-300">API secret key (Client Secret)</strong> and paste them below</li>
                     </ol>
                 </div>
 
-                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">Shopify Store Domain</label>
                         <input type="text" id="shopify-domain" placeholder="yourstore.myshopify.com" class="w-full px-3 py-2 rounded-lg text-sm">
                     </div>
                     <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Admin API Access Token</label>
-                        <input type="password" id="shopify-token" placeholder="shpat_xxxxxxxxxxxxxxxx" class="w-full px-3 py-2 rounded-lg text-sm">
-                    </div>
-                    <div>
                         <label class="text-gray-400 text-sm mb-1 block">API Version</label>
                         <select id="shopify-api-version" class="w-full px-3 py-2 rounded-lg text-sm">
-                            <option value="2024-01">2024-01</option>
-                            <option value="2024-04">2024-04</option>
-                            <option value="2024-07">2024-07</option>
+                            <option value="2025-01">2025-01</option>
                             <option value="2024-10">2024-10</option>
+                            <option value="2024-07">2024-07</option>
+                            <option value="2024-04">2024-04</option>
+                            <option value="2024-01">2024-01</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Client ID (API Key)</label>
+                        <input type="text" id="shopify-client-id" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Client Secret (API Secret Key)</label>
+                        <input type="password" id="shopify-client-secret" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" class="w-full px-3 py-2 rounded-lg text-sm">
                     </div>
                 </div>
                 <div class="flex gap-3">
@@ -1684,7 +1838,7 @@
         <!-- ============================================================
              MODAL: View Submission (with draft order creation)
              ============================================================ -->
-        <div id="submission-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8">
+        <div id="submission-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
             <div class="glass rounded-2xl p-6 w-full max-w-3xl mx-4 my-auto hide" id="submission-modal-inner">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold">Order Submission</h3>
@@ -2190,6 +2344,9 @@
                     break;
                 case 'users':
                     loadAllUsers();
+                    break;
+                case 'po-tracker':
+                    loadPoTracker();
                     break;
             }
         }
@@ -4707,22 +4864,26 @@
         function loadShopifyConfigUI() {
             if (!currentBrand) return;
             document.getElementById('shopify-domain').value = currentBrand.shopify_domain || '';
-            document.getElementById('shopify-token').value = currentBrand.shopify_access_token || '';
-            document.getElementById('shopify-api-version').value = currentBrand.shopify_api_version || '2024-01';
+            document.getElementById('shopify-client-id').value = currentBrand.shopify_client_id || '';
+            document.getElementById('shopify-client-secret').value = currentBrand.shopify_client_secret || '';
+            document.getElementById('shopify-api-version').value = currentBrand.shopify_api_version || '2025-01';
         }
 
         async function saveShopifyConfig() {
             const domain = document.getElementById('shopify-domain').value.trim();
-            const token = document.getElementById('shopify-token').value.trim();
+            const clientId = document.getElementById('shopify-client-id').value.trim();
+            const clientSecret = document.getElementById('shopify-client-secret').value.trim();
             const version = document.getElementById('shopify-api-version').value;
             const { error } = await supabase.from('brands').update({
                 shopify_domain: domain || null,
-                shopify_access_token: token || null,
+                shopify_client_id: clientId || null,
+                shopify_client_secret: clientSecret || null,
                 shopify_api_version: version
             }).eq('id', currentBrand.id);
             if (error) { showToast(error.message, 'error'); return; }
             currentBrand.shopify_domain = domain;
-            currentBrand.shopify_access_token = token;
+            currentBrand.shopify_client_id = clientId;
+            currentBrand.shopify_client_secret = clientSecret;
             currentBrand.shopify_api_version = version;
             showToast('Shopify config saved');
             const statusEl = document.getElementById('shopify-config-status');
@@ -4735,14 +4896,16 @@
 
         async function testShopifyConnection() {
             const domain = document.getElementById('shopify-domain').value.trim();
-            const token = document.getElementById('shopify-token').value.trim();
-            if (!domain || !token) { showToast('Enter domain and token first', 'error'); return; }
+            const clientId = document.getElementById('shopify-client-id').value.trim();
+            const clientSecret = document.getElementById('shopify-client-secret').value.trim();
+            const version = document.getElementById('shopify-api-version').value;
+            if (!domain || !clientId || !clientSecret) { showToast('Enter domain, client ID, and client secret first', 'error'); return; }
             const statusEl = document.getElementById('shopify-config-status');
             statusEl.className = 'mt-3 text-sm text-gray-400';
             statusEl.textContent = 'Testing connection...';
             statusEl.classList.remove('hide');
             try {
-                const result = await shopifyApiRequest(domain, token, '2024-01', 'GET', 'shop.json');
+                const result = await shopifyApiRequest(domain, clientId, clientSecret, version, 'GET', 'shop.json');
                 if (result.shop) {
                     statusEl.className = 'mt-3 text-sm text-green-400';
                     statusEl.textContent = `✓ Connected to ${result.shop.name} (${result.shop.domain})`;
@@ -4757,9 +4920,9 @@
             }
         }
 
-        async function shopifyApiRequest(domain, token, version, method, endpoint, body = null) {
+        async function shopifyApiRequest(domain, clientId, clientSecret, version, method, endpoint, body = null) {
             const url = `https://${domain}/admin/api/${version}/${endpoint}`;
-            const opts = { method, headers: { 'Content-Type': 'application/json', 'X-Shopify-Access-Token': token } };
+            const opts = { method, headers: { 'Content-Type': 'application/json', 'Authorization': 'Basic ' + btoa(clientId + ':' + clientSecret) } };
             if (body) opts.body = JSON.stringify(body);
             const res = await fetch(url, opts);
             if (!res.ok) {
@@ -4771,13 +4934,14 @@
 
         function getShopifyCredentials() {
             const domain = currentBrand?.shopify_domain;
-            const token = currentBrand?.shopify_access_token;
-            const version = currentBrand?.shopify_api_version || '2024-01';
-            if (!domain || !token) {
+            const clientId = currentBrand?.shopify_client_id;
+            const clientSecret = currentBrand?.shopify_client_secret;
+            const version = currentBrand?.shopify_api_version || '2025-01';
+            if (!domain || !clientId || !clientSecret) {
                 showToast('Shopify credentials not configured. Go to Brand Settings → Shopify API.', 'error');
                 return null;
             }
-            return { domain, token, version };
+            return { domain, clientId, clientSecret, version };
         }
 
         // =============================================
@@ -4831,10 +4995,10 @@
                 }
                 let result;
                 if (currentClub.shopify_collection_id) {
-                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'PUT',
+                    result = await shopifyApiRequest(creds.domain, creds.clientId, creds.clientSecret, creds.version, 'PUT',
                         `custom_collections/${currentClub.shopify_collection_id}.json`, collectionData);
                 } else {
-                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST',
+                    result = await shopifyApiRequest(creds.domain, creds.clientId, creds.clientSecret, creds.version, 'POST',
                         'custom_collections.json', collectionData);
                 }
                 const collectionId = result.custom_collection?.id?.toString();
@@ -4889,10 +5053,10 @@
                 if (cp.image_url) productPayload.product.images = [{ src: cp.image_url, alt: cp.custom_name }];
                 let result;
                 if (cp.shopify_product_id) {
-                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'PUT',
+                    result = await shopifyApiRequest(creds.domain, creds.clientId, creds.clientSecret, creds.version, 'PUT',
                         `products/${cp.shopify_product_id}.json`, productPayload);
                 } else {
-                    result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST',
+                    result = await shopifyApiRequest(creds.domain, creds.clientId, creds.clientSecret, creds.version, 'POST',
                         'products.json', productPayload);
                 }
                 const shopifyProduct = result.product;
@@ -4900,7 +5064,7 @@
                 const variantIds = shopifyProduct.variants?.map(v => ({ id: v.id, sku: v.sku, option1: v.option1, option2: v.option2 })) || [];
                 if (currentClub.shopify_collection_id && shopifyProduct.id) {
                     try {
-                        await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST', 'collects.json',
+                        await shopifyApiRequest(creds.domain, creds.clientId, creds.clientSecret, creds.version, 'POST', 'collects.json',
                             { collect: { product_id: shopifyProduct.id, collection_id: parseInt(currentClub.shopify_collection_id) } });
                     } catch(e) { /* may already be in collection */ }
                 }
@@ -5333,7 +5497,7 @@
                         tags: `teamwearos,club:${club?.slug || ''},${isPartner ? 'partner' : 'non-partner'}`
                     }
                 };
-                const result = await shopifyApiRequest(creds.domain, creds.token, creds.version, 'POST', 'draft_orders.json', draftOrderPayload);
+                const result = await shopifyApiRequest(creds.domain, creds.clientId, creds.clientSecret, creds.version, 'POST', 'draft_orders.json', draftOrderPayload);
                 const draftOrder = result.draft_order;
                 if (!draftOrder) throw new Error('No draft order returned');
                 await supabase.from('order_submissions').update({
@@ -5460,6 +5624,221 @@
             document.getElementById('pf-content').classList.add('hide');
             document.getElementById('pf-success').classList.remove('hide');
         }
+
+        // =============================================
+        // PO TRACKER V2
+        // =============================================
+        let currentPos = [];
+        let editingPoId = null;
+
+        async function loadPoTracker() {
+            const { data, error } = await supabase
+                .from('purchase_orders')
+                .select('*, clubs(name)')
+                .eq('brand_id', currentBrandId)
+                .order('created_at', { ascending: false });
+            if (error) { showToast('Error loading POs: ' + error.message, 'error'); return; }
+            currentPos = data || [];
+            renderPoList();
+        }
+
+        function renderPoList() {
+            const search = (document.getElementById('po-search')?.value || '').toLowerCase();
+            const statusFilter = document.getElementById('po-status-filter')?.value || '';
+            const filtered = currentPos.filter(po => {
+                const matchSearch = !search ||
+                    (po.po_number || '').toLowerCase().includes(search) ||
+                    (po.factory_name || '').toLowerCase().includes(search) ||
+                    (po.clubs?.name || '').toLowerCase().includes(search);
+                const matchStatus = !statusFilter || po.status === statusFilter;
+                return matchSearch && matchStatus;
+            });
+            const el = document.getElementById('po-list');
+            if (!filtered.length) {
+                el.innerHTML = '<p class="text-gray-400 text-center py-12">No purchase orders match your filters.</p>';
+                return;
+            }
+            const statusColors = { draft: 'bg-gray-500/20 text-gray-300', sent: 'bg-blue-500/20 text-blue-300', acknowledged: 'bg-cyan-500/20 text-cyan-300', in_production: 'bg-yellow-500/20 text-yellow-300', shipped: 'bg-orange-500/20 text-orange-300', delivered: 'bg-green-500/20 text-green-300', cancelled: 'bg-red-500/20 text-red-300' };
+            const statusLabel = { draft: 'Draft', sent: 'Sent', acknowledged: 'Acknowledged', in_production: 'In Production', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' };
+            el.innerHTML = filtered.map(po => {
+                const badge = `<span class="px-2 py-1 rounded-full text-xs font-medium ${statusColors[po.status] || 'bg-gray-500/20 text-gray-300'}">${statusLabel[po.status] || po.status}</span>`;
+                const shopifyIds = po.shopify_order_ids || [];
+                return `<div class="glass rounded-xl p-5 cursor-pointer hover:border-brand-500 transition" onclick="openPoDetail('${po.id}')">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-3 mb-1"><span class="font-bold text-lg">${po.po_number || 'No PO#'}</span>${badge}</div>
+                            <p class="text-gray-400 text-sm">${po.factory_name || 'No factory assigned'}${po.clubs?.name ? ' · ' + po.clubs.name : ''}</p>
+                        </div>
+                        <div class="text-right text-sm text-gray-400">
+                            ${po.expected_delivery_date ? '<p>Delivery: ' + po.expected_delivery_date + '</p>' : ''}
+                            ${shopifyIds.length ? '<p>' + shopifyIds.length + ' Shopify order' + (shopifyIds.length > 1 ? 's' : '') + ' linked</p>' : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function openCreatePoModal() {
+            editingPoId = null;
+            document.getElementById('po-modal-title').textContent = 'New Purchase Order';
+            document.getElementById('po-number').value = '';
+            document.getElementById('po-status').value = 'draft';
+            document.getElementById('po-factory').value = '';
+            document.getElementById('po-expected-delivery').value = '';
+            document.getElementById('po-season').value = '';
+            document.getElementById('po-shopify-orders').value = '';
+            document.getElementById('po-notes').value = '';
+            document.getElementById('po-line-items').innerHTML = '';
+            document.getElementById('po-total-display').textContent = '£0.00';
+            await populatePoClubDropdown('');
+            document.getElementById('po-modal').classList.remove('hide');
+        }
+
+        async function populatePoClubDropdown(selectedClubId) {
+            const { data } = await supabase.from('clubs').select('id, name').eq('brand_id', currentBrandId).order('name');
+            const sel = document.getElementById('po-club-id');
+            sel.innerHTML = '<option value="">— No specific club —</option>';
+            (data || []).forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                if (c.id === selectedClubId) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        function hidePoModal() {
+            document.getElementById('po-modal').classList.add('hide');
+            editingPoId = null;
+        }
+
+        function addPoLineItem(desc = '', qty = 1, unitPrice = '') {
+            const lineId = 'pl-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
+            const el = document.getElementById('po-line-items');
+            const div = document.createElement('div');
+            div.id = lineId;
+            div.className = 'flex gap-2 items-center';
+            div.innerHTML = `
+                <input type="text" placeholder="Description" value="${desc}" class="flex-1 px-3 py-2 rounded-lg text-sm" oninput="calcPoTotal()">
+                <input type="number" placeholder="Qty" value="${qty}" min="1" class="w-20 px-3 py-2 rounded-lg text-sm" oninput="calcPoTotal()">
+                <input type="number" placeholder="Unit £" value="${unitPrice}" step="0.01" class="w-28 px-3 py-2 rounded-lg text-sm" oninput="calcPoTotal()">
+                <button onclick="document.getElementById('${lineId}').remove(); calcPoTotal();" class="text-red-400 hover:text-red-300 text-xl px-1">&times;</button>`;
+            el.appendChild(div);
+            calcPoTotal();
+        }
+
+        function calcPoTotal() {
+            let total = 0;
+            document.querySelectorAll('#po-line-items > div').forEach(line => {
+                const inputs = line.querySelectorAll('input');
+                total += (parseFloat(inputs[1]?.value) || 0) * (parseFloat(inputs[2]?.value) || 0);
+            });
+            document.getElementById('po-total-display').textContent = '£' + total.toFixed(2);
+        }
+
+        async function savePo() {
+            const poNumber = document.getElementById('po-number').value.trim();
+            if (!poNumber) { showToast('PO Number is required', 'error'); return; }
+            const shopifyRaw = document.getElementById('po-shopify-orders').value.trim();
+            const shopifyIds = shopifyRaw ? shopifyRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+            const payload = {
+                brand_id: currentBrandId,
+                po_number: poNumber,
+                status: document.getElementById('po-status').value,
+                factory_name: document.getElementById('po-factory').value.trim() || null,
+                club_id: document.getElementById('po-club-id').value || null,
+                expected_delivery_date: document.getElementById('po-expected-delivery').value || null,
+                season: document.getElementById('po-season').value.trim() || null,
+                shopify_order_ids: shopifyIds,
+                notes: document.getElementById('po-notes').value.trim() || null
+            };
+            let poId = editingPoId;
+            if (poId) {
+                const { error } = await supabase.from('purchase_orders').update(payload).eq('id', poId);
+                if (error) { showToast('Error updating PO: ' + error.message, 'error'); return; }
+            } else {
+                const { data, error } = await supabase.from('purchase_orders').insert(payload).select().single();
+                if (error) { showToast('Error creating PO: ' + error.message, 'error'); return; }
+                poId = data.id;
+            }
+            await supabase.from('po_line_items').delete().eq('po_id', poId);
+            const lineData = [];
+            document.querySelectorAll('#po-line-items > div').forEach((line, idx) => {
+                const inputs = line.querySelectorAll('input');
+                const desc = inputs[0]?.value.trim();
+                if (desc) lineData.push({ po_id: poId, description: desc, quantity: parseInt(inputs[1]?.value) || 1, unit_price: parseFloat(inputs[2]?.value) || null, line_order: idx });
+            });
+            if (lineData.length) await supabase.from('po_line_items').insert(lineData);
+            showToast(editingPoId ? 'PO updated' : 'PO created', 'success');
+            hidePoModal();
+            await loadPoTracker();
+        }
+
+        async function openPoDetail(poId) {
+            const po = currentPos.find(p => p.id === poId);
+            if (!po) return;
+            const { data: lines } = await supabase.from('po_line_items').select('*').eq('po_id', poId).order('line_order');
+            document.getElementById('po-detail-number').textContent = po.po_number || 'PO Detail';
+            document.getElementById('po-detail-factory').textContent = po.factory_name || 'No factory assigned';
+            const statusLabel = { draft: 'Draft', sent: 'Sent to Factory', acknowledged: 'Acknowledged', in_production: 'In Production', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' };
+            const shopifyIds = po.shopify_order_ids || [];
+            const linesHtml = (lines || []).length
+                ? `<table class="w-full text-sm mb-4"><thead><tr class="text-gray-400 text-left"><th class="py-2">Description</th><th class="py-2 text-right">Qty</th><th class="py-2 text-right">Unit £</th><th class="py-2 text-right">Line Total</th></tr></thead><tbody>${(lines || []).map(l => `<tr class="border-t border-gray-800"><td class="py-2">${l.description}</td><td class="py-2 text-right">${l.quantity}</td><td class="py-2 text-right">${l.unit_price != null ? '£' + Number(l.unit_price).toFixed(2) : '—'}</td><td class="py-2 text-right">${l.unit_price != null ? '£' + (l.quantity * l.unit_price).toFixed(2) : '—'}</td></tr>`).join('')}</tbody></table>`
+                : '<p class="text-gray-500 text-sm mb-4">No line items.</p>';
+            document.getElementById('po-detail-body').innerHTML = `
+                <div class="grid md:grid-cols-2 gap-4 mb-4 text-sm">
+                    <div><span class="text-gray-400">Status</span><p class="font-medium mt-1">${statusLabel[po.status] || po.status}</p></div>
+                    <div><span class="text-gray-400">Club</span><p class="font-medium mt-1">${po.clubs?.name || '—'}</p></div>
+                    <div><span class="text-gray-400">Expected Delivery</span><p class="font-medium mt-1">${po.expected_delivery_date || '—'}</p></div>
+                    <div><span class="text-gray-400">Season</span><p class="font-medium mt-1">${po.season || '—'}</p></div>
+                </div>
+                ${shopifyIds.length ? `<div class="mb-4"><span class="text-gray-400 text-sm">Linked Shopify Orders</span><p class="font-medium mt-1">${shopifyIds.join(', ')}</p></div>` : ''}
+                ${po.notes ? `<div class="mb-4"><span class="text-gray-400 text-sm">Notes</span><p class="mt-1">${po.notes}</p></div>` : ''}
+                <h4 class="font-semibold text-gray-300 mb-2">Line Items</h4>${linesHtml}`;
+            document.getElementById('po-detail-modal')._currentPoId = poId;
+            document.getElementById('po-detail-modal').classList.remove('hide');
+        }
+
+        function hidePoDetailModal() {
+            document.getElementById('po-detail-modal').classList.add('hide');
+        }
+
+        async function editCurrentPo() {
+            const poId = document.getElementById('po-detail-modal')._currentPoId;
+            if (!poId) return;
+            hidePoDetailModal();
+            const po = currentPos.find(p => p.id === poId);
+            if (!po) return;
+            const { data: lines } = await supabase.from('po_line_items').select('*').eq('po_id', poId).order('line_order');
+            editingPoId = poId;
+            document.getElementById('po-modal-title').textContent = 'Edit Purchase Order';
+            document.getElementById('po-number').value = po.po_number || '';
+            document.getElementById('po-status').value = po.status || 'draft';
+            document.getElementById('po-factory').value = po.factory_name || '';
+            document.getElementById('po-expected-delivery').value = po.expected_delivery_date || '';
+            document.getElementById('po-season').value = po.season || '';
+            document.getElementById('po-shopify-orders').value = (po.shopify_order_ids || []).join(', ');
+            document.getElementById('po-notes').value = po.notes || '';
+            document.getElementById('po-line-items').innerHTML = '';
+            (lines || []).forEach(l => addPoLineItem(l.description, l.quantity, l.unit_price ?? ''));
+            await populatePoClubDropdown(po.club_id);
+            calcPoTotal();
+            document.getElementById('po-modal').classList.remove('hide');
+        }
+
+        async function deleteCurrentPo() {
+            const poId = document.getElementById('po-detail-modal')._currentPoId;
+            if (!poId) return;
+            if (!confirm('Delete this purchase order? This cannot be undone.')) return;
+            const { error } = await supabase.from('purchase_orders').delete().eq('id', poId);
+            if (error) { showToast('Error deleting PO: ' + error.message, 'error'); return; }
+            showToast('PO deleted', 'success');
+            hidePoDetailModal();
+            await loadPoTracker();
+        }
+
+        document.getElementById('po-modal').addEventListener('click', function(e) { if (e.target === this) hidePoModal(); });
+        document.getElementById('po-detail-modal').addEventListener('click', function(e) { if (e.target === this) hidePoDetailModal(); });
 
         init();
     </script>
