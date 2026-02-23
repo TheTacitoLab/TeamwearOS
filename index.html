@@ -767,6 +767,71 @@
         .job-tab-btn:hover { color: #ccc; background: rgba(255,255,255,0.04); }
         .job-tab-btn.active { color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
 
+        /* Design Studio pipeline cards */
+        .design-stage-card {
+            background: rgba(15,15,15,0.9);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        .design-stage-card:hover {
+            border-color: rgba(236,72,153,0.3);
+            background: rgba(236,72,153,0.03);
+        }
+        .design-stage-active {
+            border-color: rgba(236,72,153,0.4) !important;
+            background: rgba(236,72,153,0.06) !important;
+        }
+        .design-job-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 16px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .design-job-card:hover {
+            border-color: rgba(236,72,153,0.3);
+            background: rgba(236,72,153,0.03);
+        }
+        /* Design status action buttons */
+        .ds-status-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .ds-status-btn.active { box-shadow: 0 0 0 2px currentColor; }
+        /* Activity log */
+        .activity-entry {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .activity-entry:last-child { border-bottom: none; }
+        .activity-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: rgba(20,184,166,0.12);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: #2dd4bf;
+            flex-shrink: 0;
+        }
+        /* Club team card */
+        .club-team-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+
         /* Design version cards */
         .version-card {
             background: rgba(255,255,255,0.02);
@@ -950,11 +1015,15 @@
                 </div>
 
                 <!-- Design Studio -->
-                <div id="fc-design" onclick="showTool('mockups')" class="feature-card accent-pink">
+                <div id="fc-design" onclick="showTool('design-studio')" class="feature-card accent-pink">
                     <span class="card-badge badge-new" id="badge-design" style="display:none">Off</span>
                     <div class="card-icon" style="background:rgba(236,72,153,0.12)">🎨</div>
                     <h3>Design Studio</h3>
-                    <p>Upload and manage mockup images for product presentations</p>
+                    <p>Design pipeline — track briefs by stage from working to approved</p>
+                    <div class="mt-4 flex items-center gap-2">
+                        <span id="stat-design-active" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(236,72,153,0.1);color:#f472b6">0 active</span>
+                        <span id="stat-design-review" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(255,255,255,0.04);color:#666">0 in review</span>
+                    </div>
                 </div>
 
                 <!-- Store Generator -->
@@ -1288,6 +1357,89 @@
         </div>
 
         <!-- TOOL: Club Mock-Ups -->
+        <!-- TOOL: Design Studio Pipeline Launchpad -->
+        <div id="tool-design-studio" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Launchpad
+            </button>
+
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold">Design Studio</h2>
+                    <p class="text-gray-500 text-sm mt-1">All design briefs across the pipeline</p>
+                </div>
+                <div class="flex gap-3 items-center">
+                    <span class="text-xs text-gray-500">Filter:</span>
+                    <button id="ds-filter-mine" onclick="setDesignFilter('mine')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)">My Jobs</button>
+                    <button id="ds-filter-all" onclick="setDesignFilter('all')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(255,255,255,0.05);color:#888;border:1px solid rgba(255,255,255,0.08)">All Jobs</button>
+                </div>
+            </div>
+
+            <!-- Stage Pipeline -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="ds-stage-nav">
+                <div onclick="filterDesignByStage('all')" id="ds-stage-all" class="design-stage-card design-stage-active" style="cursor:pointer">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(255,255,255,0.06)">🎨</div>
+                        <span id="ds-count-all" class="text-lg font-bold text-white">0</span>
+                    </div>
+                    <p class="text-sm font-semibold text-white">All Briefs</p>
+                </div>
+                <div onclick="filterDesignByStage('in_progress')" id="ds-stage-in_progress" class="design-stage-card" style="cursor:pointer">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(251,191,36,0.12)">✏️</div>
+                        <span id="ds-count-in_progress" class="text-lg font-bold" style="color:#fbbf24">0</span>
+                    </div>
+                    <p class="text-sm font-semibold" style="color:#fbbf24">Working</p>
+                </div>
+                <div onclick="filterDesignByStage('in_review')" id="ds-stage-in_review" class="design-stage-card" style="cursor:pointer">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(96,165,250,0.12)">👁️</div>
+                        <span id="ds-count-in_review" class="text-lg font-bold" style="color:#60a5fa">0</span>
+                    </div>
+                    <p class="text-sm font-semibold" style="color:#60a5fa">In Review</p>
+                </div>
+                <div onclick="filterDesignByStage('revisions')" id="ds-stage-revisions" class="design-stage-card" style="cursor:pointer">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(251,113,133,0.12)">🔄</div>
+                        <span id="ds-count-revisions" class="text-lg font-bold" style="color:#fb7185">0</span>
+                    </div>
+                    <p class="text-sm font-semibold" style="color:#fb7185">Revisions</p>
+                </div>
+                <div onclick="filterDesignByStage('awaiting_approval')" id="ds-stage-awaiting_approval" class="design-stage-card" style="cursor:pointer">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(167,139,250,0.12)">⏳</div>
+                        <span id="ds-count-awaiting_approval" class="text-lg font-bold" style="color:#a78bfa">0</span>
+                    </div>
+                    <p class="text-sm font-semibold" style="color:#a78bfa">Awaiting Approval</p>
+                </div>
+                <div onclick="filterDesignByStage('complete')" id="ds-stage-complete" class="design-stage-card" style="cursor:pointer">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(74,222,128,0.12)">✅</div>
+                        <span id="ds-count-complete" class="text-lg font-bold" style="color:#4ade80">0</span>
+                    </div>
+                    <p class="text-sm font-semibold" style="color:#4ade80">Approved</p>
+                </div>
+                <div onclick="filterDesignByStage('new')" id="ds-stage-new" class="design-stage-card" style="cursor:pointer">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(20,184,166,0.12)">🆕</div>
+                        <span id="ds-count-new" class="text-lg font-bold text-brand-400">0</span>
+                    </div>
+                    <p class="text-sm font-semibold text-brand-400">New</p>
+                </div>
+            </div>
+
+            <!-- Design Jobs List -->
+            <div id="ds-jobs-list" class="space-y-3">
+                <!-- Populated by JS -->
+            </div>
+            <div id="ds-jobs-empty" class="hide text-center py-16">
+                <div class="empty-icon text-5xl mb-3">🎨</div>
+                <p class="text-gray-400 font-medium">No design briefs found</p>
+                <p class="text-gray-600 text-sm mt-1">Design briefs are created from within job records</p>
+            </div>
+        </div>
+
         <div id="tool-mockups" class="hide p-6 md:p-8 max-w-6xl mx-auto">
             <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -1842,9 +1994,13 @@
 
             <!-- All Users -->
             <div class="glass rounded-2xl p-6">
-                <h3 class="font-semibold mb-4">All Users</h3>
-                <p class="text-gray-400 text-sm mb-4">Assign users to brands. Users can only see data for their assigned brand.</p>
-                <div id="users-list" class="space-y-3">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-semibold">All Users</h3>
+                        <p class="text-gray-400 text-sm mt-1">Assign users to brands and control which features each user can access.</p>
+                    </div>
+                </div>
+                <div id="users-list" class="space-y-4">
                     <!-- Populated by JS -->
                 </div>
             </div>
@@ -2314,11 +2470,26 @@
                     <div class="glass rounded-2xl p-5">
                         <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Job Details</h4>
                         <div id="jr-overview-details" class="space-y-3"></div>
+                        <!-- Assigned user row -->
+                        <div class="mt-4 pt-4 border-t border-gray-800">
+                            <label class="text-xs text-gray-500 mb-2 block">Assigned To</label>
+                            <select id="jr-assigned-user" onchange="saveJobAssignment(this.value)" class="w-full px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd">
+                                <option value="">Unassigned</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="glass rounded-2xl p-5">
-                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Notes</h4>
-                        <textarea id="jr-notes-field" rows="8" placeholder="Internal notes for this job..." class="w-full px-3 py-2 rounded-lg text-sm resize-none" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#ddd"></textarea>
-                        <button onclick="saveJobNotes()" class="btn-primary text-sm mt-3">Save Notes</button>
+                    <!-- Activity Log -->
+                    <div class="glass rounded-2xl p-5 flex flex-col">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Activity Log</h4>
+                        </div>
+                        <div id="jr-activity-log" class="flex-1 overflow-y-auto max-h-64 mb-3 space-y-1">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="flex gap-2 mt-auto">
+                            <input type="text" id="jr-activity-input" placeholder="Add a note..." class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd" onkeydown="if(event.key==='Enter')addJobActivity()">
+                            <button onclick="addJobActivity()" class="btn-primary text-sm px-4">Post</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -2361,15 +2532,34 @@
 
             <!-- TAB: Team -->
             <div id="jt-content-team" class="hide">
-                <div class="flex items-center justify-between mb-5">
-                    <h4 class="font-semibold">Team Record</h4>
-                    <button onclick="openTeamModal(null)" class="btn-primary text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Team
-                    </button>
+                <!-- Section 1: Club Team (from club_teams linked to the club) -->
+                <div class="glass rounded-2xl p-5 mb-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h4 class="font-semibold">Club Team</h4>
+                            <p class="text-gray-500 text-sm mt-0.5">Which club team is this job for?</p>
+                        </div>
+                    </div>
+                    <div id="jr-club-team-section">
+                        <p class="text-gray-600 text-sm">Link a club to this job first to select a team.</p>
+                    </div>
                 </div>
-                <div id="jr-teams-list" class="space-y-3"></div>
-                <div id="jr-teams-empty" class="empty-state"><div class="empty-icon">👕</div><p>No teams added yet.</p></div>
+
+                <!-- Section 2: Project Team (internal staff on this job) -->
+                <div class="glass rounded-2xl p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h4 class="font-semibold">Project Team</h4>
+                            <p class="text-gray-500 text-sm mt-0.5">Internal staff members working on this job</p>
+                        </div>
+                        <button onclick="openTeamModal(null)" class="btn-primary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Member
+                        </button>
+                    </div>
+                    <div id="jr-teams-list" class="space-y-3"></div>
+                    <div id="jr-teams-empty" class="empty-state hide"><div class="empty-icon">👤</div><p>No project team members added yet.</p></div>
+                </div>
             </div>
 
             <!-- TAB: Design Studio -->
@@ -2633,6 +2823,7 @@
             <!-- Tab navigation -->
             <div class="tab-nav">
                 <button id="tab-btn-overview" onclick="showClubTab('overview')" class="active">Overview</button>
+                <button id="tab-btn-teams" onclick="showClubTab('teams')">Teams</button>
                 <button id="tab-btn-products" onclick="showClubTab('products')">Club Products</button>
                 <button id="tab-btn-orderforms" onclick="showClubTab('orderforms')">Order Forms</button>
                 <button id="tab-btn-onboarding" onclick="showClubTab('onboarding')">Onboarding</button>
@@ -2653,10 +2844,17 @@
                     <!-- Branding card -->
                     <div class="card">
                         <h3 class="font-semibold text-brand-400 mb-4">Brand Identity</h3>
-                        <!-- Club Crest -->
+                        <!-- Club Logo / Crest -->
                         <div class="mb-4">
-                            <p class="text-xs text-gray-500 mb-2">Club Crest</p>
-                            <div id="club-crest-display" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.1)">🏟️</div>
+                            <p class="text-xs text-gray-500 mb-2">Club Logo / Crest</p>
+                            <div class="flex items-start gap-3">
+                                <div id="club-crest-display" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.1)">🏟️</div>
+                                <div class="flex flex-col gap-2 justify-center">
+                                    <button onclick="document.getElementById('club-logo-upload-inline').click()" class="text-xs btn-secondary px-3 py-1.5">Upload Logo</button>
+                                    <input type="file" id="club-logo-upload-inline" accept="image/*" class="hide" onchange="uploadClubLogoInline(event)">
+                                    <button id="club-logo-download-btn" onclick="downloadClubLogo()" class="text-xs btn-secondary px-3 py-1.5 hide">Download</button>
+                                </div>
+                            </div>
                         </div>
                         <!-- Pantone colours -->
                         <div class="mb-4">
@@ -2667,6 +2865,13 @@
                                 <div id="pantone-acc-swatch" class="pantone-swatch" title="Accent"></div>
                                 <span id="pantone-labels" class="text-xs text-gray-600">—</span>
                             </div>
+                        </div>
+                        <!-- Assigned to -->
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-500 mb-2">Assigned To</p>
+                            <select id="club-assigned-user" onchange="saveClubAssignment(this.value)" class="w-full px-2 py-1.5 rounded-lg text-xs" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd">
+                                <option value="">Unassigned</option>
+                            </select>
                         </div>
                         <!-- Sponsor logos -->
                         <div>
@@ -2693,6 +2898,27 @@
                         <p class="text-xs text-gray-500 mb-1">Shopify Synced</p>
                         <p id="overview-stat-synced" class="text-2xl font-bold" style="color:#c084fc">0</p>
                     </div>
+                </div>
+            </div>
+
+            <!-- TAB: Teams -->
+            <div id="club-tab-teams" class="club-tab-content hide">
+                <div class="section-header mb-5">
+                    <div>
+                        <h3 class="font-semibold text-lg">Club Teams</h3>
+                        <p class="text-gray-500 text-sm mt-1">All squads and teams within this club. Every team must belong to a club.</p>
+                    </div>
+                    <button onclick="openClubTeamModal(null)" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Team
+                    </button>
+                </div>
+                <div id="club-teams-list" class="grid md:grid-cols-2 gap-4">
+                    <!-- Populated by JS -->
+                </div>
+                <div id="club-teams-empty" class="hide text-center py-12">
+                    <div class="empty-icon">👕</div>
+                    <p class="text-gray-500">No teams yet. Add teams for this club.</p>
                 </div>
             </div>
 
@@ -2957,6 +3183,20 @@
                     </div>
                 </div>
 
+                <!-- Club Logo Upload -->
+                <div class="modal-section">
+                    <p class="modal-section-title">Club Logo</p>
+                    <div class="flex items-center gap-4">
+                        <div id="club-logo-preview" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15)">🏟️</div>
+                        <div class="flex-1">
+                            <input type="file" id="club-logo-upload" accept="image/*" class="hide" onchange="previewClubLogo(event)">
+                            <button onclick="document.getElementById('club-logo-upload').click()" class="btn-secondary text-sm mb-2 w-full">Upload Logo / Crest</button>
+                            <p class="text-xs text-gray-600">PNG or SVG recommended. Shown in design studio assets.</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="club-logo-url-existing">
+                </div>
+
                 <!-- Address -->
                 <div class="modal-section">
                     <p class="modal-section-title">Address</p>
@@ -3010,6 +3250,58 @@
                     <button onclick="hideCreateClubModal()" class="flex-1 btn-secondary py-3">Cancel</button>
                     <button onclick="saveClubEnhanced()" class="flex-1 btn-primary py-3">Save Club</button>
                 </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Add/Edit Club Team
+             ============================================================ -->
+        <div id="club-team-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
+            <div class="glass rounded-2xl p-6 w-full max-w-lg mx-4 my-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="club-team-modal-title" class="text-xl font-bold">Add Team</h3>
+                    <button onclick="closeClubTeamModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <input type="hidden" id="edit-club-team-id">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="col-span-2">
+                        <label class="text-gray-400 text-sm mb-1 block">Team Name *</label>
+                        <input type="text" id="ct-name" placeholder="e.g. U14s Boys, First Team, Ladies" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Age Group</label>
+                        <input type="text" id="ct-age-group" placeholder="e.g. Under 14s, Senior" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Gender</label>
+                        <select id="ct-gender" class="w-full px-3 py-2 rounded-lg text-sm">
+                            <option value="">Not specified</option>
+                            <option value="Boys / Male">Boys / Male</option>
+                            <option value="Girls / Female">Girls / Female</option>
+                            <option value="Mixed">Mixed</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Coach / Manager Name</label>
+                        <input type="text" id="ct-coach-name" placeholder="John Smith" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Coach Email</label>
+                        <input type="email" id="ct-coach-email" placeholder="coach@club.com" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Coach Phone</label>
+                        <input type="tel" id="ct-coach-phone" placeholder="+44 7700 000000" class="w-full px-3 py-2 rounded-lg text-sm">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="text-gray-400 text-sm mb-1 block">Notes</label>
+                        <textarea id="ct-notes" rows="2" placeholder="Any additional notes..." class="w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                    </div>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="closeClubTeamModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="saveClubTeam()" class="flex-1 btn-primary py-3">Save Team</button>
                 </div>
             </div>
         </div>
@@ -3465,6 +3757,8 @@
 
             // Load data
             await loadAllData();
+            // Apply any feature access restrictions for this user
+            await applyUserFeaturePermissions();
             showLaunchpad();
         }
 
@@ -3480,6 +3774,7 @@
             
             // Reload all data for new brand
             await loadAllData();
+            await applyUserFeaturePermissions();
             showLaunchpad();
             showToast(`Switched to ${brand.name}`);
         }
@@ -3578,6 +3873,21 @@
             // Load jobs
             await loadJobs();
 
+            // Load user feature permissions (used to restrict UI access per user)
+            await loadUserFeaturePermissions();
+
+            // Load design task counts for launchpad badges
+            const { data: dtData } = await supabase
+                .from('design_tasks')
+                .select('status, jobs!inner(brand_id)')
+                .eq('jobs.brand_id', currentBrand.id);
+            const activeDT = (dtData || []).filter(dt => dt.status === 'in_progress').length;
+            const reviewDT = (dtData || []).filter(dt => dt.status === 'in_review').length;
+            const el_da = document.getElementById('stat-design-active');
+            const el_dr = document.getElementById('stat-design-review');
+            if (el_da) el_da.textContent = `${activeDT} active`;
+            if (el_dr) el_dr.textContent = `${reviewDT} in review`;
+
             updateStats();
         }
 
@@ -3656,7 +3966,7 @@
                 'sales':          { card: 'fc-sales',       badge: 'badge-sales',       onclick: "showTool('sales')" },
                 'clubs':          { card: 'fc-clubs',       badge: 'badge-clubs',       onclick: "showTool('clubs')" },
                 'production':     { card: 'fc-production',  badge: 'badge-production',  onclick: "showTool('po-tracker')" },
-                'design_studio':  { card: 'fc-design',      badge: 'badge-design',      onclick: "showTool('mockups')" },
+                'design_studio':  { card: 'fc-design',      badge: 'badge-design',      onclick: "showTool('design-studio')" },
                 'store_generator':{ card: 'fc-store',       badge: 'badge-store',       onclick: "showTool('generator')" },
                 'products':       { card: 'fc-products',    badge: 'badge-products',    onclick: "showTool('products')" }
             };
@@ -3696,6 +4006,9 @@
                     break;
                 case 'clubs':
                     renderClubsEnhanced();
+                    break;
+                case 'design-studio':
+                    loadDesignStudio();
                     break;
                 case 'mockups':
                     populateClubSelect();
@@ -3894,28 +4207,41 @@
                 .from('user_profiles')
                 .select('*, brands(name)')
                 .order('email');
-            
+            await loadUserFeaturePermissions();
+
             const container = document.getElementById('users-list');
-            
             if (!users || users.length === 0) {
                 container.innerHTML = '<p class="text-gray-500">No users found</p>';
                 return;
             }
-            
-            container.innerHTML = users.map(user => `
-                <div class="flex items-center justify-between bg-gray-800 rounded-lg px-4 py-3">
-                    <div>
-                        <span class="font-medium">${user.email}</span>
-                        ${user.role === 'super_admin' ? '<span class="text-purple-400 text-xs ml-2">SUPER ADMIN</span>' : ''}
-                    </div>
-                    <div class="flex items-center gap-3">
+
+            container.innerHTML = users.map(user => {
+                const perms = userFeaturePermissions[user.id] || {};
+                const featureChecks = FEATURES.map(f => {
+                    const enabled = perms[f.key] !== false; // default: enabled
+                    return `<label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" ${enabled ? 'checked' : ''} onchange="saveUserFeaturePermission('${user.id}','${f.key}',this.checked)" class="rounded" ${user.role === 'super_admin' ? 'disabled' : ''}>
+                        <span class="text-xs">${f.icon} ${f.label}</span>
+                    </label>`;
+                }).join('');
+                return `
+                <div class="glass rounded-xl p-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <span class="font-medium text-sm">${escHtml(user.email)}</span>
+                            ${user.role === 'super_admin' ? '<span class="text-purple-400 text-xs ml-2 px-2 py-0.5 rounded" style="background:rgba(167,139,250,0.1)">SUPER ADMIN</span>' : ''}
+                        </div>
                         <select onchange="assignUserToBrand('${user.id}', this.value)" class="bg-gray-700 border border-gray-600 px-3 py-1 rounded text-sm" ${user.role === 'super_admin' ? 'disabled' : ''}>
                             <option value="">No brand</option>
-                            ${allBrands.map(b => `<option value="${b.id}" ${user.brand_id === b.id ? 'selected' : ''}>${b.name}</option>`).join('')}
+                            ${allBrands.map(b => `<option value="${b.id}" ${user.brand_id === b.id ? 'selected' : ''}>${escHtml(b.name)}</option>`).join('')}
                         </select>
                     </div>
-                </div>
-            `).join('');
+                    ${user.role !== 'super_admin' ? `<div>
+                        <p class="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Feature Access</p>
+                        <div class="flex flex-wrap gap-x-5 gap-y-2">${featureChecks}</div>
+                    </div>` : '<p class="text-xs text-gray-600">Super admin — full access to all features</p>'}
+                </div>`;
+            }).join('');
         }
 
         async function assignUserToBrand(userId, brandId) {
@@ -6100,6 +6426,11 @@
             document.getElementById('club-pantone-main').value = '#14b8a6';
             document.getElementById('club-pantone-sec').value = '#ffffff';
             document.getElementById('club-pantone-acc').value = '#000000';
+            // Reset logo preview
+            const logoPreview = document.getElementById('club-logo-preview');
+            if (logoPreview) logoPreview.innerHTML = '🏟️';
+            const logoExisting = document.getElementById('club-logo-url-existing');
+            if (logoExisting) logoExisting.value = '';
             document.getElementById('create-club-modal').classList.remove('hide');
         }
 
@@ -6127,6 +6458,12 @@
             document.getElementById('club-contact-name').value = currentClub.contact_name || '';
             document.getElementById('club-contact-email').value = currentClub.contact_email || '';
             document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
+            // Logo preview
+            const logoSrc = currentClub.logo_url || currentClub.club_crest_url;
+            const logoPreview = document.getElementById('club-logo-preview');
+            const logoExisting = document.getElementById('club-logo-url-existing');
+            if (logoPreview) logoPreview.innerHTML = logoSrc ? `<img src="${escHtml(logoSrc)}" class="w-full h-full object-contain rounded-xl">` : '🏟️';
+            if (logoExisting) logoExisting.value = logoSrc || '';
             document.getElementById('create-club-modal').classList.remove('hide');
         }
 
@@ -6167,6 +6504,18 @@
                 if (existing) { showToast(`Suffix "${suffix}" already used`, 'error'); return; }
             }
             const clubStatus = document.getElementById('club-status')?.value || 'retail';
+            // Handle logo upload if a new file was selected
+            let logoUrl = document.getElementById('club-logo-url-existing')?.value || null;
+            const logoFile = document.getElementById('club-logo-upload')?.files[0];
+            if (logoFile && currentBrand) {
+                const ext = logoFile.name.substring(logoFile.name.lastIndexOf('.'));
+                const sp = `${currentBrand.slug}/${suffix}/logo${ext}`;
+                const { error: upErr } = await supabase.storage.from('club-images').upload(sp, logoFile, { upsert: true });
+                if (!upErr) {
+                    const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(sp);
+                    logoUrl = urlData.publicUrl;
+                }
+            }
             const clubData = {
                 brand_id: currentBrand.id, name, suffix,
                 sport: document.getElementById('club-sport').value || null,
@@ -6184,7 +6533,8 @@
                 pantone_accent: document.getElementById('club-pantone-acc')?.value || null,
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
-                contact_phone: document.getElementById('club-contact-phone').value.trim() || null
+                contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
+                logo_url: logoUrl
             };
             let result;
             if (clubId) {
@@ -6252,6 +6602,7 @@
             document.querySelectorAll('.tab-nav button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`club-tab-${tab}`)?.classList.remove('hide');
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
+            if (tab === 'teams') { loadClubTeams().then(() => renderClubTeams()); }
             if (tab === 'products') renderClubProducts();
             if (tab === 'orderforms') renderClubOrderForms();
             if (tab === 'onboarding') { renderShopifySyncStatus(); renderOnboardingTab(); }
@@ -6328,11 +6679,18 @@
                 `<div class="info-row"><span class="info-label">${escHtml(label)}</span><span class="info-value">${escHtml(value)}</span></div>`
             ).join('');
 
-            // Update branding panel
+            // Update branding panel — prefer logo_url, fall back to club_crest_url
             const crestEl = document.getElementById('club-crest-display');
-            if (crestEl && currentClub.club_crest_url) {
-                crestEl.innerHTML = `<img src="${escHtml(currentClub.club_crest_url)}" class="w-full h-full object-contain rounded-xl">`;
+            const logoSrc = currentClub.logo_url || currentClub.club_crest_url;
+            if (crestEl) {
+                crestEl.innerHTML = logoSrc
+                    ? `<img src="${escHtml(logoSrc)}" class="w-full h-full object-contain rounded-xl">`
+                    : '🏟️';
             }
+            const dlBtn = document.getElementById('club-logo-download-btn');
+            if (dlBtn) { if (logoSrc) dlBtn.classList.remove('hide'); else dlBtn.classList.add('hide'); }
+            // Populate assignment dropdown
+            populateUserAssignDropdown('club-assigned-user', currentClub.assigned_user_id);
             const mainSwatch = document.getElementById('pantone-main-swatch');
             const secSwatch = document.getElementById('pantone-sec-swatch');
             const accSwatch = document.getElementById('pantone-acc-swatch');
@@ -7795,6 +8153,14 @@
 
             renderJobHeader();
             showJobTab('overview');
+            // Load activity log and populate user assignment dropdown
+            await Promise.all([loadJobActivity(), loadBrandUsers()]);
+            populateUserAssignDropdown('jr-assigned-user', currentJob?.assigned_user_id);
+        }
+
+        // Helper to open job record from design studio (sets right tab)
+        function showJobRecord(job) {
+            openJobRecord(job.id);
         }
 
         function closeJobRecord() {
@@ -7833,14 +8199,6 @@
             showToast('Stage updated to ' + JOB_STAGES.find(s => s.key === newStage)?.label);
         }
 
-        async function saveJobNotes() {
-            if (!currentJobId) return;
-            const notes = document.getElementById('jr-notes-field').value;
-            const { error } = await supabase.from('jobs').update({ notes }).eq('id', currentJobId);
-            if (error) { showToast('Error saving notes', 'error'); return; }
-            showToast('Notes saved');
-        }
-
         // =============================================
         // SALES — JOB TABS
         // =============================================
@@ -7856,16 +8214,18 @@
                 case 'overview':   renderJobOverview(); break;
                 case 'products':   renderJobProducts(); break;
                 case 'club':       renderJobClubTab(); break;
-                case 'team':       loadJobTeams(); break;
+                case 'team':       loadJobTeams(); renderJobClubTeamSection(); break;
                 case 'design':     loadJobDesign(); break;
                 case 'orderform':  renderJobOrderForm(); break;
                 case 'production': renderJobProduction(); break;
             }
         }
 
+        // Allow design studio to jump straight to design tab
+        function switchJobTab(tab) { showJobTab(tab); }
+
         function renderJobOverview() {
             if (!currentJob) return;
-            document.getElementById('jr-notes-field').value = currentJob.notes || '';
             const details = document.getElementById('jr-overview-details');
             if (!details) return;
             const rows = [
@@ -8148,27 +8508,83 @@
             if (!currentDesignTask) {
                 container.innerHTML = `<div class="glass rounded-2xl p-8 text-center">
                     <div class="empty-icon text-5xl mb-3">🎨</div>
-                    <p class="text-gray-500 mb-4">No design task created for this job yet.</p>
-                    <button onclick="openCreateDesignTask()" class="btn-primary">Create Design Task</button>
+                    <p class="text-gray-500 mb-4">No design brief created for this job yet.</p>
+                    <button onclick="openCreateDesignTask()" class="btn-primary">Create Design Brief</button>
                 </div>`;
                 return;
             }
 
-            const statusClass = `design-status-${currentDesignTask.status}`;
+            const s = currentDesignTask.status;
+            const statusClass = `design-status-${s}`;
+
+            // Job Assets from linked club
+            let assetsHtml = '';
+            if (currentJob?.club_id) {
+                const club = clubs.find(c => c.id === currentJob.club_id);
+                if (club) {
+                    const logoSrc = currentJob.logo_url_override || club.logo_url || club.club_crest_url;
+                    const pm = currentJob.pantone_main || club.pantone_main || '#14b8a6';
+                    const ps = currentJob.pantone_secondary || club.pantone_secondary || '#ffffff';
+                    const pa = currentJob.pantone_accent || club.pantone_accent || '#000000';
+                    assetsHtml = `
+                    <div class="glass rounded-2xl p-5 mb-5">
+                        <h4 class="font-semibold text-sm text-brand-400 mb-4">Job Assets — ${escHtml(club.name)}</h4>
+                        <div class="flex flex-wrap gap-5 items-start">
+                            <div>
+                                <p class="text-xs text-gray-500 mb-2">Club Logo</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="w-16 h-16 rounded-xl flex items-center justify-center text-2xl" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">${logoSrc ? `<img src="${escHtml(logoSrc)}" class="w-full h-full object-contain rounded-xl">` : '🏟️'}</div>
+                                    ${logoSrc ? `<a href="${escHtml(logoSrc)}" download class="text-xs btn-secondary px-3 py-1.5">Download</a>` : '<p class="text-xs text-gray-600">No logo uploaded</p>'}
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-xs text-gray-500 mb-2">Pantone Colours <span class="text-gray-700">(overrideable per job)</span></p>
+                                <div class="flex gap-2 items-center mb-2">
+                                    <div class="pantone-swatch" style="background:${escHtml(pm)};width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)"></div>
+                                    <div class="pantone-swatch" style="background:${escHtml(ps)};width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)"></div>
+                                    <div class="pantone-swatch" style="background:${escHtml(pa)};width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)"></div>
+                                    <button onclick="toggleJobColourOverride()" class="text-xs text-brand-400 hover:text-brand-300 ml-2">Override colours</button>
+                                </div>
+                                <div id="job-colour-override" class="hide">
+                                    <div class="flex gap-3">
+                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(pm)}" oninput="updateJobPantone('main',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#111;border:1px solid #333"><span class="text-xs text-gray-500">Main</span></div>
+                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(ps)}" oninput="updateJobPantone('secondary',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#111;border:1px solid #333"><span class="text-xs text-gray-500">Secondary</span></div>
+                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(pa)}" oninput="updateJobPantone('accent',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#111;border:1px solid #333"><span class="text-xs text-gray-500">Accent</span></div>
+                                        <button onclick="saveJobColours()" class="btn-primary text-xs px-3 py-1.5">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+            }
+
+            // Status action buttons
+            const statusBtns = [
+                { key: 'in_progress', label: '✏️ Working',         color: '#fbbf24', bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)' },
+                { key: 'in_review',   label: '👁️ Send For Review', color: '#60a5fa', bg: 'rgba(96,165,250,0.12)',  border: 'rgba(96,165,250,0.3)' },
+                { key: 'revisions',   label: '🔄 Revisions',       color: '#fb7185', bg: 'rgba(251,113,133,0.12)', border: 'rgba(251,113,133,0.3)' },
+                { key: 'complete',    label: '✅ Approved',         color: '#4ade80', bg: 'rgba(74,222,128,0.12)',  border: 'rgba(74,222,128,0.3)' }
+            ].map(b => {
+                const active = s === b.key;
+                const btnLabel = (b.key === 'in_review' && s === 'in_review') ? '👁️ In Review' : b.label;
+                return `<button onclick="updateDesignStatus('${b.key}')" class="ds-status-btn ${active ? 'active' : ''}" style="color:${b.color};background:${active ? b.bg : 'rgba(255,255,255,0.03)'};border-color:${active ? b.border : 'rgba(255,255,255,0.07)'}">${btnLabel}</button>`;
+            }).join('');
+
             container.innerHTML = `
+                ${assetsHtml}
                 <div class="glass rounded-2xl p-6 mb-5">
-                    <div class="flex items-start justify-between mb-5">
+                    <div class="flex items-start justify-between mb-4">
                         <div>
                             <h4 class="font-bold text-lg mb-1">Design Brief</h4>
-                            <span class="stage-pill ${statusClass}">${DESIGN_STATUS_LABELS[currentDesignTask.status] || currentDesignTask.status}</span>
+                            <span class="stage-pill ${statusClass}">${DESIGN_STATUS_LABELS[s] || s}</span>
                         </div>
-                        <div class="flex gap-3 flex-wrap">
-                            <select onchange="updateDesignStatus(this.value)" class="px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#ddd">
-                                ${Object.entries(DESIGN_STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k === currentDesignTask.status ? 'selected' : ''}>${v}</option>`).join('')}
-                            </select>
-                            <button onclick="saveDesignTask()" class="btn-primary text-sm">Save Brief</button>
-                        </div>
+                        <button onclick="saveDesignTask()" class="btn-primary text-sm">Save Brief</button>
                     </div>
+
+                    <!-- Status action buttons -->
+                    <div class="flex gap-2 mb-5 flex-wrap">${statusBtns}</div>
+
                     <div class="grid md:grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="text-xs text-gray-500 mb-1 block">Design Summary</label>
@@ -8208,6 +8624,14 @@
                 </div>
                 <div id="design-versions-list" class="space-y-3">
                     ${renderDesignVersions()}
+                </div>
+
+                <!-- Design Brief Log -->
+                <div class="mt-6">
+                    <h4 class="font-semibold mb-3 text-sm text-gray-400 uppercase tracking-wider">Design Log</h4>
+                    <div id="design-brief-log-list" class="space-y-1">
+                        ${renderDesignBriefLog()}
+                    </div>
                 </div>
             `;
         }
@@ -8265,10 +8689,23 @@
 
         async function updateDesignStatus(status) {
             if (!currentDesignTask?.id) return;
+            const oldStatus = currentDesignTask.status;
             const { error } = await supabase.from('design_tasks').update({ status }).eq('id', currentDesignTask.id);
             if (error) { showToast('Error updating status', 'error'); return; }
+            // Log the change
+            const userName = currentUserProfile?.email?.split('@')[0] || 'Unknown';
+            await supabase.from('design_brief_log').insert({
+                design_task_id: currentDesignTask.id,
+                user_id: currentUser?.id,
+                user_name: userName,
+                old_status: oldStatus,
+                new_status: status
+            });
             currentDesignTask.status = status;
+            // Reload log entries
+            await loadDesignBriefLog();
             renderDesignTab();
+            showToast(`Status → ${DESIGN_STATUS_LABELS[status]}`);
         }
 
         async function addDesignVersion() {
@@ -8290,12 +8727,22 @@
         }
 
         async function approveDesignVersion(versionId) {
+            const oldStatus = currentDesignTask.status;
             // Un-approve all others first
             await supabase.from('design_versions').update({ status: 'pending' }).eq('design_task_id', currentDesignTask.id);
             const { error } = await supabase.from('design_versions').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', versionId);
             if (error) { showToast('Error approving version', 'error'); return; }
             // Also update design task to complete
             await supabase.from('design_tasks').update({ status: 'complete' }).eq('id', currentDesignTask.id);
+            // Log
+            const userName = currentUserProfile?.email?.split('@')[0] || 'Unknown';
+            await supabase.from('design_brief_log').insert({
+                design_task_id: currentDesignTask.id,
+                user_id: currentUser?.id,
+                user_name: userName,
+                old_status: oldStatus,
+                new_status: 'complete'
+            });
             await loadJobDesign();
             showToast('Version approved — Design marked complete');
         }
@@ -8314,6 +8761,479 @@
             const idx = currentDesignVersions.findIndex(v => v.id === versionId);
             if (idx >= 0) currentDesignVersions[idx].notes = notes.trim() || null;
             if (vList) vList.innerHTML = renderDesignVersions();
+        }
+
+        // =============================================
+        // DESIGN STUDIO — PIPELINE LAUNCHPAD
+        // =============================================
+        let designStudioFilter = 'all';
+        let designStageFilter = 'all';
+        let allDesignTasks = [];
+        let designBriefLog = [];
+
+        async function loadDesignStudio() {
+            if (!currentBrand) return;
+            // Load all design_tasks for this brand with job and club info
+            const { data } = await supabase
+                .from('design_tasks')
+                .select('*, jobs(id, job_name, job_number, club_id, stage, assigned_user_id, clubs(name))')
+                .eq('jobs.brand_id', currentBrand.id)
+                .order('updated_at', { ascending: false });
+            allDesignTasks = (data || []).filter(dt => dt.jobs);
+            renderDesignStudio();
+        }
+
+        function setDesignFilter(f) {
+            designStudioFilter = f;
+            document.getElementById('ds-filter-mine').style.cssText = f === 'mine'
+                ? 'background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)'
+                : 'background:rgba(255,255,255,0.05);color:#888;border:1px solid rgba(255,255,255,0.08)';
+            document.getElementById('ds-filter-all').style.cssText = f === 'all'
+                ? 'background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)'
+                : 'background:rgba(255,255,255,0.05);color:#888;border:1px solid rgba(255,255,255,0.08)';
+            renderDesignStudio();
+        }
+
+        function filterDesignByStage(stage) {
+            designStageFilter = stage;
+            document.querySelectorAll('.design-stage-card').forEach(c => c.classList.remove('design-stage-active'));
+            const activeCard = document.getElementById(`ds-stage-${stage}`);
+            if (activeCard) activeCard.classList.add('design-stage-active');
+            renderDesignStudio();
+        }
+
+        function renderDesignStudio() {
+            let tasks = allDesignTasks;
+            if (designStudioFilter === 'mine' && currentUser) {
+                tasks = tasks.filter(dt => dt.jobs?.assigned_user_id === currentUser.id);
+            }
+            // Update stage counts (always from full filtered set)
+            const stageCounts = { all: tasks.length };
+            ['new','in_progress','revisions','in_review','awaiting_approval','complete'].forEach(s => {
+                stageCounts[s] = tasks.filter(dt => dt.status === s).length;
+            });
+            Object.entries(stageCounts).forEach(([s, c]) => {
+                const el = document.getElementById(`ds-count-${s}`);
+                if (el) el.textContent = c;
+            });
+
+            // Filter by selected stage
+            if (designStageFilter !== 'all') {
+                tasks = tasks.filter(dt => dt.status === designStageFilter);
+            }
+
+            const container = document.getElementById('ds-jobs-list');
+            const empty = document.getElementById('ds-jobs-empty');
+            if (!tasks.length) {
+                container.innerHTML = '';
+                empty.classList.remove('hide');
+                return;
+            }
+            empty.classList.add('hide');
+            const statusColour = { new:'#2dd4bf', in_progress:'#fbbf24', revisions:'#fb7185', in_review:'#60a5fa', awaiting_approval:'#a78bfa', complete:'#4ade80' };
+            container.innerHTML = tasks.map(dt => {
+                const job = dt.jobs;
+                const club = job?.clubs;
+                const days = Math.floor((new Date() - new Date(dt.updated_at)) / 86400000);
+                const col = statusColour[dt.status] || '#888';
+                return `<div class="design-job-card" onclick="openJobFromDesignStudio('${job.id}')">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="text-xs font-mono text-gray-500">${escHtml(job.job_number || '')}</span>
+                                <span class="text-sm font-semibold">${escHtml(job.job_name)}</span>
+                            </div>
+                            ${club ? `<p class="text-xs text-gray-500 mb-2">🏟️ ${escHtml(club.name)}</p>` : ''}
+                            <span class="stage-pill design-status-${dt.status}">${DESIGN_STATUS_LABELS[dt.status] || dt.status}</span>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <p class="text-xs text-gray-600">${days === 0 ? 'Today' : `${days}d ago`}</p>
+                            <p class="text-xs text-gray-600 mt-1">${(dt.design_summary || '').substring(0,40)}${dt.design_summary?.length > 40 ? '…' : ''}</p>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Update launchpad badge stats
+            const el_active = document.getElementById('stat-design-active');
+            const el_review = document.getElementById('stat-design-review');
+            if (el_active) el_active.textContent = `${stageCounts.in_progress || 0} active`;
+            if (el_review) el_review.textContent = `${stageCounts.in_review || 0} in review`;
+        }
+
+        async function openJobFromDesignStudio(jobId) {
+            const job = jobs.find(j => j.id === jobId);
+            if (!job) {
+                // Load job and navigate
+                const { data } = await supabase.from('jobs').select('*').eq('id', jobId).single();
+                if (data) { showJobRecord(data); switchJobTab('design'); }
+                return;
+            }
+            showJobRecord(job);
+            switchJobTab('design');
+        }
+
+        // =============================================
+        // DESIGN BRIEF LOG
+        // =============================================
+        async function loadDesignBriefLog() {
+            if (!currentDesignTask?.id) { designBriefLog = []; return; }
+            const { data } = await supabase.from('design_brief_log')
+                .select('*').eq('design_task_id', currentDesignTask.id).order('created_at');
+            designBriefLog = data || [];
+        }
+
+        function renderDesignBriefLog() {
+            if (!designBriefLog.length) return '<p class="text-xs text-gray-700">No status changes logged yet.</p>';
+            const colours = { new:'#9ca3af', in_progress:'#fbbf24', revisions:'#fb7185', in_review:'#60a5fa', awaiting_approval:'#a78bfa', complete:'#4ade80' };
+            return designBriefLog.map(entry => {
+                const oldLabel = DESIGN_STATUS_LABELS[entry.old_status] || entry.old_status || '—';
+                const newLabel = DESIGN_STATUS_LABELS[entry.new_status] || entry.new_status;
+                const col = colours[entry.new_status] || '#888';
+                const ts = new Date(entry.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+                return `<div class="flex items-center gap-3 py-2 border-b border-gray-800 last:border-0">
+                    <div class="w-2 h-2 rounded-full flex-shrink-0" style="background:${col}"></div>
+                    <p class="text-xs text-gray-400 flex-1"><span class="font-semibold text-gray-300">${escHtml(entry.user_name)}</span> changed status from <span class="text-gray-500">${escHtml(oldLabel)}</span> → <span style="color:${col}">${escHtml(newLabel)}</span></p>
+                    <span class="text-xs text-gray-700 flex-shrink-0">${ts}</span>
+                </div>`;
+            }).join('');
+        }
+
+        // =============================================
+        // DESIGN STUDIO — JOB COLOUR OVERRIDES
+        // =============================================
+        function toggleJobColourOverride() {
+            const el = document.getElementById('job-colour-override');
+            if (el) el.classList.toggle('hide');
+        }
+
+        function updateJobPantone(field, value) {
+            if (!currentJob) return;
+            currentJob[`pantone_${field}`] = value;
+        }
+
+        async function saveJobColours() {
+            if (!currentJob?.id) return;
+            const { error } = await supabase.from('jobs').update({
+                pantone_main: currentJob.pantone_main,
+                pantone_secondary: currentJob.pantone_secondary,
+                pantone_accent: currentJob.pantone_accent
+            }).eq('id', currentJob.id);
+            if (error) { showToast('Error saving colours', 'error'); return; }
+            renderDesignTab();
+            showToast('Job colours saved');
+        }
+
+        // =============================================
+        // CLUB TEAMS
+        // =============================================
+        let currentClubTeams = [];
+
+        async function loadClubTeams() {
+            if (!currentClub) return;
+            const { data } = await supabase.from('club_teams')
+                .select('*').eq('club_id', currentClub.id).order('team_name');
+            currentClubTeams = data || [];
+        }
+
+        function renderClubTeams() {
+            const container = document.getElementById('club-teams-list');
+            const empty = document.getElementById('club-teams-empty');
+            if (!container) return;
+            if (!currentClubTeams.length) {
+                container.innerHTML = '';
+                empty.classList.remove('hide');
+                return;
+            }
+            empty.classList.add('hide');
+            container.innerHTML = currentClubTeams.map(t => `
+                <div class="club-team-card">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-semibold text-sm">👕 ${escHtml(t.team_name)}</span>
+                                ${t.age_group ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(20,184,166,0.1);color:#2dd4bf">${escHtml(t.age_group)}</span>` : ''}
+                                ${t.gender ? `<span class="text-xs text-gray-600">${escHtml(t.gender)}</span>` : ''}
+                            </div>
+                            ${t.coach_name ? `<p class="text-xs text-gray-400">Coach: ${escHtml(t.coach_name)}${t.coach_email ? ` · <a href="mailto:${escHtml(t.coach_email)}" class="text-brand-400 hover:underline">${escHtml(t.coach_email)}</a>` : ''}${t.coach_phone ? ` · ${escHtml(t.coach_phone)}` : ''}</p>` : ''}
+                            ${t.notes ? `<p class="text-xs text-gray-600 mt-1">${escHtml(t.notes)}</p>` : ''}
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0">
+                            <button onclick="openClubTeamModal('${t.id}')" class="text-xs btn-secondary px-3 py-1.5">Edit</button>
+                            <button onclick="deleteClubTeam('${t.id}')" class="text-xs text-red-400 hover:text-red-300 px-2 py-1.5">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openClubTeamModal(teamId) {
+            const team = teamId ? currentClubTeams.find(t => t.id === teamId) : null;
+            document.getElementById('club-team-modal-title').textContent = team ? 'Edit Team' : 'Add Team';
+            document.getElementById('edit-club-team-id').value = team?.id || '';
+            document.getElementById('ct-name').value = team?.team_name || '';
+            document.getElementById('ct-age-group').value = team?.age_group || '';
+            document.getElementById('ct-gender').value = team?.gender || '';
+            document.getElementById('ct-coach-name').value = team?.coach_name || '';
+            document.getElementById('ct-coach-email').value = team?.coach_email || '';
+            document.getElementById('ct-coach-phone').value = team?.coach_phone || '';
+            document.getElementById('ct-notes').value = team?.notes || '';
+            document.getElementById('club-team-modal').classList.remove('hide');
+        }
+
+        function closeClubTeamModal() {
+            document.getElementById('club-team-modal').classList.add('hide');
+        }
+
+        async function saveClubTeam() {
+            const teamId = document.getElementById('edit-club-team-id').value;
+            const name = document.getElementById('ct-name').value.trim();
+            if (!name) { showToast('Team name is required', 'error'); return; }
+            const payload = {
+                club_id: currentClub.id,
+                brand_id: currentBrand.id,
+                team_name: name,
+                age_group: document.getElementById('ct-age-group').value.trim() || null,
+                gender: document.getElementById('ct-gender').value || null,
+                coach_name: document.getElementById('ct-coach-name').value.trim() || null,
+                coach_email: document.getElementById('ct-coach-email').value.trim() || null,
+                coach_phone: document.getElementById('ct-coach-phone').value.trim() || null,
+                notes: document.getElementById('ct-notes').value.trim() || null
+            };
+            let result;
+            if (teamId) {
+                result = await supabase.from('club_teams').update(payload).eq('id', teamId).select().single();
+                if (result.data) { const idx = currentClubTeams.findIndex(t => t.id === teamId); if (idx >= 0) currentClubTeams[idx] = result.data; }
+            } else {
+                result = await supabase.from('club_teams').insert(payload).select().single();
+                if (result.data) currentClubTeams.push(result.data);
+            }
+            if (result.error) { showToast(result.error.message, 'error'); return; }
+            closeClubTeamModal();
+            renderClubTeams();
+            showToast(teamId ? 'Team updated' : 'Team added');
+        }
+
+        async function deleteClubTeam(teamId) {
+            if (!confirm('Delete this team?')) return;
+            await supabase.from('club_teams').delete().eq('id', teamId);
+            currentClubTeams = currentClubTeams.filter(t => t.id !== teamId);
+            renderClubTeams();
+            showToast('Team removed');
+        }
+
+        // =============================================
+        // JOB RECORD — CLUB TEAM SECTION
+        // =============================================
+        async function renderJobClubTeamSection() {
+            const container = document.getElementById('jr-club-team-section');
+            if (!container || !currentJob?.club_id) return;
+            const { data: teams } = await supabase.from('club_teams').select('*').eq('club_id', currentJob.club_id).order('team_name');
+            if (!teams?.length) {
+                container.innerHTML = '<p class="text-gray-600 text-sm">No teams set up for this club yet. Add teams in the club record.</p>';
+                return;
+            }
+            const current = currentJob.club_team_id;
+            container.innerHTML = `
+                <p class="text-xs text-gray-500 mb-2">Select which team this job is for:</p>
+                <div class="flex flex-wrap gap-2 mb-3">
+                    ${teams.map(t => `<button onclick="setJobClubTeam('${t.id}')" class="text-xs px-3 py-2 rounded-lg font-medium transition ${current === t.id ? 'btn-primary' : 'btn-secondary'}">${escHtml(t.team_name)}${t.age_group ? ` (${escHtml(t.age_group)})` : ''}</button>`).join('')}
+                </div>
+                ${current ? (() => {
+                    const t = teams.find(x => x.id === current);
+                    if (!t) return '';
+                    return `<div class="p-3 rounded-xl" style="background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2)">
+                        <p class="text-xs text-brand-400 font-semibold mb-1">Selected: ${escHtml(t.team_name)}</p>
+                        ${t.coach_name ? `<p class="text-xs text-gray-400">Coach: ${escHtml(t.coach_name)}${t.coach_email ? ` · ${escHtml(t.coach_email)}` : ''}</p>` : ''}
+                    </div>`;
+                })() : ''}
+            `;
+        }
+
+        async function setJobClubTeam(teamId) {
+            if (!currentJob?.id) return;
+            const newTeamId = currentJob.club_team_id === teamId ? null : teamId; // toggle
+            await supabase.from('jobs').update({ club_team_id: newTeamId }).eq('id', currentJob.id);
+            currentJob.club_team_id = newTeamId;
+            renderJobClubTeamSection();
+            showToast(newTeamId ? 'Club team linked' : 'Club team unlinked');
+        }
+
+        // =============================================
+        // JOB ACTIVITY LOG
+        // =============================================
+        let jobActivityLog = [];
+
+        async function loadJobActivity() {
+            if (!currentJobId) return;
+            const { data } = await supabase.from('job_activity')
+                .select('*').eq('job_id', currentJobId).order('created_at', { ascending: false });
+            jobActivityLog = data || [];
+            renderJobActivity();
+        }
+
+        function renderJobActivity() {
+            const container = document.getElementById('jr-activity-log');
+            if (!container) return;
+            if (!jobActivityLog.length) {
+                container.innerHTML = '<p class="text-xs text-gray-700 py-4 text-center">No activity yet.</p>';
+                return;
+            }
+            container.innerHTML = jobActivityLog.map(entry => {
+                const initial = (entry.user_name || '?').charAt(0).toUpperCase();
+                const ts = new Date(entry.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+                const typeColour = { status_change: '#a78bfa', assignment: '#60a5fa', system: '#9ca3af', note: '#2dd4bf' };
+                const col = typeColour[entry.activity_type] || '#2dd4bf';
+                return `<div class="activity-entry">
+                    <div class="activity-avatar" style="background:${col}18;color:${col}">${initial}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-gray-300">${escHtml(entry.user_name)}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">${escHtml(entry.message)}</p>
+                        <p class="text-xs text-gray-700 mt-0.5">${ts}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function addJobActivity(message, type) {
+            const input = document.getElementById('jr-activity-input');
+            const msg = message || input?.value?.trim();
+            if (!msg) return;
+            const userName = currentUserProfile?.email?.split('@')[0] || 'Unknown';
+            const { data, error } = await supabase.from('job_activity').insert({
+                job_id: currentJobId,
+                brand_id: currentBrand.id,
+                user_id: currentUser?.id,
+                user_name: userName,
+                message: msg,
+                activity_type: type || 'note'
+            }).select().single();
+            if (error) { showToast('Error adding activity', 'error'); return; }
+            jobActivityLog.unshift(data);
+            if (input) input.value = '';
+            renderJobActivity();
+        }
+
+        // =============================================
+        // USER ASSIGNMENT
+        // =============================================
+        let brandUsers = [];
+
+        async function loadBrandUsers() {
+            if (!currentBrand) return;
+            const { data } = await supabase.from('user_profiles').select('id, email').eq('brand_id', currentBrand.id).order('email');
+            brandUsers = data || [];
+        }
+
+        function populateUserAssignDropdown(selectId, currentAssignedId) {
+            const el = document.getElementById(selectId);
+            if (!el) return;
+            el.innerHTML = '<option value="">Unassigned</option>' +
+                brandUsers.map(u => `<option value="${u.id}" ${u.id === currentAssignedId ? 'selected' : ''}>${escHtml(u.email.split('@')[0])}</option>`).join('');
+        }
+
+        async function saveJobAssignment(userId) {
+            if (!currentJobId) return;
+            await supabase.from('jobs').update({ assigned_user_id: userId || null }).eq('id', currentJobId);
+            if (currentJob) currentJob.assigned_user_id = userId || null;
+            showToast('Assignment saved');
+        }
+
+        async function saveClubAssignment(userId) {
+            if (!currentClub?.id) return;
+            await supabase.from('clubs').update({ assigned_user_id: userId || null }).eq('id', currentClub.id);
+            if (currentClub) currentClub.assigned_user_id = userId || null;
+            showToast('Assignment saved');
+        }
+
+        // =============================================
+        // CLUB LOGO UPLOAD
+        // =============================================
+        function previewClubLogo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const preview = document.getElementById('club-logo-preview');
+                if (preview) preview.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-contain rounded-xl">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function uploadClubLogoInline(event) {
+            const file = event.target.files[0];
+            if (!file || !currentClub || !currentBrand) return;
+            const ext = file.name.substring(file.name.lastIndexOf('.'));
+            const storagePath = `${currentBrand.slug}/${currentClub.suffix}/logo${ext}`;
+            const { error } = await supabase.storage.from('club-images').upload(storagePath, file, { upsert: true });
+            if (error) { showToast('Upload failed: ' + error.message, 'error'); return; }
+            const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+            const logoUrl = urlData.publicUrl;
+            await supabase.from('clubs').update({ logo_url: logoUrl }).eq('id', currentClub.id);
+            currentClub.logo_url = logoUrl;
+            const clubIdx = clubs.findIndex(c => c.id === currentClub.id);
+            if (clubIdx >= 0) clubs[clubIdx].logo_url = logoUrl;
+            // Update display
+            const crestEl = document.getElementById('club-crest-display');
+            if (crestEl) crestEl.innerHTML = `<img src="${escHtml(logoUrl)}" class="w-full h-full object-contain rounded-xl">`;
+            const dlBtn = document.getElementById('club-logo-download-btn');
+            if (dlBtn) dlBtn.classList.remove('hide');
+            showToast('Logo uploaded');
+        }
+
+        function downloadClubLogo() {
+            if (!currentClub?.logo_url) return;
+            const a = document.createElement('a');
+            a.href = currentClub.logo_url;
+            a.download = `${currentClub.suffix}-logo`;
+            a.target = '_blank';
+            a.click();
+        }
+
+        // =============================================
+        // USER FEATURE PERMISSIONS
+        // =============================================
+        let userFeaturePermissions = {}; // { userId: { feature: enabled } }
+
+        async function loadUserFeaturePermissions() {
+            if (!currentBrand) return;
+            const { data } = await supabase.from('user_feature_permissions')
+                .select('*').eq('brand_id', currentBrand.id);
+            userFeaturePermissions = {};
+            (data || []).forEach(p => {
+                if (!userFeaturePermissions[p.user_id]) userFeaturePermissions[p.user_id] = {};
+                userFeaturePermissions[p.user_id][p.feature] = p.enabled;
+            });
+        }
+
+        async function saveUserFeaturePermission(userId, feature, enabled) {
+            await supabase.from('user_feature_permissions').upsert(
+                { brand_id: currentBrand.id, user_id: userId, feature, enabled, updated_at: new Date().toISOString() },
+                { onConflict: 'brand_id,user_id,feature' }
+            );
+            if (!userFeaturePermissions[userId]) userFeaturePermissions[userId] = {};
+            userFeaturePermissions[userId][feature] = enabled;
+        }
+
+        async function applyUserFeaturePermissions() {
+            if (!currentUser || isSuperAdmin) return; // super admins see everything
+            const perms = userFeaturePermissions[currentUser.id];
+            if (!perms) return; // no restrictions set = all access
+            Object.entries(perms).forEach(([feature, enabled]) => {
+                if (!enabled) {
+                    // Hide the feature card
+                    const featureMap = {
+                        'prospecting': 'fc-prospecting', 'sales': 'fc-sales', 'clubs': 'fc-clubs',
+                        'production': 'fc-production', 'design_studio': 'fc-design',
+                        'store_generator': 'fc-store', 'products': 'fc-products'
+                    };
+                    const cardId = featureMap[feature];
+                    if (cardId) {
+                        const card = document.getElementById(cardId);
+                        if (card) { card.style.display = 'none'; }
+                    }
+                }
+            });
         }
 
         // =============================================
