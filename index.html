@@ -419,6 +419,282 @@
         }
         .info-label { color: #666; }
         .info-value { color: #ddd; }
+
+        /* =============================================
+           ENHANCED LAUNCHPAD
+           ============================================= */
+        .feature-card {
+            position: relative;
+            background: rgba(15,15,15,0.8);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 20px;
+            padding: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        .feature-card.disabled-card {
+            opacity: 0.45;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .feature-card.coming-soon {
+            opacity: 0.5;
+            cursor: default;
+        }
+        .feature-card .card-icon {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+        .feature-card p { font-size: 13px; color: #666; line-height: 1.5; }
+        .feature-card .card-badge {
+            position: absolute;
+            top: 16px; right: 16px;
+            font-size: 10px; font-weight: 600;
+            padding: 3px 8px; border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        .badge-soon { background: rgba(255,255,255,0.07); color: #666; }
+        .badge-off { background: rgba(239,68,68,0.15); color: #f87171; }
+        .badge-new { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+
+        /* Card accent gradients */
+        .accent-teal::before { background: linear-gradient(90deg, #14b8a6, #06b6d4); }
+        .accent-purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
+        .accent-blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .accent-orange::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .accent-pink::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
+        .accent-green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+
+        /* Stats bar */
+        .stat-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px 20px;
+        }
+
+        /* =============================================
+           PROSPECTING MODULE
+           ============================================= */
+        .prospect-card {
+            background: rgba(15,15,15,0.9);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px;
+            padding: 24px 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .prospect-card:hover {
+            border-color: rgba(20,184,166,0.4);
+            background: rgba(20,184,166,0.04);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Lead list */
+        .lead-row {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .lead-row:hover {
+            background: rgba(20,184,166,0.05);
+            border-color: rgba(20,184,166,0.2);
+        }
+        .lead-sport-badge {
+            font-size: 11px; font-weight: 600;
+            padding: 3px 8px; border-radius: 6px;
+            background: rgba(20,184,166,0.12);
+            color: #2dd4bf;
+            white-space: nowrap;
+        }
+        .lead-county-badge {
+            font-size: 11px; font-weight: 500;
+            padding: 3px 8px; border-radius: 6px;
+            background: rgba(255,255,255,0.06);
+            color: #999;
+            white-space: nowrap;
+        }
+
+        /* Kanban board */
+        .kanban-board {
+            display: flex;
+            gap: 16px;
+            overflow-x: auto;
+            padding-bottom: 16px;
+            min-height: 500px;
+            align-items: flex-start;
+        }
+        .kanban-board::-webkit-scrollbar { height: 4px; }
+        .kanban-board::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+        .kanban-board::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        .kanban-column {
+            flex: 0 0 300px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 16px;
+            min-height: 400px;
+        }
+        .kanban-column.drag-over {
+            border-color: rgba(20,184,166,0.4);
+            background: rgba(20,184,166,0.04);
+        }
+        .kanban-col-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .kanban-col-title {
+            font-size: 13px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: #aaa;
+        }
+        .kanban-count {
+            font-size: 12px; font-weight: 600;
+            padding: 2px 8px; border-radius: 10px;
+            background: rgba(255,255,255,0.07);
+            color: #777;
+        }
+
+        .kanban-card {
+            background: rgba(20,20,20,0.9);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            draggable: true;
+        }
+        .kanban-card:hover {
+            border-color: rgba(20,184,166,0.3);
+            background: rgba(20,184,166,0.04);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+        .kanban-card.dragging {
+            opacity: 0.5;
+            transform: rotate(2deg);
+        }
+        .kanban-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+        .kanban-card-club { font-size: 12px; color: #888; margin-bottom: 8px; }
+        .kanban-card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        /* Feature toggle toggle switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.1);
+            transition: .3s;
+            border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 3px; bottom: 3px;
+            background: #666;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider { background: rgba(20,184,166,0.3); border-color: #14b8a6; }
+        input:checked + .toggle-slider:before { transform: translateX(20px); background: #14b8a6; }
+
+        /* Search & filter bar */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .filter-bar input, .filter-bar select {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #ddd;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        .filter-bar input:focus, .filter-bar select:focus {
+            border-color: #14b8a6;
+            outline: none;
+        }
+
+        /* Lead modal sections */
+        .modal-section {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        .modal-section-title {
+            font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: #555;
+            margin-bottom: 12px;
+        }
+
+        /* Contact card in modal */
+        .contact-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .contact-card .contact-name { font-size: 14px; font-weight: 600; }
+        .contact-card .contact-details { font-size: 12px; color: #777; margin-top: 4px; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #555;
+        }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+        .empty-state p { font-size: 14px; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -493,87 +769,122 @@
 
         <!-- Launchpad -->
         <div id="launchpad" class="p-8 max-w-6xl mx-auto">
-            <h2 class="text-2xl font-bold mb-8">Welcome to TeamwearOS</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Product Database -->
-                <div onclick="showTool('products')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
-                    <div class="w-12 h-12 bg-brand-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📦</div>
-                    <h3 class="font-semibold text-lg mb-2">Product Database</h3>
-                    <p class="text-gray-400 text-sm">Import and manage your master product catalogue</p>
+            <!-- Welcome header -->
+            <div class="flex items-end justify-between mb-10">
+                <div>
+                    <p class="text-sm text-gray-500 mb-1 uppercase tracking-widest font-medium">Home</p>
+                    <h2 class="text-3xl font-bold">TeamwearOS</h2>
+                    <p class="text-gray-500 text-sm mt-1">Your teamwear operations platform</p>
                 </div>
-                <!-- Clubs (enhanced) -->
-                <div onclick="showTool('clubs')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
-                    <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🏟️</div>
-                    <h3 class="font-semibold text-lg mb-2">Clubs</h3>
-                    <p class="text-gray-400 text-sm">Manage clubs, products, order forms and pricing</p>
-                </div>
-                <!-- Order Forms -->
-                <div onclick="showTool('order-forms')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
-                    <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📝</div>
-                    <h3 class="font-semibold text-lg mb-2">Order Forms</h3>
-                    <p class="text-gray-400 text-sm">View all direct order form submissions</p>
-                </div>
-                <!-- Store Generator -->
-                <div onclick="showTool('generator')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
-                    <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🏪</div>
-                    <h3 class="font-semibold text-lg mb-2">Store Generator</h3>
-                    <p class="text-gray-400 text-sm">Generate Shopify CSV import files</p>
-                </div>
-                <!-- Factory Orders (POs) -->
-                <div onclick="showTool('orders')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
-                    <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">📋</div>
-                    <h3 class="font-semibold text-lg mb-2">Factory Orders</h3>
-                    <p class="text-gray-400 text-sm">Create and manage purchase orders</p>
-                </div>
-                <!-- PO Tracker V2 -->
-                <div onclick="showTool('po-tracker')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition">
-                    <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🚚</div>
-                    <h3 class="font-semibold text-lg mb-2">PO Tracker</h3>
-                    <p class="text-gray-400 text-sm">Track factory orders, link Shopify orders, manage delivery</p>
-                </div>
-                <!-- Club Mock-Ups (legacy - image upload) -->
-                <div onclick="showTool('mockups')" class="glass rounded-2xl p-6 cursor-pointer hover:border-brand-500 transition opacity-70">
-                    <div class="w-12 h-12 bg-gray-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">🎨</div>
-                    <h3 class="font-semibold text-lg mb-2">Image Uploads</h3>
-                    <p class="text-gray-400 text-sm">Upload mock-up images for Shopify CSV export</p>
+                <div class="text-right hide" id="launchpad-brand-display">
+                    <p class="text-xs text-gray-600 uppercase tracking-wider">Active Brand</p>
+                    <p id="launchpad-brand-name" class="text-brand-400 font-semibold"></p>
                 </div>
             </div>
 
+            <!-- Main Feature Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" id="feature-grid">
+
+                <!-- Prospecting -->
+                <div id="fc-prospecting" onclick="showTool('prospecting')" class="feature-card accent-teal">
+                    <span class="card-badge badge-new" id="badge-prospecting" style="display:none">Off</span>
+                    <div class="card-icon" style="background:rgba(20,184,166,0.12)">🎯</div>
+                    <h3>Prospecting</h3>
+                    <p>Track leads, manage early conversations and monitor conversion pipeline</p>
+                    <div class="mt-4 flex items-center gap-2">
+                        <span id="stat-leads-nc" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(20,184,166,0.1);color:#2dd4bf">0 new leads</span>
+                        <span id="stat-leads-id" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(255,255,255,0.05);color:#888">0 in discussion</span>
+                    </div>
+                </div>
+
+                <!-- Sales (Coming Soon) -->
+                <div id="fc-sales" class="feature-card accent-purple coming-soon">
+                    <span class="card-badge badge-soon">Coming Soon</span>
+                    <div class="card-icon" style="background:rgba(139,92,246,0.12)">💰</div>
+                    <h3 style="color:#aaa">Sales</h3>
+                    <p>Quotes, proposals, order management and revenue tracking</p>
+                </div>
+
+                <!-- Clubs -->
+                <div id="fc-clubs" onclick="showTool('clubs')" class="feature-card accent-purple">
+                    <span class="card-badge badge-new" id="badge-clubs" style="display:none">Off</span>
+                    <div class="card-icon" style="background:rgba(139,92,246,0.12)">🏟️</div>
+                    <h3>Clubs</h3>
+                    <p>Manage clubs, custom products, order forms and Shopify collections</p>
+                    <div class="mt-4">
+                        <span id="stat-clubs-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(139,92,246,0.1);color:#a78bfa">0 clubs</span>
+                    </div>
+                </div>
+
+                <!-- Production -->
+                <div id="fc-production" onclick="showTool('po-tracker')" class="feature-card accent-orange">
+                    <span class="card-badge badge-new" id="badge-production" style="display:none">Off</span>
+                    <div class="card-icon" style="background:rgba(249,115,22,0.12)">🚚</div>
+                    <h3>Production</h3>
+                    <p>Purchase orders, factory tracking and delivery management</p>
+                    <div class="mt-4">
+                        <span id="stat-pos-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(249,115,22,0.1);color:#fb923c">0 active POs</span>
+                    </div>
+                </div>
+
+                <!-- Design Studio -->
+                <div id="fc-design" onclick="showTool('mockups')" class="feature-card accent-pink">
+                    <span class="card-badge badge-new" id="badge-design" style="display:none">Off</span>
+                    <div class="card-icon" style="background:rgba(236,72,153,0.12)">🎨</div>
+                    <h3>Design Studio</h3>
+                    <p>Upload and manage mockup images for product presentations</p>
+                </div>
+
+                <!-- Store Generator -->
+                <div id="fc-store" onclick="showTool('generator')" class="feature-card accent-blue">
+                    <span class="card-badge badge-new" id="badge-store" style="display:none">Off</span>
+                    <div class="card-icon" style="background:rgba(59,130,246,0.12)">🏪</div>
+                    <h3>Store Generator</h3>
+                    <p>Generate Shopify CSV imports and sync products to your store</p>
+                    <div class="mt-4">
+                        <span id="stat-products-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(59,130,246,0.1);color:#60a5fa">0 products</span>
+                    </div>
+                </div>
+
+            </div>
+
             <!-- Quick Stats -->
-            <div class="grid md:grid-cols-4 gap-4 mt-8">
-                <div class="glass rounded-xl p-4">
-                    <p class="text-gray-400 text-sm">Products</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+                <div class="stat-card">
+                    <p class="text-xs text-gray-500 mb-1">Products</p>
                     <p id="stat-products" class="text-2xl font-bold text-brand-400">0</p>
                 </div>
-                <div class="glass rounded-xl p-4">
-                    <p class="text-gray-400 text-sm">Clubs</p>
-                    <p id="stat-clubs" class="text-2xl font-bold text-purple-400">0</p>
+                <div class="stat-card">
+                    <p class="text-xs text-gray-500 mb-1">Clubs</p>
+                    <p id="stat-clubs" class="text-2xl font-bold" style="color:#a78bfa">0</p>
                 </div>
-                <div class="glass rounded-xl p-4">
-                    <p class="text-gray-400 text-sm">Orders</p>
-                    <p id="stat-orders" class="text-2xl font-bold text-blue-400">0</p>
+                <div class="stat-card">
+                    <p class="text-xs text-gray-500 mb-1">Active POs</p>
+                    <p id="stat-orders" class="text-2xl font-bold" style="color:#60a5fa">0</p>
                 </div>
-                <div class="glass rounded-xl p-4">
-                    <p class="text-gray-400 text-sm">Salespeople</p>
-                    <p id="stat-salespeople" class="text-2xl font-bold text-orange-400">0</p>
+                <div class="stat-card">
+                    <p class="text-xs text-gray-500 mb-1">Leads</p>
+                    <p id="stat-salespeople" class="text-2xl font-bold" style="color:#fb923c">0</p>
                 </div>
             </div>
 
             <!-- Super Admin Section -->
-            <div id="admin-section" class="hide mt-8">
-                <h3 class="text-lg font-semibold text-purple-400 mb-4">⚡ Super Admin Tools</h3>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Brand Settings -->
-                    <div onclick="showTool('settings')" class="glass rounded-2xl p-6 cursor-pointer hover:border-purple-500 border border-transparent transition">
-                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">⚙️</div>
-                        <h3 class="font-semibold text-lg mb-2">Brand Settings</h3>
-                        <p class="text-gray-400 text-sm">Manage salespeople & brand config</p>
+            <div id="admin-section" class="hide mt-10">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="h-px flex-1" style="background:rgba(139,92,246,0.2)"></div>
+                    <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Admin Tools</span>
+                    <div class="h-px flex-1" style="background:rgba(139,92,246,0.2)"></div>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <div onclick="showTool('settings')" class="feature-card" style="border-color:rgba(139,92,246,0.15)">
+                        <div class="card-icon" style="background:rgba(139,92,246,0.12)">⚙️</div>
+                        <h3>Brand Settings</h3>
+                        <p>Manage brand config, salespeople and feature toggles</p>
                     </div>
-                    <!-- User Management -->
-                    <div onclick="showTool('users')" class="glass rounded-2xl p-6 cursor-pointer hover:border-purple-500 border border-transparent transition">
-                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center text-2xl mb-4">👥</div>
-                        <h3 class="font-semibold text-lg mb-2">User Management</h3>
-                        <p class="text-gray-400 text-sm">Assign users to brands</p>
+                    <div onclick="showTool('users')" class="feature-card" style="border-color:rgba(139,92,246,0.15)">
+                        <div class="card-icon" style="background:rgba(139,92,246,0.12)">👥</div>
+                        <h3>User Management</h3>
+                        <p>Assign users to brands and manage access</p>
                     </div>
                 </div>
             </div>
@@ -1348,6 +1659,15 @@
                 <div id="shopify-config-status" class="mt-3 text-sm hide"></div>
             </div>
 
+            <!-- Feature Toggles -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-1">Feature Toggles</h3>
+                <p class="text-gray-500 text-sm mb-5">Enable or disable modules for this brand. Disabled features will be hidden from the launchpad.</p>
+                <div id="feature-toggles-list" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
             <!-- Danger Zone -->
             <div class="glass rounded-2xl p-6 border border-red-500/30">
                 <h3 class="font-semibold mb-4 text-red-400">Danger Zone</h3>
@@ -1371,6 +1691,326 @@
                 <p class="text-gray-400 text-sm mb-4">Assign users to brands. Users can only see data for their assigned brand.</p>
                 <div id="users-list" class="space-y-3">
                     <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             TOOL: PROSPECTING
+             ============================================================ -->
+        <div id="tool-prospecting" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Launchpad
+            </button>
+
+            <!-- Prospecting Sub-Launchpad (home view) -->
+            <div id="prospect-home">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold">Prospecting</h2>
+                    <p class="text-gray-500 text-sm mt-1">Track and manage your leads pipeline</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5 mb-8">
+                    <!-- Not Contacted -->
+                    <div onclick="showProspectView('not-contacted')" class="prospect-card">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl" style="background:rgba(20,184,166,0.1)">📋</div>
+                            <span id="nc-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(20,184,166,0.12);color:#2dd4bf">0</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Not Contacted</h3>
+                        <p class="text-gray-500 text-sm">New leads waiting to be contacted. Filter by sport and county.</p>
+                        <div class="mt-5 flex items-center gap-2 text-brand-400 text-sm font-semibold">
+                            View list
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+
+                    <!-- In Discussion -->
+                    <div onclick="showProspectView('in-discussion')" class="prospect-card">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl" style="background:rgba(139,92,246,0.1)">🤝</div>
+                            <span id="id-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(139,92,246,0.12);color:#a78bfa">0</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">In Discussion</h3>
+                        <p class="text-gray-500 text-sm">Active conversations on a visual Kanban board with customisable stages.</p>
+                        <div class="mt-5 flex items-center gap-2 text-sm font-semibold" style="color:#a78bfa">
+                            View board
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Lead
+                    </button>
+                    <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
+                    <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
+                </div>
+            </div>
+
+            <!-- Not Contacted List View -->
+            <div id="prospect-not-contacted" class="hide">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <button onclick="showProspectView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            Back
+                        </button>
+                        <h3 class="text-xl font-bold">Not Contacted</h3>
+                        <span id="nc-list-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:rgba(20,184,166,0.1);color:#2dd4bf">0</span>
+                    </div>
+                    <button onclick="openLeadModal(null, 'not_contacted')" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Lead
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <input type="text" id="nc-search" placeholder="Search leads..." oninput="renderNotContacted()" style="min-width:200px">
+                    <select id="nc-filter-sport" onchange="renderNotContacted()">
+                        <option value="">All Sports</option>
+                        <option>Football</option><option>Rugby</option><option>Cricket</option>
+                        <option>Basketball</option><option>Netball</option><option>Hockey</option>
+                        <option>Athletics</option><option>Cycling</option><option>Swimming</option>
+                        <option>Tennis</option><option>Other</option>
+                    </select>
+                    <select id="nc-filter-county" onchange="renderNotContacted()">
+                        <option value="">All Counties</option>
+                    </select>
+                    <button onclick="exportLeadsCSV('not_contacted')" class="btn-secondary text-sm">Export CSV</button>
+                </div>
+
+                <div id="nc-list" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- In Discussion Kanban View -->
+            <div id="prospect-in-discussion" class="hide">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-3">
+                        <button onclick="showProspectView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                            Back
+                        </button>
+                        <h3 class="text-xl font-bold">In Discussion</h3>
+                        <span id="id-board-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:rgba(139,92,246,0.1);color:#a78bfa">0</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="openStageConfig()" class="btn-secondary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Configure Stages
+                        </button>
+                        <button onclick="openLeadModal(null, 'in_discussion')" class="btn-primary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Lead
+                        </button>
+                    </div>
+                </div>
+
+                <div id="kanban-board" class="kanban-board">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Lead Record -->
+        <div id="lead-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)">
+            <div class="glass rounded-2xl w-full max-w-2xl max-h-screen overflow-y-auto" style="max-height:90vh">
+                <div class="p-6 border-b border-white border-opacity-5 flex items-center justify-between sticky top-0 glass z-10">
+                    <h3 id="lead-modal-title" class="text-lg font-bold">New Lead</h3>
+                    <button onclick="closeLeadModal()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-5">✕</button>
+                </div>
+                <div class="p-6">
+                    <input type="hidden" id="lead-id">
+
+                    <!-- Core info -->
+                    <div class="modal-section">
+                        <p class="modal-section-title">Lead Information</p>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Lead Name *</label>
+                                <input type="text" id="lead-name" placeholder="e.g. Westfield FC Enquiry" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Club Name *</label>
+                                <input type="text" id="lead-club-name" placeholder="e.g. Westfield FC" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Sport</label>
+                                <select id="lead-sport" class="w-full px-3 py-2 rounded-lg text-sm">
+                                    <option value="">Select sport...</option>
+                                    <option>Football</option><option>Rugby</option><option>Cricket</option>
+                                    <option>Basketball</option><option>Netball</option><option>Hockey</option>
+                                    <option>Athletics</option><option>Cycling</option><option>Swimming</option>
+                                    <option>Tennis</option><option>Other</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Sport Level</label>
+                                <select id="lead-sport-level" class="w-full px-3 py-2 rounded-lg text-sm">
+                                    <option value="">Select level...</option>
+                                    <option value="grassroots">Grassroots</option>
+                                    <option value="amateur">Amateur</option>
+                                    <option value="semi-pro">Semi-Pro</option>
+                                    <option value="professional">Professional</option>
+                                    <option value="elite">Elite / National</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">County</label>
+                                <input type="text" id="lead-county" placeholder="e.g. Yorkshire" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Location / Town</label>
+                                <input type="text" id="lead-location" placeholder="e.g. Leeds" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="text-xs text-gray-500 mb-1 block">Number of Teams</label>
+                            <input type="number" id="lead-teams" placeholder="e.g. 4" min="1" class="w-full px-3 py-2 rounded-lg text-sm" style="max-width:160px">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Notes</label>
+                            <textarea id="lead-notes" rows="3" placeholder="Any additional notes about this lead..." class="w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Status & Stage -->
+                    <div class="modal-section">
+                        <p class="modal-section-title">Status & Pipeline</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Status</label>
+                                <select id="lead-status" class="w-full px-3 py-2 rounded-lg text-sm" onchange="toggleKanbanStageField()">
+                                    <option value="not_contacted">Not Contacted</option>
+                                    <option value="in_discussion">In Discussion</option>
+                                </select>
+                            </div>
+                            <div id="lead-stage-field">
+                                <label class="text-xs text-gray-500 mb-1 block">Kanban Stage</label>
+                                <select id="lead-stage" class="w-full px-3 py-2 rounded-lg text-sm">
+                                    <option value="">Select stage...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contacts -->
+                    <div class="modal-section">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="modal-section-title" style="margin-bottom:0">Contacts</p>
+                            <button onclick="showAddContactForm()" class="text-xs text-brand-400 hover:text-brand-300 font-semibold flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                Add Contact
+                            </button>
+                        </div>
+                        <div id="lead-contacts-list" class="mb-3">
+                            <!-- Populated by JS -->
+                        </div>
+                        <!-- Add contact form (hidden by default) -->
+                        <div id="add-contact-form" class="hide" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px">
+                            <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">New Contact</p>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <input type="text" id="contact-first-name" placeholder="First name" class="px-3 py-2 rounded-lg text-sm">
+                                <input type="text" id="contact-last-name" placeholder="Last name" class="px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <input type="email" id="contact-email" placeholder="Email" class="px-3 py-2 rounded-lg text-sm">
+                                <input type="tel" id="contact-phone" placeholder="Phone" class="px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <input type="text" id="contact-role" placeholder="Role (e.g. Manager)" class="px-3 py-2 rounded-lg text-sm">
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="contact-primary" class="w-4 h-4">
+                                    <label for="contact-primary" class="text-sm text-gray-400">Primary contact</label>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="saveContact()" class="btn-primary text-xs py-2 px-4">Save Contact</button>
+                                <button onclick="document.getElementById('add-contact-form').classList.add('hide')" class="btn-secondary text-xs py-2 px-4">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="flex gap-3">
+                            <button id="lead-save-btn" onclick="saveLead()" class="btn-primary">Save Lead</button>
+                            <button onclick="closeLeadModal()" class="btn-secondary">Cancel</button>
+                        </div>
+                        <div class="flex gap-2" id="lead-danger-actions" style="display:none!important">
+                            <button onclick="archiveLead('not_interested')" class="text-xs text-orange-400 hover:text-orange-300 px-3 py-2 rounded-lg" style="background:rgba(249,115,22,0.1)">Archive — Not Interested</button>
+                            <button onclick="deleteLead()" class="text-xs text-red-400 hover:text-red-300 px-3 py-2 rounded-lg" style="background:rgba(239,68,68,0.1)">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Stage Config -->
+        <div id="stage-config-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)">
+            <div class="glass rounded-2xl w-full max-w-md">
+                <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between">
+                    <h3 class="text-lg font-bold">Configure Kanban Stages</h3>
+                    <button onclick="closeStageConfig()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-5">✕</button>
+                </div>
+                <div class="p-5">
+                    <p class="text-gray-500 text-sm mb-4">Create up to 3 stages for your In Discussion pipeline. Drag to reorder.</p>
+                    <div id="stages-list" class="space-y-2 mb-4">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div id="add-stage-form" class="hide mb-4" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px">
+                        <div class="flex gap-3 items-end">
+                            <div class="flex-1">
+                                <label class="text-xs text-gray-500 mb-1 block">Stage Name</label>
+                                <input type="text" id="new-stage-name" placeholder="e.g. Proposal Sent" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Colour</label>
+                                <input type="color" id="new-stage-color" value="#14b8a6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
+                            </div>
+                            <button onclick="saveNewStage()" class="btn-primary text-sm py-2">Add</button>
+                        </div>
+                    </div>
+                    <button id="add-stage-btn" onclick="showAddStageForm()" class="btn-secondary text-sm w-full flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Stage
+                    </button>
+                    <div class="mt-4 text-right">
+                        <button onclick="closeStageConfig()" class="btn-primary text-sm">Done</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: CSV Import Leads -->
+        <div id="leads-csv-import-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)">
+            <div class="glass rounded-2xl w-full max-w-lg">
+                <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between">
+                    <h3 class="text-lg font-bold">Import Leads from CSV</h3>
+                    <button onclick="document.getElementById('leads-csv-import-modal').classList.add('hide')" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-5">✕</button>
+                </div>
+                <div class="p-5">
+                    <div class="mb-4 p-3 rounded-lg text-sm" style="background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.15)">
+                        <p class="text-brand-400 font-semibold mb-1">Required CSV columns:</p>
+                        <p class="text-gray-400 text-xs font-mono">lead_name, club_name, sport, county, location, sport_level, amount_of_teams, notes</p>
+                    </div>
+                    <label class="dropzone flex flex-col items-center justify-center p-8 cursor-pointer mb-4">
+                        <svg class="w-10 h-10 text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-gray-400 text-sm">Click to select CSV file</p>
+                        <input type="file" accept=".csv" id="leads-csv-file" onchange="handleLeadsCSVUpload(event)" class="hidden">
+                    </label>
+                    <div id="leads-import-status" class="hide text-sm text-brand-400"></div>
                 </div>
             </div>
         </div>
@@ -2029,6 +2669,15 @@
         let orderLines = [];
         let poSequence = 1;
 
+        // Prospecting state
+        let leads = [];
+        let kanbanStages = [];
+        let featureToggles = {};
+        let currentLeadId = null;
+        let currentLeadContacts = [];
+        let editingLeadContacts = [];
+        let dragLeadId = null;
+
         // =============================================
         // TOAST NOTIFICATIONS
         // =============================================
@@ -2274,20 +2923,53 @@
                 .eq('brand_id', currentBrand.id);
             poSequence = (count || 0) + 1;
 
+            // Load feature toggles
+            await loadFeatureToggles();
+
+            // Load leads
+            await loadLeads();
+
+            // Load kanban stages
+            await loadKanbanStages();
+
             updateStats();
         }
 
         function updateStats() {
             document.getElementById('stat-products').textContent = products.length;
             document.getElementById('stat-clubs').textContent = clubs.length;
-            document.getElementById('stat-salespeople').textContent = salespeople.length;
-            
+
+            // Leads count (replaces salespeople in new stat bar)
+            const totalLeads = leads.filter(l => l.status !== 'archived').length;
+            document.getElementById('stat-salespeople').textContent = totalLeads;
+
+            // Launchpad feature card stats
+            const ncLeads = leads.filter(l => l.status === 'not_contacted').length;
+            const idLeads = leads.filter(l => l.status === 'in_discussion').length;
+            const el_nc = document.getElementById('stat-leads-nc');
+            const el_id = document.getElementById('stat-leads-id');
+            const el_clubs_lp = document.getElementById('stat-clubs-lp');
+            const el_prods_lp = document.getElementById('stat-products-lp');
+            if (el_nc) el_nc.textContent = `${ncLeads} new lead${ncLeads !== 1 ? 's' : ''}`;
+            if (el_id) el_id.textContent = `${idLeads} in discussion`;
+            if (el_clubs_lp) el_clubs_lp.textContent = `${clubs.length} club${clubs.length !== 1 ? 's' : ''}`;
+            if (el_prods_lp) el_prods_lp.textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
+
+            // Prospecting home badges
+            const ncBadge = document.getElementById('nc-count-badge');
+            const idBadge = document.getElementById('id-count-badge');
+            if (ncBadge) ncBadge.textContent = ncLeads;
+            if (idBadge) idBadge.textContent = idLeads;
+
             supabase
                 .from('purchase_orders')
                 .select('*', { count: 'exact', head: true })
                 .eq('brand_id', currentBrand?.id)
                 .then(({ count }) => {
-                    document.getElementById('stat-orders').textContent = count || 0;
+                    const posCount = count || 0;
+                    document.getElementById('stat-orders').textContent = posCount;
+                    const el_pos = document.getElementById('stat-pos-lp');
+                    if (el_pos) el_pos.textContent = `${posCount} active PO${posCount !== 1 ? 's' : ''}`;
                 });
         }
 
@@ -2297,13 +2979,62 @@
         function showLaunchpad() {
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('launchpad').classList.remove('hide');
-            
+
             // Show admin section only for super admins
             if (isSuperAdmin) {
                 document.getElementById('admin-section').classList.remove('hide');
             } else {
                 document.getElementById('admin-section').classList.add('hide');
             }
+
+            // Update launchpad brand display
+            const brandDisplay = document.getElementById('launchpad-brand-display');
+            const brandNameEl = document.getElementById('launchpad-brand-name');
+            if (currentBrand) {
+                if (brandDisplay) brandDisplay.classList.remove('hide');
+                if (brandNameEl) brandNameEl.textContent = currentBrand.name;
+            }
+
+            // Apply feature toggles to cards
+            applyFeatureToggles();
+        }
+
+        function applyFeatureToggles() {
+            const featureMap = {
+                'prospecting': 'fc-prospecting',
+                'clubs': 'fc-clubs',
+                'production': 'fc-production',
+                'design_studio': 'fc-design',
+                'store_generator': 'fc-store'
+            };
+            Object.entries(featureMap).forEach(([feature, cardId]) => {
+                const card = document.getElementById(cardId);
+                const badge = document.getElementById(`badge-${feature.replace('_studio','').replace('_generator','')}`);
+                const badgeAlt = {
+                    'design_studio': 'badge-design',
+                    'store_generator': 'badge-store'
+                };
+                const badgeEl = document.getElementById(badgeAlt[feature] || `badge-${feature}`);
+                if (!card) return;
+                const enabled = featureToggles[feature] !== false; // default to enabled
+                if (enabled) {
+                    card.classList.remove('disabled-card');
+                    if (badgeEl) badgeEl.style.display = 'none';
+                    // restore onclick
+                    const onclickMap = {
+                        'prospecting': "showTool('prospecting')",
+                        'clubs': "showTool('clubs')",
+                        'production': "showTool('po-tracker')",
+                        'design_studio': "showTool('mockups')",
+                        'store_generator': "showTool('generator')"
+                    };
+                    card.setAttribute('onclick', onclickMap[feature]);
+                } else {
+                    card.classList.add('disabled-card');
+                    if (badgeEl) { badgeEl.style.display = ''; badgeEl.textContent = 'Off'; badgeEl.className = 'card-badge badge-off'; }
+                    card.removeAttribute('onclick');
+                }
+            });
         }
 
         function showTool(tool) {
@@ -2348,6 +3079,9 @@
                 case 'po-tracker':
                     loadPoTracker();
                     break;
+                case 'prospecting':
+                    showProspectView('home');
+                    break;
             }
         }
 
@@ -2363,6 +3097,7 @@
 
             renderSalespeopleList();
             loadShopifyConfigUI();
+            renderFeatureToggles();
         }
 
         function renderSalespeopleList() {
@@ -5839,6 +6574,678 @@
 
         document.getElementById('po-modal').addEventListener('click', function(e) { if (e.target === this) hidePoModal(); });
         document.getElementById('po-detail-modal').addEventListener('click', function(e) { if (e.target === this) hidePoDetailModal(); });
+
+        // =============================================
+        // FEATURE TOGGLES
+        // =============================================
+        const FEATURES = [
+            { key: 'prospecting', label: 'Prospecting', icon: '🎯', desc: 'Lead tracking and early pipeline management' },
+            { key: 'clubs', label: 'Clubs', icon: '🏟️', desc: 'Club management, products and order forms' },
+            { key: 'production', label: 'Production', icon: '🚚', desc: 'PO tracking and factory management' },
+            { key: 'design_studio', label: 'Design Studio', icon: '🎨', desc: 'Mockup image uploads' },
+            { key: 'store_generator', label: 'Store Generator', icon: '🏪', desc: 'Shopify CSV and store sync' }
+        ];
+
+        async function loadFeatureToggles() {
+            if (!currentBrand) return;
+            const { data } = await supabase
+                .from('feature_toggles')
+                .select('*')
+                .eq('brand_id', currentBrand.id);
+            featureToggles = {};
+            (data || []).forEach(ft => { featureToggles[ft.feature] = ft.enabled; });
+        }
+
+        async function saveFeatureToggle(feature, enabled) {
+            if (!currentBrand) return;
+            const { error } = await supabase
+                .from('feature_toggles')
+                .upsert({ brand_id: currentBrand.id, feature, enabled, updated_at: new Date().toISOString() },
+                    { onConflict: 'brand_id,feature' });
+            if (error) { showToast('Error saving toggle: ' + error.message, 'error'); return; }
+            featureToggles[feature] = enabled;
+            applyFeatureToggles();
+            showToast(`${FEATURES.find(f=>f.key===feature)?.label} ${enabled ? 'enabled' : 'disabled'}`);
+        }
+
+        function renderFeatureToggles() {
+            const container = document.getElementById('feature-toggles-list');
+            if (!container) return;
+            container.innerHTML = FEATURES.map(f => {
+                const enabled = featureToggles[f.key] !== false;
+                return `<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${f.icon}</span>
+                        <div>
+                            <p class="text-sm font-semibold">${f.label}</p>
+                            <p class="text-xs text-gray-500">${f.desc}</p>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" ${enabled ? 'checked' : ''} onchange="saveFeatureToggle('${f.key}', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>`;
+            }).join('');
+        }
+
+        // =============================================
+        // PROSPECTING — DATA LOADING
+        // =============================================
+        async function loadLeads() {
+            if (!currentBrand) return;
+            const { data } = await supabase
+                .from('leads')
+                .select('*, kanban_stages(id,name,color,position)')
+                .eq('brand_id', currentBrand.id)
+                .order('created_at', { ascending: false });
+            leads = data || [];
+        }
+
+        async function loadKanbanStages() {
+            if (!currentBrand) return;
+            const { data } = await supabase
+                .from('kanban_stages')
+                .select('*')
+                .eq('brand_id', currentBrand.id)
+                .order('position');
+            kanbanStages = data || [];
+            // If no stages exist, seed defaults
+            if (kanbanStages.length === 0) {
+                await seedDefaultStages();
+            }
+        }
+
+        async function seedDefaultStages() {
+            if (!currentBrand) return;
+            const defaults = [
+                { brand_id: currentBrand.id, name: 'Initial Contact', color: '#14b8a6', position: 0 },
+                { brand_id: currentBrand.id, name: 'Proposal Sent', color: '#8b5cf6', position: 1 },
+                { brand_id: currentBrand.id, name: 'Decision Pending', color: '#f97316', position: 2 }
+            ];
+            const { data } = await supabase.from('kanban_stages').insert(defaults).select();
+            kanbanStages = data || [];
+        }
+
+        // =============================================
+        // PROSPECTING — NAVIGATION
+        // =============================================
+        function showProspectView(view) {
+            document.getElementById('prospect-home').classList.add('hide');
+            document.getElementById('prospect-not-contacted').classList.add('hide');
+            document.getElementById('prospect-in-discussion').classList.add('hide');
+
+            if (view === 'home') {
+                document.getElementById('prospect-home').classList.remove('hide');
+                updateStats();
+            } else if (view === 'not-contacted') {
+                document.getElementById('prospect-not-contacted').classList.remove('hide');
+                renderNotContacted();
+                populateCountyFilter();
+            } else if (view === 'in-discussion') {
+                document.getElementById('prospect-in-discussion').classList.remove('hide');
+                renderKanban();
+            }
+        }
+
+        // =============================================
+        // PROSPECTING — NOT CONTACTED LIST
+        // =============================================
+        function renderNotContacted() {
+            const search = (document.getElementById('nc-search')?.value || '').toLowerCase();
+            const sportFilter = document.getElementById('nc-filter-sport')?.value || '';
+            const countyFilter = document.getElementById('nc-filter-county')?.value || '';
+
+            let filtered = leads.filter(l => l.status === 'not_contacted');
+            if (search) filtered = filtered.filter(l =>
+                l.lead_name?.toLowerCase().includes(search) ||
+                l.club_name?.toLowerCase().includes(search) ||
+                l.county?.toLowerCase().includes(search) ||
+                l.location?.toLowerCase().includes(search)
+            );
+            if (sportFilter) filtered = filtered.filter(l => l.sport === sportFilter);
+            if (countyFilter) filtered = filtered.filter(l => l.county === countyFilter);
+
+            const countEl = document.getElementById('nc-list-count');
+            if (countEl) countEl.textContent = filtered.length;
+
+            const container = document.getElementById('nc-list');
+            if (!container) return;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>No leads found. Add your first lead to get started.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(lead => `
+                <div class="lead-row" onclick="openLeadModal('${lead.id}')">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-sm truncate">${escHtml(lead.lead_name)}</p>
+                        <p class="text-xs text-gray-500 truncate">${escHtml(lead.club_name)}${lead.location ? ' · ' + escHtml(lead.location) : ''}</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        ${lead.sport ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>` : ''}
+                        ${lead.county ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
+                        ${lead.amount_of_teams ? `<span class="text-xs text-gray-600">${lead.amount_of_teams} team${lead.amount_of_teams !== 1 ? 's' : ''}</span>` : ''}
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button onclick="event.stopPropagation();moveLeadToDiscussion('${lead.id}')"
+                            class="text-xs px-3 py-1.5 rounded-lg font-semibold transition"
+                            style="background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.2)"
+                            title="Move to In Discussion">
+                            Move to Discussion →
+                        </button>
+                        <button onclick="event.stopPropagation();archiveLeadById('${lead.id}','not_interested')"
+                            class="text-xs px-2 py-1.5 rounded-lg transition"
+                            style="background:rgba(255,255,255,0.04);color:#666"
+                            title="Archive as Not Interested">
+                            Archive
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function populateCountyFilter() {
+            const sel = document.getElementById('nc-filter-county');
+            if (!sel) return;
+            const counties = [...new Set(leads.filter(l => l.county).map(l => l.county))].sort();
+            const current = sel.value;
+            sel.innerHTML = '<option value="">All Counties</option>' +
+                counties.map(c => `<option value="${escHtml(c)}" ${c === current ? 'selected' : ''}>${escHtml(c)}</option>`).join('');
+        }
+
+        async function moveLeadToDiscussion(leadId) {
+            const defaultStage = kanbanStages[0];
+            const updates = { status: 'in_discussion', kanban_stage_id: defaultStage?.id || null };
+            const { error } = await supabase.from('leads').update(updates).eq('id', leadId);
+            if (error) { showToast('Error moving lead: ' + error.message, 'error'); return; }
+            await loadLeads();
+            renderNotContacted();
+            updateStats();
+            showToast('Lead moved to In Discussion');
+        }
+
+        async function archiveLeadById(leadId, reason) {
+            if (!confirm('Archive this lead as "Not Interested"?')) return;
+            const { error } = await supabase.from('leads')
+                .update({ status: 'archived', archived_reason: reason })
+                .eq('id', leadId);
+            if (error) { showToast('Error archiving lead: ' + error.message, 'error'); return; }
+            await loadLeads();
+            renderNotContacted();
+            updateStats();
+            showToast('Lead archived');
+        }
+
+        // =============================================
+        // PROSPECTING — KANBAN BOARD
+        // =============================================
+        function renderKanban() {
+            const board = document.getElementById('kanban-board');
+            if (!board) return;
+
+            const idLeads = leads.filter(l => l.status === 'in_discussion');
+            const countEl = document.getElementById('id-board-count');
+            if (countEl) countEl.textContent = idLeads.length;
+
+            if (kanbanStages.length === 0) {
+                board.innerHTML = `<div class="empty-state w-full"><div class="empty-icon">🏗️</div><p>No stages configured. Click "Configure Stages" to get started.</p></div>`;
+                return;
+            }
+
+            board.innerHTML = kanbanStages.map(stage => {
+                const stageLeads = idLeads
+                    .filter(l => l.kanban_stage_id === stage.id)
+                    .sort((a, b) => (a.kanban_order || 0) - (b.kanban_order || 0));
+
+                const cards = stageLeads.map(lead => `
+                    <div class="kanban-card"
+                        draggable="true"
+                        ondragstart="onKanbanDragStart(event,'${lead.id}')"
+                        ondragend="onKanbanDragEnd(event)"
+                        onclick="openLeadModal('${lead.id}')">
+                        <div class="kanban-card-title">${escHtml(lead.lead_name)}</div>
+                        <div class="kanban-card-club">${escHtml(lead.club_name)}</div>
+                        <div class="kanban-card-meta">
+                            ${lead.sport ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>` : ''}
+                            ${lead.county ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                return `
+                    <div class="kanban-column"
+                        ondragover="onKanbanDragOver(event)"
+                        ondrop="onKanbanDrop(event,'${stage.id}')"
+                        ondragleave="onKanbanDragLeave(event)">
+                        <div class="kanban-col-header">
+                            <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.name)}</span>
+                            <span class="kanban-count">${stageLeads.length}</span>
+                        </div>
+                        ${cards || `<div style="color:#444;font-size:13px;padding:8px 0;text-align:center">Drop leads here</div>`}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Drag & drop handlers
+        function onKanbanDragStart(event, leadId) {
+            dragLeadId = leadId;
+            event.currentTarget.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+        function onKanbanDragEnd(event) {
+            event.currentTarget.classList.remove('dragging');
+            dragLeadId = null;
+        }
+        function onKanbanDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            event.currentTarget.classList.add('drag-over');
+        }
+        function onKanbanDragLeave(event) {
+            event.currentTarget.classList.remove('drag-over');
+        }
+        async function onKanbanDrop(event, stageId) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('drag-over');
+            if (!dragLeadId) return;
+            const { error } = await supabase.from('leads')
+                .update({ kanban_stage_id: stageId })
+                .eq('id', dragLeadId);
+            if (error) { showToast('Error moving card: ' + error.message, 'error'); return; }
+            await loadLeads();
+            renderKanban();
+            dragLeadId = null;
+        }
+
+        // =============================================
+        // PROSPECTING — KANBAN STAGE CONFIG
+        // =============================================
+        function openStageConfig() {
+            renderStagesList();
+            document.getElementById('stage-config-modal').classList.remove('hide');
+        }
+        function closeStageConfig() {
+            document.getElementById('stage-config-modal').classList.add('hide');
+            renderKanban();
+        }
+
+        function renderStagesList() {
+            const container = document.getElementById('stages-list');
+            if (!container) return;
+            if (kanbanStages.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No stages yet. Add your first stage below.</p>';
+            } else {
+                container.innerHTML = kanbanStages.map(stage => `
+                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
+                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${stage.color}"></span>
+                        <span class="flex-1 text-sm font-medium">${escHtml(stage.name)}</span>
+                        <span class="text-xs text-gray-600">${leads.filter(l=>l.kanban_stage_id===stage.id).length} leads</span>
+                        <button onclick="deleteStage('${stage.id}')" class="text-red-500 hover:text-red-400 text-xs px-2 py-1 rounded" style="background:rgba(239,68,68,0.08)">Remove</button>
+                    </div>
+                `).join('');
+            }
+            // Show/hide Add Stage button based on count
+            const addBtn = document.getElementById('add-stage-btn');
+            if (addBtn) addBtn.style.display = kanbanStages.length >= 3 ? 'none' : '';
+            document.getElementById('add-stage-form')?.classList.add('hide');
+        }
+
+        function showAddStageForm() {
+            if (kanbanStages.length >= 3) { showToast('Maximum 3 stages allowed', 'error'); return; }
+            document.getElementById('add-stage-form').classList.remove('hide');
+            document.getElementById('add-stage-btn').style.display = 'none';
+            document.getElementById('new-stage-name').value = '';
+            document.getElementById('new-stage-color').value = '#14b8a6';
+        }
+
+        async function saveNewStage() {
+            const name = document.getElementById('new-stage-name').value.trim();
+            const color = document.getElementById('new-stage-color').value;
+            if (!name) { showToast('Stage name is required', 'error'); return; }
+            if (kanbanStages.length >= 3) { showToast('Maximum 3 stages allowed', 'error'); return; }
+            const { data, error } = await supabase.from('kanban_stages').insert({
+                brand_id: currentBrand.id, name, color, position: kanbanStages.length
+            }).select().single();
+            if (error) { showToast('Error creating stage: ' + error.message, 'error'); return; }
+            kanbanStages.push(data);
+            renderStagesList();
+            populateStageDropdown();
+            showToast('Stage added');
+        }
+
+        async function deleteStage(stageId) {
+            const stageLeadsCount = leads.filter(l => l.kanban_stage_id === stageId).length;
+            const msg = stageLeadsCount > 0
+                ? `This stage has ${stageLeadsCount} lead(s). Leads will be unassigned. Continue?`
+                : 'Delete this stage?';
+            if (!confirm(msg)) return;
+            const { error } = await supabase.from('kanban_stages').delete().eq('id', stageId);
+            if (error) { showToast('Error deleting stage: ' + error.message, 'error'); return; }
+            kanbanStages = kanbanStages.filter(s => s.id !== stageId);
+            await loadLeads();
+            renderStagesList();
+            populateStageDropdown();
+            showToast('Stage removed');
+        }
+
+        function populateStageDropdown() {
+            const sel = document.getElementById('lead-stage');
+            if (!sel) return;
+            sel.innerHTML = '<option value="">Select stage...</option>' +
+                kanbanStages.map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('');
+        }
+
+        function toggleKanbanStageField() {
+            const status = document.getElementById('lead-status')?.value;
+            const stageField = document.getElementById('lead-stage-field');
+            if (stageField) {
+                stageField.style.display = status === 'in_discussion' ? '' : 'none';
+            }
+        }
+
+        // =============================================
+        // PROSPECTING — LEAD MODAL (CRUD)
+        // =============================================
+        async function openLeadModal(leadId, defaultStatus = 'not_contacted') {
+            currentLeadId = leadId;
+            editingLeadContacts = [];
+            currentLeadContacts = [];
+
+            populateStageDropdown();
+
+            const modal = document.getElementById('lead-modal');
+            const title = document.getElementById('lead-modal-title');
+            const dangerActions = document.getElementById('lead-danger-actions');
+
+            if (leadId) {
+                // Edit mode
+                const lead = leads.find(l => l.id === leadId);
+                if (!lead) return;
+                title.textContent = lead.lead_name || 'Edit Lead';
+                document.getElementById('lead-id').value = lead.id;
+                document.getElementById('lead-name').value = lead.lead_name || '';
+                document.getElementById('lead-club-name').value = lead.club_name || '';
+                document.getElementById('lead-sport').value = lead.sport || '';
+                document.getElementById('lead-sport-level').value = lead.sport_level || '';
+                document.getElementById('lead-county').value = lead.county || '';
+                document.getElementById('lead-location').value = lead.location || '';
+                document.getElementById('lead-teams').value = lead.amount_of_teams || '';
+                document.getElementById('lead-notes').value = lead.notes || '';
+                document.getElementById('lead-status').value = lead.status || 'not_contacted';
+                document.getElementById('lead-stage').value = lead.kanban_stage_id || '';
+                dangerActions.style.removeProperty('display');
+
+                // Load contacts
+                const { data: contacts } = await supabase
+                    .from('lead_contacts')
+                    .select('*')
+                    .eq('lead_id', leadId)
+                    .order('is_primary', { ascending: false });
+                currentLeadContacts = contacts || [];
+                editingLeadContacts = JSON.parse(JSON.stringify(currentLeadContacts));
+            } else {
+                // Create mode
+                title.textContent = 'New Lead';
+                document.getElementById('lead-id').value = '';
+                document.getElementById('lead-name').value = '';
+                document.getElementById('lead-club-name').value = '';
+                document.getElementById('lead-sport').value = '';
+                document.getElementById('lead-sport-level').value = '';
+                document.getElementById('lead-county').value = '';
+                document.getElementById('lead-location').value = '';
+                document.getElementById('lead-teams').value = '';
+                document.getElementById('lead-notes').value = '';
+                document.getElementById('lead-status').value = defaultStatus;
+                document.getElementById('lead-stage').value = defaultStatus === 'in_discussion' ? (kanbanStages[0]?.id || '') : '';
+                dangerActions.style.display = 'none';
+            }
+
+            toggleKanbanStageField();
+            renderContactsList();
+            document.getElementById('add-contact-form').classList.add('hide');
+            modal.classList.remove('hide');
+        }
+
+        function closeLeadModal() {
+            document.getElementById('lead-modal').classList.add('hide');
+            currentLeadId = null;
+            editingLeadContacts = [];
+        }
+
+        function renderContactsList() {
+            const container = document.getElementById('lead-contacts-list');
+            if (!container) return;
+            if (editingLeadContacts.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-600 mb-2">No contacts added yet.</p>';
+                return;
+            }
+            container.innerHTML = editingLeadContacts.map((c, i) => `
+                <div class="contact-card">
+                    ${c.is_primary ? '<span class="absolute top-2 right-2 text-xs px-2 py-0.5 rounded" style="background:rgba(20,184,166,0.1);color:#2dd4bf">Primary</span>' : ''}
+                    <div class="contact-name">${escHtml((c.first_name || '') + ' ' + (c.last_name || '')).trim() || 'Unnamed contact'}</div>
+                    <div class="contact-details">
+                        ${c.role ? `<span>${escHtml(c.role)}</span>` : ''}
+                        ${c.email ? `<span> · ${escHtml(c.email)}</span>` : ''}
+                        ${c.phone ? `<span> · ${escHtml(c.phone)}</span>` : ''}
+                    </div>
+                    ${!c.id ? `<button onclick="removeNewContact(${i})" class="absolute top-2 right-10 text-xs text-red-400 hover:text-red-300">Remove</button>` :
+                               `<button onclick="deleteContact('${c.id}',${i})" class="absolute top-2 right-10 text-xs text-red-400 hover:text-red-300">Remove</button>`}
+                </div>
+            `).join('');
+        }
+
+        function showAddContactForm() {
+            document.getElementById('add-contact-form').classList.remove('hide');
+        }
+
+        function saveContact() {
+            const firstName = document.getElementById('contact-first-name').value.trim();
+            const lastName = document.getElementById('contact-last-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const phone = document.getElementById('contact-phone').value.trim();
+            const role = document.getElementById('contact-role').value.trim();
+            const isPrimary = document.getElementById('contact-primary').checked;
+            if (!firstName && !lastName && !email) { showToast('Please fill in at least a name or email', 'error'); return; }
+            if (isPrimary) {
+                editingLeadContacts.forEach(c => c.is_primary = false);
+            }
+            editingLeadContacts.push({ first_name: firstName, last_name: lastName, email, phone, role, is_primary: isPrimary });
+            renderContactsList();
+            document.getElementById('add-contact-form').classList.add('hide');
+            // Clear form
+            ['contact-first-name','contact-last-name','contact-email','contact-phone','contact-role'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+            document.getElementById('contact-primary').checked = false;
+        }
+
+        function removeNewContact(index) {
+            editingLeadContacts.splice(index, 1);
+            renderContactsList();
+        }
+
+        async function deleteContact(contactId, index) {
+            if (!confirm('Remove this contact?')) return;
+            if (contactId && contactId !== 'undefined') {
+                const { error } = await supabase.from('lead_contacts').delete().eq('id', contactId);
+                if (error) { showToast('Error removing contact', 'error'); return; }
+            }
+            editingLeadContacts.splice(index, 1);
+            renderContactsList();
+        }
+
+        async function saveLead() {
+            const leadName = document.getElementById('lead-name').value.trim();
+            const clubName = document.getElementById('lead-club-name').value.trim();
+            if (!leadName) { showToast('Lead name is required', 'error'); return; }
+            if (!clubName) { showToast('Club name is required', 'error'); return; }
+
+            const status = document.getElementById('lead-status').value;
+            const stageId = document.getElementById('lead-stage').value || null;
+            const payload = {
+                brand_id: currentBrand.id,
+                lead_name: leadName,
+                club_name: clubName,
+                sport: document.getElementById('lead-sport').value || null,
+                sport_level: document.getElementById('lead-sport-level').value || null,
+                county: document.getElementById('lead-county').value.trim() || null,
+                location: document.getElementById('lead-location').value.trim() || null,
+                amount_of_teams: parseInt(document.getElementById('lead-teams').value) || null,
+                notes: document.getElementById('lead-notes').value.trim() || null,
+                status,
+                kanban_stage_id: status === 'in_discussion' ? stageId : null
+            };
+
+            let leadId = currentLeadId;
+            if (leadId) {
+                const { error } = await supabase.from('leads').update(payload).eq('id', leadId);
+                if (error) { showToast('Error saving lead: ' + error.message, 'error'); return; }
+            } else {
+                const { data, error } = await supabase.from('leads').insert(payload).select().single();
+                if (error) { showToast('Error creating lead: ' + error.message, 'error'); return; }
+                leadId = data.id;
+            }
+
+            // Save new contacts (those without an id)
+            const newContacts = editingLeadContacts.filter(c => !c.id);
+            if (newContacts.length > 0) {
+                const toInsert = newContacts.map(c => ({ ...c, lead_id: leadId }));
+                await supabase.from('lead_contacts').insert(toInsert);
+            }
+
+            await loadLeads();
+            updateStats();
+            closeLeadModal();
+
+            // Refresh current view
+            const ncVisible = !document.getElementById('prospect-not-contacted').classList.contains('hide');
+            const idVisible = !document.getElementById('prospect-in-discussion').classList.contains('hide');
+            if (ncVisible) renderNotContacted();
+            if (idVisible) renderKanban();
+
+            showToast(currentLeadId ? 'Lead updated' : 'Lead created');
+        }
+
+        async function archiveLead(reason) {
+            if (!currentLeadId) return;
+            if (!confirm('Archive this lead?')) return;
+            const { error } = await supabase.from('leads')
+                .update({ status: 'archived', archived_reason: reason })
+                .eq('id', currentLeadId);
+            if (error) { showToast('Error archiving lead: ' + error.message, 'error'); return; }
+            await loadLeads();
+            updateStats();
+            closeLeadModal();
+            renderNotContacted();
+            showToast('Lead archived');
+        }
+
+        async function deleteLead() {
+            if (!currentLeadId) return;
+            if (!confirm('Permanently delete this lead? This cannot be undone.')) return;
+            await supabase.from('lead_contacts').delete().eq('lead_id', currentLeadId);
+            const { error } = await supabase.from('leads').delete().eq('id', currentLeadId);
+            if (error) { showToast('Error deleting lead: ' + error.message, 'error'); return; }
+            await loadLeads();
+            updateStats();
+            closeLeadModal();
+            renderNotContacted();
+            renderKanban();
+            showToast('Lead deleted');
+        }
+
+        // =============================================
+        // PROSPECTING — CSV IMPORT / EXPORT
+        // =============================================
+        function exportLeadsCSV(statusFilter) {
+            let toExport = leads;
+            if (statusFilter) toExport = leads.filter(l => l.status === statusFilter);
+
+            const headers = ['lead_name','club_name','sport','sport_level','county','location','amount_of_teams','notes','status'];
+            const rows = toExport.map(l => headers.map(h => {
+                const val = l[h] ?? '';
+                return `"${String(val).replace(/"/g,'""')}"`;
+            }));
+
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `leads_${statusFilter || 'all'}_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function handleLeadsCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: async (results) => {
+                    const statusEl = document.getElementById('leads-import-status');
+                    statusEl.classList.remove('hide');
+                    statusEl.textContent = `Importing ${results.data.length} leads...`;
+
+                    let successCount = 0, errorCount = 0;
+                    for (const row of results.data) {
+                        const payload = {
+                            brand_id: currentBrand.id,
+                            lead_name: row.lead_name?.trim() || row.club_name?.trim() || 'Unnamed Lead',
+                            club_name: row.club_name?.trim() || 'Unknown Club',
+                            sport: row.sport?.trim() || null,
+                            sport_level: row.sport_level?.trim() || null,
+                            county: row.county?.trim() || null,
+                            location: row.location?.trim() || null,
+                            amount_of_teams: parseInt(row.amount_of_teams) || null,
+                            notes: row.notes?.trim() || null,
+                            status: 'not_contacted'
+                        };
+                        const { error } = await supabase.from('leads').insert(payload);
+                        if (error) errorCount++;
+                        else successCount++;
+                    }
+
+                    await loadLeads();
+                    updateStats();
+                    statusEl.textContent = `Imported ${successCount} leads${errorCount > 0 ? `, ${errorCount} errors` : ''}`;
+
+                    setTimeout(() => {
+                        document.getElementById('leads-csv-import-modal').classList.add('hide');
+                        statusEl.classList.add('hide');
+                        renderNotContacted();
+                    }, 2000);
+                }
+            });
+        }
+
+        // =============================================
+        // UTILITY
+        // =============================================
+        function escHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g,'&amp;')
+                .replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;')
+                .replace(/"/g,'&quot;')
+                .replace(/'/g,'&#39;');
+        }
+
+        // Modal close on backdrop click
+        document.getElementById('lead-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeLeadModal();
+        });
+        document.getElementById('stage-config-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeStageConfig();
+        });
+        document.getElementById('leads-csv-import-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.add('hide');
+        });
 
         init();
     </script>
