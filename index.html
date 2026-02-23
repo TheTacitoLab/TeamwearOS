@@ -968,6 +968,17 @@
                     </div>
                 </div>
 
+                <!-- Product Database -->
+                <div id="fc-products" onclick="showTool('products')" class="feature-card accent-teal">
+                    <span class="card-badge badge-new" id="badge-products" style="display:none">Off</span>
+                    <div class="card-icon" style="background:rgba(20,184,166,0.12)">📦</div>
+                    <h3>Product Database</h3>
+                    <p>Master catalogue — product codes, pricing and size structure for all ranges</p>
+                    <div class="mt-4">
+                        <span id="stat-products-db" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(20,184,166,0.1);color:#2dd4bf">0 products</span>
+                    </div>
+                </div>
+
             </div>
 
             <!-- Quick Stats -->
@@ -1017,8 +1028,30 @@
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
                 ← Back to Launchpad
             </button>
-            <h2 class="text-2xl font-bold mb-6">Product Database</h2>
-            
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h2 class="text-2xl font-bold">Master Product Catalogue</h2>
+                    <p class="text-gray-500 text-sm mt-1">The definitive source of truth — all ranges, pricing tiers and size structures for this brand</p>
+                </div>
+            </div>
+
+            <!-- Uniform Structure Guide -->
+            <div class="glass rounded-2xl p-4 mb-6 border" style="border-color:rgba(20,184,166,0.2)">
+                <div class="flex items-start gap-3">
+                    <span class="text-xl mt-0.5">📐</span>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold text-brand-400 mb-1">Uniform Product Code Structure</p>
+                        <p class="text-xs text-gray-400 mb-2">All products must follow the format: <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">BRAND/RANGE/NNN</code> — e.g. <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">APX/ATL/001</code></p>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs text-gray-500">
+                            <div><span class="text-gray-300 font-medium">BRAND</span> — short brand prefix (e.g. APX)</div>
+                            <div><span class="text-gray-300 font-medium">RANGE</span> — 3-letter range code (e.g. ATL = Atlas)</div>
+                            <div><span class="text-gray-300 font-medium">NNN</span> — 3-digit item number (001, 002…)</div>
+                            <div><span class="text-gray-300 font-medium">Club SKU</span> — appended automatically: <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">/WFC-S</code></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Action Bar -->
             <div class="flex flex-wrap gap-4 mb-6">
                 <button onclick="showAddProductModal()" class="bg-brand-500 hover:bg-brand-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
@@ -3012,11 +3045,11 @@
                     <h4 class="font-semibold text-sm mb-3 text-brand-400">Price Tiers</h4>
                     <div class="grid grid-cols-3 gap-4">
                         <div class="price-tier-card">
-                            <p class="text-xs text-gray-500 mb-1 font-medium">Web Price</p>
-                            <p class="text-xs text-gray-600 mb-2">Public Shopify price</p>
+                            <p class="text-xs text-brand-400 mb-1 font-medium">Shop Price</p>
+                            <p class="text-xs text-gray-600 mb-2">Partner + £2 · Public Shopify price</p>
                             <div class="flex items-center gap-1">
                                 <span class="text-gray-400">£</span>
-                                <input type="number" step="0.01" id="cp-web-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm">
+                                <input type="number" step="0.01" id="cp-web-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm" oninput="onWebPriceManualEdit()">
                             </div>
                         </div>
                         <div class="price-tier-card">
@@ -3024,19 +3057,19 @@
                             <p class="text-xs text-gray-600 mb-2">Direct partner orders</p>
                             <div class="flex items-center gap-1">
                                 <span class="text-gray-400">£</span>
-                                <input type="number" step="0.01" id="cp-partner-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm">
+                                <input type="number" step="0.01" id="cp-partner-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm" oninput="onPartnerPriceInput()">
                             </div>
                         </div>
                         <div class="price-tier-card">
                             <p class="text-xs text-gray-400 mb-1 font-medium">Non-Partner Price</p>
-                            <p class="text-xs text-gray-600 mb-2">Direct non-partner orders</p>
+                            <p class="text-xs text-gray-600 mb-2">Direct retail/non-partner</p>
                             <div class="flex items-center gap-1">
                                 <span class="text-gray-400">£</span>
                                 <input type="number" step="0.01" id="cp-non-partner-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm">
                             </div>
                         </div>
                     </div>
-                    <p class="text-gray-600 text-xs mt-3">Note: Web price is stored in Shopify. Internal prices are stored here and used when creating draft orders.</p>
+                    <p class="text-gray-600 text-xs mt-3">Shop price auto-sets to Partner + £2. Override manually if needed. Internal prices used for draft orders.</p>
                 </div>
 
                 <!-- Sizes from master product -->
@@ -3567,6 +3600,8 @@
             if (el_id) el_id.textContent = `${idLeads} in discussion`;
             if (el_clubs_lp) el_clubs_lp.textContent = `${clubs.length} club${clubs.length !== 1 ? 's' : ''}`;
             if (el_prods_lp) el_prods_lp.textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
+            const el_prods_db = document.getElementById('stat-products-db');
+            if (el_prods_db) el_prods_db.textContent = `${products.length} product${products.length !== 1 ? 's' : ''}`;
 
             // Prospecting home badges
             const ncBadge = document.getElementById('nc-count-badge');
@@ -3617,12 +3652,13 @@
 
         function applyFeatureToggles() {
             const featureMap = {
-                'prospecting':   { card: 'fc-prospecting', badge: 'badge-prospecting', onclick: "showTool('prospecting')" },
-                'sales':         { card: 'fc-sales',       badge: 'badge-sales',       onclick: "showTool('sales')" },
-                'clubs':         { card: 'fc-clubs',       badge: 'badge-clubs',       onclick: "showTool('clubs')" },
-                'production':    { card: 'fc-production',  badge: 'badge-production',  onclick: "showTool('po-tracker')" },
-                'design_studio': { card: 'fc-design',      badge: 'badge-design',      onclick: "showTool('mockups')" },
-                'store_generator':{ card: 'fc-store',      badge: 'badge-store',       onclick: "showTool('generator')" }
+                'prospecting':    { card: 'fc-prospecting', badge: 'badge-prospecting', onclick: "showTool('prospecting')" },
+                'sales':          { card: 'fc-sales',       badge: 'badge-sales',       onclick: "showTool('sales')" },
+                'clubs':          { card: 'fc-clubs',       badge: 'badge-clubs',       onclick: "showTool('clubs')" },
+                'production':     { card: 'fc-production',  badge: 'badge-production',  onclick: "showTool('po-tracker')" },
+                'design_studio':  { card: 'fc-design',      badge: 'badge-design',      onclick: "showTool('mockups')" },
+                'store_generator':{ card: 'fc-store',       badge: 'badge-store',       onclick: "showTool('generator')" },
+                'products':       { card: 'fc-products',    badge: 'badge-products',    onclick: "showTool('products')" }
             };
             Object.entries(featureMap).forEach(([feature, cfg]) => {
                 const card = document.getElementById(cfg.card);
@@ -5881,10 +5917,171 @@
             renderClubsEnhanced();
         }
 
-        function generateShopifyCSVForClub(overrideClubId) {
+        async function generateShopifyCSVForClub(overrideClubId) {
             const club = overrideClubId ? clubs.find(c => c.id === overrideClubId) : currentClub;
             if (!club) { showToast('No club selected', 'error'); return; }
-            showTool('generator');
+
+            // Fetch club products with master product data
+            let clubProds = currentClubProducts;
+            if (overrideClubId && overrideClubId !== currentClub?.id) {
+                const { data } = await supabase.from('club_products')
+                    .select('*, products(*)')
+                    .eq('club_id', overrideClubId).eq('is_active', true).order('created_at');
+                clubProds = data || [];
+            }
+
+            if (!clubProds.length) {
+                showToast('No club products found. Add products to this club first.', 'error');
+                return;
+            }
+
+            const headers = [
+                'Title', 'URL handle', 'Description', 'Vendor', 'Product category', 'Type',
+                'Tags', 'Published on online store', 'Status', 'Collection', 'SKU', 'Barcode',
+                'Option1 name', 'Option1 value', 'Option2 name', 'Option2 value',
+                'Option3 name', 'Option3 value', 'Price', 'Compare-at price', 'Cost per item',
+                'Charge tax', 'Tax code', 'Inventory policy', 'Inventory tracker',
+                'Inventory quantity', 'Continue selling when out of stock', 'Weight value (grams)',
+                'Weight unit for display', 'Requires shipping', 'Fulfillment service',
+                'Product image URL', 'Image position', 'Image alt text', 'Variant image URL',
+                'Gift card', 'SEO title', 'SEO description'
+            ];
+
+            const rows = [];
+
+            for (const cp of clubProds) {
+                const masterProduct = cp.products;
+                if (!masterProduct) continue;
+
+                const title = cp.custom_name || `${club.name} ${masterProduct.item_name}`;
+                const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const webPrice = cp.web_price || (cp.partner_price ? (cp.partner_price + 2) : null);
+
+                let description = masterProduct.description || '';
+                description = description
+                    .replace(/\*ADD CLUB NAME \+ RANGE\*/g, `${club.name} ${masterProduct.range_name}`)
+                    .replace(/\*ADD CLUB \+ RANGE\*/g, `${club.name} ${masterProduct.range_name}`)
+                    .replace(/\*ADD CLUB NAME\*/g, club.name);
+                description = description.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p.trim()}</p>`).join('');
+
+                const tags = [club.name, masterProduct.range_name, masterProduct.category];
+                if (masterProduct.has_addons) tags.push('apx-with-addons');
+
+                const sizes = masterProduct.sizes?.split(',').map(s => s.trim()) || [];
+                const youthSizes = sizes.filter(s => s.startsWith('Y'));
+                const adultSizes = sizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+
+                let variantIndex = 0;
+
+                if (masterProduct.is_single_price || (!youthSizes.length && !adultSizes.length)) {
+                    const sku = `${masterProduct.product_code}/${club.suffix}-OS`;
+                    rows.push({
+                        'Title': title, 'URL handle': handle, 'Description': description,
+                        'Vendor': currentBrand.name, 'Product category': 'Apparel & Accessories > Clothing',
+                        'Type': masterProduct.category, 'Tags': tags.join(','),
+                        'Published on online store': 'TRUE', 'Status': 'active', 'Collection': club.name,
+                        'SKU': sku, 'Barcode': '',
+                        'Option1 name': 'Size', 'Option1 value': 'One Size',
+                        'Option2 name': '', 'Option2 value': '', 'Option3 name': '', 'Option3 value': '',
+                        'Price': webPrice ? Number(webPrice).toFixed(2) : '',
+                        'Compare-at price': '', 'Cost per item': '',
+                        'Charge tax': 'FALSE', 'Tax code': '', 'Inventory policy': 'continue',
+                        'Inventory tracker': 'shopify', 'Inventory quantity': '0',
+                        'Continue selling when out of stock': 'TRUE',
+                        'Weight value (grams)': masterProduct.weight_grams || '450',
+                        'Weight unit for display': 'g', 'Requires shipping': 'TRUE',
+                        'Fulfillment service': 'manual', 'Product image URL': '', 'Image position': '1',
+                        'Image alt text': title, 'Variant image URL': '', 'Gift card': 'FALSE',
+                        'SEO title': `${title} | Official ${club.name} Merchandise`,
+                        'SEO description': `Shop the official ${title}. Premium quality teamwear.`
+                    });
+                } else {
+                    // Youth variants
+                    youthSizes.forEach(size => {
+                        const sku = `${masterProduct.product_code}/${club.suffix}-${size}`;
+                        const isFirst = variantIndex === 0;
+                        const youthWebPrice = cp.web_price || (cp.partner_price ? (cp.partner_price + 2) : null);
+                        rows.push({
+                            'Title': isFirst ? title : '', 'URL handle': handle,
+                            'Description': isFirst ? description : '',
+                            'Vendor': isFirst ? currentBrand.name : '',
+                            'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
+                            'Type': isFirst ? masterProduct.category : '',
+                            'Tags': isFirst ? tags.join(',') : '',
+                            'Published on online store': isFirst ? 'TRUE' : '',
+                            'Status': 'active', 'Collection': isFirst ? club.name : '',
+                            'SKU': sku, 'Barcode': '',
+                            'Option1 name': 'Fit', 'Option1 value': 'Youth',
+                            'Option2 name': 'Size', 'Option2 value': size,
+                            'Option3 name': '', 'Option3 value': '',
+                            'Price': youthWebPrice ? Number(youthWebPrice).toFixed(2) : '',
+                            'Compare-at price': '', 'Cost per item': '',
+                            'Charge tax': 'FALSE', 'Tax code': '', 'Inventory policy': 'continue',
+                            'Inventory tracker': 'shopify', 'Inventory quantity': '0',
+                            'Continue selling when out of stock': 'TRUE',
+                            'Weight value (grams)': masterProduct.weight_grams || '450',
+                            'Weight unit for display': 'g', 'Requires shipping': 'TRUE',
+                            'Fulfillment service': 'manual',
+                            'Product image URL': '', 'Image position': isFirst ? '1' : '',
+                            'Image alt text': isFirst ? title : '', 'Variant image URL': '',
+                            'Gift card': 'FALSE',
+                            'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
+                            'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : ''
+                        });
+                        variantIndex++;
+                    });
+
+                    // Adult variants
+                    adultSizes.forEach(size => {
+                        const sku = `${masterProduct.product_code}/${club.suffix}-${size}`;
+                        const isFirst = variantIndex === 0;
+                        const adultWebPrice = cp.web_price || (cp.partner_price ? (cp.partner_price + 2) : null);
+                        rows.push({
+                            'Title': isFirst ? title : '', 'URL handle': handle,
+                            'Description': isFirst ? description : '',
+                            'Vendor': isFirst ? currentBrand.name : '',
+                            'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
+                            'Type': isFirst ? masterProduct.category : '',
+                            'Tags': isFirst ? tags.join(',') : '',
+                            'Published on online store': isFirst ? 'TRUE' : '',
+                            'Status': 'active', 'Collection': isFirst ? club.name : '',
+                            'SKU': sku, 'Barcode': '',
+                            'Option1 name': 'Fit', 'Option1 value': 'Adult',
+                            'Option2 name': 'Size', 'Option2 value': size,
+                            'Option3 name': '', 'Option3 value': '',
+                            'Price': adultWebPrice ? Number(adultWebPrice).toFixed(2) : '',
+                            'Compare-at price': '', 'Cost per item': '',
+                            'Charge tax': 'TRUE', 'Tax code': '', 'Inventory policy': 'continue',
+                            'Inventory tracker': 'shopify', 'Inventory quantity': '0',
+                            'Continue selling when out of stock': 'TRUE',
+                            'Weight value (grams)': masterProduct.weight_grams || '450',
+                            'Weight unit for display': 'g', 'Requires shipping': 'TRUE',
+                            'Fulfillment service': 'manual',
+                            'Product image URL': '', 'Image position': isFirst ? '1' : '',
+                            'Image alt text': isFirst ? title : '', 'Variant image URL': '',
+                            'Gift card': 'FALSE',
+                            'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
+                            'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : ''
+                        });
+                        variantIndex++;
+                    });
+                }
+            }
+
+            if (!rows.length) {
+                showToast('Could not generate CSV — check that club products have master product data', 'error');
+                return;
+            }
+
+            const csv = Papa.unparse({ fields: headers, data: rows.map(row => headers.map(h => row[h] ?? '')) });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${club.suffix}_shopify_products.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`CSV downloaded — ${clubProds.length} product${clubProds.length !== 1 ? 's' : ''}`);
         }
 
         // =============================================
@@ -6264,6 +6461,17 @@
             document.getElementById('cp-master-product').disabled = false;
         }
 
+        // Reactive: when partner price is typed, auto-update shop price = partner + £2
+        function onPartnerPriceInput() {
+            const partner = parseFloat(document.getElementById('cp-partner-price').value);
+            if (!isNaN(partner)) {
+                document.getElementById('cp-web-price').value = (partner + 2).toFixed(2);
+            }
+        }
+
+        // Allow manual override of shop price without recalculating
+        function onWebPriceManualEdit() { /* no-op — user override is fine */ }
+
         function onMasterProductChange() {
             const productId = document.getElementById('cp-master-product').value;
             if (!productId) { document.getElementById('cp-sizes-info').classList.add('hide'); return; }
@@ -6272,13 +6480,15 @@
             if (!document.getElementById('cp-custom-name').value && !document.getElementById('edit-club-product-id').value) {
                 document.getElementById('cp-custom-name').value = `${currentClub.name} ${product.item_name}`;
             }
-            if (!document.getElementById('cp-web-price').value) {
-                const webPrice = product.is_single_price ? product.single_retail_price : product.adult_retail_price;
-                if (webPrice) document.getElementById('cp-web-price').value = Number(webPrice).toFixed(2);
+            // Auto-set prices from master product: partner price first, then web = partner + £2
+            const partnerPrice = product.is_single_price ? product.single_partner_price : product.adult_partner_price;
+            const retailPrice = product.is_single_price ? product.single_retail_price : product.adult_retail_price;
+            if (partnerPrice) {
+                document.getElementById('cp-partner-price').value = Number(partnerPrice).toFixed(2);
+                document.getElementById('cp-web-price').value = (Number(partnerPrice) + 2).toFixed(2);
             }
-            if (!document.getElementById('cp-partner-price').value) {
-                const partnerPrice = product.is_single_price ? product.single_partner_price : product.adult_partner_price;
-                if (partnerPrice) document.getElementById('cp-partner-price').value = Number(partnerPrice).toFixed(2);
+            if (retailPrice) {
+                document.getElementById('cp-non-partner-price').value = Number(retailPrice).toFixed(2);
             }
             document.getElementById('cp-sizes-display').textContent = product.sizes || 'See master product';
             document.getElementById('cp-sizes-info').classList.remove('hide');
@@ -8177,7 +8387,8 @@
             { key: 'clubs', label: 'Clubs', icon: '🏟️', desc: 'Club management, products and order forms' },
             { key: 'production', label: 'Production', icon: '🚚', desc: 'PO tracking and factory management' },
             { key: 'design_studio', label: 'Design Studio', icon: '🎨', desc: 'Mockup image uploads' },
-            { key: 'store_generator', label: 'Store Generator', icon: '🏪', desc: 'Shopify CSV and store sync' }
+            { key: 'store_generator', label: 'Store Generator', icon: '🏪', desc: 'Shopify CSV and store sync' },
+            { key: 'products', label: 'Product Database', icon: '📦', desc: 'Master product catalogue and pricing structure' }
         ];
 
         async function loadFeatureToggles() {
