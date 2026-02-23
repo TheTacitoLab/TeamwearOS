@@ -695,6 +695,124 @@
         }
         .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
         .empty-state p { font-size: 14px; }
+
+        /* =============================================
+           SALES MODULE
+           ============================================= */
+        .stage-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 700;
+            padding: 4px 12px; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            cursor: pointer; transition: all 0.2s ease;
+        }
+        .stage-pill.active { box-shadow: 0 0 0 1px currentColor; }
+        .stage-discovery   { background:rgba(107,114,128,0.12); color:#9ca3af; }
+        .stage-concepts    { background:rgba(59,130,246,0.12);  color:#60a5fa; }
+        .stage-awaiting    { background:rgba(234,179,8,0.12);   color:#facc15; }
+        .stage-quote       { background:rgba(20,184,166,0.12);  color:#2dd4bf; }
+        .stage-paid        { background:rgba(34,197,94,0.12);   color:#4ade80; }
+        .stage-onboarding  { background:rgba(168,85,247,0.12);  color:#c084fc; }
+        .stage-completed   { background:rgba(255,255,255,0.06); color:#6b7280; }
+
+        .job-card {
+            background: rgba(15,15,15,0.9);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .job-card:hover {
+            border-color: rgba(255,255,255,0.14);
+            background: rgba(25,25,25,0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+        }
+        .job-card .job-number { font-size: 11px; color: #555; font-family: monospace; }
+        .job-card .job-name   { font-size: 15px; font-weight: 700; margin: 4px 0; }
+        .job-card .job-meta   { font-size: 12px; color: #666; }
+
+        /* Stage grid header (Live Jobs) */
+        .stage-nav-grid {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .stage-nav-btn {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 12px 16px; border-radius: 12px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+            transition: all 0.2s ease;
+            min-width: 90px; text-align: center;
+        }
+        .stage-nav-btn:hover, .stage-nav-btn.active {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.12);
+        }
+        .stage-nav-btn .sn-count { font-size: 20px; font-weight: 800; }
+        .stage-nav-btn .sn-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #666; }
+        .stage-nav-btn.active .sn-label { color: inherit; }
+
+        /* Job record tabs */
+        .job-tab-nav { display: flex; gap: 2px; margin-bottom: 20px; flex-wrap: wrap; }
+        .job-tab-btn {
+            padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            color: #666; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent;
+        }
+        .job-tab-btn:hover { color: #ccc; background: rgba(255,255,255,0.04); }
+        .job-tab-btn.active { color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
+
+        /* Design version cards */
+        .version-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        .version-card.approved { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.04); }
+        .version-card.rejected { border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.03); opacity: 0.7; }
+        .version-label { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; }
+
+        /* Design status badge */
+        .design-status-new           { background:rgba(107,114,128,0.12); color:#9ca3af; }
+        .design-status-in_progress   { background:rgba(59,130,246,0.12);  color:#60a5fa; }
+        .design-status-revisions     { background:rgba(234,179,8,0.12);   color:#facc15; }
+        .design-status-in_review     { background:rgba(168,85,247,0.12);  color:#c084fc; }
+        .design-status-awaiting_approval { background:rgba(249,115,22,0.12); color:#fb923c; }
+        .design-status-complete      { background:rgba(34,197,94,0.12);   color:#4ade80; }
+
+        /* Pantone swatch */
+        .pantone-swatch {
+            width: 32px; height: 32px; border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: inline-block; cursor: pointer; flex-shrink: 0;
+        }
+
+        /* Club status badges */
+        .status-retail       { background:rgba(107,114,128,0.12); color:#9ca3af; }
+        .status-partner      { background:rgba(20,184,166,0.12);  color:#2dd4bf; }
+        .status-partner-plus { background:rgba(168,85,247,0.12);  color:#c084fc; }
+
+        /* Split grid (clubs portal) */
+        .split-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+        @media (max-width: 640px) { .split-action-grid { grid-template-columns: 1fr; } }
+        .split-action-card {
+            padding: 28px; border-radius: 18px; cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.02);
+            transition: all 0.25s ease; text-align: center;
+        }
+        .split-action-card:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -797,12 +915,16 @@
                     </div>
                 </div>
 
-                <!-- Sales (Coming Soon) -->
-                <div id="fc-sales" class="feature-card accent-purple coming-soon">
-                    <span class="card-badge badge-soon">Coming Soon</span>
-                    <div class="card-icon" style="background:rgba(139,92,246,0.12)">💰</div>
-                    <h3 style="color:#aaa">Sales</h3>
-                    <p>Quotes, proposals, order management and revenue tracking</p>
+                <!-- Sales -->
+                <div id="fc-sales" onclick="showTool('sales')" class="feature-card accent-purple">
+                    <span class="card-badge badge-new" id="badge-sales" style="display:none">Off</span>
+                    <div class="card-icon" style="background:rgba(139,92,246,0.12)">💼</div>
+                    <h3>Sales</h3>
+                    <p>Manage jobs, design briefs, club products and order pipeline</p>
+                    <div class="mt-4 flex items-center gap-2">
+                        <span id="stat-jobs-live" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(139,92,246,0.1);color:#a78bfa">0 live jobs</span>
+                        <span id="stat-jobs-done" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(255,255,255,0.04);color:#666">0 completed</span>
+                    </div>
                 </div>
 
                 <!-- Clubs -->
@@ -2016,6 +2138,377 @@
         </div>
 
         <!-- ============================================================
+             TOOL: SALES
+             ============================================================ -->
+        <div id="tool-sales" class="hide p-6 md:p-8 max-w-7xl mx-auto">
+            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                Back to Launchpad
+            </button>
+
+            <!-- SALES HOME -->
+            <div id="sales-home">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold">Sales</h2>
+                    <p class="text-gray-500 text-sm mt-1">Manage jobs, design briefs and your sales pipeline</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-5 mb-8">
+                    <div onclick="openNewJobModal()" class="feature-card accent-purple" style="cursor:pointer">
+                        <div class="card-icon" style="background:rgba(139,92,246,0.12)">✨</div>
+                        <h3>Create New Job</h3>
+                        <p>Start a new job record and kick off the sales process</p>
+                    </div>
+                    <div onclick="showSalesView('live')" class="feature-card accent-teal" style="cursor:pointer">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="card-icon" style="background:rgba(20,184,166,0.12);margin-bottom:0">🔥</div>
+                            <span id="sales-live-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(20,184,166,0.12);color:#2dd4bf">0</span>
+                        </div>
+                        <h3>Live Jobs</h3>
+                        <p>Active jobs across all pipeline stages</p>
+                    </div>
+                    <div onclick="showSalesView('completed')" class="feature-card accent-green" style="cursor:pointer">
+                        <div class="flex items-start justify-between mb-4">
+                            <div class="card-icon" style="background:rgba(34,197,94,0.12);margin-bottom:0">✅</div>
+                            <span id="sales-done-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(34,197,94,0.1);color:#4ade80">0</span>
+                        </div>
+                        <h3>Completed</h3>
+                        <p>All finished jobs and historical records</p>
+                    </div>
+                </div>
+                <!-- Recent jobs preview -->
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Recent Jobs</h3>
+                    <div id="sales-recent-jobs" class="space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- LIVE JOBS VIEW -->
+            <div id="sales-live-view" class="hide">
+                <div class="flex items-center gap-3 mb-6">
+                    <button onclick="showSalesView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
+                    </button>
+                    <h3 class="text-xl font-bold">Live Jobs</h3>
+                </div>
+                <!-- Stage filter grid -->
+                <div class="stage-nav-grid" id="stage-nav-grid"></div>
+                <!-- Jobs list -->
+                <div class="flex items-center justify-between mb-4">
+                    <p id="live-jobs-filter-label" class="text-sm text-gray-500">All stages</p>
+                    <button onclick="openNewJobModal()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        New Job
+                    </button>
+                </div>
+                <div id="live-jobs-list" class="space-y-3"></div>
+            </div>
+
+            <!-- COMPLETED JOBS VIEW -->
+            <div id="sales-completed-view" class="hide">
+                <div class="flex items-center gap-3 mb-6">
+                    <button onclick="showSalesView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
+                    </button>
+                    <h3 class="text-xl font-bold">Completed Jobs</h3>
+                </div>
+                <div id="completed-jobs-list" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             TOOL: JOB RECORD (Full page, 7 tabs)
+             ============================================================ -->
+        <div id="tool-job-record" class="hide p-6 md:p-8 max-w-7xl mx-auto">
+            <div class="flex items-center gap-3 mb-6">
+                <button onclick="closeJobRecord()" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Back to Sales
+                </button>
+            </div>
+
+            <!-- Job header -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <div class="flex items-start justify-between flex-wrap gap-4">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span id="jr-job-number" class="text-xs text-gray-600 font-mono"></span>
+                            <span id="jr-stage-badge" class="stage-pill stage-discovery">Discovery</span>
+                        </div>
+                        <h2 id="jr-job-name" class="text-2xl font-bold mb-1">Job Name</h2>
+                        <p id="jr-job-desc" class="text-gray-500 text-sm"></p>
+                    </div>
+                    <div class="flex gap-3 flex-wrap">
+                        <button onclick="openEditJobModal()" class="btn-secondary text-sm">Edit Job</button>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-gray-500">Stage:</label>
+                            <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#ddd">
+                                <option value="discovery">Discovery</option>
+                                <option value="concepts">Concepts</option>
+                                <option value="awaiting_approval">Awaiting Approval</option>
+                                <option value="quote">Quote</option>
+                                <option value="paid">Paid</option>
+                                <option value="on_boarding">On-Boarding</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <!-- Quick meta -->
+                <div class="flex gap-6 mt-4 flex-wrap" id="jr-meta-row">
+                    <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-sm font-semibold mt-0.5">—</p></div>
+                    <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-sm font-semibold mt-0.5">—</p></div>
+                    <div><span class="text-xs text-gray-600">Channel</span><p id="jr-channel" class="text-sm font-semibold mt-0.5">—</p></div>
+                    <div><span class="text-xs text-gray-600">Linked Club</span><p id="jr-club-link" class="text-sm font-semibold mt-0.5">—</p></div>
+                    <div><span class="text-xs text-gray-600">Created</span><p id="jr-created" class="text-sm font-semibold mt-0.5">—</p></div>
+                    <div><span class="text-xs text-gray-600">Days Open</span><p id="jr-days-open" class="text-sm font-semibold mt-0.5">—</p></div>
+                </div>
+            </div>
+
+            <!-- Tab navigation -->
+            <div class="job-tab-nav">
+                <button class="job-tab-btn active" onclick="showJobTab('overview')" id="jt-overview">Overview</button>
+                <button class="job-tab-btn" onclick="showJobTab('products')" id="jt-products">Products</button>
+                <button class="job-tab-btn" onclick="showJobTab('club')" id="jt-club">Club Record</button>
+                <button class="job-tab-btn" onclick="showJobTab('team')" id="jt-team">Team</button>
+                <button class="job-tab-btn" onclick="showJobTab('design')" id="jt-design">Design Studio</button>
+                <button class="job-tab-btn" onclick="showJobTab('orderform')" id="jt-orderform">Order Form</button>
+                <button class="job-tab-btn" onclick="showJobTab('production')" id="jt-production">Production</button>
+            </div>
+
+            <!-- TAB: Overview -->
+            <div id="jt-content-overview">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="glass rounded-2xl p-5">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Job Details</h4>
+                        <div id="jr-overview-details" class="space-y-3"></div>
+                    </div>
+                    <div class="glass rounded-2xl p-5">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Notes</h4>
+                        <textarea id="jr-notes-field" rows="8" placeholder="Internal notes for this job..." class="w-full px-3 py-2 rounded-lg text-sm resize-none" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#ddd"></textarea>
+                        <button onclick="saveJobNotes()" class="btn-primary text-sm mt-3">Save Notes</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Products -->
+            <div id="jt-content-products" class="hide">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h4 class="font-semibold">Club Products</h4>
+                        <p class="text-gray-500 text-sm mt-0.5">Products created for this job's club. Pricing: Partner Price + £2 for shop.</p>
+                    </div>
+                    <div class="flex gap-3">
+                        <div id="jr-range-approved-wrap" class="flex items-center gap-2 px-4 py-2 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)">
+                            <input type="checkbox" id="jr-range-approved" onchange="toggleRangeApproved(this.checked)" class="w-4 h-4">
+                            <label for="jr-range-approved" class="text-sm font-semibold text-gray-300 cursor-pointer">Range Approved</label>
+                        </div>
+                        <button onclick="showJobAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Product
+                        </button>
+                    </div>
+                </div>
+                <div id="jr-products-list" class="space-y-3"></div>
+                <div id="jr-products-empty" class="empty-state hide"><div class="empty-icon">📦</div><p>No products added yet. Link a club first, then add products.</p></div>
+            </div>
+
+            <!-- TAB: Club Record -->
+            <div id="jt-content-club" class="hide">
+                <div id="jr-club-content">
+                    <div class="glass rounded-2xl p-6 text-center">
+                        <div class="empty-icon">🏟️</div>
+                        <p class="text-gray-500 mb-4">No club linked to this job yet.</p>
+                        <div class="flex gap-3 justify-center">
+                            <button onclick="showLinkClubModal()" class="btn-secondary text-sm">Link Existing Club</button>
+                            <button onclick="showCreateClubForJob()" class="btn-primary text-sm">Create New Club</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Team -->
+            <div id="jt-content-team" class="hide">
+                <div class="flex items-center justify-between mb-5">
+                    <h4 class="font-semibold">Team Record</h4>
+                    <button onclick="openTeamModal(null)" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Team
+                    </button>
+                </div>
+                <div id="jr-teams-list" class="space-y-3"></div>
+                <div id="jr-teams-empty" class="empty-state"><div class="empty-icon">👕</div><p>No teams added yet.</p></div>
+            </div>
+
+            <!-- TAB: Design Studio -->
+            <div id="jt-content-design" class="hide">
+                <div id="jr-design-content">
+                    <!-- Populated by JS - shows design task or create button -->
+                </div>
+            </div>
+
+            <!-- TAB: Order Form -->
+            <div id="jt-content-orderform" class="hide">
+                <div id="jr-orderform-content">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- TAB: Production -->
+            <div id="jt-content-production" class="hide">
+                <div class="glass rounded-2xl p-6">
+                    <h4 class="font-semibold mb-4">Production</h4>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">PO Number</label>
+                            <input type="text" id="jr-po-number" placeholder="e.g. PO-0001" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <button onclick="generateProductionWorksheet()" class="btn-primary text-sm w-full">
+                                Generate Production Worksheet (PDF)
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <p class="text-xs text-gray-500 mb-2">Production worksheet is auto-generated from the approved order form. It includes the PO number at the top and excludes commercial pricing.</p>
+                        <div id="jr-production-status" class="p-4 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                            <p class="text-sm text-gray-600">No order form approved yet. Approve an order form to enable worksheet generation.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: New/Edit Job -->
+        <div id="job-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)">
+            <div class="glass rounded-2xl w-full max-w-lg max-h-screen overflow-y-auto" style="max-height:90vh">
+                <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between sticky top-0 glass">
+                    <h3 id="job-modal-title" class="text-lg font-bold">New Job</h3>
+                    <button onclick="closeJobModal()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg">✕</button>
+                </div>
+                <div class="p-5">
+                    <input type="hidden" id="job-id">
+                    <div class="modal-section">
+                        <p class="modal-section-title">Job Information</p>
+                        <div class="mb-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Job Name *</label>
+                            <input type="text" id="job-name" placeholder="e.g. Westfield FC 2025 Kit" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Description</label>
+                            <textarea id="job-description" rows="2" placeholder="Brief overview of this job..." class="w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Job Type</label>
+                                <select id="job-type" class="w-full px-3 py-2 rounded-lg text-sm">
+                                    <option value="new_club">New Club</option>
+                                    <option value="repeat_order">Repeat Order</option>
+                                    <option value="new_concept">New Concept</option>
+                                    <option value="new_team">New Team</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Club Type</label>
+                                <select id="job-club-type" class="w-full px-3 py-2 rounded-lg text-sm">
+                                    <option value="retail">Retail</option>
+                                    <option value="partner">Partner</option>
+                                    <option value="partner_plus">Partner+</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Channel</label>
+                                <select id="job-channel" class="w-full px-3 py-2 rounded-lg text-sm">
+                                    <option value="direct">Direct</option>
+                                    <option value="store">Store</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Stage</label>
+                                <select id="job-stage" class="w-full px-3 py-2 rounded-lg text-sm">
+                                    <option value="discovery">Discovery</option>
+                                    <option value="concepts">Concepts</option>
+                                    <option value="awaiting_approval">Awaiting Approval</option>
+                                    <option value="quote">Quote</option>
+                                    <option value="paid">Paid</option>
+                                    <option value="on_boarding">On-Boarding</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Link Club</label>
+                            <select id="job-club-id" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">— No club linked —</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="saveJob()" class="btn-primary">Save Job</button>
+                        <button onclick="closeJobModal()" class="btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Team record -->
+        <div id="team-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)">
+            <div class="glass rounded-2xl w-full max-w-lg">
+                <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between">
+                    <h3 id="team-modal-title" class="text-lg font-bold">Team Details</h3>
+                    <button onclick="closeTeamModal()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg">✕</button>
+                </div>
+                <div class="p-5">
+                    <input type="hidden" id="team-id">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div class="col-span-2">
+                            <label class="text-xs text-gray-500 mb-1 block">Team Name *</label>
+                            <input type="text" id="team-name" placeholder="e.g. Westfield FC First Team" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Manager Name</label>
+                            <input type="text" id="team-manager-name" placeholder="Name" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Manager Email</label>
+                            <input type="email" id="team-manager-email" placeholder="email@example.com" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Manager Phone</label>
+                            <input type="tel" id="team-manager-phone" placeholder="Phone" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Notes</label>
+                            <input type="text" id="team-notes" placeholder="Any notes..." class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-2">
+                        <button onclick="saveTeam()" class="btn-primary">Save Team</button>
+                        <button onclick="closeTeamModal()" class="btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Link Club to Job -->
+        <div id="link-club-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)">
+            <div class="glass rounded-2xl w-full max-w-md">
+                <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between">
+                    <h3 class="text-lg font-bold">Link Club</h3>
+                    <button onclick="document.getElementById('link-club-modal').classList.add('hide')" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg">✕</button>
+                </div>
+                <div class="p-5">
+                    <label class="text-xs text-gray-500 mb-2 block">Select Club</label>
+                    <select id="link-club-select" class="w-full px-3 py-2 rounded-lg text-sm mb-4">
+                        <option value="">Choose club...</option>
+                    </select>
+                    <button onclick="linkClubToJob()" class="btn-primary w-full">Link Club</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
              TOOL: CLUBS (Enhanced)
              ============================================================ -->
         <div id="tool-clubs" class="hide p-6 md:p-8 max-w-6xl mx-auto">
@@ -2023,47 +2516,55 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
             </button>
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold">Clubs</h2>
+                <p class="text-gray-500 text-sm mt-1">Manage all your clubs, products and Shopify stores</p>
+            </div>
 
-            <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-2xl font-bold">Clubs</h2>
-                    <p class="text-gray-500 text-sm mt-1">Create and manage clubs, products, order forms and Shopify sync</p>
+            <!-- Split action grid -->
+            <div class="split-action-grid mb-8">
+                <div onclick="showCreateClubModal()" class="split-action-card">
+                    <div class="text-4xl mb-3">➕</div>
+                    <h3 class="text-lg font-bold mb-1">Create New Club</h3>
+                    <p class="text-gray-500 text-sm">Set up a brand new club record with all details</p>
                 </div>
-                <button onclick="showCreateClubModal()" class="btn-primary flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    New Club
-                </button>
+                <div onclick="showClubSearch()" class="split-action-card">
+                    <div class="text-4xl mb-3">🔍</div>
+                    <h3 class="text-lg font-bold mb-1">Search Clubs</h3>
+                    <p class="text-gray-500 text-sm">Find and manage existing clubs by name, sport or county</p>
+                </div>
             </div>
 
-            <!-- Club search/filter bar -->
-            <div class="glass rounded-xl p-4 mb-6 flex flex-wrap gap-4">
-                <input type="text" id="clubs-search" placeholder="Search clubs..." class="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm" oninput="renderClubsEnhanced()">
-                <select id="clubs-filter-sport" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
-                    <option value="">All Sports</option>
-                    <option value="Football">Football</option>
-                    <option value="Rugby">Rugby</option>
-                    <option value="Cricket">Cricket</option>
-                    <option value="Basketball">Basketball</option>
-                    <option value="Netball">Netball</option>
-                    <option value="Hockey">Hockey</option>
-                    <option value="Athletics">Athletics</option>
-                    <option value="Other">Other</option>
-                </select>
-                <select id="clubs-filter-partner" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
-                    <option value="">All Types</option>
-                    <option value="partner">Partner</option>
-                    <option value="nonpartner">Non-Partner</option>
-                </select>
+            <!-- Club search area (hidden until Search clicked) -->
+            <div id="club-search-area" class="hide">
+                <div class="glass rounded-xl p-4 mb-5 flex flex-wrap gap-4">
+                    <input type="text" id="clubs-search" placeholder="Search clubs by name..." class="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm" oninput="renderClubsEnhanced()">
+                    <select id="clubs-filter-sport" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
+                        <option value="">All Sports</option>
+                        <option value="Football">Football</option><option value="Rugby">Rugby</option>
+                        <option value="Cricket">Cricket</option><option value="Basketball">Basketball</option>
+                        <option value="Netball">Netball</option><option value="Hockey">Hockey</option>
+                        <option value="Athletics">Athletics</option><option value="Other">Other</option>
+                    </select>
+                    <select id="clubs-filter-partner" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
+                        <option value="">All Status</option>
+                        <option value="retail">Retail</option>
+                        <option value="partner">Partner</option>
+                        <option value="partner_plus">Partner+</option>
+                    </select>
+                </div>
+                <div id="clubs-enhanced-list" class="space-y-3"></div>
+                <div id="clubs-enhanced-empty" class="hide text-center py-16">
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center text-3xl">🏟️</div>
+                    <p class="text-gray-400 font-medium mb-2">No clubs found</p>
+                    <p class="text-gray-600 text-sm">Try adjusting your search or filters</p>
+                </div>
             </div>
 
-            <!-- Clubs list -->
-            <div id="clubs-enhanced-list" class="space-y-3">
-                <!-- Populated by JS -->
-            </div>
-            <div id="clubs-enhanced-empty" class="hide text-center py-16">
-                <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center text-3xl">🏟️</div>
-                <p class="text-gray-400 font-medium mb-2">No clubs yet</p>
-                <p class="text-gray-600 text-sm">Create your first club to get started</p>
+            <!-- Recent clubs when not searching -->
+            <div id="clubs-recent" class="">
+                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">All Clubs</h3>
+                <div id="clubs-recent-list" class="space-y-3"></div>
             </div>
         </div>
 
@@ -2099,43 +2600,65 @@
             <!-- Tab navigation -->
             <div class="tab-nav">
                 <button id="tab-btn-overview" onclick="showClubTab('overview')" class="active">Overview</button>
-                <button id="tab-btn-products" onclick="showClubTab('products')">Products</button>
+                <button id="tab-btn-products" onclick="showClubTab('products')">Club Products</button>
                 <button id="tab-btn-orderforms" onclick="showClubTab('orderforms')">Order Forms</button>
-                <button id="tab-btn-shopify" onclick="showClubTab('shopify')">Shopify Sync</button>
+                <button id="tab-btn-onboarding" onclick="showClubTab('onboarding')">Onboarding</button>
                 <button id="tab-btn-images" onclick="showClubTab('images')">Images</button>
             </div>
 
             <!-- TAB: Overview -->
             <div id="club-tab-overview" class="club-tab-content">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <!-- Club info card -->
+                <div class="grid md:grid-cols-3 gap-5">
+                    <!-- Club identity card -->
+                    <div class="card md:col-span-2">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="font-semibold text-brand-400">Club Details</h3>
+                            <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:rgba(255,255,255,0.05)">Edit</button>
+                        </div>
+                        <div id="club-overview-info"><!-- Populated by JS --></div>
+                    </div>
+                    <!-- Branding card -->
                     <div class="card">
-                        <h3 class="font-semibold text-brand-400 mb-4">Club Details</h3>
-                        <div id="club-overview-info">
-                            <!-- Populated by JS -->
+                        <h3 class="font-semibold text-brand-400 mb-4">Brand Identity</h3>
+                        <!-- Club Crest -->
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-500 mb-2">Club Crest</p>
+                            <div id="club-crest-display" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.1)">🏟️</div>
+                        </div>
+                        <!-- Pantone colours -->
+                        <div class="mb-4">
+                            <p class="text-xs text-gray-500 mb-2">Pantone Colours</p>
+                            <div class="flex gap-2 items-center">
+                                <div id="pantone-main-swatch" class="pantone-swatch" title="Main"></div>
+                                <div id="pantone-sec-swatch" class="pantone-swatch" title="Secondary"></div>
+                                <div id="pantone-acc-swatch" class="pantone-swatch" title="Accent"></div>
+                                <span id="pantone-labels" class="text-xs text-gray-600">—</span>
+                            </div>
+                        </div>
+                        <!-- Sponsor logos -->
+                        <div>
+                            <p class="text-xs text-gray-500 mb-2">Sponsor Logos</p>
+                            <div id="sponsor-logos-display" class="text-xs text-gray-600">—</div>
                         </div>
                     </div>
-                    <!-- Stats card -->
-                    <div class="card">
-                        <h3 class="font-semibold text-brand-400 mb-4">Overview</h3>
-                        <div class="space-y-3">
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Club Products</span>
-                                <span id="overview-stat-products" class="font-semibold text-brand-400">0</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Active Order Forms</span>
-                                <span id="overview-stat-forms" class="font-semibold text-green-400">0</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Total Submissions</span>
-                                <span id="overview-stat-submissions" class="font-semibold text-blue-400">0</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Shopify Synced Products</span>
-                                <span id="overview-stat-synced" class="font-semibold text-purple-400">0</span>
-                            </div>
-                        </div>
+                </div>
+                <!-- Stats row -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+                    <div class="stat-card">
+                        <p class="text-xs text-gray-500 mb-1">Club Products</p>
+                        <p id="overview-stat-products" class="text-2xl font-bold text-brand-400">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="text-xs text-gray-500 mb-1">Active Forms</p>
+                        <p id="overview-stat-forms" class="text-2xl font-bold" style="color:#4ade80">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="text-xs text-gray-500 mb-1">Submissions</p>
+                        <p id="overview-stat-submissions" class="text-2xl font-bold" style="color:#60a5fa">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="text-xs text-gray-500 mb-1">Shopify Synced</p>
+                        <p id="overview-stat-synced" class="text-2xl font-bold" style="color:#c084fc">0</p>
                     </div>
                 </div>
             </div>
@@ -2181,35 +2704,62 @@
             </div>
 
             <!-- TAB: Shopify Sync -->
-            <div id="club-tab-shopify" class="club-tab-content hide">
-                <div class="card mb-6">
-                    <h3 class="font-semibold text-brand-400 mb-4">Shopify Collection</h3>
-                    <div id="club-shopify-collection-status" class="mb-4">
-                        <!-- Populated by JS -->
+            <!-- TAB: Onboarding (formerly Shopify Sync) -->
+            <div id="club-tab-onboarding" class="club-tab-content hide">
+                <!-- Shopify Connection -->
+                <div class="card mb-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-brand-400">Shopify Collection</h3>
+                        <div id="club-shopify-collection-status"></div>
                     </div>
-                    <div class="flex gap-3">
+                    <p class="text-gray-500 text-sm mb-4">Create or update this club's Shopify collection. Choose CSV download or direct API push.</p>
+                    <div class="flex flex-wrap gap-3">
                         <button onclick="syncClubCollection()" class="btn-primary text-sm">
-                            Sync Collection to Shopify
+                            Push Collection via API
+                        </button>
+                        <button onclick="generateShopifyCSVForClub()" class="btn-secondary text-sm">
+                            Download Shopify CSV
                         </button>
                     </div>
                 </div>
+
+                <!-- Product Sync -->
+                <div class="card mb-5">
+                    <h3 class="font-semibold text-brand-400 mb-4">Product Sync</h3>
+                    <p class="text-gray-500 text-sm mb-4">Sync club products to Shopify with all variants. Shop price = Partner Price + £2.</p>
+                    <div id="club-shopify-products-status" class="space-y-2 mb-4"></div>
+                    <div class="flex gap-3">
+                        <button onclick="syncAllClubProducts()" class="btn-primary text-sm">Sync All via API</button>
+                    </div>
+                </div>
+
+                <!-- Order Forms -->
+                <div class="card mb-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-brand-400">Order Forms</h3>
+                        <button onclick="showCreateOrderFormModal()" class="btn-primary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            New Form
+                        </button>
+                    </div>
+                    <div id="club-order-forms-list-onboard" class="space-y-2"></div>
+                    <div id="club-order-forms-empty-onboard" class="hide text-center py-6 text-gray-600 text-sm">No order forms yet. Range must be approved first.</div>
+                </div>
+
+                <!-- Checklist -->
                 <div class="card">
-                    <h3 class="font-semibold text-brand-400 mb-4">Product Sync Status</h3>
-                    <p class="text-gray-500 text-sm mb-4">Sync individual club products to Shopify as products with variants.</p>
-                    <div id="club-shopify-products-status" class="space-y-2">
-                        <!-- Populated by JS -->
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-gray-800">
-                        <button onclick="syncAllClubProducts()" class="btn-primary text-sm">
-                            Sync All Products to Shopify
-                        </button>
-                    </div>
+                    <h3 class="font-semibold text-brand-400 mb-4">Onboarding Checklist</h3>
+                    <div id="onboarding-checklist" class="space-y-3"></div>
                 </div>
-                <div class="mt-4 card border border-yellow-500/20">
+
+                <div class="mt-4 card" style="border-color:rgba(234,179,8,0.2)">
                     <h4 class="font-medium text-yellow-400 mb-2">Setup Required</h4>
-                    <p class="text-gray-400 text-sm">Shopify API credentials must be configured in Brand Settings before syncing. You'll also need a Shopify Custom App with CORS enabled for this application's domain.</p>
+                    <p class="text-gray-400 text-sm">Shopify API credentials must be configured in Brand Settings. Ensure your Shopify Custom App has CORS enabled for this application's domain.</p>
                 </div>
             </div>
+
+            <!-- Keep legacy id for JS compatibility -->
+            <div id="club-tab-shopify" class="hide"></div>
 
             <!-- TAB: Images (embedded mockups) -->
             <div id="club-tab-images" class="club-tab-content hide">
@@ -2297,57 +2847,113 @@
              MODAL: Create Club (Enhanced)
              ============================================================ -->
         <div id="create-club-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
-            <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4 my-auto">
-                <div class="flex justify-between items-center mb-6">
+            <div class="glass rounded-2xl w-full max-w-2xl mx-4 my-auto" style="max-height:92vh;overflow-y:auto">
+                <div class="flex justify-between items-center p-6 pb-4 sticky top-0 glass z-10">
                     <h3 id="club-modal-title" class="text-xl font-bold">Create New Club</h3>
                     <button onclick="hideCreateClubModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
+                <div class="px-6 pb-6">
                 <input type="hidden" id="edit-club-id">
 
                 <!-- Basic info -->
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Club Name *</label>
-                        <input type="text" id="club-name" placeholder="Liphook Cricket Club" class="w-full px-3 py-2 rounded-lg" oninput="generateClubSlugAndSuffix()">
+                <div class="modal-section">
+                    <p class="modal-section-title">Club Identity</p>
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Club Name *</label>
+                            <input type="text" id="club-name" placeholder="Westfield FC" class="w-full px-3 py-2 rounded-lg text-sm" oninput="generateClubSlugAndSuffix()">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Suffix * <span class="text-gray-600">(max 6 chars)</span></label>
+                            <input type="text" id="club-suffix" placeholder="WFC" class="w-full px-3 py-2 rounded-lg text-sm uppercase font-mono" maxlength="6">
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Suffix *</label>
-                        <input type="text" id="club-suffix" placeholder="LCC" class="w-full px-3 py-2 rounded-lg uppercase font-mono" maxlength="6">
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Sport</label>
+                            <select id="club-sport" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">Select sport...</option>
+                                <option>Football</option><option>Rugby</option><option>Cricket</option>
+                                <option>Basketball</option><option>Netball</option><option>Hockey</option>
+                                <option>Athletics</option><option>Cycling</option><option>Swimming</option>
+                                <option>Tennis</option><option>Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Status</label>
+                            <select id="club-status" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="retail">Retail</option>
+                                <option value="partner">Partner</option>
+                                <option value="partner_plus">Partner+</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Sport</label>
-                        <select id="club-sport" class="w-full px-3 py-2 rounded-lg">
-                            <option value="">Select sport...</option>
-                            <option value="Football">Football</option>
-                            <option value="Rugby">Rugby</option>
-                            <option value="Cricket">Cricket</option>
-                            <option value="Basketball">Basketball</option>
-                            <option value="Netball">Netball</option>
-                            <option value="Hockey">Hockey</option>
-                            <option value="Athletics">Athletics</option>
-                            <option value="Other">Other</option>
-                        </select>
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">League</label>
+                            <input type="text" id="club-league" placeholder="e.g. Southern Counties" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">URL Slug</label>
+                            <input type="text" id="club-slug" placeholder="westfield-fc" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">URL Slug</label>
-                        <input type="text" id="club-slug" placeholder="liphook-cc" class="w-full px-3 py-2 rounded-lg">
+                    <!-- Pantone colours -->
+                    <div class="grid grid-cols-3 gap-4">
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Pantone Main</label>
+                            <div class="flex gap-2 items-center">
+                                <input type="color" id="club-pantone-main" value="#14b8a6" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
+                                <input type="text" id="club-pantone-main-text" placeholder="e.g. 355 C" class="flex-1 px-2 py-2 rounded-lg text-xs">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Pantone Secondary</label>
+                            <div class="flex gap-2 items-center">
+                                <input type="color" id="club-pantone-sec" value="#ffffff" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
+                                <input type="text" id="club-pantone-sec-text" placeholder="e.g. 032 C" class="flex-1 px-2 py-2 rounded-lg text-xs">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Pantone Accent</label>
+                            <div class="flex gap-2 items-center">
+                                <input type="color" id="club-pantone-acc" value="#000000" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
+                                <input type="text" id="club-pantone-acc-text" placeholder="e.g. Black C" class="flex-1 px-2 py-2 rounded-lg text-xs">
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Partner status -->
-                <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
-                    <label class="flex items-center gap-3 cursor-pointer">
-                        <input type="checkbox" id="club-is-partner" class="w-4 h-4 rounded">
+                <!-- Address -->
+                <div class="modal-section">
+                    <p class="modal-section-title">Address</p>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
                         <div>
-                            <p class="font-medium">Partner Club</p>
-                            <p class="text-gray-500 text-xs">Partner clubs receive preferential direct pricing on orders</p>
+                            <label class="text-gray-400 text-xs mb-1 block">Address Line 1</label>
+                            <input type="text" id="club-addr1" placeholder="123 Stadium Road" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
-                    </label>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Address Line 2</label>
+                            <input type="text" id="club-addr2" placeholder="Optional" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Town / City</label>
+                            <input type="text" id="club-town" placeholder="Town" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">County</label>
+                            <input type="text" id="club-county" placeholder="County" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Postcode</label>
+                            <input type="text" id="club-postcode" placeholder="SW1A 1AA" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Contact details -->
-                <div class="bg-gray-800/50 rounded-xl p-4 mb-6">
-                    <h4 class="font-semibold text-sm mb-3 text-brand-400">Main Contact</h4>
+                <div class="modal-section">
+                    <p class="modal-section-title">Key Contact</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                             <label class="text-gray-400 text-xs mb-1 block">Contact Name</label>
@@ -2364,9 +2970,13 @@
                     </div>
                 </div>
 
-                <div class="flex gap-3">
+                <!-- Hidden legacy partner checkbox for JS compatibility -->
+                <input type="hidden" id="club-is-partner" value="false">
+
+                <div class="flex gap-3 mt-4">
                     <button onclick="hideCreateClubModal()" class="flex-1 btn-secondary py-3">Cancel</button>
                     <button onclick="saveClubEnhanced()" class="flex-1 btn-primary py-3">Save Club</button>
+                </div>
                 </div>
             </div>
         </div>
@@ -2932,6 +3542,9 @@
             // Load kanban stages
             await loadKanbanStages();
 
+            // Load jobs
+            await loadJobs();
+
             updateStats();
         }
 
@@ -2960,6 +3573,9 @@
             const idBadge = document.getElementById('id-count-badge');
             if (ncBadge) ncBadge.textContent = ncLeads;
             if (idBadge) idBadge.textContent = idLeads;
+
+            // Sales stats
+            updateSalesBadges();
 
             supabase
                 .from('purchase_orders')
@@ -3001,34 +3617,22 @@
 
         function applyFeatureToggles() {
             const featureMap = {
-                'prospecting': 'fc-prospecting',
-                'clubs': 'fc-clubs',
-                'production': 'fc-production',
-                'design_studio': 'fc-design',
-                'store_generator': 'fc-store'
+                'prospecting':   { card: 'fc-prospecting', badge: 'badge-prospecting', onclick: "showTool('prospecting')" },
+                'sales':         { card: 'fc-sales',       badge: 'badge-sales',       onclick: "showTool('sales')" },
+                'clubs':         { card: 'fc-clubs',       badge: 'badge-clubs',       onclick: "showTool('clubs')" },
+                'production':    { card: 'fc-production',  badge: 'badge-production',  onclick: "showTool('po-tracker')" },
+                'design_studio': { card: 'fc-design',      badge: 'badge-design',      onclick: "showTool('mockups')" },
+                'store_generator':{ card: 'fc-store',      badge: 'badge-store',       onclick: "showTool('generator')" }
             };
-            Object.entries(featureMap).forEach(([feature, cardId]) => {
-                const card = document.getElementById(cardId);
-                const badge = document.getElementById(`badge-${feature.replace('_studio','').replace('_generator','')}`);
-                const badgeAlt = {
-                    'design_studio': 'badge-design',
-                    'store_generator': 'badge-store'
-                };
-                const badgeEl = document.getElementById(badgeAlt[feature] || `badge-${feature}`);
+            Object.entries(featureMap).forEach(([feature, cfg]) => {
+                const card = document.getElementById(cfg.card);
+                const badgeEl = document.getElementById(cfg.badge);
                 if (!card) return;
-                const enabled = featureToggles[feature] !== false; // default to enabled
+                const enabled = featureToggles[feature] !== false;
                 if (enabled) {
                     card.classList.remove('disabled-card');
                     if (badgeEl) badgeEl.style.display = 'none';
-                    // restore onclick
-                    const onclickMap = {
-                        'prospecting': "showTool('prospecting')",
-                        'clubs': "showTool('clubs')",
-                        'production': "showTool('po-tracker')",
-                        'design_studio': "showTool('mockups')",
-                        'store_generator': "showTool('generator')"
-                    };
-                    card.setAttribute('onclick', onclickMap[feature]);
+                    card.setAttribute('onclick', cfg.onclick);
                 } else {
                     card.classList.add('disabled-card');
                     if (badgeEl) { badgeEl.style.display = ''; badgeEl.textContent = 'Off'; badgeEl.className = 'card-badge badge-off'; }
@@ -3081,6 +3685,9 @@
                     break;
                 case 'prospecting':
                     showProspectView('home');
+                    break;
+                case 'sales':
+                    showSalesView('home');
                     break;
             }
         }
@@ -5197,58 +5804,87 @@
         // =============================================
         // CLUBS: LIST VIEW
         // =============================================
-        function renderClubsEnhanced() {
+        function renderClubsEnhanced(targetContainer) {
             const search = (document.getElementById('clubs-search')?.value || '').toLowerCase();
             const sportFilter = document.getElementById('clubs-filter-sport')?.value || '';
             const partnerFilter = document.getElementById('clubs-filter-partner')?.value || '';
 
+            const statusLabel = { retail: 'Retail', partner: 'Partner', partner_plus: 'Partner+' };
+            const statusBadgeClass = { retail: 'badge-nonpartner', partner: 'badge-partner', partner_plus: 'badge-partner' };
+
             let filtered = clubs.filter(c => {
-                if (search && !c.name.toLowerCase().includes(search) && !(c.suffix || '').toLowerCase().includes(search)) return false;
+                if (search && !c.name.toLowerCase().includes(search) && !(c.suffix || '').toLowerCase().includes(search) && !(c.address_county || '').toLowerCase().includes(search)) return false;
                 if (sportFilter && c.sport !== sportFilter) return false;
-                if (partnerFilter === 'partner' && !c.is_partner) return false;
-                if (partnerFilter === 'nonpartner' && c.is_partner) return false;
+                if (partnerFilter && (c.club_status || (c.is_partner ? 'partner' : 'retail')) !== partnerFilter) return false;
                 return true;
             });
 
-            const container = document.getElementById('clubs-enhanced-list');
-            const emptyEl = document.getElementById('clubs-enhanced-empty');
-            if (!container) return;
-
-            if (!filtered.length) {
-                container.innerHTML = '';
-                emptyEl.classList.remove('hide');
-                return;
-            }
-            emptyEl.classList.add('hide');
-
-            container.innerHTML = filtered.map(club => `
-                <div class="club-list-card" onclick="openClubDashboard('${club.id}')">
+            const makeClubHtml = (club) => {
+                const cs = club.club_status || (club.is_partner ? 'partner' : 'retail');
+                return `<div class="club-list-card" onclick="openClubDashboard('${club.id}')">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-xl bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(20,184,166,0.08)">
                                 <span class="text-brand-400 font-bold text-sm">${((club.suffix || club.name.substring(0,2))).substring(0,2)}</span>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="font-semibold text-white">${club.name}</span>
-                                    <span class="badge ${club.is_partner ? 'badge-partner' : 'badge-nonpartner'} text-xs">${club.is_partner ? 'Partner' : 'Non-Partner'}</span>
-                                    ${club.sport ? `<span class="badge badge-info text-xs">${club.sport}</span>` : ''}
+                                    <span class="font-semibold text-white">${escHtml(club.name)}</span>
+                                    <span class="badge ${statusBadgeClass[cs] || 'badge-nonpartner'} text-xs">${statusLabel[cs] || 'Retail'}</span>
+                                    ${club.sport ? `<span class="badge badge-info text-xs">${escHtml(club.sport)}</span>` : ''}
                                 </div>
                                 <div class="flex items-center gap-3 mt-0.5">
-                                    <span class="text-gray-600 font-mono text-xs">${club.suffix || ''}</span>
-                                    ${club.contact_name ? `<span class="text-gray-500 text-xs">${club.contact_name}</span>` : ''}
-                                    ${club.contact_email ? `<span class="text-gray-600 text-xs">${club.contact_email}</span>` : ''}
+                                    <span class="text-gray-600 font-mono text-xs">${escHtml(club.suffix || '')}</span>
+                                    ${club.address_county ? `<span class="text-gray-500 text-xs">${escHtml(club.address_county)}</span>` : ''}
+                                    ${club.contact_name ? `<span class="text-gray-500 text-xs">${escHtml(club.contact_name)}</span>` : ''}
                                 </div>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 flex-shrink-0">
                             ${club.has_images ? '<span class="badge badge-success text-xs">Images</span>' : ''}
-                            ${club.shopify_collection_id ? '<span class="badge badge-info text-xs">Shopify</span>' : ''}
+                            ${club.shopify_collection_id ? '<span class="badge badge-info text-xs">Shopify ✓</span>' : ''}
                             <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            };
+
+            // Update recent list (all clubs)
+            const recentList = document.getElementById('clubs-recent-list');
+            if (recentList) {
+                if (clubs.length === 0) {
+                    recentList.innerHTML = `<div class="empty-state"><div class="empty-icon">🏟️</div><p>No clubs yet. Create your first club above.</p></div>`;
+                } else {
+                    recentList.innerHTML = clubs.slice(0, 20).map(c => makeClubHtml(c)).join('');
+                }
+            }
+
+            // Update search results if search is active
+            const container = document.getElementById('clubs-enhanced-list');
+            const emptyEl = document.getElementById('clubs-enhanced-empty');
+            if (!container) return;
+            if (!filtered.length) {
+                container.innerHTML = '';
+                emptyEl?.classList.remove('hide');
+                return;
+            }
+            emptyEl?.classList.add('hide');
+            container.innerHTML = filtered.map(c => makeClubHtml(c)).join('');
+        }
+
+        function showClubSearch() {
+            const searchArea = document.getElementById('club-search-area');
+            const recentArea = document.getElementById('clubs-recent');
+            if (searchArea) searchArea.classList.remove('hide');
+            if (recentArea) recentArea.classList.add('hide');
+            document.getElementById('clubs-search')?.focus();
+            renderClubsEnhanced();
+        }
+
+        function generateShopifyCSVForClub(overrideClubId) {
+            const club = overrideClubId ? clubs.find(c => c.id === overrideClubId) : currentClub;
+            if (!club) { showToast('No club selected', 'error'); return; }
+            showTool('generator');
         }
 
         // =============================================
@@ -5257,14 +5893,16 @@
         function showCreateClubModal() {
             document.getElementById('club-modal-title').textContent = 'Create New Club';
             document.getElementById('edit-club-id').value = '';
-            document.getElementById('club-name').value = '';
-            document.getElementById('club-suffix').value = '';
+            ['club-name','club-suffix','club-slug','club-league','club-addr1','club-addr2',
+             'club-town','club-county','club-postcode','club-contact-name','club-contact-email','club-contact-phone'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
             document.getElementById('club-sport').value = '';
-            document.getElementById('club-slug').value = '';
-            document.getElementById('club-is-partner').checked = false;
-            document.getElementById('club-contact-name').value = '';
-            document.getElementById('club-contact-email').value = '';
-            document.getElementById('club-contact-phone').value = '';
+            document.getElementById('club-status').value = 'retail';
+            document.getElementById('club-pantone-main').value = '#14b8a6';
+            document.getElementById('club-pantone-sec').value = '#ffffff';
+            document.getElementById('club-pantone-acc').value = '#000000';
             document.getElementById('create-club-modal').classList.remove('hide');
         }
 
@@ -5275,8 +5913,20 @@
             document.getElementById('club-name').value = currentClub.name || '';
             document.getElementById('club-suffix').value = currentClub.suffix || '';
             document.getElementById('club-sport').value = currentClub.sport || '';
+            document.getElementById('club-status').value = currentClub.club_status || (currentClub.is_partner ? 'partner' : 'retail');
             document.getElementById('club-slug').value = currentClub.slug || '';
-            document.getElementById('club-is-partner').checked = currentClub.is_partner || false;
+            document.getElementById('club-league').value = currentClub.league || '';
+            document.getElementById('club-addr1').value = currentClub.address_line1 || '';
+            document.getElementById('club-addr2').value = currentClub.address_line2 || '';
+            document.getElementById('club-town').value = currentClub.address_town || '';
+            document.getElementById('club-county').value = currentClub.address_county || '';
+            document.getElementById('club-postcode').value = currentClub.address_postcode || '';
+            document.getElementById('club-pantone-main').value = currentClub.pantone_main || '#14b8a6';
+            document.getElementById('club-pantone-main-text').value = currentClub.pantone_main || '';
+            document.getElementById('club-pantone-sec').value = currentClub.pantone_secondary || '#ffffff';
+            document.getElementById('club-pantone-sec-text').value = currentClub.pantone_secondary || '';
+            document.getElementById('club-pantone-acc').value = currentClub.pantone_accent || '#000000';
+            document.getElementById('club-pantone-acc-text').value = currentClub.pantone_accent || '';
             document.getElementById('club-contact-name').value = currentClub.contact_name || '';
             document.getElementById('club-contact-email').value = currentClub.contact_email || '';
             document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
@@ -5319,11 +5969,22 @@
                 const existing = clubs.find(c => c.suffix.toUpperCase() === suffix);
                 if (existing) { showToast(`Suffix "${suffix}" already used`, 'error'); return; }
             }
+            const clubStatus = document.getElementById('club-status')?.value || 'retail';
             const clubData = {
                 brand_id: currentBrand.id, name, suffix,
                 sport: document.getElementById('club-sport').value || null,
                 slug: document.getElementById('club-slug').value.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-                is_partner: document.getElementById('club-is-partner').checked,
+                club_status: clubStatus,
+                is_partner: clubStatus === 'partner' || clubStatus === 'partner_plus',
+                league: document.getElementById('club-league')?.value.trim() || null,
+                address_line1: document.getElementById('club-addr1')?.value.trim() || null,
+                address_line2: document.getElementById('club-addr2')?.value.trim() || null,
+                address_town: document.getElementById('club-town')?.value.trim() || null,
+                address_county: document.getElementById('club-county')?.value.trim() || null,
+                address_postcode: document.getElementById('club-postcode')?.value.trim() || null,
+                pantone_main: document.getElementById('club-pantone-main')?.value || null,
+                pantone_secondary: document.getElementById('club-pantone-sec')?.value || null,
+                pantone_accent: document.getElementById('club-pantone-acc')?.value || null,
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null
@@ -5381,8 +6042,11 @@
             document.getElementById('club-detail-sport').textContent = currentClub.sport || '';
             document.getElementById('club-detail-suffix').textContent = `(${currentClub.suffix || ''})`;
             const badge = document.getElementById('club-detail-partner-badge');
-            badge.className = `badge ${currentClub.is_partner ? 'badge-partner' : 'badge-nonpartner'} text-xs`;
-            badge.textContent = currentClub.is_partner ? 'Partner' : 'Non-Partner';
+            const statusLabel = { retail: 'Retail', partner: 'Partner', partner_plus: 'Partner+' };
+            const statusClass = { retail: 'badge-nonpartner', partner: 'badge-partner', partner_plus: 'badge-partner' };
+            const cs = currentClub.club_status || (currentClub.is_partner ? 'partner' : 'retail');
+            badge.className = `badge ${statusClass[cs] || 'badge-nonpartner'} text-xs`;
+            badge.textContent = statusLabel[cs] || 'Retail';
         }
 
         function showClubTab(tab) {
@@ -5393,22 +6057,95 @@
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
             if (tab === 'products') renderClubProducts();
             if (tab === 'orderforms') renderClubOrderForms();
-            if (tab === 'shopify') renderShopifySyncStatus();
+            if (tab === 'onboarding') { renderShopifySyncStatus(); renderOnboardingTab(); }
+            if (tab === 'shopify') renderShopifySyncStatus(); // legacy compatibility
             if (tab === 'images') loadClubDetailImages();
+        }
+
+        function renderOnboardingTab() {
+            if (!currentClub) return;
+            // Populate order forms in onboarding tab
+            const formsList = document.getElementById('club-order-forms-list-onboard');
+            const formsEmpty = document.getElementById('club-order-forms-empty-onboard');
+            if (formsList) {
+                if (currentOrderForms.length === 0) {
+                    formsList.innerHTML = '';
+                    formsEmpty?.classList.remove('hide');
+                } else {
+                    formsEmpty?.classList.add('hide');
+                    const baseUrl = window.location.origin + window.location.pathname;
+                    formsList.innerHTML = currentOrderForms.map(f => `
+                        <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
+                            <div>
+                                <p class="text-sm font-semibold">${escHtml(f.title)}</p>
+                                <p class="text-xs text-gray-500">${f.season || ''} · ${f.is_active ? '<span style="color:#4ade80">Active</span>' : 'Closed'}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="copyFormLink('${baseUrl}?form=${f.token}')" class="text-xs btn-secondary py-1 px-3">Copy Link</button>
+                            </div>
+                        </div>`).join('');
+                }
+            }
+
+            // Onboarding checklist
+            const checklistEl = document.getElementById('onboarding-checklist');
+            if (checklistEl && currentClub) {
+                const checks = [
+                    { done: !!currentClub.name, label: 'Club record created' },
+                    { done: (currentClubProducts.length > 0), label: 'Club products added' },
+                    { done: currentClubProducts.some(p => p.shopify_product_id), label: 'Products synced to Shopify' },
+                    { done: !!currentClub.shopify_collection_id, label: 'Shopify collection created' },
+                    { done: currentOrderForms.some(f => f.is_active), label: 'Order form live' },
+                ];
+                checklistEl.innerHTML = checks.map(c => `
+                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
+                        <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-sm" style="${c.done ? 'background:rgba(34,197,94,0.15);color:#4ade80' : 'background:rgba(255,255,255,0.05);color:#555'}">
+                            ${c.done ? '✓' : '○'}
+                        </span>
+                        <span class="text-sm ${c.done ? 'text-gray-300' : 'text-gray-600'}">${c.label}</span>
+                    </div>`).join('');
+            }
         }
 
         function renderClubOverviewInfo() {
             const el = document.getElementById('club-overview-info');
             if (!el || !currentClub) return;
+            const statusLabel = { retail: 'Retail', partner: 'Partner', partner_plus: 'Partner+' };
+            const fullAddress = [
+                currentClub.address_line1, currentClub.address_line2,
+                currentClub.address_town, currentClub.address_county,
+                currentClub.address_postcode
+            ].filter(Boolean).join(', ');
             const rows = [
-                ['Name', currentClub.name], ['Suffix', currentClub.suffix || '-'],
-                ['Sport', currentClub.sport || '-'], ['Status', currentClub.is_partner ? 'Partner' : 'Non-Partner'],
-                ['Slug', currentClub.slug || '-'], ['Contact', currentClub.contact_name || '-'],
-                ['Email', currentClub.contact_email || '-'], ['Phone', currentClub.contact_phone || '-']
+                ['Name', currentClub.name],
+                ['Suffix', currentClub.suffix || '—'],
+                ['Sport', currentClub.sport || '—'],
+                ['Status', statusLabel[currentClub.club_status] || (currentClub.is_partner ? 'Partner' : 'Retail')],
+                ['League', currentClub.league || '—'],
+                ['Address', fullAddress || '—'],
+                ['Contact', currentClub.contact_name || '—'],
+                ['Email', currentClub.contact_email || '—'],
+                ['Phone', currentClub.contact_phone || '—'],
             ];
             el.innerHTML = rows.map(([label, value]) =>
-                `<div class="info-row"><span class="info-label">${label}</span><span class="info-value">${value}</span></div>`
+                `<div class="info-row"><span class="info-label">${escHtml(label)}</span><span class="info-value">${escHtml(value)}</span></div>`
             ).join('');
+
+            // Update branding panel
+            const crestEl = document.getElementById('club-crest-display');
+            if (crestEl && currentClub.club_crest_url) {
+                crestEl.innerHTML = `<img src="${escHtml(currentClub.club_crest_url)}" class="w-full h-full object-contain rounded-xl">`;
+            }
+            const mainSwatch = document.getElementById('pantone-main-swatch');
+            const secSwatch = document.getElementById('pantone-sec-swatch');
+            const accSwatch = document.getElementById('pantone-acc-swatch');
+            const pantoneLabels = document.getElementById('pantone-labels');
+            if (mainSwatch) mainSwatch.style.background = currentClub.pantone_main || 'rgba(255,255,255,0.04)';
+            if (secSwatch) secSwatch.style.background = currentClub.pantone_secondary || 'rgba(255,255,255,0.04)';
+            if (accSwatch) accSwatch.style.background = currentClub.pantone_accent || 'rgba(255,255,255,0.04)';
+            if (pantoneLabels) {
+                pantoneLabels.textContent = currentClub.pantone_main ? '' : '—';
+            }
         }
 
         function updateOverviewStats() {
@@ -6576,10 +7313,867 @@
         document.getElementById('po-detail-modal').addEventListener('click', function(e) { if (e.target === this) hidePoDetailModal(); });
 
         // =============================================
+        // SALES MODULE — STATE
+        // =============================================
+        let jobs = [];
+        let currentJobId = null;
+        let currentJob = null;
+        let jobTeams = [];
+        let currentDesignTask = null;
+        let currentDesignVersions = [];
+        let salesViewStageFilter = null;
+
+        const JOB_STAGES = [
+            { key: 'discovery',         label: 'Discovery',         colorClass: 'stage-discovery' },
+            { key: 'concepts',          label: 'Concepts',          colorClass: 'stage-concepts' },
+            { key: 'awaiting_approval', label: 'Awaiting Approval', colorClass: 'stage-awaiting' },
+            { key: 'quote',             label: 'Quote',             colorClass: 'stage-quote' },
+            { key: 'paid',              label: 'Paid',              colorClass: 'stage-paid' },
+            { key: 'on_boarding',       label: 'On-Boarding',       colorClass: 'stage-onboarding' },
+            { key: 'completed',         label: 'Completed',         colorClass: 'stage-completed' }
+        ];
+
+        const JOB_TYPE_LABELS = {
+            new_club: 'New Club', repeat_order: 'Repeat Order',
+            new_concept: 'New Concept', new_team: 'New Team'
+        };
+        const CLUB_TYPE_LABELS = { retail: 'Retail', partner: 'Partner', partner_plus: 'Partner+' };
+        const CHANNEL_LABELS   = { direct: 'Direct', store: 'Store' };
+
+        // =============================================
+        // SALES — DATA LOADING
+        // =============================================
+        async function loadJobs() {
+            if (!currentBrand) return;
+            const { data } = await supabase
+                .from('jobs')
+                .select('*, clubs(id,name,sport,club_status)')
+                .eq('brand_id', currentBrand.id)
+                .order('created_at', { ascending: false });
+            jobs = data || [];
+        }
+
+        // =============================================
+        // SALES — NAVIGATION
+        // =============================================
+        function showSalesView(view) {
+            document.getElementById('sales-home').classList.add('hide');
+            document.getElementById('sales-live-view').classList.add('hide');
+            document.getElementById('sales-completed-view').classList.add('hide');
+
+            if (view === 'home') {
+                document.getElementById('sales-home').classList.remove('hide');
+                renderSalesRecentJobs();
+                updateSalesBadges();
+            } else if (view === 'live') {
+                document.getElementById('sales-live-view').classList.remove('hide');
+                salesViewStageFilter = null;
+                renderStageNavGrid();
+                renderLiveJobs();
+            } else if (view === 'completed') {
+                document.getElementById('sales-completed-view').classList.remove('hide');
+                renderCompletedJobs();
+            }
+        }
+
+        function updateSalesBadges() {
+            const liveCount = jobs.filter(j => j.stage !== 'completed').length;
+            const doneCount = jobs.filter(j => j.stage === 'completed').length;
+            const lbEl = document.getElementById('sales-live-badge');
+            const dbEl = document.getElementById('sales-done-badge');
+            if (lbEl) lbEl.textContent = liveCount;
+            if (dbEl) dbEl.textContent = doneCount;
+            // Launchpad
+            const lpLive = document.getElementById('stat-jobs-live');
+            const lpDone = document.getElementById('stat-jobs-done');
+            if (lpLive) lpLive.textContent = `${liveCount} live job${liveCount !== 1 ? 's' : ''}`;
+            if (lpDone) lpDone.textContent = `${doneCount} completed`;
+        }
+
+        // =============================================
+        // SALES — STAGE GRID
+        // =============================================
+        function renderStageNavGrid() {
+            const grid = document.getElementById('stage-nav-grid');
+            if (!grid) return;
+            const liveJobs = jobs.filter(j => j.stage !== 'completed');
+            grid.innerHTML = JOB_STAGES.map(s => {
+                const count = liveJobs.filter(j => j.stage === s.key).length;
+                const isActive = salesViewStageFilter === s.key;
+                return `<div class="stage-nav-btn ${isActive ? 'active ' + s.colorClass : ''}" onclick="filterByStage('${s.key}')">
+                    <span class="sn-count ${s.colorClass}">${count}</span>
+                    <span class="sn-label">${s.label}</span>
+                </div>`;
+            }).join('') + `<div class="stage-nav-btn ${!salesViewStageFilter ? 'active' : ''}" onclick="filterByStage(null)" style="margin-left:auto">
+                <span class="sn-count" style="color:#666">${liveJobs.length}</span>
+                <span class="sn-label">All</span>
+            </div>`;
+        }
+
+        function filterByStage(stageKey) {
+            salesViewStageFilter = stageKey;
+            renderStageNavGrid();
+            renderLiveJobs();
+        }
+
+        // =============================================
+        // SALES — JOB LISTS
+        // =============================================
+        function renderLiveJobs() {
+            let filtered = jobs.filter(j => j.stage !== 'completed');
+            if (salesViewStageFilter) filtered = filtered.filter(j => j.stage === salesViewStageFilter);
+            const labelEl = document.getElementById('live-jobs-filter-label');
+            if (labelEl) {
+                const s = JOB_STAGES.find(s => s.key === salesViewStageFilter);
+                labelEl.textContent = s ? `Filtered: ${s.label} (${filtered.length})` : `All stages (${filtered.length})`;
+            }
+            const container = document.getElementById('live-jobs-list');
+            if (!container) return;
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>No jobs in this stage.</p></div>`;
+                return;
+            }
+            container.innerHTML = filtered.map(j => renderJobCard(j)).join('');
+        }
+
+        function renderCompletedJobs() {
+            const completed = jobs.filter(j => j.stage === 'completed');
+            const container = document.getElementById('completed-jobs-list');
+            if (!container) return;
+            if (completed.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><p>No completed jobs yet.</p></div>`;
+                return;
+            }
+            container.innerHTML = completed.map(j => renderJobCard(j)).join('');
+        }
+
+        function renderSalesRecentJobs() {
+            const container = document.getElementById('sales-recent-jobs');
+            if (!container) return;
+            const recent = jobs.slice(0, 6);
+            if (recent.length === 0) {
+                container.innerHTML = `<div class="empty-state" style="padding:30px"><div class="empty-icon">💼</div><p>No jobs yet. Create your first job to get started.</p></div>`;
+                return;
+            }
+            container.innerHTML = recent.map(j => renderJobCard(j)).join('');
+        }
+
+        function renderJobCard(job) {
+            const stage = JOB_STAGES.find(s => s.key === job.stage) || JOB_STAGES[0];
+            const clubName = job.clubs?.name || 'No club linked';
+            const days = Math.floor((new Date() - new Date(job.created_at)) / 86400000);
+            return `<div class="job-card" onclick="openJobRecord('${job.id}')">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="job-number">${job.job_number || ''}</span>
+                            <span class="stage-pill ${stage.colorClass}">${stage.label}</span>
+                            ${job.range_approved ? '<span class="stage-pill stage-paid" style="font-size:10px">Range ✓</span>' : ''}
+                        </div>
+                        <p class="job-name truncate">${escHtml(job.job_name)}</p>
+                        <p class="job-meta">${escHtml(clubName)} · ${JOB_TYPE_LABELS[job.job_type] || job.job_type} · ${CHANNEL_LABELS[job.channel] || job.channel}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <p class="text-xs text-gray-600">${days}d ago</p>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // =============================================
+        // SALES — NEW JOB MODAL
+        // =============================================
+        function openNewJobModal() {
+            currentJobId = null;
+            document.getElementById('job-modal-title').textContent = 'New Job';
+            document.getElementById('job-id').value = '';
+            document.getElementById('job-name').value = '';
+            document.getElementById('job-description').value = '';
+            document.getElementById('job-type').value = 'new_club';
+            document.getElementById('job-club-type').value = 'retail';
+            document.getElementById('job-channel').value = 'direct';
+            document.getElementById('job-stage').value = 'discovery';
+            // Populate club dropdown
+            const sel = document.getElementById('job-club-id');
+            sel.innerHTML = '<option value="">— No club linked —</option>' +
+                clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+            document.getElementById('job-modal').classList.remove('hide');
+        }
+
+        function openEditJobModal() {
+            if (!currentJob) return;
+            document.getElementById('job-modal-title').textContent = 'Edit Job';
+            document.getElementById('job-id').value = currentJob.id;
+            document.getElementById('job-name').value = currentJob.job_name || '';
+            document.getElementById('job-description').value = currentJob.job_description || '';
+            document.getElementById('job-type').value = currentJob.job_type || 'new_club';
+            document.getElementById('job-club-type').value = currentJob.club_type || 'retail';
+            document.getElementById('job-channel').value = currentJob.channel || 'direct';
+            document.getElementById('job-stage').value = currentJob.stage || 'discovery';
+            const sel = document.getElementById('job-club-id');
+            sel.innerHTML = '<option value="">— No club linked —</option>' +
+                clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
+            document.getElementById('job-modal').classList.remove('hide');
+        }
+
+        function closeJobModal() {
+            document.getElementById('job-modal').classList.add('hide');
+        }
+
+        async function saveJob() {
+            const jobName = document.getElementById('job-name').value.trim();
+            if (!jobName) { showToast('Job name is required', 'error'); return; }
+            const jobId = document.getElementById('job-id').value;
+            const clubId = document.getElementById('job-club-id').value || null;
+            const payload = {
+                brand_id: currentBrand.id,
+                job_name: jobName,
+                job_description: document.getElementById('job-description').value.trim() || null,
+                job_type: document.getElementById('job-type').value,
+                club_type: document.getElementById('job-club-type').value,
+                channel: document.getElementById('job-channel').value,
+                stage: document.getElementById('job-stage').value,
+                club_id: clubId
+            };
+
+            if (jobId) {
+                const { error } = await supabase.from('jobs').update(payload).eq('id', jobId);
+                if (error) { showToast('Error saving job: ' + error.message, 'error'); return; }
+                showToast('Job updated');
+            } else {
+                // Get job number
+                const { count } = await supabase.from('jobs').select('*', { count: 'exact', head: true }).eq('brand_id', currentBrand.id);
+                payload.job_number = 'JOB-' + String((count || 0) + 1).padStart(4, '0');
+                const { data, error } = await supabase.from('jobs').insert(payload).select().single();
+                if (error) { showToast('Error creating job: ' + error.message, 'error'); return; }
+                showToast('Job created');
+                closeJobModal();
+                await loadJobs();
+                updateSalesBadges();
+                openJobRecord(data.id);
+                return;
+            }
+
+            closeJobModal();
+            await loadJobs();
+            updateSalesBadges();
+            if (currentJobId) {
+                currentJob = jobs.find(j => j.id === currentJobId);
+                renderJobHeader();
+            } else {
+                showSalesView('home');
+            }
+        }
+
+        // =============================================
+        // SALES — JOB RECORD
+        // =============================================
+        async function openJobRecord(jobId) {
+            currentJobId = jobId;
+            // Load from DB fresh
+            const { data: job } = await supabase
+                .from('jobs')
+                .select('*, clubs(*)')
+                .eq('id', jobId)
+                .single();
+            currentJob = job;
+
+            // Switch to job record tool
+            document.getElementById('launchpad').classList.add('hide');
+            document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
+            document.getElementById('tool-job-record').classList.remove('hide');
+
+            renderJobHeader();
+            showJobTab('overview');
+        }
+
+        function closeJobRecord() {
+            document.getElementById('tool-job-record').classList.add('hide');
+            document.getElementById('tool-sales').classList.remove('hide');
+            showSalesView('live');
+        }
+
+        function renderJobHeader() {
+            if (!currentJob) return;
+            const stage = JOB_STAGES.find(s => s.key === currentJob.stage) || JOB_STAGES[0];
+            document.getElementById('jr-job-number').textContent = currentJob.job_number || '';
+            document.getElementById('jr-job-name').textContent = currentJob.job_name || '';
+            document.getElementById('jr-job-desc').textContent = currentJob.job_description || '';
+            const stageBadge = document.getElementById('jr-stage-badge');
+            stageBadge.textContent = stage.label;
+            stageBadge.className = `stage-pill ${stage.colorClass}`;
+            document.getElementById('jr-stage-select').value = currentJob.stage || 'discovery';
+            document.getElementById('jr-type').textContent = JOB_TYPE_LABELS[currentJob.job_type] || currentJob.job_type;
+            document.getElementById('jr-club-type').textContent = CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type;
+            document.getElementById('jr-channel').textContent = CHANNEL_LABELS[currentJob.channel] || currentJob.channel;
+            document.getElementById('jr-club-link').textContent = currentJob.clubs?.name || '—';
+            document.getElementById('jr-created').textContent = new Date(currentJob.created_at).toLocaleDateString('en-GB');
+            const days = Math.floor((new Date() - new Date(currentJob.created_at)) / 86400000);
+            document.getElementById('jr-days-open').textContent = `${days} day${days !== 1 ? 's' : ''}`;
+        }
+
+        async function updateJobStage(newStage) {
+            if (!currentJobId) return;
+            const { error } = await supabase.from('jobs').update({ stage: newStage }).eq('id', currentJobId);
+            if (error) { showToast('Error updating stage: ' + error.message, 'error'); return; }
+            currentJob = { ...currentJob, stage: newStage };
+            renderJobHeader();
+            await loadJobs();
+            updateSalesBadges();
+            showToast('Stage updated to ' + JOB_STAGES.find(s => s.key === newStage)?.label);
+        }
+
+        async function saveJobNotes() {
+            if (!currentJobId) return;
+            const notes = document.getElementById('jr-notes-field').value;
+            const { error } = await supabase.from('jobs').update({ notes }).eq('id', currentJobId);
+            if (error) { showToast('Error saving notes', 'error'); return; }
+            showToast('Notes saved');
+        }
+
+        // =============================================
+        // SALES — JOB TABS
+        // =============================================
+        function showJobTab(tab) {
+            ['overview','products','club','team','design','orderform','production'].forEach(t => {
+                document.getElementById(`jt-content-${t}`)?.classList.add('hide');
+                document.getElementById(`jt-${t}`)?.classList.remove('active');
+            });
+            document.getElementById(`jt-content-${tab}`)?.classList.remove('hide');
+            document.getElementById(`jt-${tab}`)?.classList.add('active');
+
+            switch(tab) {
+                case 'overview':   renderJobOverview(); break;
+                case 'products':   renderJobProducts(); break;
+                case 'club':       renderJobClubTab(); break;
+                case 'team':       loadJobTeams(); break;
+                case 'design':     loadJobDesign(); break;
+                case 'orderform':  renderJobOrderForm(); break;
+                case 'production': renderJobProduction(); break;
+            }
+        }
+
+        function renderJobOverview() {
+            if (!currentJob) return;
+            document.getElementById('jr-notes-field').value = currentJob.notes || '';
+            const details = document.getElementById('jr-overview-details');
+            if (!details) return;
+            const rows = [
+                ['Job Name', currentJob.job_name],
+                ['Job Type', JOB_TYPE_LABELS[currentJob.job_type] || currentJob.job_type],
+                ['Club Type', CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type],
+                ['Channel', CHANNEL_LABELS[currentJob.channel] || currentJob.channel],
+                ['Stage', JOB_STAGES.find(s => s.key === currentJob.stage)?.label || currentJob.stage],
+                ['Linked Club', currentJob.clubs?.name || 'None'],
+                ['Range Approved', currentJob.range_approved ? 'Yes ✓' : 'No'],
+            ];
+            details.innerHTML = rows.map(([k, v]) => `
+                <div class="info-row"><span class="info-label">${k}</span><span class="info-value">${escHtml(v || '—')}</span></div>
+            `).join('');
+        }
+
+        async function renderJobProducts() {
+            if (!currentJob) return;
+            const rangeApproved = document.getElementById('jr-range-approved');
+            if (rangeApproved) rangeApproved.checked = currentJob.range_approved || false;
+
+            if (!currentJob.club_id) {
+                document.getElementById('jr-products-list').innerHTML = '';
+                document.getElementById('jr-products-empty').classList.remove('hide');
+                document.getElementById('jr-products-empty').querySelector('p').textContent = 'Link a club to this job first to manage products.';
+                return;
+            }
+
+            const { data: clubProds } = await supabase
+                .from('club_products')
+                .select('*, products(*)')
+                .eq('club_id', currentJob.club_id)
+                .eq('is_active', true);
+
+            const container = document.getElementById('jr-products-list');
+            const emptyEl = document.getElementById('jr-products-empty');
+            if (!clubProds || clubProds.length === 0) {
+                container.innerHTML = '';
+                emptyEl.classList.remove('hide');
+                return;
+            }
+            emptyEl.classList.add('hide');
+            container.innerHTML = clubProds.map(cp => {
+                const shopPrice = (cp.partner_price + 2).toFixed(2);
+                return `<div class="glass rounded-xl p-4 flex items-center justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-sm">${escHtml(cp.custom_name)}</p>
+                        <p class="text-xs text-gray-500">${escHtml(cp.products?.product_code || '')} · ${escHtml(cp.products?.item_name || '')}</p>
+                    </div>
+                    <div class="flex gap-6 text-right flex-shrink-0">
+                        <div><p class="text-xs text-gray-600">Shop</p><p class="text-sm font-bold text-brand-400">£${shopPrice}</p></div>
+                        <div><p class="text-xs text-gray-600">Partner</p><p class="text-sm font-bold">£${(cp.partner_price||0).toFixed(2)}</p></div>
+                        <div><p class="text-xs text-gray-600">Direct</p><p class="text-sm font-bold">£${(cp.non_partner_price||0).toFixed(2)}</p></div>
+                    </div>
+                    ${cp.shopify_product_id ? '<span class="text-xs text-purple-400 flex-shrink-0">Shopify ✓</span>' : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function showJobAddClubProductModal() {
+            if (!currentJob?.club_id) { showToast('Link a club to this job first', 'error'); return; }
+            // Temporarily set current club to job's club then open modal
+            const club = clubs.find(c => c.id === currentJob.club_id);
+            if (club) { showAddClubProductModal(club); }
+        }
+
+        async function toggleRangeApproved(checked) {
+            if (!currentJobId) return;
+            const { error } = await supabase.from('jobs').update({ range_approved: checked }).eq('id', currentJobId);
+            if (error) { showToast('Error updating range status', 'error'); return; }
+            currentJob = { ...currentJob, range_approved: checked };
+            showToast(checked ? 'Range approved ✓' : 'Range approval removed');
+        }
+
+        async function renderJobClubTab() {
+            if (!currentJob) return;
+            const container = document.getElementById('jr-club-content');
+            if (!currentJob.club_id) {
+                container.innerHTML = `<div class="glass rounded-2xl p-6 text-center">
+                    <div class="empty-icon text-5xl mb-3">🏟️</div>
+                    <p class="text-gray-500 mb-4">No club linked to this job yet.</p>
+                    <div class="flex gap-3 justify-center">
+                        <button onclick="showLinkClubModal()" class="btn-secondary text-sm">Link Existing Club</button>
+                        <button onclick="showCreateClubForJob()" class="btn-primary text-sm">Create New Club</button>
+                    </div>
+                </div>`;
+                return;
+            }
+
+            // Load full club data
+            const { data: club } = await supabase.from('clubs').select('*').eq('id', currentJob.club_id).single();
+            if (!club) return;
+
+            const statusColors = { retail: 'status-retail', partner: 'status-partner', partner_plus: 'status-partner-plus' };
+            const statusLabel = { retail: 'Retail', partner: 'Partner', partner_plus: 'Partner+' };
+            container.innerHTML = `<div class="glass rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-5">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold" style="background:rgba(20,184,166,0.12);color:#2dd4bf">${(club.name||'').substring(0,2).toUpperCase()}</div>
+                        <div>
+                            <h4 class="font-bold text-lg">${escHtml(club.name)}</h4>
+                            <span class="stage-pill ${statusColors[club.club_status] || 'status-retail'}">${statusLabel[club.club_status] || 'Retail'}</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openClubDashboard('${club.id}')" class="btn-secondary text-sm">Open Club Record</button>
+                        <button onclick="showLinkClubModal()" class="btn-secondary text-sm">Change Club</button>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div class="info-row"><span class="info-label">Sport</span><span class="info-value">${escHtml(club.sport||'—')}</span></div>
+                    <div class="info-row"><span class="info-label">League</span><span class="info-value">${escHtml(club.league||'—')}</span></div>
+                    <div class="info-row"><span class="info-label">County</span><span class="info-value">${escHtml(club.address_county||'—')}</span></div>
+                    <div class="info-row"><span class="info-label">Contact</span><span class="info-value">${escHtml(club.contact_name||'—')}</span></div>
+                    <div class="info-row"><span class="info-label">Email</span><span class="info-value">${escHtml(club.contact_email||'—')}</span></div>
+                    <div class="info-row"><span class="info-label">Phone</span><span class="info-value">${escHtml(club.contact_phone||'—')}</span></div>
+                </div>
+                ${club.pantone_main ? `<div class="mt-4 flex items-center gap-3">
+                    <span class="text-xs text-gray-500">Pantone:</span>
+                    <span class="pantone-swatch" style="background:${club.pantone_main}"></span>
+                    ${club.pantone_secondary ? `<span class="pantone-swatch" style="background:${club.pantone_secondary}"></span>` : ''}
+                    ${club.pantone_accent ? `<span class="pantone-swatch" style="background:${club.pantone_accent}"></span>` : ''}
+                </div>` : ''}
+                <div class="mt-5 flex gap-3">
+                    <button onclick="syncClubCollectionForJob('${club.id}')" class="btn-primary text-sm">Create Shopify Collection (API)</button>
+                    <button onclick="generateShopifyCSVForClub('${club.id}')" class="btn-secondary text-sm">Download Shopify CSV</button>
+                </div>
+            </div>`;
+        }
+
+        function showLinkClubModal() {
+            const sel = document.getElementById('link-club-select');
+            sel.innerHTML = '<option value="">Choose club...</option>' +
+                clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+            document.getElementById('link-club-modal').classList.remove('hide');
+        }
+
+        async function linkClubToJob() {
+            const clubId = document.getElementById('link-club-select').value;
+            if (!clubId) { showToast('Please select a club', 'error'); return; }
+            const { error } = await supabase.from('jobs').update({ club_id: clubId }).eq('id', currentJobId);
+            if (error) { showToast('Error linking club', 'error'); return; }
+            document.getElementById('link-club-modal').classList.add('hide');
+            // Reload current job
+            const { data: job } = await supabase.from('jobs').select('*, clubs(*)').eq('id', currentJobId).single();
+            currentJob = job;
+            renderJobHeader();
+            renderJobClubTab();
+            showToast('Club linked');
+        }
+
+        function showCreateClubForJob() {
+            showCreateClubModal();
+        }
+
+        async function syncClubCollectionForJob(clubId) {
+            // Set current club context and run Shopify sync
+            const club = clubs.find(c => c.id === clubId);
+            if (!club) return;
+            // Temporarily expose club ID to syncClubCollection
+            window._jobClubId = clubId;
+            await syncClubCollection();
+            window._jobClubId = null;
+        }
+
+        // =============================================
+        // SALES — TEAMS
+        // =============================================
+        async function loadJobTeams() {
+            if (!currentJobId) return;
+            const { data } = await supabase.from('job_teams').select('*').eq('job_id', currentJobId).order('created_at');
+            jobTeams = data || [];
+            renderJobTeams();
+        }
+
+        function renderJobTeams() {
+            const container = document.getElementById('jr-teams-list');
+            const emptyEl = document.getElementById('jr-teams-empty');
+            if (!container) return;
+            if (jobTeams.length === 0) {
+                container.innerHTML = '';
+                emptyEl?.classList.remove('hide');
+                return;
+            }
+            emptyEl?.classList.add('hide');
+            container.innerHTML = jobTeams.map(t => `
+                <div class="glass rounded-xl p-4 flex items-start justify-between gap-4">
+                    <div class="flex-1">
+                        <p class="font-semibold">${escHtml(t.team_name)}</p>
+                        <p class="text-sm text-gray-500 mt-1">${[t.manager_name, t.manager_email, t.manager_phone].filter(Boolean).map(v => escHtml(v)).join(' · ')}</p>
+                        ${t.notes ? `<p class="text-xs text-gray-600 mt-1">${escHtml(t.notes)}</p>` : ''}
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openTeamModal('${t.id}')" class="text-xs btn-secondary py-1 px-3">Edit</button>
+                        <button onclick="deleteTeam('${t.id}')" class="text-xs text-red-400 hover:text-red-300 py-1 px-2 rounded-lg" style="background:rgba(239,68,68,0.08)">✕</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openTeamModal(teamId) {
+            document.getElementById('team-modal-title').textContent = teamId ? 'Edit Team' : 'Add Team';
+            const team = jobTeams.find(t => t.id === teamId);
+            document.getElementById('team-id').value = teamId || '';
+            document.getElementById('team-name').value = team?.team_name || '';
+            document.getElementById('team-manager-name').value = team?.manager_name || '';
+            document.getElementById('team-manager-email').value = team?.manager_email || '';
+            document.getElementById('team-manager-phone').value = team?.manager_phone || '';
+            document.getElementById('team-notes').value = team?.notes || '';
+            document.getElementById('team-modal').classList.remove('hide');
+        }
+
+        function closeTeamModal() { document.getElementById('team-modal').classList.add('hide'); }
+
+        async function saveTeam() {
+            const name = document.getElementById('team-name').value.trim();
+            if (!name) { showToast('Team name is required', 'error'); return; }
+            const teamId = document.getElementById('team-id').value;
+            const payload = {
+                job_id: currentJobId,
+                team_name: name,
+                manager_name: document.getElementById('team-manager-name').value.trim() || null,
+                manager_email: document.getElementById('team-manager-email').value.trim() || null,
+                manager_phone: document.getElementById('team-manager-phone').value.trim() || null,
+                notes: document.getElementById('team-notes').value.trim() || null
+            };
+            if (teamId) {
+                const { error } = await supabase.from('job_teams').update(payload).eq('id', teamId);
+                if (error) { showToast('Error saving team', 'error'); return; }
+            } else {
+                const { error } = await supabase.from('job_teams').insert(payload);
+                if (error) { showToast('Error creating team', 'error'); return; }
+            }
+            closeTeamModal();
+            await loadJobTeams();
+            showToast('Team saved');
+        }
+
+        async function deleteTeam(teamId) {
+            if (!confirm('Remove this team record?')) return;
+            await supabase.from('job_teams').delete().eq('id', teamId);
+            await loadJobTeams();
+        }
+
+        // =============================================
+        // SALES — DESIGN STUDIO TAB
+        // =============================================
+        async function loadJobDesign() {
+            if (!currentJobId) return;
+            const { data: task } = await supabase
+                .from('design_tasks')
+                .select('*')
+                .eq('job_id', currentJobId)
+                .maybeSingle();
+            currentDesignTask = task;
+
+            if (task) {
+                const { data: versions } = await supabase
+                    .from('design_versions')
+                    .select('*')
+                    .eq('design_task_id', task.id)
+                    .order('version_number');
+                currentDesignVersions = versions || [];
+            } else {
+                currentDesignVersions = [];
+            }
+            renderDesignTab();
+        }
+
+        const DESIGN_STATUS_LABELS = {
+            new: 'New', in_progress: 'In Progress', revisions: 'Revisions',
+            in_review: 'In Review', awaiting_approval: 'Awaiting Approval', complete: 'Complete'
+        };
+
+        function renderDesignTab() {
+            const container = document.getElementById('jr-design-content');
+            if (!container) return;
+            const days = currentJob ? Math.floor((new Date() - new Date(currentJob.created_at)) / 86400000) : 0;
+
+            if (!currentDesignTask) {
+                container.innerHTML = `<div class="glass rounded-2xl p-8 text-center">
+                    <div class="empty-icon text-5xl mb-3">🎨</div>
+                    <p class="text-gray-500 mb-4">No design task created for this job yet.</p>
+                    <button onclick="openCreateDesignTask()" class="btn-primary">Create Design Task</button>
+                </div>`;
+                return;
+            }
+
+            const statusClass = `design-status-${currentDesignTask.status}`;
+            container.innerHTML = `
+                <div class="glass rounded-2xl p-6 mb-5">
+                    <div class="flex items-start justify-between mb-5">
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">Design Brief</h4>
+                            <span class="stage-pill ${statusClass}">${DESIGN_STATUS_LABELS[currentDesignTask.status] || currentDesignTask.status}</span>
+                        </div>
+                        <div class="flex gap-3 flex-wrap">
+                            <select onchange="updateDesignStatus(this.value)" class="px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#ddd">
+                                ${Object.entries(DESIGN_STATUS_LABELS).map(([k,v]) => `<option value="${k}" ${k === currentDesignTask.status ? 'selected' : ''}>${v}</option>`).join('')}
+                            </select>
+                            <button onclick="saveDesignTask()" class="btn-primary text-sm">Save Brief</button>
+                        </div>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Design Summary</label>
+                            <textarea id="design-summary" rows="4" class="w-full px-3 py-2 rounded-lg text-sm resize-none" placeholder="Describe the design requirements...">${escHtml(currentDesignTask.design_summary || '')}</textarea>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Design Appetite</label>
+                            <select id="design-appetite" class="w-full px-3 py-2 rounded-lg text-sm mb-3">
+                                <option value="">Select appetite...</option>
+                                <option value="minimal" ${currentDesignTask.design_appetite==='minimal'?'selected':''}>Minimal — simple, clean</option>
+                                <option value="moderate" ${currentDesignTask.design_appetite==='moderate'?'selected':''}>Moderate — balanced design</option>
+                                <option value="bold" ${currentDesignTask.design_appetite==='bold'?'selected':''}>Bold — striking, impactful</option>
+                                <option value="bespoke" ${currentDesignTask.design_appetite==='bespoke'?'selected':''}>Bespoke — fully custom</option>
+                            </select>
+                            <div class="grid grid-cols-2 gap-3 text-sm">
+                                <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+                                    <p class="text-xs text-gray-500">Job Type</p>
+                                    <p class="font-semibold mt-0.5">${JOB_TYPE_LABELS[currentJob?.job_type] || '—'}</p>
+                                </div>
+                                <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+                                    <p class="text-xs text-gray-500">Days Open</p>
+                                    <p class="font-semibold mt-0.5">${days}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-600">Last modified: ${new Date(currentDesignTask.updated_at).toLocaleString('en-GB')}</div>
+                </div>
+
+                <!-- Design Versions -->
+                <div class="flex items-center justify-between mb-4">
+                    <h4 class="font-semibold">Design Versions</h4>
+                    <button onclick="addDesignVersion()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Version
+                    </button>
+                </div>
+                <div id="design-versions-list" class="space-y-3">
+                    ${renderDesignVersions()}
+                </div>
+            `;
+        }
+
+        function renderDesignVersions() {
+            if (currentDesignVersions.length === 0) {
+                return `<div class="empty-state" style="padding:30px"><div class="empty-icon">🖼️</div><p>No versions yet. Add the first design version.</p></div>`;
+            }
+            return currentDesignVersions.map(v => {
+                const statusClass = v.status === 'approved' ? 'approved' : v.status === 'rejected' ? 'rejected' : '';
+                return `<div class="version-card ${statusClass}">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <span class="version-label">${escHtml(v.version_label || ('V' + v.version_number))}</span>
+                                ${v.status === 'approved' ? '<span class="stage-pill stage-paid">Approved ✓</span>' : ''}
+                                ${v.status === 'rejected' ? '<span style="background:rgba(239,68,68,0.1);color:#f87171;font-size:11px;padding:3px 10px;border-radius:20px">Rejected</span>' : ''}
+                            </div>
+                            ${v.notes ? `<p class="text-sm text-gray-400">${escHtml(v.notes)}</p>` : ''}
+                            <p class="text-xs text-gray-600 mt-1">${new Date(v.created_at).toLocaleDateString('en-GB')}</p>
+                        </div>
+                        <div class="flex gap-2 flex-shrink-0">
+                            ${v.status !== 'approved' ? `<button onclick="approveDesignVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg" style="background:rgba(34,197,94,0.1);color:#4ade80">Approve</button>` : ''}
+                            ${v.status === 'approved' ? `<button onclick="unapproveDesignVersion('${v.id}')" class="text-xs px-2 py-1.5 text-gray-500 hover:text-gray-300">Unset</button>` : ''}
+                            <button onclick="editVersionNotes('${v.id}')" class="text-xs btn-secondary py-1.5 px-3">Notes</button>
+                        </div>
+                    </div>
+                    ${v.file_url ? `<div class="mt-3"><img src="${escHtml(v.file_url)}" class="rounded-lg max-h-48 object-contain" alt="V${v.version_number}"></div>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function openCreateDesignTask() {
+            currentDesignTask = { design_summary: '', design_appetite: '', status: 'new', job_id: currentJobId };
+            renderDesignTab();
+        }
+
+        async function saveDesignTask() {
+            if (!currentJobId) return;
+            const summary = document.getElementById('design-summary')?.value.trim();
+            const appetite = document.getElementById('design-appetite')?.value;
+            if (currentDesignTask?.id) {
+                const { error } = await supabase.from('design_tasks').update({ design_summary: summary, design_appetite: appetite }).eq('id', currentDesignTask.id);
+                if (error) { showToast('Error saving brief', 'error'); return; }
+            } else {
+                const { data, error } = await supabase.from('design_tasks').insert({
+                    job_id: currentJobId, design_summary: summary, design_appetite: appetite, status: 'new'
+                }).select().single();
+                if (error) { showToast('Error creating brief', 'error'); return; }
+                currentDesignTask = data;
+            }
+            await loadJobDesign();
+            showToast('Design brief saved');
+        }
+
+        async function updateDesignStatus(status) {
+            if (!currentDesignTask?.id) return;
+            const { error } = await supabase.from('design_tasks').update({ status }).eq('id', currentDesignTask.id);
+            if (error) { showToast('Error updating status', 'error'); return; }
+            currentDesignTask.status = status;
+            renderDesignTab();
+        }
+
+        async function addDesignVersion() {
+            if (!currentDesignTask?.id) { showToast('Save design brief first', 'error'); return; }
+            const nextNum = (currentDesignVersions.length || 0) + 1;
+            const notes = prompt(`Notes for V${nextNum} (optional):`);
+            const { data, error } = await supabase.from('design_versions').insert({
+                design_task_id: currentDesignTask.id,
+                version_number: nextNum,
+                version_label: `V${nextNum}`,
+                notes: notes || null,
+                status: 'pending'
+            }).select().single();
+            if (error) { showToast('Error adding version', 'error'); return; }
+            currentDesignVersions.push(data);
+            const vList = document.getElementById('design-versions-list');
+            if (vList) vList.innerHTML = renderDesignVersions();
+            showToast(`V${nextNum} added`);
+        }
+
+        async function approveDesignVersion(versionId) {
+            // Un-approve all others first
+            await supabase.from('design_versions').update({ status: 'pending' }).eq('design_task_id', currentDesignTask.id);
+            const { error } = await supabase.from('design_versions').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', versionId);
+            if (error) { showToast('Error approving version', 'error'); return; }
+            // Also update design task to complete
+            await supabase.from('design_tasks').update({ status: 'complete' }).eq('id', currentDesignTask.id);
+            await loadJobDesign();
+            showToast('Version approved — Design marked complete');
+        }
+
+        async function unapproveDesignVersion(versionId) {
+            await supabase.from('design_versions').update({ status: 'pending', approved_at: null }).eq('id', versionId);
+            await loadJobDesign();
+        }
+
+        async function editVersionNotes(versionId) {
+            const v = currentDesignVersions.find(v => v.id === versionId);
+            const notes = prompt('Edit notes:', v?.notes || '');
+            if (notes === null) return;
+            await supabase.from('design_versions').update({ notes: notes.trim() || null }).eq('id', versionId);
+            const vList = document.getElementById('design-versions-list');
+            const idx = currentDesignVersions.findIndex(v => v.id === versionId);
+            if (idx >= 0) currentDesignVersions[idx].notes = notes.trim() || null;
+            if (vList) vList.innerHTML = renderDesignVersions();
+        }
+
+        // =============================================
+        // SALES — ORDER FORM TAB (in Job Record)
+        // =============================================
+        async function renderJobOrderForm() {
+            const container = document.getElementById('jr-orderform-content');
+            if (!container || !currentJob?.club_id) {
+                container.innerHTML = `<div class="glass rounded-2xl p-6 text-center"><div class="empty-icon text-5xl mb-3">📝</div><p class="text-gray-500">Link a club to this job to create order forms.</p></div>`;
+                return;
+            }
+            // Load order forms for the linked club
+            const { data: forms } = await supabase.from('order_forms').select('*').eq('club_id', currentJob.club_id).order('created_at', { ascending: false });
+            if (!forms || forms.length === 0) {
+                container.innerHTML = `<div class="glass rounded-2xl p-6 text-center">
+                    <div class="empty-icon text-5xl mb-3">📝</div>
+                    <p class="text-gray-500 mb-4">No order forms yet for this club.</p>
+                    <button onclick="createOrderFormForJob()" class="btn-primary text-sm">Create Order Form</button>
+                </div>`;
+                return;
+            }
+            const baseUrl = window.location.origin + window.location.pathname;
+            container.innerHTML = `<div class="flex items-center justify-between mb-4">
+                <h4 class="font-semibold">Order Forms for ${escHtml(currentJob.clubs?.name || '')}</h4>
+                <button onclick="createOrderFormForJob()" class="btn-primary text-sm">New Form</button>
+            </div>` +
+            forms.map(f => `<div class="glass rounded-xl p-4 mb-3">
+                <div class="flex items-start justify-between gap-3">
+                    <div>
+                        <p class="font-semibold">${escHtml(f.title)}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">${f.season || ''} ${f.is_active ? '<span style="color:#4ade80">● Active</span>' : '<span style="color:#555">● Closed</span>'}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="copyFormLink('${baseUrl}?form=${f.token}')" class="text-xs btn-secondary py-1 px-3">Copy Link</button>
+                        <a href="${baseUrl}?form=${f.token}" target="_blank" class="text-xs btn-secondary py-1 px-3">Preview</a>
+                        <button onclick="viewFormSubmissions('${f.id}')" class="text-xs btn-primary py-1 px-3">Submissions</button>
+                    </div>
+                </div>
+            </div>`).join('');
+        }
+
+        async function createOrderFormForJob() {
+            if (!currentJob?.club_id) { showToast('Link a club first', 'error'); return; }
+            // Open the existing order form modal but with job's club pre-set
+            const clubObj = clubs.find(c => c.id === currentJob.club_id);
+            if (clubObj) {
+                // Set up the club context and open modal
+                window._currentClub = clubObj;
+                showCreateOrderFormModal();
+            }
+        }
+
+        // =============================================
+        // SALES — PRODUCTION TAB
+        // =============================================
+        async function renderJobProduction() {
+            document.getElementById('jr-po-number').value = currentJob?.po_number || '';
+        }
+
+        async function generateProductionWorksheet() {
+            if (!currentJob) return;
+            showToast('Production worksheet generation coming soon', 'info');
+        }
+
+        // =============================================
         // FEATURE TOGGLES
         // =============================================
         const FEATURES = [
             { key: 'prospecting', label: 'Prospecting', icon: '🎯', desc: 'Lead tracking and early pipeline management' },
+            { key: 'sales', label: 'Sales', icon: '💼', desc: 'Job management, design briefs and order pipeline' },
             { key: 'clubs', label: 'Clubs', icon: '🏟️', desc: 'Club management, products and order forms' },
             { key: 'production', label: 'Production', icon: '🚚', desc: 'PO tracking and factory management' },
             { key: 'design_studio', label: 'Design Studio', icon: '🎨', desc: 'Mockup image uploads' },
@@ -7244,6 +8838,15 @@
             if (e.target === this) closeStageConfig();
         });
         document.getElementById('leads-csv-import-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.add('hide');
+        });
+        document.getElementById('job-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeJobModal();
+        });
+        document.getElementById('team-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeTeamModal();
+        });
+        document.getElementById('link-club-modal').addEventListener('click', function(e) {
             if (e.target === this) this.classList.add('hide');
         });
 
