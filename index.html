@@ -859,6 +859,77 @@
             display: inline-block; cursor: pointer; flex-shrink: 0;
         }
 
+        /* ── Design stage filter row (single-line) ── */
+        #ds-stage-nav { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:24px; }
+        #ds-stage-nav::-webkit-scrollbar { height:3px; }
+        #ds-stage-nav::-webkit-scrollbar-track { background:transparent; }
+        #ds-stage-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
+        .ds-filter-chip {
+            display:flex; align-items:center; gap:8px; padding:8px 16px;
+            border-radius:40px; border:1px solid rgba(255,255,255,0.08);
+            background:rgba(255,255,255,0.03); cursor:pointer;
+            transition:all 0.2s; white-space:nowrap; flex-shrink:0;
+        }
+        .ds-filter-chip:hover { border-color:rgba(236,72,153,0.3); }
+        .ds-filter-chip.active { background:rgba(236,72,153,0.08); border-color:rgba(236,72,153,0.35); }
+        .ds-filter-chip .chip-count { font-size:13px; font-weight:700; }
+        .ds-filter-chip .chip-label { font-size:12px; font-weight:600; color:#aaa; }
+        .ds-filter-chip.active .chip-label { color:#f472b6; }
+
+        /* ── Job stage pills ── */
+        .stage-pill-selector { display:flex; gap:4px; flex-wrap:wrap; }
+        .stage-pill-btn {
+            padding:5px 13px; border-radius:20px; font-size:12px; font-weight:700;
+            cursor:pointer; transition:all 0.18s; border:1px solid rgba(255,255,255,0.08);
+            background:rgba(255,255,255,0.04); color:#555; letter-spacing:0.2px;
+        }
+        .stage-pill-btn:hover { color:#ccc; background:rgba(255,255,255,0.07); }
+        .stage-pill-btn.active { color:#fff; box-shadow:0 0 0 1.5px currentColor; }
+        .design-stage-row { display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
+
+        /* ── Bulk product selector ── */
+        .product-select-item {
+            display:flex; align-items:center; gap-3; padding:10px 12px;
+            border-radius:10px; border:1px solid rgba(255,255,255,0.06);
+            background:rgba(255,255,255,0.02); cursor:pointer; transition:all 0.15s;
+            gap:10px;
+        }
+        .product-select-item:hover { border-color:rgba(20,184,166,0.3); background:rgba(20,184,166,0.04); }
+        .product-select-item.selected { border-color:rgba(20,184,166,0.4); background:rgba(20,184,166,0.07); }
+        .product-select-item input[type=checkbox] { accent-color:#14b8a6; width:15px; height:15px; flex-shrink:0; cursor:pointer; }
+
+        /* ── Annotation pin ── */
+        .ann-pin {
+            position:absolute; transform:translate(-50%,-100%);
+            display:flex; flex-direction:column; align-items:center;
+            pointer-events:none; z-index:10;
+        }
+        .ann-pin-bubble {
+            width:24px; height:24px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:11px; font-weight:800; color:#fff;
+            box-shadow:0 2px 8px rgba(0,0,0,0.6);
+        }
+        .ann-pin-arrow {
+            width:0; height:0;
+            border-left:5px solid transparent;
+            border-right:5px solid transparent;
+            margin-top:-1px;
+        }
+
+        /* ── Design activity feed ── */
+        .feed-item {
+            padding:12px 14px; border-radius:12px;
+            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06);
+            transition:all 0.15s;
+        }
+        .feed-item:hover { border-color:rgba(255,255,255,0.1); }
+
+        /* ── Annotation overlay ── */
+        #ann-img-container { position:relative; display:inline-block; max-width:100%; }
+        #ann-img-container img { display:block; max-width:100%; border-radius:10px; user-select:none; }
+        #ann-overlay { position:absolute; inset:0; cursor:crosshair; border-radius:10px; }
+
         /* Club status badges */
         .status-retail       { background:rgba(107,114,128,0.12); color:#9ca3af; }
         .status-partner      { background:rgba(20,184,166,0.12);  color:#2dd4bf; }
@@ -1376,67 +1447,64 @@
                 </div>
             </div>
 
-            <!-- Stage Pipeline -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8" id="ds-stage-nav">
-                <div onclick="filterDesignByStage('all')" id="ds-stage-all" class="design-stage-card design-stage-active" style="cursor:pointer">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(255,255,255,0.06)">🎨</div>
-                        <span id="ds-count-all" class="text-lg font-bold text-white">0</span>
-                    </div>
-                    <p class="text-sm font-semibold text-white">All Briefs</p>
+            <!-- Stage Pipeline — single-line filter chips -->
+            <div id="ds-stage-nav">
+                <div onclick="filterDesignByStage('all')" id="ds-stage-all" class="ds-filter-chip active">
+                    <span class="chip-count text-white" id="ds-count-all">0</span>
+                    <span class="chip-label">All</span>
                 </div>
-                <div onclick="filterDesignByStage('in_progress')" id="ds-stage-in_progress" class="design-stage-card" style="cursor:pointer">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(251,191,36,0.12)">✏️</div>
-                        <span id="ds-count-in_progress" class="text-lg font-bold" style="color:#fbbf24">0</span>
-                    </div>
-                    <p class="text-sm font-semibold" style="color:#fbbf24">Working</p>
+                <div onclick="filterDesignByStage('new')" id="ds-stage-new" class="ds-filter-chip">
+                    <span class="chip-count text-brand-400" id="ds-count-new">0</span>
+                    <span class="chip-label">New</span>
                 </div>
-                <div onclick="filterDesignByStage('in_review')" id="ds-stage-in_review" class="design-stage-card" style="cursor:pointer">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(96,165,250,0.12)">👁️</div>
-                        <span id="ds-count-in_review" class="text-lg font-bold" style="color:#60a5fa">0</span>
-                    </div>
-                    <p class="text-sm font-semibold" style="color:#60a5fa">In Review</p>
+                <div onclick="filterDesignByStage('in_progress')" id="ds-stage-in_progress" class="ds-filter-chip">
+                    <span class="chip-count" style="color:#fbbf24" id="ds-count-in_progress">0</span>
+                    <span class="chip-label">Working</span>
                 </div>
-                <div onclick="filterDesignByStage('revisions')" id="ds-stage-revisions" class="design-stage-card" style="cursor:pointer">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(251,113,133,0.12)">🔄</div>
-                        <span id="ds-count-revisions" class="text-lg font-bold" style="color:#fb7185">0</span>
-                    </div>
-                    <p class="text-sm font-semibold" style="color:#fb7185">Revisions</p>
+                <div onclick="filterDesignByStage('in_review')" id="ds-stage-in_review" class="ds-filter-chip">
+                    <span class="chip-count" style="color:#60a5fa" id="ds-count-in_review">0</span>
+                    <span class="chip-label">In Review</span>
                 </div>
-                <div onclick="filterDesignByStage('awaiting_approval')" id="ds-stage-awaiting_approval" class="design-stage-card" style="cursor:pointer">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(167,139,250,0.12)">⏳</div>
-                        <span id="ds-count-awaiting_approval" class="text-lg font-bold" style="color:#a78bfa">0</span>
-                    </div>
-                    <p class="text-sm font-semibold" style="color:#a78bfa">Awaiting Approval</p>
+                <div onclick="filterDesignByStage('revisions')" id="ds-stage-revisions" class="ds-filter-chip">
+                    <span class="chip-count" style="color:#fb7185" id="ds-count-revisions">0</span>
+                    <span class="chip-label">Revisions</span>
                 </div>
-                <div onclick="filterDesignByStage('complete')" id="ds-stage-complete" class="design-stage-card" style="cursor:pointer">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(74,222,128,0.12)">✅</div>
-                        <span id="ds-count-complete" class="text-lg font-bold" style="color:#4ade80">0</span>
-                    </div>
-                    <p class="text-sm font-semibold" style="color:#4ade80">Approved</p>
+                <div onclick="filterDesignByStage('awaiting_approval')" id="ds-stage-awaiting_approval" class="ds-filter-chip">
+                    <span class="chip-count" style="color:#a78bfa" id="ds-count-awaiting_approval">0</span>
+                    <span class="chip-label">Awaiting Approval</span>
                 </div>
-                <div onclick="filterDesignByStage('new')" id="ds-stage-new" class="design-stage-card" style="cursor:pointer">
-                    <div class="flex items-start justify-between mb-3">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl" style="background:rgba(20,184,166,0.12)">🆕</div>
-                        <span id="ds-count-new" class="text-lg font-bold text-brand-400">0</span>
-                    </div>
-                    <p class="text-sm font-semibold text-brand-400">New</p>
+                <div onclick="filterDesignByStage('complete')" id="ds-stage-complete" class="ds-filter-chip">
+                    <span class="chip-count" style="color:#4ade80" id="ds-count-complete">0</span>
+                    <span class="chip-label">Approved</span>
                 </div>
             </div>
 
-            <!-- Design Jobs List -->
-            <div id="ds-jobs-list" class="space-y-3">
-                <!-- Populated by JS -->
-            </div>
-            <div id="ds-jobs-empty" class="hide text-center py-16">
-                <div class="empty-icon text-5xl mb-3">🎨</div>
-                <p class="text-gray-400 font-medium">No design briefs found</p>
-                <p class="text-gray-600 text-sm mt-1">Design briefs are created from within job records</p>
+            <!-- Design Jobs + Activity Feed side-by-side -->
+            <div class="flex gap-6 items-start">
+                <!-- Briefs list (left, wider) -->
+                <div class="flex-1 min-w-0">
+                    <div id="ds-jobs-list" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div id="ds-jobs-empty" class="hide text-center py-16">
+                        <div class="empty-icon text-5xl mb-3">🎨</div>
+                        <p class="text-gray-400 font-medium">No design briefs found</p>
+                        <p class="text-gray-600 text-sm mt-1">Design briefs are created from within job records</p>
+                    </div>
+                </div>
+
+                <!-- Activity Feed (right, fixed width) -->
+                <div class="w-80 flex-shrink-0" style="min-width:280px">
+                    <div class="glass rounded-2xl p-5 sticky top-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="font-semibold text-sm">Activity Feed</h4>
+                            <button onclick="refreshDesignFeed()" class="text-xs text-gray-500 hover:text-brand-400 transition">Refresh</button>
+                        </div>
+                        <div id="ds-feed-list" class="space-y-3 max-h-96 overflow-y-auto">
+                            <p class="text-xs text-gray-600 text-center py-4">Loading feed…</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2417,33 +2485,45 @@
 
             <!-- Job header -->
             <div class="glass rounded-2xl p-6 mb-6">
-                <div class="flex items-start justify-between flex-wrap gap-4">
+                <div class="flex items-start justify-between flex-wrap gap-4 mb-5">
                     <div>
                         <div class="flex items-center gap-3 mb-1">
                             <span id="jr-job-number" class="text-xs text-gray-600 font-mono"></span>
-                            <span id="jr-stage-badge" class="stage-pill stage-discovery">Discovery</span>
                         </div>
                         <h2 id="jr-job-name" class="text-2xl font-bold mb-1">Job Name</h2>
                         <p id="jr-job-desc" class="text-gray-500 text-sm"></p>
                     </div>
-                    <div class="flex gap-3 flex-wrap">
-                        <button onclick="openEditJobModal()" class="btn-secondary text-sm">Edit Job</button>
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs text-gray-500">Stage:</label>
-                            <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#ddd">
-                                <option value="discovery">Discovery</option>
-                                <option value="concepts">Concepts</option>
-                                <option value="awaiting_approval">Awaiting Approval</option>
-                                <option value="quote">Quote</option>
-                                <option value="paid">Paid</option>
-                                <option value="on_boarding">On-Boarding</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
+                    <button onclick="openEditJobModal()" class="btn-secondary text-sm flex-shrink-0">Edit Job</button>
+                </div>
+
+                <!-- Job Stage pills -->
+                <div class="mb-4">
+                    <p class="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Job Stage</p>
+                    <div class="stage-pill-selector" id="jr-stage-pills">
+                        <!-- Populated by renderJobStagePills() -->
+                    </div>
+                    <!-- Hidden select kept for JS compat -->
+                    <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
+                        <option value="discovery">Discovery</option>
+                        <option value="concepts">Concepts</option>
+                        <option value="awaiting_approval">Awaiting Approval</option>
+                        <option value="quote">Quote</option>
+                        <option value="paid">Paid</option>
+                        <option value="on_boarding">On-Boarding</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <!-- Design Stage pills -->
+                <div class="mb-4">
+                    <p class="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Design Stage</p>
+                    <div class="design-stage-row" id="jr-design-stage-pills">
+                        <!-- Populated by renderDesignStagePills() -->
                     </div>
                 </div>
+
                 <!-- Quick meta -->
-                <div class="flex gap-6 mt-4 flex-wrap" id="jr-meta-row">
+                <div class="flex gap-6 mt-4 flex-wrap border-t border-gray-800 pt-4" id="jr-meta-row">
                     <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-sm font-semibold mt-0.5">—</p></div>
                     <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-sm font-semibold mt-0.5">—</p></div>
                     <div><span class="text-xs text-gray-600">Channel</span><p id="jr-channel" class="text-sm font-semibold mt-0.5">—</p></div>
@@ -2795,9 +2875,9 @@
              TOOL: CLUB DETAIL DASHBOARD
              ============================================================ -->
         <div id="tool-club-detail" class="hide p-6 md:p-8 max-w-6xl mx-auto">
-            <button onclick="showTool('clubs')" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
+            <button onclick="goBack()" id="club-detail-back-btn" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Clubs
+                <span id="club-detail-back-label">Back to Clubs</span>
             </button>
 
             <!-- Club header -->
@@ -2826,6 +2906,7 @@
                 <button id="tab-btn-teams" onclick="showClubTab('teams')">Teams</button>
                 <button id="tab-btn-products" onclick="showClubTab('products')">Club Products</button>
                 <button id="tab-btn-orderforms" onclick="showClubTab('orderforms')">Order Forms</button>
+                <button id="tab-btn-jobs" onclick="showClubTab('jobs')">Jobs</button>
                 <button id="tab-btn-onboarding" onclick="showClubTab('onboarding')">Onboarding</button>
                 <button id="tab-btn-images" onclick="showClubTab('images')">Images</button>
             </div>
@@ -2929,10 +3010,16 @@
                         <h3 class="font-semibold text-lg">Club Products</h3>
                         <p class="text-gray-500 text-sm mt-1">Assign master products and set club-specific pricing</p>
                     </div>
-                    <button onclick="showAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Product
-                    </button>
+                    <div class="flex gap-2">
+                        <button onclick="showBulkAddProductsModal()" class="btn-secondary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            Bulk Add
+                        </button>
+                        <button onclick="showAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Product
+                        </button>
+                    </div>
                 </div>
                 <div id="club-products-list" class="space-y-3">
                     <!-- Populated by JS -->
@@ -3061,6 +3148,21 @@
                     <div id="club-detail-images-empty" class="hide text-center py-8 text-gray-600 text-sm">No images uploaded yet</div>
                 </div>
             </div>
+
+            <!-- TAB: Jobs -->
+            <div id="club-tab-jobs" class="club-tab-content hide">
+                <div class="section-header mb-5">
+                    <div>
+                        <h3 class="font-semibold text-lg">Club Jobs</h3>
+                        <p class="text-gray-500 text-sm mt-1">All sales jobs linked to this club</p>
+                    </div>
+                </div>
+                <div id="club-jobs-list" class="space-y-3"></div>
+                <div id="club-jobs-empty" class="hide text-center py-12">
+                    <div class="empty-icon">💼</div>
+                    <p class="text-gray-500">No jobs linked to this club yet.</p>
+                </div>
+            </div>
         </div>
 
         <!-- ============================================================
@@ -3160,24 +3262,24 @@
                     <!-- Pantone colours -->
                     <div class="grid grid-cols-3 gap-4">
                         <div>
-                            <label class="text-gray-400 text-xs mb-1 block">Pantone Main</label>
+                            <label class="text-gray-400 text-xs mb-1 block">Main Colour</label>
                             <div class="flex gap-2 items-center">
-                                <input type="color" id="club-pantone-main" value="#14b8a6" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
-                                <input type="text" id="club-pantone-main-text" placeholder="e.g. 355 C" class="flex-1 px-2 py-2 rounded-lg text-xs">
+                                <input type="color" id="club-pantone-main" value="#14b8a6" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333" title="Pick hex colour">
+                                <input type="text" id="club-pantone-main-text" placeholder="Pantone e.g. 355 C" class="flex-1 px-2 py-2 rounded-lg text-xs" title="Pantone reference code">
                             </div>
                         </div>
                         <div>
-                            <label class="text-gray-400 text-xs mb-1 block">Pantone Secondary</label>
+                            <label class="text-gray-400 text-xs mb-1 block">Secondary Colour</label>
                             <div class="flex gap-2 items-center">
-                                <input type="color" id="club-pantone-sec" value="#ffffff" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
-                                <input type="text" id="club-pantone-sec-text" placeholder="e.g. 032 C" class="flex-1 px-2 py-2 rounded-lg text-xs">
+                                <input type="color" id="club-pantone-sec" value="#ffffff" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333" title="Pick hex colour">
+                                <input type="text" id="club-pantone-sec-text" placeholder="Pantone e.g. 032 C" class="flex-1 px-2 py-2 rounded-lg text-xs" title="Pantone reference code">
                             </div>
                         </div>
                         <div>
-                            <label class="text-gray-400 text-xs mb-1 block">Pantone Accent</label>
+                            <label class="text-gray-400 text-xs mb-1 block">Accent Colour</label>
                             <div class="flex gap-2 items-center">
-                                <input type="color" id="club-pantone-acc" value="#000000" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
-                                <input type="text" id="club-pantone-acc-text" placeholder="e.g. Black C" class="flex-1 px-2 py-2 rounded-lg text-xs">
+                                <input type="color" id="club-pantone-acc" value="#000000" class="h-9 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333" title="Pick hex colour">
+                                <input type="text" id="club-pantone-acc-text" placeholder="Pantone e.g. Black C" class="flex-1 px-2 py-2 rounded-lg text-xs" title="Pantone reference code">
                             </div>
                         </div>
                     </div>
@@ -3302,6 +3404,109 @@
                 <div class="flex gap-3">
                     <button onclick="closeClubTeamModal()" class="flex-1 btn-secondary py-3">Cancel</button>
                     <button onclick="saveClubTeam()" class="flex-1 btn-primary py-3">Save Team</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Bulk Add Club Products
+             ============================================================ -->
+        <div id="bulk-products-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
+            <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4 my-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Bulk Add Products</h3>
+                    <button onclick="hideBulkProductsModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <p class="text-gray-500 text-sm mb-4">Select one or more products. Click a row to toggle; click first then Shift+click to select a range.</p>
+                <div class="flex gap-3 mb-4">
+                    <input type="text" id="bulk-product-search" placeholder="Search products..." class="flex-1 px-3 py-2 rounded-lg text-sm" oninput="filterBulkProductList()">
+                    <button onclick="selectAllBulkProducts()" class="btn-secondary text-sm px-4">Select All</button>
+                    <button onclick="clearBulkProductSelection()" class="btn-secondary text-sm px-4">Clear</button>
+                </div>
+                <div id="bulk-product-list" class="space-y-1.5 max-h-80 overflow-y-auto mb-4">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="flex items-center justify-between">
+                    <p class="text-sm text-gray-500"><span id="bulk-selected-count">0</span> selected</p>
+                    <div class="flex gap-3">
+                        <button onclick="hideBulkProductsModal()" class="btn-secondary py-2 px-5">Cancel</button>
+                        <button onclick="saveBulkProducts()" class="btn-primary py-2 px-5">Add Selected</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Upload Design Version
+             ============================================================ -->
+        <div id="upload-version-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-md mx-4">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="text-xl font-bold">Upload Design Version</h3>
+                    <button onclick="hideUploadVersionModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <div class="mb-4">
+                    <label class="dropzone flex flex-col items-center justify-center p-8 cursor-pointer mb-3" id="version-dropzone" onclick="document.getElementById('version-file-input').click()">
+                        <svg class="w-10 h-10 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-gray-500 text-sm text-center" id="version-file-label">Click to select image (PNG, JPG, PDF)</p>
+                    </label>
+                    <input type="file" id="version-file-input" accept="image/*,.pdf" class="hide" onchange="previewVersionFile(event)">
+                    <div id="version-file-preview" class="hide mb-3 rounded-xl overflow-hidden" style="max-height:200px">
+                        <img id="version-file-preview-img" class="w-full object-contain" style="max-height:200px">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Notes (optional)</label>
+                    <textarea id="version-notes" rows="2" placeholder="Any notes about this version..." class="w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="hideUploadVersionModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="uploadDesignVersion()" class="flex-1 btn-primary py-3" id="upload-version-btn">Upload Version</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Design Annotation
+             ============================================================ -->
+        <div id="annotation-modal" class="fixed inset-0 bg-black/90 z-50 flex items-center justify-center hide overflow-hidden">
+            <div class="glass rounded-2xl w-full mx-4 flex flex-col" style="max-width:1100px;max-height:90vh">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-5 border-b border-white/5 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-lg font-bold">Annotate Design</h3>
+                        <span id="ann-version-label" class="stage-pill design-status-in_review text-xs"></span>
+                        <span class="text-xs text-gray-500">Click image to place markers</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="declineAnnotatedVersion()" class="text-sm px-4 py-2 rounded-lg font-semibold" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.3)">Decline</button>
+                        <button onclick="approveAnnotatedVersion()" class="text-sm px-4 py-2 rounded-lg font-semibold" style="background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.3)">Approve</button>
+                        <button onclick="saveAnnotations()" class="btn-primary text-sm">Save Feedback</button>
+                        <button onclick="closeAnnotationModal()" class="text-gray-400 hover:text-white text-2xl ml-1">&times;</button>
+                    </div>
+                </div>
+                <!-- Body -->
+                <div class="flex flex-1 overflow-hidden">
+                    <!-- Image area -->
+                    <div class="flex-1 overflow-auto p-5 flex items-start justify-center" style="background:rgba(0,0,0,0.4)">
+                        <div id="ann-img-container">
+                            <img id="ann-img" src="" alt="Design version" style="max-width:100%;display:block;border-radius:10px;user-select:none">
+                            <div id="ann-overlay" onclick="placeAnnotationMarker(event)"></div>
+                            <!-- Markers placed here by JS -->
+                        </div>
+                    </div>
+                    <!-- Comments panel -->
+                    <div class="w-80 flex-shrink-0 flex flex-col border-l border-white/5">
+                        <div class="p-4 border-b border-white/5">
+                            <p class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Annotations</p>
+                        </div>
+                        <div id="ann-comments-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div class="p-4 border-t border-white/5">
+                            <button onclick="clearAllAnnotations()" class="text-xs text-gray-500 hover:text-red-400 transition">Clear all markers</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -6156,6 +6361,46 @@
         }
 
         // =============================================
+        // NAVIGATION STACK
+        // =============================================
+        let navStack = [];
+
+        function pushNav(ctx) {
+            navStack.push(ctx);
+        }
+
+        function goBack() {
+            const prev = navStack.pop();
+            if (!prev) { showLaunchpad(); return; }
+            switch (prev.type) {
+                case 'launchpad':
+                    showLaunchpad(); break;
+                case 'tool':
+                    showTool(prev.tool);
+                    if (prev.tool === 'sales' && prev.view) setTimeout(() => showSalesView(prev.view), 0);
+                    break;
+                case 'job':
+                    openJobRecord(prev.jobId); break;
+                case 'club-detail':
+                    openClubDashboard(prev.clubId); break;
+                default:
+                    showLaunchpad();
+            }
+        }
+
+        function setClubDetailBackLabel(label) {
+            const lbl = document.getElementById('club-detail-back-label');
+            if (lbl) lbl.textContent = label;
+        }
+
+        // Open club from within a job record (pushes job record to stack)
+        function openClubFromJob(clubId) {
+            pushNav({ type: 'job', jobId: currentJobId, label: 'Back to Job' });
+            setClubDetailBackLabel('Back to Job');
+            openClubDashboard(clubId);
+        }
+
+        // =============================================
         // ENHANCED CLUBS STATE
         // =============================================
         let currentClub = null;
@@ -6450,11 +6695,11 @@
             document.getElementById('club-county').value = currentClub.address_county || '';
             document.getElementById('club-postcode').value = currentClub.address_postcode || '';
             document.getElementById('club-pantone-main').value = currentClub.pantone_main || '#14b8a6';
-            document.getElementById('club-pantone-main-text').value = currentClub.pantone_main || '';
+            document.getElementById('club-pantone-main-text').value = currentClub.pantone_main_code || '';
             document.getElementById('club-pantone-sec').value = currentClub.pantone_secondary || '#ffffff';
-            document.getElementById('club-pantone-sec-text').value = currentClub.pantone_secondary || '';
+            document.getElementById('club-pantone-sec-text').value = currentClub.pantone_sec_code || '';
             document.getElementById('club-pantone-acc').value = currentClub.pantone_accent || '#000000';
-            document.getElementById('club-pantone-acc-text').value = currentClub.pantone_accent || '';
+            document.getElementById('club-pantone-acc-text').value = currentClub.pantone_acc_code || '';
             document.getElementById('club-contact-name').value = currentClub.contact_name || '';
             document.getElementById('club-contact-email').value = currentClub.contact_email || '';
             document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
@@ -6531,6 +6776,9 @@
                 pantone_main: document.getElementById('club-pantone-main')?.value || null,
                 pantone_secondary: document.getElementById('club-pantone-sec')?.value || null,
                 pantone_accent: document.getElementById('club-pantone-acc')?.value || null,
+                pantone_main_code: document.getElementById('club-pantone-main-text')?.value.trim() || null,
+                pantone_sec_code: document.getElementById('club-pantone-sec-text')?.value.trim() || null,
+                pantone_acc_code: document.getElementById('club-pantone-acc-text')?.value.trim() || null,
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
@@ -6574,6 +6822,15 @@
             document.getElementById('launchpad').classList.add('hide');
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('tool-club-detail').classList.remove('hide');
+            // Update back label from navStack context (if pushed from a job, label was already set)
+            const backLbl = document.getElementById('club-detail-back-label');
+            if (backLbl && navStack.length > 0) {
+                const top = navStack[navStack.length - 1];
+                if (top.type === 'job') backLbl.textContent = 'Back to Job';
+                else backLbl.textContent = 'Back to Clubs';
+            } else if (backLbl) {
+                backLbl.textContent = 'Back to Clubs';
+            }
             updateClubDetailHeader();
             showClubTab('overview');
             await Promise.all([loadCurrentClubProducts(), loadCurrentClubOrderForms()]);
@@ -6605,6 +6862,7 @@
             if (tab === 'teams') { loadClubTeams().then(() => renderClubTeams()); }
             if (tab === 'products') renderClubProducts();
             if (tab === 'orderforms') renderClubOrderForms();
+            if (tab === 'jobs') loadClubJobs();
             if (tab === 'onboarding') { renderShopifySyncStatus(); renderOnboardingTab(); }
             if (tab === 'shopify') renderShopifySyncStatus(); // legacy compatibility
             if (tab === 'images') loadClubDetailImages();
@@ -6699,7 +6957,8 @@
             if (secSwatch) secSwatch.style.background = currentClub.pantone_secondary || 'rgba(255,255,255,0.04)';
             if (accSwatch) accSwatch.style.background = currentClub.pantone_accent || 'rgba(255,255,255,0.04)';
             if (pantoneLabels) {
-                pantoneLabels.textContent = currentClub.pantone_main ? '' : '—';
+                const codes = [currentClub.pantone_main_code, currentClub.pantone_sec_code, currentClub.pantone_acc_code].filter(Boolean);
+                pantoneLabels.textContent = codes.length ? codes.join(' / ') : (currentClub.pantone_main ? '' : '—');
             }
         }
 
@@ -6817,6 +7076,159 @@
         function hideClubProductModal() {
             document.getElementById('club-product-modal').classList.add('hide');
             document.getElementById('cp-master-product').disabled = false;
+        }
+
+        // =============================================
+        // BULK ADD PRODUCTS
+        // =============================================
+        let bulkSelectedProducts = new Set();
+        let bulkLastClickedIndex = -1;
+
+        function showBulkAddProductsModal() {
+            bulkSelectedProducts = new Set();
+            bulkLastClickedIndex = -1;
+            document.getElementById('bulk-product-search').value = '';
+            renderBulkProductList();
+            document.getElementById('bulk-products-modal').classList.remove('hide');
+        }
+
+        function hideBulkProductsModal() {
+            document.getElementById('bulk-products-modal').classList.add('hide');
+        }
+
+        function renderBulkProductList() {
+            const search = document.getElementById('bulk-product-search').value.toLowerCase();
+            const assignedIds = new Set(currentClubProducts.map(cp => cp.product_id));
+            const available = products.filter(p => !assignedIds.has(p.id));
+            const filtered = search
+                ? available.filter(p => (p.product_code + ' ' + p.item_name + ' ' + (p.range_name||'')).toLowerCase().includes(search))
+                : available;
+            const container = document.getElementById('bulk-product-list');
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No unassigned products match your search</p>';
+                return;
+            }
+            container.innerHTML = filtered.map((p, i) => {
+                const sel = bulkSelectedProducts.has(p.id);
+                return `<div class="product-select-item${sel ? ' selected' : ''}" data-product-id="${p.id}" data-index="${i}" onclick="toggleBulkProduct(event, '${p.id}', ${i})">
+                    <input type="checkbox" ${sel ? 'checked' : ''} onclick="event.stopPropagation()" onchange="toggleBulkProduct(event, '${p.id}', ${i})">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold">${escHtml(p.product_code)} — ${escHtml(p.item_name)}</p>
+                        <p class="text-xs text-gray-500">${escHtml(p.range_name||'')}</p>
+                    </div>
+                    <span class="text-xs text-gray-600 font-mono flex-shrink-0">£${Number(p.adult_partner_price||p.single_partner_price||0).toFixed(2)}</span>
+                </div>`;
+            }).join('');
+            updateBulkCount();
+        }
+
+        function filterBulkProductList() { renderBulkProductList(); }
+
+        function toggleBulkProduct(event, productId, index) {
+            if (event.shiftKey && bulkLastClickedIndex >= 0) {
+                // Range select: get all visible items between last and current
+                const items = Array.from(document.querySelectorAll('#bulk-product-list .product-select-item'));
+                const from = Math.min(bulkLastClickedIndex, index);
+                const to   = Math.max(bulkLastClickedIndex, index);
+                items.slice(from, to + 1).forEach(el => {
+                    const pid = el.dataset.productId;
+                    bulkSelectedProducts.add(pid);
+                });
+            } else {
+                if (bulkSelectedProducts.has(productId)) bulkSelectedProducts.delete(productId);
+                else bulkSelectedProducts.add(productId);
+            }
+            bulkLastClickedIndex = index;
+            renderBulkProductList();
+        }
+
+        function selectAllBulkProducts() {
+            document.querySelectorAll('#bulk-product-list .product-select-item').forEach(el => bulkSelectedProducts.add(el.dataset.productId));
+            renderBulkProductList();
+        }
+
+        function clearBulkProductSelection() {
+            bulkSelectedProducts.clear();
+            renderBulkProductList();
+        }
+
+        function updateBulkCount() {
+            document.getElementById('bulk-selected-count').textContent = bulkSelectedProducts.size;
+        }
+
+        async function saveBulkProducts() {
+            if (!currentClub) return;
+            if (bulkSelectedProducts.size === 0) { showToast('Select at least one product', 'error'); return; }
+            const btn = document.querySelector('#bulk-products-modal .btn-primary');
+            if (btn) { btn.disabled = true; btn.textContent = 'Adding…'; }
+            let added = 0, failed = 0;
+            for (const productId of bulkSelectedProducts) {
+                const p = products.find(x => x.id === productId);
+                if (!p) continue;
+                const partnerPrice = p.is_single_price ? p.single_partner_price : p.adult_partner_price;
+                const retailPrice  = p.is_single_price ? p.single_retail_price  : p.adult_retail_price;
+                const webPrice = partnerPrice ? (Number(partnerPrice) + 2) : null;
+                const { error } = await supabase.from('club_products').insert({
+                    club_id: currentClub.id,
+                    product_id: productId,
+                    custom_name: `${currentClub.name} ${p.item_name}`,
+                    web_price: webPrice,
+                    partner_price: partnerPrice ? Number(partnerPrice) : null,
+                    non_partner_price: retailPrice ? Number(retailPrice) : null,
+                    is_active: true
+                });
+                if (error) failed++; else added++;
+            }
+            // Reload
+            await loadCurrentClubProducts();
+            renderClubProducts();
+            hideBulkProductsModal();
+            if (btn) { btn.disabled = false; btn.textContent = 'Add Selected'; }
+            showToast(failed ? `${added} added, ${failed} failed` : `${added} product${added !== 1 ? 's' : ''} added`);
+        }
+
+        // =============================================
+        // CLUB JOBS TAB
+        // =============================================
+        async function loadClubJobs() {
+            if (!currentClub) return;
+            const { data } = await supabase
+                .from('jobs')
+                .select('*')
+                .eq('club_id', currentClub.id)
+                .order('created_at', { ascending: false });
+            renderClubJobs(data || []);
+        }
+
+        function renderClubJobs(jobList) {
+            const container = document.getElementById('club-jobs-list');
+            const emptyEl   = document.getElementById('club-jobs-empty');
+            if (!container) return;
+            if (jobList.length === 0) {
+                container.innerHTML = '';
+                emptyEl?.classList.remove('hide');
+                return;
+            }
+            emptyEl?.classList.add('hide');
+            container.innerHTML = jobList.map(j => {
+                const stage = JOB_STAGES.find(s => s.key === j.stage) || JOB_STAGES[0];
+                return `<div class="glass rounded-xl p-4 flex items-center justify-between gap-4 cursor-pointer hover:border-brand-500/30 transition" onclick="openJobFromClub('${j.id}')">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs text-gray-600 font-mono">${escHtml(j.job_number||'')}</span>
+                            <span class="stage-pill ${stage.colorClass}" style="font-size:10px">${stage.label}</span>
+                        </div>
+                        <p class="font-semibold truncate">${escHtml(j.job_name||'Untitled Job')}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">${new Date(j.created_at).toLocaleDateString('en-GB')}</p>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>`;
+            }).join('');
+        }
+
+        function openJobFromClub(jobId) {
+            pushNav({ type: 'club-detail', clubId: currentClub.id, label: 'Back to Club' });
+            openJobRecord(jobId);
         }
 
         // Reactive: when partner price is typed, auto-update shop price = partner + £2
@@ -8138,6 +8550,16 @@
         // =============================================
         async function openJobRecord(jobId) {
             currentJobId = jobId;
+            // Push current view to navStack if not already navigating
+            if (!navStack.length || navStack[navStack.length-1].type !== 'job') {
+                // detect current visible tool to push as back context
+                if (!document.getElementById('tool-sales').classList.contains('hide')) {
+                    navStack.push({ type: 'tool', tool: 'sales', view: 'live' });
+                } else if (!document.getElementById('tool-design-studio').classList.contains('hide')) {
+                    navStack.push({ type: 'tool', tool: 'design-studio' });
+                }
+                // (other push contexts are handled by the calling function e.g. openJobFromClub)
+            }
             // Load from DB fresh
             const { data: job } = await supabase
                 .from('jobs')
@@ -8164,20 +8586,21 @@
         }
 
         function closeJobRecord() {
-            document.getElementById('tool-job-record').classList.add('hide');
-            document.getElementById('tool-sales').classList.remove('hide');
-            showSalesView('live');
+            // If we have a nav stack entry, use goBack; otherwise default to sales
+            if (navStack.length > 0) {
+                goBack();
+            } else {
+                document.getElementById('tool-job-record').classList.add('hide');
+                document.getElementById('tool-sales').classList.remove('hide');
+                showSalesView('live');
+            }
         }
 
         function renderJobHeader() {
             if (!currentJob) return;
-            const stage = JOB_STAGES.find(s => s.key === currentJob.stage) || JOB_STAGES[0];
             document.getElementById('jr-job-number').textContent = currentJob.job_number || '';
             document.getElementById('jr-job-name').textContent = currentJob.job_name || '';
             document.getElementById('jr-job-desc').textContent = currentJob.job_description || '';
-            const stageBadge = document.getElementById('jr-stage-badge');
-            stageBadge.textContent = stage.label;
-            stageBadge.className = `stage-pill ${stage.colorClass}`;
             document.getElementById('jr-stage-select').value = currentJob.stage || 'discovery';
             document.getElementById('jr-type').textContent = JOB_TYPE_LABELS[currentJob.job_type] || currentJob.job_type;
             document.getElementById('jr-club-type').textContent = CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type;
@@ -8186,6 +8609,54 @@
             document.getElementById('jr-created').textContent = new Date(currentJob.created_at).toLocaleDateString('en-GB');
             const days = Math.floor((new Date() - new Date(currentJob.created_at)) / 86400000);
             document.getElementById('jr-days-open').textContent = `${days} day${days !== 1 ? 's' : ''}`;
+            renderJobStagePills();
+            renderDesignStagePills();
+        }
+
+        const JOB_STAGE_COLORS = {
+            discovery: '#9ca3af', concepts: '#60a5fa', awaiting_approval: '#a78bfa',
+            quote: '#fb923c', paid: '#4ade80', on_boarding: '#2dd4bf', completed: '#f472b6'
+        };
+
+        function renderJobStagePills() {
+            const container = document.getElementById('jr-stage-pills');
+            if (!container) return;
+            container.innerHTML = JOB_STAGES.map(s => {
+                const active = (currentJob?.stage || 'discovery') === s.key;
+                const c = JOB_STAGE_COLORS[s.key] || '#888';
+                return `<button onclick="updateJobStage('${s.key}')" class="stage-pill-btn${active ? ' active' : ''}"
+                    style="${active ? `color:${c};border-color:${c};background:${c}18` : ''}">${s.label}</button>`;
+            }).join('');
+        }
+
+        const DESIGN_STAGE_LABELS = {
+            not_started: 'Not Started', briefed: 'Briefed', in_progress: 'In Progress',
+            in_review: 'In Review', revisions: 'Revisions', awaiting_approval: 'Awaiting Approval', complete: 'Complete'
+        };
+        const DESIGN_STAGE_COLORS = {
+            not_started: '#555', briefed: '#9ca3af', in_progress: '#fbbf24',
+            in_review: '#60a5fa', revisions: '#fb7185', awaiting_approval: '#a78bfa', complete: '#4ade80'
+        };
+        const DESIGN_STAGES_ORDER = ['not_started','briefed','in_progress','in_review','revisions','awaiting_approval','complete'];
+
+        function renderDesignStagePills() {
+            const container = document.getElementById('jr-design-stage-pills');
+            if (!container) return;
+            container.innerHTML = DESIGN_STAGES_ORDER.map(key => {
+                const active = (currentJob?.design_stage || 'not_started') === key;
+                const c = DESIGN_STAGE_COLORS[key] || '#888';
+                return `<button onclick="updateJobDesignStage('${key}')" class="stage-pill-btn${active ? ' active' : ''}"
+                    style="${active ? `color:${c};border-color:${c};background:${c}18` : ''}">${DESIGN_STAGE_LABELS[key]}</button>`;
+            }).join('');
+        }
+
+        async function updateJobDesignStage(newStage) {
+            if (!currentJobId) return;
+            const { error } = await supabase.from('jobs').update({ design_stage: newStage }).eq('id', currentJobId);
+            if (error) { showToast('Error updating design stage', 'error'); return; }
+            currentJob = { ...currentJob, design_stage: newStage };
+            renderDesignStagePills();
+            showToast('Design stage → ' + DESIGN_STAGE_LABELS[newStage]);
         }
 
         async function updateJobStage(newStage) {
@@ -8331,7 +8802,7 @@
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="openClubDashboard('${club.id}')" class="btn-secondary text-sm">Open Club Record</button>
+                        <button onclick="openClubFromJob('${club.id}')" class="btn-secondary text-sm">Open Club Record</button>
                         <button onclick="showLinkClubModal()" class="btn-secondary text-sm">Change Club</button>
                     </div>
                 </div>
@@ -8638,30 +9109,83 @@
 
         function renderDesignVersions() {
             if (currentDesignVersions.length === 0) {
-                return `<div class="empty-state" style="padding:30px"><div class="empty-icon">🖼️</div><p>No versions yet. Add the first design version.</p></div>`;
+                return `<div class="empty-state" style="padding:30px"><div class="empty-icon">🖼️</div><p>No versions yet. Upload the first design version.</p></div>`;
             }
             return currentDesignVersions.map(v => {
                 const statusClass = v.status === 'approved' ? 'approved' : v.status === 'rejected' ? 'rejected' : '';
+                const canAnnotate = !!v.file_url;
                 return `<div class="version-card ${statusClass}">
                     <div class="flex items-start justify-between gap-4">
-                        <div class="flex-1">
+                        <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-3 mb-2">
                                 <span class="version-label">${escHtml(v.version_label || ('V' + v.version_number))}</span>
                                 ${v.status === 'approved' ? '<span class="stage-pill stage-paid">Approved ✓</span>' : ''}
-                                ${v.status === 'rejected' ? '<span style="background:rgba(239,68,68,0.1);color:#f87171;font-size:11px;padding:3px 10px;border-radius:20px">Rejected</span>' : ''}
+                                ${v.status === 'rejected' ? '<span style="background:rgba(239,68,68,0.1);color:#f87171;font-size:11px;padding:3px 10px;border-radius:20px">Declined</span>' : ''}
                             </div>
                             ${v.notes ? `<p class="text-sm text-gray-400">${escHtml(v.notes)}</p>` : ''}
-                            <p class="text-xs text-gray-600 mt-1">${new Date(v.created_at).toLocaleDateString('en-GB')}</p>
+                            <p class="text-xs text-gray-600 mt-0.5">${new Date(v.created_at).toLocaleDateString('en-GB')}</p>
                         </div>
-                        <div class="flex gap-2 flex-shrink-0">
-                            ${v.status !== 'approved' ? `<button onclick="approveDesignVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg" style="background:rgba(34,197,94,0.1);color:#4ade80">Approve</button>` : ''}
-                            ${v.status === 'approved' ? `<button onclick="unapproveDesignVersion('${v.id}')" class="text-xs px-2 py-1.5 text-gray-500 hover:text-gray-300">Unset</button>` : ''}
-                            <button onclick="editVersionNotes('${v.id}')" class="text-xs btn-secondary py-1.5 px-3">Notes</button>
+                        <div class="flex gap-2 flex-shrink-0 flex-wrap justify-end">
+                            ${canAnnotate ? `<button onclick="openAnnotationModal('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2)">Annotate</button>` : ''}
+                            ${v.status === 'pending' ? `
+                                <button onclick="approveDesignVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.2)">Approve</button>
+                                <button onclick="declineVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)">Decline</button>
+                            ` : ''}
+                            ${v.status === 'approved' ? `<button onclick="unapproveDesignVersion('${v.id}')" class="text-xs px-2 py-1.5 text-gray-500 hover:text-gray-300 btn-secondary">Unset</button>` : ''}
+                            ${v.status === 'rejected' ? `<button onclick="unapproveDesignVersion('${v.id}')" class="text-xs px-2 py-1.5 text-gray-500 hover:text-gray-300 btn-secondary">Reset</button>` : ''}
                         </div>
                     </div>
-                    ${v.file_url ? `<div class="mt-3"><img src="${escHtml(v.file_url)}" class="rounded-lg max-h-48 object-contain" alt="V${v.version_number}"></div>` : ''}
+                    ${v.file_url
+                        ? `<div class="mt-3 cursor-pointer" onclick="openAnnotationModal('${v.id}')">
+                               <img src="${escHtml(v.file_url)}" class="rounded-lg max-h-64 object-contain w-full" alt="V${v.version_number}" style="border:1px solid rgba(255,255,255,0.08)">
+                               <p class="text-xs text-gray-600 mt-1">Click image to annotate</p>
+                           </div>`
+                        : `<div class="mt-3 p-4 rounded-xl text-center" style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08)">
+                               <p class="text-xs text-gray-600 mb-2">No image uploaded</p>
+                               <button onclick="uploadVersionFileFor('${v.id}')" class="text-xs btn-secondary px-3 py-1.5">Upload Image</button>
+                           </div>`}
                 </div>`;
             }).join('');
+        }
+
+        async function declineVersion(versionId) {
+            await supabase.from('design_versions').update({ status: 'rejected' }).eq('id', versionId);
+            if (currentBrand && currentJobId) {
+                const v = currentDesignVersions.find(x => x.id === versionId);
+                await supabase.from('design_feed').insert({
+                    brand_id: currentBrand.id, job_id: currentJobId, version_id: versionId,
+                    activity_type: 'declined', message: `${v?.version_label||'Version'} declined`,
+                    created_by: currentUser?.id
+                });
+            }
+            await loadJobDesign();
+            showToast('Version declined');
+        }
+
+        let _uploadingForVersionId = null;
+        // Upload image for a specific existing version
+        function uploadVersionFileFor(versionId) {
+            _uploadingForVersionId = versionId;
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*,.pdf';
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const v = currentDesignVersions.find(x => x.id === versionId);
+                if (!v) return;
+                const suffix = currentClub?.suffix || 'job';
+                const ext = file.name.substring(file.name.lastIndexOf('.'));
+                const sp = `${currentBrand?.slug||'brand'}/${suffix}/design/v${v.version_number}_${Date.now()}${ext}`;
+                showToast('Uploading…');
+                const { error: upErr } = await supabase.storage.from('club-images').upload(sp, file, { upsert: true });
+                if (upErr) { showToast('Upload failed', 'error'); return; }
+                const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(sp);
+                await supabase.from('design_versions').update({ file_url: urlData.publicUrl, storage_path: sp }).eq('id', versionId);
+                await loadJobDesign();
+                showToast('Image uploaded');
+            };
+            input.click();
         }
 
         function openCreateDesignTask() {
@@ -8708,22 +9232,271 @@
             showToast(`Status → ${DESIGN_STATUS_LABELS[status]}`);
         }
 
-        async function addDesignVersion() {
+        function addDesignVersion() {
             if (!currentDesignTask?.id) { showToast('Save design brief first', 'error'); return; }
+            showUploadVersionModal();
+        }
+
+        // =============================================
+        // DESIGN VERSION UPLOAD MODAL
+        // =============================================
+        let _pendingVersionFile = null;
+
+        function showUploadVersionModal() {
+            _pendingVersionFile = null;
+            document.getElementById('version-file-input').value = '';
+            document.getElementById('version-notes').value = '';
+            document.getElementById('version-file-label').textContent = 'Click to select image (PNG, JPG, PDF)';
+            document.getElementById('version-file-preview').classList.add('hide');
+            document.getElementById('upload-version-modal').classList.remove('hide');
+        }
+
+        function hideUploadVersionModal() {
+            document.getElementById('upload-version-modal').classList.add('hide');
+            _pendingVersionFile = null;
+        }
+
+        function previewVersionFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            _pendingVersionFile = file;
+            document.getElementById('version-file-label').textContent = file.name;
+            const preview = document.getElementById('version-file-preview');
+            const img = document.getElementById('version-file-preview-img');
+            if (file.type.startsWith('image/')) {
+                img.src = URL.createObjectURL(file);
+                preview.classList.remove('hide');
+            }
+        }
+
+        async function uploadDesignVersion() {
+            if (!currentDesignTask?.id) return;
+            const btn = document.getElementById('upload-version-btn');
+            const notes = document.getElementById('version-notes').value.trim();
             const nextNum = (currentDesignVersions.length || 0) + 1;
-            const notes = prompt(`Notes for V${nextNum} (optional):`);
+
+            btn.disabled = true;
+            btn.textContent = 'Uploading…';
+
+            let fileUrl = null, storagePath = null;
+
+            if (_pendingVersionFile) {
+                const suffix = currentClub?.suffix || currentJob?.id?.substring(0,6) || 'job';
+                const ext = _pendingVersionFile.name.substring(_pendingVersionFile.name.lastIndexOf('.'));
+                storagePath = `${currentBrand?.slug || 'brand'}/${suffix}/design/v${nextNum}_${Date.now()}${ext}`;
+                const { error: upErr } = await supabase.storage
+                    .from('club-images')
+                    .upload(storagePath, _pendingVersionFile, { upsert: true });
+                if (upErr) {
+                    showToast('Upload failed: ' + upErr.message, 'error');
+                    btn.disabled = false; btn.textContent = 'Upload Version';
+                    return;
+                }
+                const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+                fileUrl = urlData.publicUrl;
+            }
+
             const { data, error } = await supabase.from('design_versions').insert({
                 design_task_id: currentDesignTask.id,
                 version_number: nextNum,
                 version_label: `V${nextNum}`,
                 notes: notes || null,
-                status: 'pending'
+                status: 'pending',
+                file_url: fileUrl,
+                storage_path: storagePath
             }).select().single();
+
+            btn.disabled = false; btn.textContent = 'Upload Version';
             if (error) { showToast('Error adding version', 'error'); return; }
+
             currentDesignVersions.push(data);
             const vList = document.getElementById('design-versions-list');
             if (vList) vList.innerHTML = renderDesignVersions();
-            showToast(`V${nextNum} added`);
+            hideUploadVersionModal();
+
+            // Log to design feed
+            if (currentBrand && currentJobId) {
+                await supabase.from('design_feed').insert({
+                    brand_id: currentBrand.id,
+                    job_id: currentJobId,
+                    version_id: data.id,
+                    activity_type: 'upload',
+                    message: `V${nextNum} uploaded${notes ? ': ' + notes : ''}`,
+                    created_by: currentUser?.id
+                });
+            }
+            showToast(`V${nextNum} uploaded`);
+        }
+
+        // =============================================
+        // DESIGN ANNOTATION TOOL
+        // =============================================
+        let currentAnnotatingVersionId = null;
+        let currentAnnotations = []; // [{id?, marker_label, x_percent, y_percent, comment}]
+        const ANN_COLOURS = ['#ec4899','#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444','#06b6d4','#84cc16'];
+        const ANN_LETTERS = ['A','B','C','D','E','F','G','H'];
+
+        async function openAnnotationModal(versionId) {
+            currentAnnotatingVersionId = versionId;
+            const v = currentDesignVersions.find(x => x.id === versionId);
+            if (!v) return;
+            if (!v.file_url) { showToast('No image uploaded for this version yet', 'error'); return; }
+
+            // Load existing annotations
+            const { data: existing } = await supabase.from('design_annotations')
+                .select('*').eq('version_id', versionId).order('created_at');
+            currentAnnotations = (existing || []).map(a => ({
+                id: a.id, marker_label: a.marker_label,
+                x_percent: Number(a.x_percent), y_percent: Number(a.y_percent), comment: a.comment || ''
+            }));
+
+            // Populate modal
+            document.getElementById('ann-version-label').textContent = v.version_label || `V${v.version_number}`;
+            document.getElementById('ann-img').src = v.file_url;
+            document.getElementById('annotation-modal').classList.remove('hide');
+
+            // Wait for image to load then render markers
+            document.getElementById('ann-img').onload = () => renderAnnotationMarkers();
+            if (document.getElementById('ann-img').complete) renderAnnotationMarkers();
+            renderAnnotationComments();
+        }
+
+        function closeAnnotationModal() {
+            document.getElementById('annotation-modal').classList.add('hide');
+            currentAnnotatingVersionId = null;
+            currentAnnotations = [];
+        }
+
+        function placeAnnotationMarker(event) {
+            const overlay = document.getElementById('ann-overlay');
+            const rect = overlay.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 100;
+            const y = ((event.clientY - rect.top) / rect.height) * 100;
+            const label = ANN_LETTERS[currentAnnotations.length % ANN_LETTERS.length];
+            currentAnnotations.push({ marker_label: label, x_percent: x, y_percent: y, comment: '' });
+            renderAnnotationMarkers();
+            renderAnnotationComments();
+            // Focus the new comment input
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('#ann-comments-list .ann-comment-input');
+                if (inputs.length > 0) inputs[inputs.length - 1].focus();
+            }, 50);
+        }
+
+        function renderAnnotationMarkers() {
+            const container = document.getElementById('ann-img-container');
+            // Remove existing pins
+            container.querySelectorAll('.ann-pin').forEach(el => el.remove());
+            currentAnnotations.forEach((a, i) => {
+                const colour = ANN_COLOURS[i % ANN_COLOURS.length];
+                const pin = document.createElement('div');
+                pin.className = 'ann-pin';
+                pin.style.left = a.x_percent + '%';
+                pin.style.top = a.y_percent + '%';
+                pin.innerHTML = `<div class="ann-pin-bubble" style="background:${colour}">${escHtml(a.marker_label)}</div>
+                    <div class="ann-pin-arrow" style="border-top-color:${colour}"></div>`;
+                container.appendChild(pin);
+            });
+        }
+
+        function renderAnnotationComments() {
+            const container = document.getElementById('ann-comments-list');
+            if (!container) return;
+            if (currentAnnotations.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">Click on the image to place a marker</p>';
+                return;
+            }
+            container.innerHTML = currentAnnotations.map((a, i) => {
+                const colour = ANN_COLOURS[i % ANN_COLOURS.length];
+                return `<div class="glass rounded-xl p-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style="background:${colour}">${escHtml(a.marker_label)}</div>
+                            <span class="text-xs text-gray-500">Marker ${a.marker_label}</span>
+                        </div>
+                        <button onclick="removeAnnotation(${i})" class="text-gray-600 hover:text-red-400 text-sm transition">✕</button>
+                    </div>
+                    <textarea class="ann-comment-input w-full px-2 py-1.5 rounded-lg text-sm resize-none" rows="2"
+                        placeholder="Add comment…" oninput="updateAnnotationComment(${i},this.value)"
+                        style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd">${escHtml(a.comment)}</textarea>
+                </div>`;
+            }).join('');
+        }
+
+        function updateAnnotationComment(index, value) {
+            if (currentAnnotations[index]) currentAnnotations[index].comment = value;
+        }
+
+        function removeAnnotation(index) {
+            currentAnnotations.splice(index, 1);
+            // Re-label remaining
+            currentAnnotations.forEach((a, i) => { a.marker_label = ANN_LETTERS[i % ANN_LETTERS.length]; });
+            renderAnnotationMarkers();
+            renderAnnotationComments();
+        }
+
+        function clearAllAnnotations() {
+            currentAnnotations = [];
+            renderAnnotationMarkers();
+            renderAnnotationComments();
+        }
+
+        async function saveAnnotations() {
+            if (!currentAnnotatingVersionId) return;
+            // Delete existing annotations for this version
+            await supabase.from('design_annotations').delete().eq('version_id', currentAnnotatingVersionId);
+            // Insert new ones
+            if (currentAnnotations.length > 0) {
+                const rows = currentAnnotations.map(a => ({
+                    version_id: currentAnnotatingVersionId,
+                    marker_label: a.marker_label,
+                    x_percent: a.x_percent,
+                    y_percent: a.y_percent,
+                    comment: a.comment || null,
+                    created_by: currentUser?.id
+                }));
+                await supabase.from('design_annotations').insert(rows);
+            }
+            // Log to feed
+            if (currentBrand && currentJobId && currentAnnotations.length > 0) {
+                await supabase.from('design_feed').insert({
+                    brand_id: currentBrand.id,
+                    job_id: currentJobId,
+                    version_id: currentAnnotatingVersionId,
+                    activity_type: 'annotation',
+                    message: `${currentAnnotations.length} annotation${currentAnnotations.length !== 1 ? 's' : ''} added`,
+                    created_by: currentUser?.id
+                });
+            }
+            showToast('Annotations saved');
+            closeAnnotationModal();
+        }
+
+        async function approveAnnotatedVersion() {
+            if (!currentAnnotatingVersionId) return;
+            await saveAnnotations();
+            await approveDesignVersion(currentAnnotatingVersionId);
+        }
+
+        async function declineAnnotatedVersion() {
+            if (!currentAnnotatingVersionId) return;
+            await saveAnnotations();
+            await supabase.from('design_versions').update({ status: 'rejected' }).eq('id', currentAnnotatingVersionId);
+            // Log to feed
+            if (currentBrand && currentJobId) {
+                const v = currentDesignVersions.find(x => x.id === currentAnnotatingVersionId);
+                await supabase.from('design_feed').insert({
+                    brand_id: currentBrand.id,
+                    job_id: currentJobId,
+                    version_id: currentAnnotatingVersionId,
+                    activity_type: 'declined',
+                    message: `${v?.version_label||'Version'} declined`,
+                    created_by: currentUser?.id
+                });
+            }
+            closeAnnotationModal();
+            await loadJobDesign();
+            showToast('Version declined');
         }
 
         async function approveDesignVersion(versionId) {
@@ -8781,6 +9554,87 @@
                 .order('updated_at', { ascending: false });
             allDesignTasks = (data || []).filter(dt => dt.jobs);
             renderDesignStudio();
+            loadDesignFeed();
+        }
+
+        // =============================================
+        // DESIGN ACTIVITY FEED
+        // =============================================
+        let designFeedDismissed = new Set(JSON.parse(localStorage.getItem('ds_dismissed') || '[]'));
+
+        function saveDesignFeedDismissed() {
+            localStorage.setItem('ds_dismissed', JSON.stringify([...designFeedDismissed]));
+        }
+
+        async function loadDesignFeed() {
+            if (!currentBrand) return;
+            const container = document.getElementById('ds-feed-list');
+            if (!container) return;
+            // Fetch recent activity (last 50)
+            const { data } = await supabase
+                .from('design_feed')
+                .select('*, jobs(job_name, job_number)')
+                .eq('brand_id', currentBrand.id)
+                .order('created_at', { ascending: false })
+                .limit(50);
+            const items = (data || []).filter(item => !designFeedDismissed.has(item.id));
+            renderDesignFeed(items);
+        }
+
+        function renderDesignFeed(items) {
+            const container = document.getElementById('ds-feed-list');
+            if (!container) return;
+            if (items.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-600 text-center py-4">No recent activity</p>';
+                return;
+            }
+            const icons = { upload: '🖼️', annotation: '📌', approved: '✅', declined: '❌', status_change: '🔄', comment: '💬' };
+            container.innerHTML = items.map(item => {
+                const timeAgo = formatTimeAgo(item.created_at);
+                const jobName = item.jobs?.job_name || 'Unknown job';
+                const jobNum  = item.jobs?.job_number || '';
+                return `<div class="feed-item" id="feed-${item.id}">
+                    <div class="flex items-start gap-2">
+                        <span class="text-base flex-shrink-0 mt-0.5">${icons[item.activity_type] || '📋'}</span>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm leading-snug">${escHtml(item.message || item.activity_type)}</p>
+                            <button onclick="openJobFromFeed('${item.jobs?.id||''}')" class="text-xs text-brand-400 hover:text-brand-300 mt-0.5 truncate max-w-full block text-left transition">${escHtml(jobNum ? jobNum + ' · ' + jobName : jobName)}</button>
+                            <p class="text-xs text-gray-600 mt-0.5">${timeAgo}</p>
+                        </div>
+                        <button onclick="dismissFeedItem('${item.id}')" class="text-gray-600 hover:text-brand-400 transition flex-shrink-0 text-lg leading-none" title="Dismiss">👍</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function dismissFeedItem(itemId) {
+            designFeedDismissed.add(itemId);
+            saveDesignFeedDismissed();
+            const el = document.getElementById(`feed-${itemId}`);
+            if (el) el.remove();
+            // Show empty state if no items left
+            const container = document.getElementById('ds-feed-list');
+            if (container && container.children.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-600 text-center py-4">No recent activity</p>';
+            }
+        }
+
+        function openJobFromFeed(jobId) {
+            if (!jobId) return;
+            pushNav({ type: 'tool', tool: 'design-studio' });
+            openJobRecord(jobId).then(() => showJobTab('design'));
+        }
+
+        function refreshDesignFeed() {
+            loadDesignFeed();
+        }
+
+        function formatTimeAgo(dateStr) {
+            const secs = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+            if (secs < 60) return 'Just now';
+            if (secs < 3600) return `${Math.floor(secs/60)}m ago`;
+            if (secs < 86400) return `${Math.floor(secs/3600)}h ago`;
+            return `${Math.floor(secs/86400)}d ago`;
         }
 
         function setDesignFilter(f) {
@@ -8796,9 +9650,9 @@
 
         function filterDesignByStage(stage) {
             designStageFilter = stage;
-            document.querySelectorAll('.design-stage-card').forEach(c => c.classList.remove('design-stage-active'));
+            document.querySelectorAll('.ds-filter-chip').forEach(c => c.classList.remove('active'));
             const activeCard = document.getElementById(`ds-stage-${stage}`);
-            if (activeCard) activeCard.classList.add('design-stage-active');
+            if (activeCard) activeCard.classList.add('active');
             renderDesignStudio();
         }
 
