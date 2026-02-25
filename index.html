@@ -1357,28 +1357,85 @@
                 <!-- Product Details -->
                 <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
                     <h4 class="font-semibold mb-3 text-brand-400">Product Details</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-3">
-                        <div>
-                            <label class="text-gray-400 text-sm mb-1 block">Fit Type</label>
-                            <select id="prod-fit-type" class="w-full px-3 py-2 rounded-lg">
-                                <option value="Adult / Youth">Adult / Youth</option>
-                                <option value="One Size Only">One Size Only</option>
-                            </select>
-                        </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                         <div>
                             <label class="text-gray-400 text-sm mb-1 block">Weight (grams)</label>
                             <input type="number" id="prod-weight" placeholder="450" class="w-full px-3 py-2 rounded-lg">
                         </div>
                         <div>
-                            <label class="text-gray-400 text-sm mb-1 block">Sizes (comma separated)</label>
-                            <input type="text" id="prod-sizes" placeholder="YXXS,YXS,YS,YM,YL,YXL,S,M,L,XL,2XL,3XL" class="w-full px-3 py-2 rounded-lg">
+                            <label class="text-gray-400 text-sm mb-1 block">COGS (£)</label>
+                            <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-gray-400 text-sm mb-1 block">Shopify Tags (comma-separated)</label>
+                            <input type="text" id="prod-shopify-tags" placeholder="teamwear, football, kit" class="w-full px-3 py-2 rounded-lg">
                         </div>
                     </div>
+
+                    <!-- Available Fits -->
                     <div class="mb-3">
-                        <label class="flex items-center gap-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="prod-has-addons" class="rounded">
-                            <span class="text-gray-300">Has addons (apx-with-addons tag for Cut & Sew)</span>
-                        </label>
+                        <label class="text-gray-400 text-sm mb-2 block">Available Fits <span class="text-gray-600 text-xs">(select all that apply — each adds size variants)</span></label>
+                        <div class="flex flex-wrap gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                <input type="checkbox" id="prod-fit-adult" checked onchange="onFitsChanged()" class="rounded">
+                                <span class="text-gray-300">Adult / Unisex</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                <input type="checkbox" id="prod-fit-youth" checked onchange="onFitsChanged()" class="rounded">
+                                <span class="text-gray-300">Youth</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                <input type="checkbox" id="prod-fit-women" onchange="onFitsChanged()" class="rounded">
+                                <span class="text-gray-300">Women's</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm ml-4 border-l border-gray-700 pl-4">
+                                <input type="checkbox" id="prod-single-price" onchange="toggleSinglePrice()" class="rounded">
+                                <span class="text-gray-300">One Size / Single Price</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                <input type="checkbox" id="prod-is-taxable" checked class="rounded">
+                                <span class="text-gray-300">Charge Tax</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm">
+                                <input type="checkbox" id="prod-has-addons" class="rounded">
+                                <span class="text-gray-300">Has Addons (Cut &amp; Sew)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Size inputs per fit -->
+                    <div class="space-y-2 mt-2">
+                        <div id="prod-row-adult" class="flex items-center gap-3">
+                            <span class="text-xs text-gray-500 w-28 flex-shrink-0">Adult / Unisex:</span>
+                            <input type="text" id="prod-sizes" placeholder="S,M,L,XL,2XL,3XL" class="flex-1 px-3 py-1.5 rounded-lg text-sm">
+                        </div>
+                        <div id="prod-row-youth">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs text-gray-500 w-28 flex-shrink-0">Youth:</span>
+                                <input type="text" id="prod-youth-sizes" placeholder="YXXS,YXS,YS,YM,YL,YXL" class="flex-1 px-3 py-1.5 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div id="prod-row-women" class="hide">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs text-gray-500 w-28 flex-shrink-0">Women's:</span>
+                                <input type="text" id="prod-women-sizes" placeholder="XS,S,M,L,XL" class="flex-1 px-3 py-1.5 rounded-lg text-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Women's Pricing (shown when Women fit selected) -->
+                <div id="prod-women-pricing" class="bg-pink-500/5 border border-pink-500/20 rounded-xl p-4 mb-4 hide">
+                    <h4 class="font-semibold mb-3 text-pink-400 text-sm">Women's Pricing</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Women's Retail</label>
+                            <input type="number" step="0.01" id="prod-women-retail" placeholder="38.95" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Women's Partner</label>
+                            <input type="number" step="0.01" id="prod-women-partner" placeholder="31.95" class="w-full px-3 py-2 rounded-lg">
+                        </div>
                     </div>
                 </div>
 
@@ -3011,13 +3068,17 @@
                         <p class="text-gray-500 text-sm mt-1">Assign master products and set club-specific pricing</p>
                     </div>
                     <div class="flex gap-2">
+                        <button onclick="showMockupUploadModal()" class="btn-primary text-sm flex items-center gap-2" style="background:linear-gradient(135deg,rgba(20,184,166,0.8),rgba(16,185,129,0.8))">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            Upload Mock-Ups
+                        </button>
                         <button onclick="showBulkAddProductsModal()" class="btn-secondary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                             Bulk Add
                         </button>
-                        <button onclick="showAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
+                        <button onclick="showAddClubProductModal()" class="btn-secondary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Add Product
+                            Add
                         </button>
                     </div>
                 </div>
@@ -3052,55 +3113,95 @@
             <!-- TAB: Shopify Sync -->
             <!-- TAB: Onboarding (formerly Shopify Sync) -->
             <div id="club-tab-onboarding" class="club-tab-content hide">
-                <!-- Shopify Connection -->
+                <!-- Step 1: Create Club Range -->
                 <div class="card mb-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-brand-400">Shopify Collection</h3>
-                        <div id="club-shopify-collection-status"></div>
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">1</span>
+                                <h3 class="font-semibold">Club Range &amp; Mock-Ups</h3>
+                            </div>
+                            <p class="text-gray-500 text-sm">Upload finished mock-up images for this club. TeamwearOS reads the filename and auto-creates club products from the master catalogue.</p>
+                        </div>
+                        <button onclick="showMockupUploadModal()" class="btn-primary text-sm flex items-center gap-2 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            Upload Mock-Ups
+                        </button>
                     </div>
-                    <p class="text-gray-500 text-sm mb-4">Create or update this club's Shopify collection. Choose CSV download or direct API push.</p>
-                    <div class="flex flex-wrap gap-3">
-                        <button onclick="syncClubCollection()" class="btn-primary text-sm">
-                            Push Collection via API
-                        </button>
-                        <button onclick="generateShopifyCSVForClub()" class="btn-secondary text-sm">
-                            Download Shopify CSV
-                        </button>
+                    <!-- Products with images summary -->
+                    <div id="onboard-images-summary" class="p-3 rounded-xl mt-2" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                        <p class="text-xs text-gray-500">Club products with images: <span id="onboard-image-count" class="text-white font-semibold">0</span> of <span id="onboard-total-count" class="text-white font-semibold">0</span></p>
                     </div>
                 </div>
 
-                <!-- Product Sync -->
+                <!-- Step 2: Collection Image -->
                 <div class="card mb-5">
-                    <h3 class="font-semibold text-brand-400 mb-4">Product Sync</h3>
-                    <p class="text-gray-500 text-sm mb-4">Sync club products to Shopify with all variants. Shop price = Partner Price + £2.</p>
-                    <div id="club-shopify-products-status" class="space-y-2 mb-4"></div>
-                    <div class="flex gap-3">
-                        <button onclick="syncAllClubProducts()" class="btn-primary text-sm">Sync All via API</button>
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">2</span>
+                                <h3 class="font-semibold">Collection Image</h3>
+                            </div>
+                            <p class="text-gray-500 text-sm">This is the hero image shown at the top of the Shopify collection page.</p>
+                        </div>
                     </div>
+                    <div class="flex items-center gap-4">
+                        <div id="onboard-coll-img-preview" class="w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15)">🏟️</div>
+                        <div>
+                            <button onclick="document.getElementById('onboard-coll-img-input').click()" class="btn-secondary text-sm mb-2">Upload Collection Image</button>
+                            <input type="file" id="onboard-coll-img-input" accept="image/*" class="hide" onchange="uploadOnboardCollectionImage(event)">
+                            <p class="text-xs text-gray-600">Recommended: 1200×600px or wider</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Create Shopify Store -->
+                <div class="card mb-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">3</span>
+                                <h3 class="font-semibold">Create Club Store on Shopify</h3>
+                            </div>
+                            <p class="text-gray-500 text-sm">Generate and download the Shopify CSV or push directly via the API (if enabled).</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="openCreateStoreModal()" class="btn-primary flex items-center gap-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Create Club Store (CSV)
+                        </button>
+                        <button id="onboard-api-btn" onclick="syncClubCollection()" class="btn-secondary text-sm flex items-center gap-2 hide">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Push via Shopify API
+                        </button>
+                    </div>
+                    <div id="club-shopify-collection-status" class="mt-3"></div>
                 </div>
 
                 <!-- Order Forms -->
                 <div class="card mb-5">
                     <div class="flex items-center justify-between mb-4">
-                        <h3 class="font-semibold text-brand-400">Order Forms</h3>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">4</span>
+                                <h3 class="font-semibold">Order Forms</h3>
+                            </div>
+                            <p class="text-gray-500 text-sm mt-0.5">Create direct order links for the club to collect individual kit orders</p>
+                        </div>
                         <button onclick="showCreateOrderFormModal()" class="btn-primary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             New Form
                         </button>
                     </div>
                     <div id="club-order-forms-list-onboard" class="space-y-2"></div>
-                    <div id="club-order-forms-empty-onboard" class="hide text-center py-6 text-gray-600 text-sm">No order forms yet. Range must be approved first.</div>
+                    <div id="club-order-forms-empty-onboard" class="hide text-center py-6 text-gray-600 text-sm">No order forms yet.</div>
                 </div>
 
                 <!-- Checklist -->
                 <div class="card">
                     <h3 class="font-semibold text-brand-400 mb-4">Onboarding Checklist</h3>
                     <div id="onboarding-checklist" class="space-y-3"></div>
-                </div>
-
-                <div class="mt-4 card" style="border-color:rgba(234,179,8,0.2)">
-                    <h4 class="font-medium text-yellow-400 mb-2">Setup Required</h4>
-                    <p class="text-gray-400 text-sm">Shopify API credentials must be configured in Brand Settings. Ensure your Shopify Custom App has CORS enabled for this application's domain.</p>
                 </div>
             </div>
 
@@ -3404,6 +3505,133 @@
                 <div class="flex gap-3">
                     <button onclick="closeClubTeamModal()" class="flex-1 btn-secondary py-3">Cancel</button>
                     <button onclick="saveClubTeam()" class="flex-1 btn-primary py-3">Save Team</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Upload Club Mock-Ups / Create Club Range
+             ============================================================ -->
+        <div id="mockup-upload-modal" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center hide overflow-y-auto py-8">
+            <div class="glass rounded-2xl w-full max-w-3xl mx-4 my-auto">
+                <div class="flex justify-between items-center p-6 border-b border-white/5">
+                    <div>
+                        <h3 class="text-xl font-bold">Upload Club Mock-Ups</h3>
+                        <p class="text-gray-500 text-sm mt-0.5">Drop finished images — TeamwearOS reads the filename and maps each to the master catalogue</p>
+                    </div>
+                    <button onclick="hideMockupUploadModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <!-- Filename guide -->
+                <div class="mx-6 mt-4 p-4 rounded-xl text-xs font-mono" style="background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2)">
+                    <p class="text-brand-400 font-semibold mb-1.5 font-sans text-sm">Filename naming convention</p>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-400">
+                        <span><span class="text-white">APX-COR-001.png</span> → Front view, product V1</span>
+                        <span><span class="text-white">APX-COR-001-B.png</span> → Back view (-B)</span>
+                        <span><span class="text-white">APX-COR-001-S.png</span> → Side view (-S)</span>
+                        <span><span class="text-white">APX-COR-001-V2.png</span> → Second product variant (V2)</span>
+                        <span><span class="text-white">APX-COR-001-B-V2.png</span> → Back view of V2 variant</span>
+                        <span class="text-gray-600">V1 is never written — just the code + view</span>
+                    </div>
+                </div>
+
+                <!-- Dropzone -->
+                <div class="px-6 pt-4">
+                    <label id="mockup-dropzone" class="dropzone flex flex-col items-center justify-center p-8 cursor-pointer" onclick="document.getElementById('mockup-file-input').click()">
+                        <svg class="w-10 h-10 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-gray-400 text-sm text-center">Click to select images, or drag &amp; drop</p>
+                        <p class="text-gray-600 text-xs mt-1">PNG, JPG, WEBP — multiple files accepted</p>
+                    </label>
+                    <input type="file" id="mockup-file-input" accept="image/*" multiple class="hide" onchange="previewMockupFiles(event)">
+                </div>
+
+                <!-- Preview table -->
+                <div id="mockup-preview-wrap" class="px-6 pb-2 hide">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-sm font-semibold"><span id="mockup-file-count">0</span> files selected</p>
+                        <div class="flex gap-2 text-xs">
+                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(34,197,94,0.12);color:#4ade80">■ matched</span>
+                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(239,68,68,0.12);color:#f87171">■ no match</span>
+                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(251,191,36,0.12);color:#fbbf24">■ new variant</span>
+                        </div>
+                    </div>
+                    <div class="overflow-y-auto max-h-52">
+                        <table class="w-full text-xs">
+                            <thead><tr class="text-gray-500 border-b border-white/5 text-left">
+                                <th class="pb-1.5 pr-3">Filename</th>
+                                <th class="pb-1.5 pr-3">Product Code</th>
+                                <th class="pb-1.5 pr-3">Item Name</th>
+                                <th class="pb-1.5 pr-3">View</th>
+                                <th class="pb-1.5">Variant</th>
+                            </tr></thead>
+                            <tbody id="mockup-preview-table" class="space-y-1"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 p-6 pt-4">
+                    <button onclick="hideMockupUploadModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="uploadMockupsAndCreateProducts()" id="mockup-upload-btn" class="flex-1 btn-primary py-3" disabled>
+                        Upload &amp; Create Products
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Create Club Store (price list selector)
+             ============================================================ -->
+        <div id="create-store-modal" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl w-full max-w-lg mx-4">
+                <div class="flex justify-between items-center p-6 border-b border-white/5">
+                    <h3 class="text-xl font-bold">Create Club Store</h3>
+                    <button onclick="document.getElementById('create-store-modal').classList.add('hide')" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-5">
+                        <label class="text-gray-400 text-sm mb-2 block font-semibold">Price List</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)" onclick="selectPriceList('retail')">
+                                <input type="radio" name="price-list" value="retail" id="pl-retail" class="accent-brand-500">
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Retail</p>
+                                    <p class="text-xs text-gray-500">Standard retail prices — no discount</p>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)" onclick="selectPriceList('partner')">
+                                <input type="radio" name="price-list" value="partner" id="pl-partner" class="accent-brand-500">
+                                <div>
+                                    <p class="text-sm font-semibold text-white">Partner</p>
+                                    <p class="text-xs text-gray-500">Partner price — club discount applied</p>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.25)" onclick="selectPriceList('shop')">
+                                <input type="radio" name="price-list" value="shop" id="pl-shop" checked class="accent-brand-500">
+                                <div>
+                                    <p class="text-sm font-semibold text-brand-400">Shop Price <span class="text-xs text-gray-500">(Recommended)</span></p>
+                                    <p class="text-xs text-gray-500">Partner price + £2 — standard online store price</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="store-preview-info" class="mb-5 p-4 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                        <p class="text-xs text-gray-500 mb-2">Store overview</p>
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div><p class="text-gray-500 text-xs">Club</p><p id="cstore-club-name" class="font-semibold">—</p></div>
+                            <div><p class="text-gray-500 text-xs">Products with images</p><p id="cstore-product-count" class="font-semibold text-brand-400">—</p></div>
+                            <div><p class="text-gray-500 text-xs">Collection image</p><p id="cstore-collection-img" class="font-semibold">—</p></div>
+                            <div><p class="text-gray-500 text-xs">Collection name</p><p id="cstore-collection-name" class="font-semibold">—</p></div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                        <button onclick="document.getElementById('create-store-modal').classList.add('hide')" class="flex-1 btn-secondary py-3">Cancel</button>
+                        <button onclick="downloadClubStoreCSV()" class="flex-1 btn-primary py-3 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            Download CSV
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -4713,43 +4941,41 @@
 
         function toggleSinglePrice() {
             const isSingle = document.getElementById('prod-single-price').checked;
-            const youthFields = document.querySelectorAll('#prod-youth-retail, #prod-youth-partner');
             const adultFields = document.querySelectorAll('#prod-adult-retail, #prod-adult-partner');
-            
             if (isSingle) {
-                // For single price, we'll use youth fields as the single price
-                adultFields.forEach(f => f.disabled = true);
-                adultFields.forEach(f => f.value = '');
-                document.getElementById('prod-fit-type').value = 'One Size Only';
+                adultFields.forEach(f => { f.disabled = true; f.value = ''; });
             } else {
                 adultFields.forEach(f => f.disabled = false);
-                document.getElementById('prod-fit-type').value = 'Adult / Youth';
             }
+        }
+
+        function onFitsChanged() {
+            const hasWomen = document.getElementById('prod-fit-women').checked;
+            const hasYouth = document.getElementById('prod-fit-youth').checked;
+            document.getElementById('prod-row-youth').style.display = hasYouth ? '' : 'none';
+            document.getElementById('prod-row-women').classList.toggle('hide', !hasWomen);
+            document.getElementById('prod-women-pricing').classList.toggle('hide', !hasWomen);
         }
 
         function showAddProductModal() {
             document.getElementById('product-modal-title').textContent = 'Add Product';
             document.getElementById('edit-product-id').value = '';
-            
-            // Clear all fields
-            document.getElementById('prod-code').value = '';
-            document.getElementById('prod-name').value = '';
+            ['prod-code','prod-name','prod-range','prod-youth-retail','prod-youth-partner',
+             'prod-adult-retail','prod-adult-partner','prod-cogs','prod-shopify-tags',
+             'prod-youth-sizes','prod-women-sizes','prod-women-retail','prod-women-partner','prod-description'
+            ].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
             document.getElementById('prod-category').value = '';
-            document.getElementById('prod-range').value = '';
-            document.getElementById('prod-youth-retail').value = '';
-            document.getElementById('prod-youth-partner').value = '';
-            document.getElementById('prod-adult-retail').value = '';
-            document.getElementById('prod-adult-partner').value = '';
             document.getElementById('prod-single-price').checked = false;
-            document.getElementById('prod-fit-type').value = 'Adult / Youth';
-            document.getElementById('prod-weight').value = '450';
-            document.getElementById('prod-sizes').value = 'YXXS,YXS,YS,YM,YL,YXL,S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+            document.getElementById('prod-is-taxable').checked = true;
+            document.getElementById('prod-fit-adult').checked = true;
+            document.getElementById('prod-fit-youth').checked = true;
+            document.getElementById('prod-fit-women').checked = false;
             document.getElementById('prod-has-addons').checked = false;
-            document.getElementById('prod-description').value = '';
-            
-            // Enable all fields
+            document.getElementById('prod-weight').value = '450';
+            document.getElementById('prod-sizes').value = 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+            document.getElementById('prod-youth-sizes').value = 'YXXS,YXS,YS,YM,YL,YXL';
             document.querySelectorAll('#prod-adult-retail, #prod-adult-partner').forEach(f => f.disabled = false);
-            
+            onFitsChanged();
             document.getElementById('product-modal').classList.remove('hide');
         }
 
@@ -4759,8 +4985,6 @@
 
             document.getElementById('product-modal-title').textContent = 'Edit Product';
             document.getElementById('edit-product-id').value = productId;
-            
-            // Populate fields
             document.getElementById('prod-code').value = product.product_code || '';
             document.getElementById('prod-name').value = product.item_name || '';
             document.getElementById('prod-category').value = product.category || '';
@@ -4770,15 +4994,23 @@
             document.getElementById('prod-adult-retail').value = product.adult_retail_price || '';
             document.getElementById('prod-adult-partner').value = product.adult_partner_price || '';
             document.getElementById('prod-single-price').checked = product.is_single_price || false;
-            document.getElementById('prod-fit-type').value = product.fit_type || 'Adult / Youth';
             document.getElementById('prod-weight').value = product.weight_grams || 450;
             document.getElementById('prod-sizes').value = product.sizes || '';
             document.getElementById('prod-has-addons').checked = product.has_addons || false;
             document.getElementById('prod-description').value = product.description || '';
-            
-            // Handle single price state
+            document.getElementById('prod-cogs').value = product.cogs || '';
+            document.getElementById('prod-shopify-tags').value = product.shopify_tags || '';
+            document.getElementById('prod-is-taxable').checked = product.is_taxable !== false;
+            document.getElementById('prod-youth-sizes').value = product.youth_sizes || '';
+            document.getElementById('prod-women-sizes').value = product.women_sizes || '';
+            document.getElementById('prod-women-retail').value = product.women_retail_price || '';
+            document.getElementById('prod-women-partner').value = product.women_partner_price || '';
+            const fits = (product.available_fits || 'adult,youth').split(',').map(f => f.trim());
+            document.getElementById('prod-fit-adult').checked = fits.includes('adult');
+            document.getElementById('prod-fit-youth').checked = fits.includes('youth');
+            document.getElementById('prod-fit-women').checked = fits.includes('women');
             toggleSinglePrice();
-            
+            onFitsChanged();
             document.getElementById('product-modal').classList.remove('hide');
         }
 
@@ -4789,7 +5021,11 @@
         async function saveProduct() {
             const productId = document.getElementById('edit-product-id').value;
             const isSinglePrice = document.getElementById('prod-single-price').checked;
-            
+            const fits = [];
+            if (document.getElementById('prod-fit-adult').checked) fits.push('adult');
+            if (document.getElementById('prod-fit-youth').checked) fits.push('youth');
+            if (document.getElementById('prod-fit-women').checked) fits.push('women');
+
             const productData = {
                 brand_id: currentBrand.id,
                 product_code: document.getElementById('prod-code').value.trim(),
@@ -4803,11 +5039,18 @@
                 is_single_price: isSinglePrice,
                 single_retail_price: isSinglePrice ? parseFloat(document.getElementById('prod-youth-retail').value) || null : null,
                 single_partner_price: isSinglePrice ? parseFloat(document.getElementById('prod-youth-partner').value) || null : null,
-                fit_type: document.getElementById('prod-fit-type').value,
                 weight_grams: parseInt(document.getElementById('prod-weight').value) || 450,
                 sizes: document.getElementById('prod-sizes').value.trim(),
+                youth_sizes: document.getElementById('prod-youth-sizes').value.trim(),
                 has_addons: document.getElementById('prod-has-addons').checked,
-                description: document.getElementById('prod-description').value.trim()
+                description: document.getElementById('prod-description').value.trim(),
+                shopify_tags: document.getElementById('prod-shopify-tags').value.trim() || null,
+                is_taxable: document.getElementById('prod-is-taxable').checked,
+                cogs: parseFloat(document.getElementById('prod-cogs').value) || null,
+                available_fits: fits.join(',') || 'adult',
+                women_retail_price: parseFloat(document.getElementById('prod-women-retail').value) || null,
+                women_partner_price: parseFloat(document.getElementById('prod-women-partner').value) || null,
+                women_sizes: document.getElementById('prod-women-sizes').value.trim() || null
             };
 
             // Validation
@@ -4884,6 +5127,197 @@
             renderProductsTable();
             updateStats();
             showToast('Product deleted');
+        }
+
+        // =============================================
+        // MOCK-UP UPLOAD: filename parser + upload flow
+        // =============================================
+
+        function parseDesignFilename(filename) {
+            const base = filename.replace(/\.[^.]+$/, '');
+            let variantNumber = 1;
+            let name = base;
+            const variantMatch = base.match(/-V(\d+)$/i);
+            if (variantMatch) {
+                variantNumber = parseInt(variantMatch[1]);
+                name = base.slice(0, -variantMatch[0].length);
+            }
+            const viewMap = { '-B': 'back', '-S': 'side', '-T': 'top', '-F': 'front' };
+            let view = 'front';
+            let productCode = name;
+            for (const [suffix, viewName] of Object.entries(viewMap)) {
+                if (name.toUpperCase().endsWith(suffix)) {
+                    view = viewName;
+                    productCode = name.slice(0, -suffix.length);
+                    break;
+                }
+            }
+            return { productCode: productCode.toUpperCase(), view, variantNumber };
+        }
+
+        function showMockupUploadModal() {
+            document.getElementById('mockup-upload-modal').classList.remove('hide');
+            document.getElementById('mockup-preview-table').innerHTML = '';
+            document.getElementById('mockup-preview-wrap').classList.add('hide');
+            document.getElementById('mockup-file-input').value = '';
+            document.getElementById('mockup-upload-btn').disabled = true;
+        }
+
+        function hideMockupUploadModal() {
+            document.getElementById('mockup-upload-modal').classList.add('hide');
+        }
+
+        function previewMockupFiles(event) {
+            const files = Array.from(event.target.files);
+            const tbody = document.getElementById('mockup-preview-table');
+            const wrap = document.getElementById('mockup-preview-wrap');
+            const countEl = document.getElementById('mockup-file-count');
+            tbody.innerHTML = '';
+            if (!files.length) { wrap.classList.add('hide'); return; }
+            wrap.classList.remove('hide');
+            if (countEl) countEl.textContent = files.length;
+
+            files.forEach(file => {
+                const { productCode, view, variantNumber } = parseDesignFilename(file.name);
+                const masterProduct = products.find(p =>
+                    p.product_code.toUpperCase() === productCode
+                );
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-white/5';
+                tr.innerHTML = `
+                    <td class="py-1.5 pr-3 text-xs text-gray-400">${escHtml(file.name)}</td>
+                    <td class="py-1.5 pr-3 text-xs font-mono text-brand-400">${productCode}</td>
+                    <td class="py-1.5 pr-3 text-xs ${masterProduct ? 'text-gray-200' : 'text-red-400'}">${masterProduct ? escHtml(masterProduct.item_name) : '⚠️ No match'}</td>
+                    <td class="py-1.5 pr-3 text-xs capitalize text-gray-400">${view}</td>
+                    <td class="py-1.5 text-xs text-gray-400">V${variantNumber}</td>`;
+                tbody.appendChild(tr);
+            });
+            document.getElementById('mockup-upload-btn').disabled = false;
+        }
+
+        async function uploadMockupsAndCreateProducts() {
+            if (!currentClub) return;
+            const files = Array.from(document.getElementById('mockup-file-input').files);
+            if (!files.length) return;
+            const btn = document.getElementById('mockup-upload-btn');
+            btn.disabled = true;
+            btn.textContent = 'Uploading…';
+
+            const brandSlug = (currentBrand.slug || currentBrand.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const clubSuffix = (currentClub.suffix || currentClub.id).toLowerCase();
+            let successCount = 0, errors = [];
+
+            for (const file of files) {
+                const { productCode, variantNumber } = parseDesignFilename(file.name);
+                const masterProduct = products.find(p => p.product_code.toUpperCase() === productCode);
+                if (!masterProduct) { errors.push(`${file.name}: no matching product`); continue; }
+
+                const storagePath = `${brandSlug}/${clubSuffix}/${file.name}`;
+                const { error: uploadErr } = await supabase.storage.from('club-images')
+                    .upload(storagePath, file, { upsert: true });
+                if (uploadErr) { errors.push(`${file.name}: ${uploadErr.message}`); continue; }
+
+                const { data: { publicUrl } } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+
+                const { data: existingCP } = await supabase.from('club_products')
+                    .select('*').eq('club_id', currentClub.id)
+                    .eq('product_id', masterProduct.id).eq('variant_number', variantNumber).maybeSingle();
+
+                if (!existingCP) {
+                    const { error: createErr } = await supabase.from('club_products').insert({
+                        club_id: currentClub.id,
+                        product_id: masterProduct.id,
+                        custom_name: `${currentClub.name} ${masterProduct.item_name}`,
+                        variant_number: variantNumber,
+                        image_urls: [publicUrl],
+                        web_price: masterProduct.adult_retail_price || masterProduct.single_retail_price,
+                        partner_price: masterProduct.adult_partner_price || masterProduct.single_partner_price,
+                        is_active: true
+                    });
+                    if (createErr) { errors.push(`${file.name}: ${createErr.message}`); continue; }
+                } else {
+                    const urls = Array.isArray(existingCP.image_urls) ? existingCP.image_urls : [];
+                    if (!urls.includes(publicUrl)) urls.push(publicUrl);
+                    const { error: updateErr } = await supabase.from('club_products')
+                        .update({ image_urls: urls }).eq('id', existingCP.id);
+                    if (updateErr) { errors.push(`${file.name}: ${updateErr.message}`); continue; }
+                }
+                successCount++;
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Upload & Create Products';
+
+            if (errors.length) {
+                showToast(`${successCount} uploaded, ${errors.length} failed`, 'error');
+                console.error('Mockup upload errors:', errors);
+            } else {
+                showToast(`${successCount} mock-up${successCount !== 1 ? 's' : ''} uploaded and mapped!`);
+                hideMockupUploadModal();
+                await loadClubProducts();
+                renderOnboardingImageSummary();
+            }
+        }
+
+        // =============================================
+        // STORE CREATOR: price list + CSV download
+        // =============================================
+        let _selectedPriceList = 'shop';
+
+        function selectPriceList(type) {
+            _selectedPriceList = type;
+            const radioMap = { retail: 'pl-retail', partner: 'pl-partner', shop: 'pl-shop' };
+            const radioId = radioMap[type];
+            if (radioId) document.getElementById(radioId).checked = true;
+        }
+
+        function openCreateStoreModal() {
+            if (!currentClub) return;
+            const withImages = (currentClubProducts || []).filter(cp => (cp.image_urls || []).length > 0);
+            document.getElementById('cstore-club-name').textContent = currentClub.name || '—';
+            document.getElementById('cstore-product-count').textContent = withImages.length;
+            document.getElementById('cstore-collection-img').textContent =
+                currentClub.collection_image_url ? '✓ Uploaded' : '⚠️ Not set';
+            document.getElementById('cstore-collection-name').textContent = currentClub.name || '—';
+            selectPriceList('shop');
+            document.getElementById('create-store-modal').classList.remove('hide');
+        }
+
+        async function downloadClubStoreCSV() {
+            document.getElementById('create-store-modal').classList.add('hide');
+            await generateShopifyCSVForClub(null, _selectedPriceList);
+        }
+
+        // =============================================
+        // ONBOARDING: collection image + image summary
+        // =============================================
+
+        async function uploadOnboardCollectionImage(event) {
+            const file = event.target.files[0];
+            if (!file || !currentClub) return;
+            const brandSlug = (currentBrand.slug || currentBrand.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const clubSuffix = (currentClub.suffix || currentClub.id).toLowerCase();
+            const ext = file.name.split('.').pop();
+            const storagePath = `${brandSlug}/${clubSuffix}/collection_image.${ext}`;
+            const { error } = await supabase.storage.from('club-images').upload(storagePath, file, { upsert: true });
+            if (error) { showToast(error.message, 'error'); return; }
+            const { data: { publicUrl } } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+            const { error: updateErr } = await supabase.from('clubs')
+                .update({ collection_image_url: publicUrl }).eq('id', currentClub.id);
+            if (updateErr) { showToast(updateErr.message, 'error'); return; }
+            currentClub.collection_image_url = publicUrl;
+            const preview = document.getElementById('onboard-coll-img-preview');
+            if (preview) preview.innerHTML = `<img src="${publicUrl}" class="w-full h-full object-cover rounded-xl">`;
+            showToast('Collection image uploaded!');
+        }
+
+        function renderOnboardingImageSummary() {
+            const withImages = (currentClubProducts || []).filter(cp => (cp.image_urls || []).length > 0);
+            const total = (currentClubProducts || []).length;
+            const countEl = document.getElementById('onboard-image-count');
+            const totalEl = document.getElementById('onboard-total-count');
+            if (countEl) countEl.textContent = withImages.length;
+            if (totalEl) totalEl.textContent = total;
         }
 
         function exportProductsCSV() {
@@ -6488,7 +6922,7 @@
             renderClubsEnhanced();
         }
 
-        async function generateShopifyCSVForClub(overrideClubId) {
+        async function generateShopifyCSVForClub(overrideClubId, priceList = 'shop') {
             const club = overrideClubId ? clubs.find(c => c.id === overrideClubId) : currentClub;
             if (!club) { showToast('No club selected', 'error'); return; }
 
@@ -6501,8 +6935,10 @@
                 clubProds = data || [];
             }
 
-            if (!clubProds.length) {
-                showToast('No club products found. Add products to this club first.', 'error');
+            // Only products that have mock-up images uploaded
+            const productsWithImages = clubProds.filter(cp => (cp.image_urls || []).length > 0);
+            if (!productsWithImages.length) {
+                showToast('No products with images — upload mock-ups first.', 'error');
                 return;
             }
 
@@ -6518,129 +6954,147 @@
                 'Gift card', 'SEO title', 'SEO description'
             ];
 
+            // Price helper: respects priceList selection per fit
+            function derivePrice(cp, mp, fit) {
+                if (mp.is_single_price) {
+                    const pp = mp.single_partner_price || 0, rp = mp.single_retail_price || 0;
+                    return priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
+                }
+                if (fit === 'Youth') {
+                    const pp = mp.youth_partner_price || 0, rp = mp.youth_retail_price || 0;
+                    return priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
+                }
+                if (fit === 'Women') {
+                    const pp = mp.women_partner_price || mp.adult_partner_price || 0;
+                    const rp = mp.women_retail_price || mp.adult_retail_price || 0;
+                    return priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
+                }
+                // Adult / Unisex
+                const pp = mp.adult_partner_price || 0, rp = mp.adult_retail_price || 0;
+                const base = priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
+                return base || cp.web_price || 0;
+            }
+
             const rows = [];
 
-            for (const cp of clubProds) {
-                const masterProduct = cp.products;
-                if (!masterProduct) continue;
+            for (const cp of productsWithImages) {
+                const mp = cp.products;
+                if (!mp) continue;
 
-                const title = cp.custom_name || `${club.name} ${masterProduct.item_name}`;
+                const imageUrls = cp.image_urls || [];
+                const title = cp.custom_name || `${club.name} ${mp.item_name}`;
                 const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-                const webPrice = cp.web_price || (cp.partner_price ? (cp.partner_price + 2) : null);
 
-                let description = masterProduct.description || '';
+                let description = mp.description || '';
                 description = description
-                    .replace(/\*ADD CLUB NAME \+ RANGE\*/g, `${club.name} ${masterProduct.range_name}`)
-                    .replace(/\*ADD CLUB \+ RANGE\*/g, `${club.name} ${masterProduct.range_name}`)
+                    .replace(/\*ADD CLUB NAME \+ RANGE\*/g, `${club.name} ${mp.range_name}`)
+                    .replace(/\*ADD CLUB \+ RANGE\*/g, `${club.name} ${mp.range_name}`)
                     .replace(/\*ADD CLUB NAME\*/g, club.name);
                 description = description.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p.trim()}</p>`).join('');
 
-                const tags = [club.name, masterProduct.range_name, masterProduct.category];
-                if (masterProduct.has_addons) tags.push('apx-with-addons');
+                const tagList = [club.name, mp.range_name, mp.category];
+                if (mp.shopify_tags) mp.shopify_tags.split(',').map(t => t.trim()).forEach(t => tagList.push(t));
+                if (mp.has_addons) tagList.push('apx-with-addons');
+                const tags = [...new Set(tagList.filter(Boolean))].join(',');
 
-                const sizes = masterProduct.sizes?.split(',').map(s => s.trim()) || [];
-                const youthSizes = sizes.filter(s => s.startsWith('Y'));
-                const adultSizes = sizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+                const chargeText = mp.is_taxable !== false ? 'TRUE' : 'FALSE';
+                const cogs = mp.cogs ? Number(mp.cogs).toFixed(2) : '';
+
+                // Determine fits
+                const fits = (mp.available_fits || 'adult,youth').split(',').map(f => f.trim());
+                const hasYouth = fits.includes('youth');
+                const hasAdult = fits.includes('adult');
+                const hasWomen = fits.includes('women');
+                const multifit = (hasYouth ? 1 : 0) + (hasAdult ? 1 : 0) + (hasWomen ? 1 : 0) > 1;
+
+                // Size arrays
+                let adultSizes = (mp.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
+                let youthSizes = (mp.youth_sizes || '').split(',').map(s => s.trim()).filter(Boolean);
+                if (!youthSizes.length && mp.sizes) {
+                    youthSizes = adultSizes.filter(s => s.startsWith('Y'));
+                    adultSizes = adultSizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+                }
+                const womenSizes = (mp.women_sizes || '').split(',').map(s => s.trim()).filter(Boolean);
 
                 let variantIndex = 0;
-
-                if (masterProduct.is_single_price || (!youthSizes.length && !adultSizes.length)) {
-                    const sku = `${masterProduct.product_code}/${club.suffix}-OS`;
-                    rows.push({
-                        'Title': title, 'URL handle': handle, 'Description': description,
-                        'Vendor': currentBrand.name, 'Product category': 'Apparel & Accessories > Clothing',
-                        'Type': masterProduct.category, 'Tags': tags.join(','),
-                        'Published on online store': 'TRUE', 'Status': 'active', 'Collection': club.name,
+                const buildRow = (fit, size, price, imgUrl, imgPos) => {
+                    const sku = `${mp.product_code}/${club.suffix}-${size}`;
+                    const isFirst = variantIndex === 0;
+                    variantIndex++;
+                    return {
+                        'Title': isFirst ? title : '',
+                        'URL handle': handle,
+                        'Description': isFirst ? description : '',
+                        'Vendor': isFirst ? (currentBrand?.name || '') : '',
+                        'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
+                        'Type': isFirst ? mp.category : '',
+                        'Tags': isFirst ? tags : '',
+                        'Published on online store': isFirst ? 'TRUE' : '',
+                        'Status': 'active',
+                        'Collection': isFirst ? club.name : '',
                         'SKU': sku, 'Barcode': '',
-                        'Option1 name': 'Size', 'Option1 value': 'One Size',
-                        'Option2 name': '', 'Option2 value': '', 'Option3 name': '', 'Option3 value': '',
-                        'Price': webPrice ? Number(webPrice).toFixed(2) : '',
-                        'Compare-at price': '', 'Cost per item': '',
-                        'Charge tax': 'FALSE', 'Tax code': '', 'Inventory policy': 'continue',
-                        'Inventory tracker': 'shopify', 'Inventory quantity': '0',
-                        'Continue selling when out of stock': 'TRUE',
-                        'Weight value (grams)': masterProduct.weight_grams || '450',
+                        'Option1 name': multifit ? 'Fit' : 'Size',
+                        'Option1 value': multifit ? fit : size,
+                        'Option2 name': multifit ? 'Size' : '',
+                        'Option2 value': multifit ? size : '',
+                        'Option3 name': '', 'Option3 value': '',
+                        'Price': price > 0 ? Number(price).toFixed(2) : '',
+                        'Compare-at price': '',
+                        'Cost per item': cogs,
+                        'Charge tax': chargeText, 'Tax code': '',
+                        'Inventory policy': 'continue', 'Inventory tracker': 'shopify',
+                        'Inventory quantity': '0', 'Continue selling when out of stock': 'TRUE',
+                        'Weight value (grams)': mp.weight_grams || '450',
                         'Weight unit for display': 'g', 'Requires shipping': 'TRUE',
-                        'Fulfillment service': 'manual', 'Product image URL': '', 'Image position': '1',
-                        'Image alt text': title, 'Variant image URL': '', 'Gift card': 'FALSE',
-                        'SEO title': `${title} | Official ${club.name} Merchandise`,
-                        'SEO description': `Shop the official ${title}. Premium quality teamwear.`
-                    });
-                } else {
-                    // Youth variants
-                    youthSizes.forEach(size => {
-                        const sku = `${masterProduct.product_code}/${club.suffix}-${size}`;
-                        const isFirst = variantIndex === 0;
-                        const youthWebPrice = cp.web_price || (cp.partner_price ? (cp.partner_price + 2) : null);
-                        rows.push({
-                            'Title': isFirst ? title : '', 'URL handle': handle,
-                            'Description': isFirst ? description : '',
-                            'Vendor': isFirst ? currentBrand.name : '',
-                            'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
-                            'Type': isFirst ? masterProduct.category : '',
-                            'Tags': isFirst ? tags.join(',') : '',
-                            'Published on online store': isFirst ? 'TRUE' : '',
-                            'Status': 'active', 'Collection': isFirst ? club.name : '',
-                            'SKU': sku, 'Barcode': '',
-                            'Option1 name': 'Fit', 'Option1 value': 'Youth',
-                            'Option2 name': 'Size', 'Option2 value': size,
-                            'Option3 name': '', 'Option3 value': '',
-                            'Price': youthWebPrice ? Number(youthWebPrice).toFixed(2) : '',
-                            'Compare-at price': '', 'Cost per item': '',
-                            'Charge tax': 'FALSE', 'Tax code': '', 'Inventory policy': 'continue',
-                            'Inventory tracker': 'shopify', 'Inventory quantity': '0',
-                            'Continue selling when out of stock': 'TRUE',
-                            'Weight value (grams)': masterProduct.weight_grams || '450',
-                            'Weight unit for display': 'g', 'Requires shipping': 'TRUE',
-                            'Fulfillment service': 'manual',
-                            'Product image URL': '', 'Image position': isFirst ? '1' : '',
-                            'Image alt text': isFirst ? title : '', 'Variant image URL': '',
-                            'Gift card': 'FALSE',
-                            'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
-                            'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : ''
-                        });
-                        variantIndex++;
-                    });
+                        'Fulfillment service': 'manual',
+                        'Product image URL': imgUrl || '',
+                        'Image position': imgUrl ? String(imgPos) : '',
+                        'Image alt text': imgUrl ? title : '',
+                        'Variant image URL': '',
+                        'Gift card': 'FALSE',
+                        'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
+                        'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : ''
+                    };
+                };
 
-                    // Adult variants
-                    adultSizes.forEach(size => {
-                        const sku = `${masterProduct.product_code}/${club.suffix}-${size}`;
-                        const isFirst = variantIndex === 0;
-                        const adultWebPrice = cp.web_price || (cp.partner_price ? (cp.partner_price + 2) : null);
-                        rows.push({
-                            'Title': isFirst ? title : '', 'URL handle': handle,
-                            'Description': isFirst ? description : '',
-                            'Vendor': isFirst ? currentBrand.name : '',
-                            'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
-                            'Type': isFirst ? masterProduct.category : '',
-                            'Tags': isFirst ? tags.join(',') : '',
-                            'Published on online store': isFirst ? 'TRUE' : '',
-                            'Status': 'active', 'Collection': isFirst ? club.name : '',
-                            'SKU': sku, 'Barcode': '',
-                            'Option1 name': 'Fit', 'Option1 value': 'Adult',
-                            'Option2 name': 'Size', 'Option2 value': size,
-                            'Option3 name': '', 'Option3 value': '',
-                            'Price': adultWebPrice ? Number(adultWebPrice).toFixed(2) : '',
-                            'Compare-at price': '', 'Cost per item': '',
-                            'Charge tax': 'TRUE', 'Tax code': '', 'Inventory policy': 'continue',
-                            'Inventory tracker': 'shopify', 'Inventory quantity': '0',
-                            'Continue selling when out of stock': 'TRUE',
-                            'Weight value (grams)': masterProduct.weight_grams || '450',
-                            'Weight unit for display': 'g', 'Requires shipping': 'TRUE',
-                            'Fulfillment service': 'manual',
-                            'Product image URL': '', 'Image position': isFirst ? '1' : '',
-                            'Image alt text': isFirst ? title : '', 'Variant image URL': '',
-                            'Gift card': 'FALSE',
-                            'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
-                            'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : ''
+                if (mp.is_single_price || (!hasAdult && !hasYouth && !hasWomen)) {
+                    const price = derivePrice(cp, mp, 'Adult');
+                    rows.push(buildRow('One Size', 'OS', price, imageUrls[0] || '', 1));
+                } else {
+                    if (hasYouth && youthSizes.length) {
+                        youthSizes.forEach(size => {
+                            rows.push(buildRow('Youth', size, derivePrice(cp, mp, 'Youth'),
+                                variantIndex === 1 ? (imageUrls[0] || '') : '', 1));
                         });
-                        variantIndex++;
-                    });
+                    }
+                    if (hasAdult && adultSizes.length) {
+                        adultSizes.forEach(size => {
+                            rows.push(buildRow('Adult', size, derivePrice(cp, mp, 'Adult'),
+                                variantIndex === 1 ? (imageUrls[0] || '') : '', 1));
+                        });
+                    }
+                    if (hasWomen && womenSizes.length) {
+                        womenSizes.forEach(size => {
+                            rows.push(buildRow('Women', size, derivePrice(cp, mp, 'Women'),
+                                variantIndex === 1 ? (imageUrls[0] || '') : '', 1));
+                        });
+                    }
                 }
+
+                // Additional images as extra rows
+                imageUrls.slice(1).forEach((imgUrl, i) => {
+                    rows.push({
+                        'URL handle': handle,
+                        'Product image URL': imgUrl,
+                        'Image position': String(i + 2),
+                        'Image alt text': title,
+                        'Status': ''
+                    });
+                });
             }
 
             if (!rows.length) {
-                showToast('Could not generate CSV — check that club products have master product data', 'error');
+                showToast('Could not generate CSV — check club products have images and master product data', 'error');
                 return;
             }
 
@@ -6652,7 +7106,7 @@
             a.download = `${club.suffix}_shopify_products.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast(`CSV downloaded — ${clubProds.length} product${clubProds.length !== 1 ? 's' : ''}`);
+            showToast(`CSV downloaded — ${productsWithImages.length} product${productsWithImages.length !== 1 ? 's' : ''} (${priceList} pricing)`);
         }
 
         // =============================================
@@ -6870,6 +7324,20 @@
 
         function renderOnboardingTab() {
             if (!currentClub) return;
+
+            // Step 1: image summary
+            renderOnboardingImageSummary();
+
+            // Step 2: collection image preview
+            const collPreview = document.getElementById('onboard-coll-img-preview');
+            if (collPreview && currentClub.collection_image_url) {
+                collPreview.innerHTML = `<img src="${currentClub.collection_image_url}" class="w-full h-full object-cover rounded-xl">`;
+            }
+
+            // Step 3: show/hide API button based on brand settings
+            const apiBtn = document.getElementById('onboard-api-btn');
+            if (apiBtn) apiBtn.classList.toggle('hide', !currentBrand?.shopify_api_enabled);
+
             // Populate order forms in onboarding tab
             const formsList = document.getElementById('club-order-forms-list-onboard');
             const formsEmpty = document.getElementById('club-order-forms-empty-onboard');
