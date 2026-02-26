@@ -1347,7 +1347,7 @@
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                         <div>
                             <label class="text-gray-400 text-sm mb-1 block">Fit Type</label>
-                            <select id="prod-fit-type" class="w-full px-3 py-2 rounded-lg" onchange="toggleSinglePrice()">
+                            <select id="prod-fit-type" class="w-full px-3 py-2 rounded-lg" onchange="onFitTypeChange()">
                                 <option value="Adult / Youth">Adult / Youth</option>
                                 <option value="Women's">Women's</option>
                                 <option value="One Size Only">One Size Only</option>
@@ -1362,10 +1362,20 @@
                             <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
                         </div>
                         <div>
-                            <label class="text-gray-400 text-sm mb-1 block">Sizes</label>
-                            <input type="text" id="prod-sizes" placeholder="S,M,L,XL,2XL" class="w-full px-3 py-2 rounded-lg text-xs">
+                            <label class="text-gray-400 text-sm mb-1 block">Adult / All Sizes</label>
+                            <input type="text" id="prod-sizes" placeholder="S,M,L,XL,2XL,3XL" class="w-full px-3 py-2 rounded-lg text-xs">
                         </div>
                     </div>
+                    <!-- Additional size groups (shown by fit type) -->
+                    <div id="prod-youth-sizes-row" class="mt-3 hide">
+                        <label class="text-gray-400 text-sm mb-1 block">Youth Sizes</label>
+                        <input type="text" id="prod-youth-sizes" placeholder="YXXS,YXS,YS,YM,YL,YXL" class="w-full px-3 py-2 rounded-lg text-xs">
+                    </div>
+                    <div id="prod-women-sizes-row" class="mt-3 hide">
+                        <label class="text-gray-400 text-sm mb-1 block">Women's Sizes</label>
+                        <input type="text" id="prod-women-sizes" placeholder="XS,S,M,L,XL" class="w-full px-3 py-2 rounded-lg text-xs">
+                    </div>
+
                     <!-- Shopify Tags (replaces has_addons) -->
                     <div class="mt-3 pt-3 border-t border-gray-700">
                         <label class="text-gray-400 text-sm mb-2 block">Shopify Tags <span class="text-gray-600 text-xs ml-1">(saved per brand — reusable)</span></label>
@@ -5179,6 +5189,29 @@
             });
             const fitEl = document.getElementById('prod-fit-type');
             if (fitEl) fitEl.value = isSingle ? 'One Size Only' : 'Adult / Youth';
+            onFitTypeChange();
+        }
+
+        function onFitTypeChange() {
+            const fitVal = document.getElementById('prod-fit-type')?.value || '';
+            const isSingle = fitVal === 'One Size Only' || document.getElementById('prod-single-price')?.checked;
+            const youthRow = document.getElementById('prod-youth-sizes-row');
+            const womenRow = document.getElementById('prod-women-sizes-row');
+            const adultLabel = document.querySelector('label[for="prod-sizes"], #prod-sizes')?.previousElementSibling;
+            if (isSingle) {
+                if (youthRow) youthRow.classList.add('hide');
+                if (womenRow) womenRow.classList.add('hide');
+            } else if (fitVal === "Women's") {
+                if (youthRow) youthRow.classList.add('hide');
+                if (womenRow) womenRow.classList.remove('hide');
+            } else if (fitVal === 'Adult / Youth') {
+                if (youthRow) youthRow.classList.remove('hide');
+                if (womenRow) womenRow.classList.add('hide');
+            } else {
+                // Custom fit type - show all
+                if (youthRow) youthRow.classList.remove('hide');
+                if (womenRow) womenRow.classList.remove('hide');
+            }
         }
 
         function onFitsChanged() {
@@ -5201,7 +5234,12 @@
             document.getElementById('prod-single-price').checked = false;
             document.getElementById('prod-fit-type').value = 'Adult / Youth';
             document.getElementById('prod-weight').value = '450';
-            document.getElementById('prod-sizes').value = 'YXXS,YXS,YS,YM,YL,YXL,S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+            document.getElementById('prod-sizes').value = 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+            const ySizes = document.getElementById('prod-youth-sizes');
+            if (ySizes) ySizes.value = 'YXXS,YXS,YS,YM,YL,YXL';
+            const wSizes = document.getElementById('prod-women-sizes');
+            if (wSizes) wSizes.value = '';
+            onFitTypeChange();
             document.getElementById('prod-description').value = '';
 
             // Reset tags
@@ -5237,6 +5275,12 @@
             // Set fit type after populating the select options
             const fitTypeEl = document.getElementById('prod-fit-type');
             if (fitTypeEl) fitTypeEl.value = product.fit_type || 'Adult / Youth';
+            // Set size fields
+            const ySizes = document.getElementById('prod-youth-sizes');
+            if (ySizes) ySizes.value = product.youth_sizes || '';
+            const wSizes = document.getElementById('prod-women-sizes');
+            if (wSizes) wSizes.value = product.women_sizes || '';
+            onFitTypeChange();
 
             // Load tier prices
             let tierPrices = {};
@@ -8295,7 +8339,7 @@
         async function loadCurrentClubProducts() {
             if (!currentClub) return;
             const { data } = await supabase.from('club_products')
-                .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, has_addons, weight_grams, description)')
+                .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs)')
                 .eq('club_id', currentClub.id).eq('is_active', true).order('created_at');
             currentClubProducts = data || [];
         }
