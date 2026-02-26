@@ -4240,6 +4240,7 @@
         let currentUser = null;
         let currentBrand = null;
         let currentUserProfile = null;
+        let _appInitialising = false; // guard against double-init from handleLogin + onAuthStateChange
         let viewScope = localStorage.getItem('teamwear_view_scope') || 'all'; // 'all' | 'mine'
         let allBrands = [];
         let isSuperAdmin = false;
@@ -4294,20 +4295,29 @@
         async function handleLogin() {
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            
+
             if (!email || !password) {
                 showToast('Please enter email and password', 'error');
                 return;
             }
 
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            
-            if (error) {
-                showToast(error.message, 'error');
-                return;
-            }
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-            await initApp(data.user);
+                if (error) {
+                    showToast(error.message, 'error');
+                    return;
+                }
+
+                await initApp(data.user);
+            } catch (err) {
+                console.error('Login error:', err);
+                showToast('Login error: ' + (err?.message || 'Please try again'), 'error');
+                // Ensure auth screen stays visible if app failed to load
+                document.getElementById('auth-screen').classList.remove('hide');
+                document.getElementById('main-app').classList.add('hide');
+                _appInitialising = false;
+            }
         }
 
         async function handleSignup() {
@@ -4342,6 +4352,7 @@
             currentBrand = null;
             isSuperAdmin = false;
             allBrands = [];
+            _appInitialising = false;
             document.getElementById('main-app').classList.add('hide');
             document.getElementById('auth-screen').classList.remove('hide');
         }
@@ -4350,6 +4361,10 @@
         // APP INITIALIZATION
         // =============================================
         async function initApp(user) {
+            // Prevent double-initialization (onAuthStateChange + handleLogin both call this)
+            if (_appInitialising) return;
+            _appInitialising = true;
+
             currentUser = user;
             document.getElementById('user-email').textContent = user.email;
 
@@ -4424,6 +4439,7 @@
             // Apply any feature access restrictions for this user
             await applyUserFeaturePermissions();
             showLaunchpad();
+            _appInitialising = false;
         }
 
         // =============================================
