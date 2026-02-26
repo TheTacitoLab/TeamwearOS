@@ -1206,6 +1206,10 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v13.5M7.5 13.5L12 18l4.5-4.5"/></svg>
                     Export CSV
                 </button>
+                <button onclick="showCatalogueSettings()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    Catalogue Settings
+                </button>
                 <div class="flex-1"></div>
                 <button onclick="showBulkDeleteModal()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 border border-red-500/50">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
@@ -1263,15 +1267,13 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
-                            <tr class="text-left text-gray-400 border-b border-gray-800">
+                            <tr id="products-table-header" class="text-left text-gray-400 border-b border-gray-800">
                                 <th class="pb-3 pr-3 whitespace-nowrap">Code</th>
                                 <th class="pb-3 pr-3">Name</th>
                                 <th class="pb-3 pr-3">Category</th>
                                 <th class="pb-3 pr-3">Range</th>
-                                <th class="pb-3 pr-3 text-right">Youth Retail</th>
-                                <th class="pb-3 pr-3 text-right">Youth Partner</th>
-                                <th class="pb-3 pr-3 text-right">Adult Retail</th>
-                                <th class="pb-3 pr-3 text-right">Adult Partner</th>
+                                <th class="pb-3 pr-3 text-right" id="th-youth-price">Youth Price</th>
+                                <th class="pb-3 pr-3 text-right" id="th-adult-price">Adult Price</th>
                                 <th class="pb-3 pr-3">Tags</th>
                                 <th class="pb-3 text-center">Actions</th>
                             </tr>
@@ -1344,6 +1346,14 @@
                     <h4 class="font-semibold mb-3 text-brand-400">Product Details</h4>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
                         <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Fit Type</label>
+                            <select id="prod-fit-type" class="w-full px-3 py-2 rounded-lg" onchange="toggleSinglePrice()">
+                                <option value="Adult / Youth">Adult / Youth</option>
+                                <option value="Women's">Women's</option>
+                                <option value="One Size Only">One Size Only</option>
+                            </select>
+                        </div>
+                        <div>
                             <label class="text-gray-400 text-sm mb-1 block">Weight (grams)</label>
                             <input type="number" id="prod-weight" placeholder="450" class="w-full px-3 py-2 rounded-lg">
                         </div>
@@ -1351,9 +1361,9 @@
                             <label class="text-gray-400 text-sm mb-1 block">COGS (£)</label>
                             <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
                         </div>
-                        <div class="col-span-2">
-                            <label class="text-gray-400 text-sm mb-1 block">Shopify Tags (comma-separated)</label>
-                            <input type="text" id="prod-shopify-tags" placeholder="teamwear, football, kit" class="w-full px-3 py-2 rounded-lg">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Sizes</label>
+                            <input type="text" id="prod-sizes" placeholder="S,M,L,XL,2XL" class="w-full px-3 py-2 rounded-lg text-xs">
                         </div>
                     </div>
                     <!-- Shopify Tags (replaces has_addons) -->
@@ -1365,7 +1375,6 @@
                         </div>
                         <div id="brand-saved-tags" class="flex flex-wrap gap-1 mb-2 empty:hidden"></div>
                         <div id="product-tags-chips" class="flex flex-wrap gap-1 min-h-5"></div>
-                        <input type="hidden" id="prod-shopify-tags" value="[]">
                     </div>
                 </div>
 
@@ -2046,8 +2055,11 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
             </button>
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold">User Management</h2>
+            <div class="flex items-center justify-between mb-2">
+                <div>
+                    <h2 class="text-2xl font-bold">User Management</h2>
+                    <p class="text-gray-500 text-sm mt-1">Master admin area — allocate licenses and set permissions across all brands in TeamwearOS</p>
+                </div>
                 <button onclick="showAddUserModal()" class="btn-primary flex items-center gap-2 text-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Add User
@@ -2055,7 +2067,7 @@
             </div>
 
             <!-- Filters -->
-            <div class="glass rounded-2xl p-4 mb-5">
+            <div class="glass rounded-2xl p-4 mb-5 mt-6">
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="text-gray-400 text-xs mb-1 block">Filter by Brand</label>
@@ -2074,8 +2086,8 @@
             <div class="glass rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-4">
                     <div>
-                        <h3 class="font-semibold">Users</h3>
-                        <p class="text-gray-400 text-sm mt-1">Assign users to brands and control which features each user can access.</p>
+                        <h3 class="font-semibold">All Users</h3>
+                        <p class="text-gray-400 text-sm mt-1">Assign users to brands (APX, ROKOR, or any brand) and control feature access per user.</p>
                     </div>
                 </div>
                 <div id="users-list" class="space-y-4">
@@ -2624,7 +2636,7 @@
                 <div class="flex items-center justify-between mb-5">
                     <div>
                         <h4 class="font-semibold">Club Products</h4>
-                        <p class="text-gray-500 text-sm mt-0.5">Products created for this job's club. Pricing: Partner Price + £2 for shop.</p>
+                        <p class="text-gray-500 text-sm mt-0.5">Products created for this job's club. Pricing from the club's partnership level.</p>
                     </div>
                     <div class="flex gap-3">
                         <div id="jr-range-approved-wrap" class="flex items-center gap-2 px-4 py-2 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)">
@@ -3125,7 +3137,7 @@
                 <!-- Step 2: Collection Image -->
                 <div class="card mb-5">
                     <h3 class="font-semibold text-brand-400 mb-4">Product Sync</h3>
-                    <p class="text-gray-500 text-sm mb-4">Sync club products to Shopify with all variants. Shop price = Partner Price + £2.</p>
+                    <p class="text-gray-500 text-sm mb-4">Sync club products to Shopify with all variants. Pricing is taken from the club's partnership level.</p>
                     <div id="club-shopify-products-status" class="space-y-2 mb-4"></div>
                     <div class="flex flex-wrap gap-3">
                         <button onclick="syncAllClubProducts()" class="btn-primary text-sm">Sync All via API</button>
@@ -3495,6 +3507,84 @@
         </div>
 
         <!-- ============================================================
+             MODAL: Catalogue Settings
+             ============================================================ -->
+        <div id="catalogue-settings-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
+            <div class="glass rounded-2xl w-full max-w-2xl mx-4 my-auto">
+                <div class="flex justify-between items-center p-6 border-b border-white/5">
+                    <div>
+                        <h3 class="text-xl font-bold">Catalogue Settings</h3>
+                        <p class="text-gray-500 text-xs mt-1">Configure categories, ranges, fit types and pricing tiers for the Master Product Catalogue</p>
+                    </div>
+                    <button onclick="hideCatalogueSettings()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <div class="p-6 space-y-6">
+
+                    <!-- Pricing Tiers -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h4 class="font-semibold text-brand-400">Price Lists</h4>
+                                <p class="text-gray-500 text-xs mt-0.5">Up to 4 price lists — each has a Youth and Adult price per product</p>
+                            </div>
+                        </div>
+                        <div id="cs-tiers-list" class="space-y-2 mb-3"></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="cs-new-tier-key" placeholder="Key e.g. partner_plus" class="flex-1 px-3 py-2 rounded-lg text-sm font-mono" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <input type="text" id="cs-new-tier-name" placeholder="Display name e.g. Partner+" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <button onclick="csAddTier()" class="btn-primary text-sm px-4">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Active Price List for Catalogue View -->
+                    <div class="pt-4 border-t border-white/5">
+                        <h4 class="font-semibold text-brand-400 mb-2">Catalogue Display Price</h4>
+                        <p class="text-gray-500 text-xs mb-3">Choose which price list is shown in the Master Product Catalogue table</p>
+                        <select id="cs-active-price-list" class="w-full px-3 py-2 rounded-lg text-sm" onchange="csSetActivePriceList(this.value)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                        </select>
+                    </div>
+
+                    <!-- Categories -->
+                    <div class="pt-4 border-t border-white/5">
+                        <h4 class="font-semibold text-brand-400 mb-2">Categories</h4>
+                        <p class="text-gray-500 text-xs mb-3">Custom categories available when adding products (products already in the catalogue are included automatically)</p>
+                        <div id="cs-categories-list" class="flex flex-wrap gap-2 mb-3 min-h-6"></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="cs-new-category" placeholder="e.g. Goalkeeper Kit" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <button onclick="csAddCategory()" class="btn-primary text-sm px-4">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Ranges -->
+                    <div class="pt-4 border-t border-white/5">
+                        <h4 class="font-semibold text-brand-400 mb-2">Ranges</h4>
+                        <p class="text-gray-500 text-xs mb-3">Custom ranges available when adding products</p>
+                        <div id="cs-ranges-list" class="flex flex-wrap gap-2 mb-3 min-h-6"></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="cs-new-range" placeholder="e.g. Atlas, Warrior, Pro" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <button onclick="csAddRange()" class="btn-primary text-sm px-4">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Fit Types -->
+                    <div class="pt-4 border-t border-white/5">
+                        <h4 class="font-semibold text-brand-400 mb-2">Fit Types</h4>
+                        <p class="text-gray-500 text-xs mb-3">Available fit type options in the product form</p>
+                        <div id="cs-fittypes-list" class="flex flex-wrap gap-2 mb-3 min-h-6"></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="cs-new-fittype" placeholder="e.g. Ladies Fit, Junior" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <button onclick="csAddFitType()" class="btn-primary text-sm px-4">Add</button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="p-6 border-t border-white/5">
+                    <button onclick="hideCatalogueSettings()" class="w-full btn-primary py-3">Done</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
              MODAL: Add/Edit Club Team
              ============================================================ -->
         <div id="club-team-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
@@ -3627,28 +3717,8 @@
                 <div class="p-6">
                     <div class="mb-5">
                         <label class="text-gray-400 text-sm mb-2 block font-semibold">Price List</label>
-                        <div class="space-y-2">
-                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)" onclick="selectPriceList('retail')">
-                                <input type="radio" name="price-list" value="retail" id="pl-retail" class="accent-brand-500">
-                                <div>
-                                    <p class="text-sm font-semibold text-white">Retail</p>
-                                    <p class="text-xs text-gray-500">Standard retail prices — no discount</p>
-                                </div>
-                            </label>
-                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)" onclick="selectPriceList('partner')">
-                                <input type="radio" name="price-list" value="partner" id="pl-partner" class="accent-brand-500">
-                                <div>
-                                    <p class="text-sm font-semibold text-white">Partner</p>
-                                    <p class="text-xs text-gray-500">Partner price — club discount applied</p>
-                                </div>
-                            </label>
-                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.25)" onclick="selectPriceList('shop')">
-                                <input type="radio" name="price-list" value="shop" id="pl-shop" checked class="accent-brand-500">
-                                <div>
-                                    <p class="text-sm font-semibold text-brand-400">Shop Price <span class="text-xs text-gray-500">(Recommended)</span></p>
-                                    <p class="text-xs text-gray-500">Partner price + £2 — standard online store price</p>
-                                </div>
-                            </label>
+                        <div id="price-list-options" class="space-y-2">
+                            <!-- Populated dynamically from brandPricingTiers by openCreateStoreModal() -->
                         </div>
                     </div>
 
@@ -3808,7 +3878,7 @@
                     <div class="grid grid-cols-3 gap-4">
                         <div class="price-tier-card">
                             <p class="text-xs text-brand-400 mb-1 font-medium">Shop Price</p>
-                            <p class="text-xs text-gray-600 mb-2">Partner + £2 · Public Shopify price</p>
+                            <p class="text-xs text-gray-600 mb-2">Public Shopify / web price</p>
                             <div class="flex items-center gap-1">
                                 <span class="text-gray-400">£</span>
                                 <input type="number" step="0.01" id="cp-web-price" placeholder="0.00" class="flex-1 px-2 py-1 rounded bg-gray-900 text-sm" oninput="onWebPriceManualEdit()">
@@ -3831,7 +3901,7 @@
                             </div>
                         </div>
                     </div>
-                    <p class="text-gray-600 text-xs mt-3">Shop price auto-sets to Partner + £2. Override manually if needed. Internal prices used for draft orders.</p>
+                    <p class="text-gray-600 text-xs mt-3">Shop price is set from the club's partnership level pricing. Override manually if needed. Internal prices used for draft orders.</p>
                 </div>
 
                 <!-- Sizes from master product -->
@@ -4073,6 +4143,10 @@
         let brandPricingTiers = [];   // brand_pricing_tiers rows for current brand
         let brandShopifyTags = [];    // brand_shopify_tags rows for current brand
         let currentProductTags = [];  // tags currently applied to product being edited
+        let catalogueCustomCategories = [];   // persisted in localStorage per brand
+        let catalogueCustomRanges = [];       // persisted in localStorage per brand
+        let catalogueCustomFitTypes = [];     // persisted in localStorage per brand
+        let catalogueActivePriceKey = '';     // which tier key to show in the catalogue table
         let clubImages = [];
         let orderLines = [];
         let poSequence = 1;
@@ -4350,6 +4424,12 @@
                 .eq('brand_id', currentBrand.id)
                 .order('tag');
             brandShopifyTags = stags || [];
+
+            // Load catalogue settings from localStorage
+            loadCatalogueSettings();
+            if (!catalogueActivePriceKey && brandPricingTiers.length) {
+                catalogueActivePriceKey = brandPricingTiers[0].tier_key;
+            }
 
             // Load PO count for sequence
             const { count } = await supabase
@@ -4984,23 +5064,34 @@
                 return;
             }
 
-            tbody.innerHTML = filtered.map(p => `
-                <tr class="border-b border-gray-800 hover:bg-gray-900/50">
-                    <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap">${p.product_code}</td>
-                    <td class="py-3 pr-3">${p.item_name}</td>
-                    <td class="py-3 pr-3 text-gray-400 text-xs">${p.category || '-'}</td>
-                    <td class="py-3 pr-3 text-gray-400">${p.range_name}</td>
-                    <td class="py-3 pr-3 text-right">${p.youth_retail_price ? '£' + Number(p.youth_retail_price).toFixed(2) : '-'}</td>
-                    <td class="py-3 pr-3 text-right">${p.youth_partner_price ? '£' + Number(p.youth_partner_price).toFixed(2) : '-'}</td>
-                    <td class="py-3 pr-3 text-right">${p.adult_retail_price ? '£' + Number(p.adult_retail_price).toFixed(2) : '-'}</td>
-                    <td class="py-3 pr-3 text-right">${p.adult_partner_price ? '£' + Number(p.adult_partner_price).toFixed(2) : '-'}</td>
+            // Update price column headers to reflect active price list
+            const activeTier = brandPricingTiers.find(t => t.tier_key === catalogueActivePriceKey) || brandPricingTiers[0];
+            const activeTierName = activeTier ? activeTier.tier_name : 'Price';
+            const thYouth = document.getElementById('th-youth-price');
+            const thAdult = document.getElementById('th-adult-price');
+            if (thYouth) thYouth.textContent = `Youth (${activeTierName})`;
+            if (thAdult) thAdult.textContent = `Adult (${activeTierName})`;
+
+            tbody.innerHTML = filtered.map(p => {
+                const tierPrices = (p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {};
+                const tp = tierPrices[catalogueActivePriceKey] || {};
+                // Fall back to legacy fields for retail/partner
+                const youthPrice = tp.youth || (catalogueActivePriceKey === 'retail' ? p.youth_retail_price : (catalogueActivePriceKey === 'partner' ? p.youth_partner_price : null));
+                const adultPrice = tp.adult || (catalogueActivePriceKey === 'retail' ? p.adult_retail_price : (catalogueActivePriceKey === 'partner' ? p.adult_partner_price : null));
+                return `<tr class="border-b border-gray-800 hover:bg-gray-900/50">
+                    <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap">${escHtml(p.product_code)}</td>
+                    <td class="py-3 pr-3">${escHtml(p.item_name)}</td>
+                    <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.category || '-')}</td>
+                    <td class="py-3 pr-3 text-gray-400">${escHtml(p.range_name || '-')}</td>
+                    <td class="py-3 pr-3 text-right">${youthPrice ? '£' + Number(youthPrice).toFixed(2) : '-'}</td>
+                    <td class="py-3 pr-3 text-right">${adultPrice ? '£' + Number(adultPrice).toFixed(2) : (p.is_single_price ? '<span class="text-gray-600 text-xs">single</span>' : '-')}</td>
                     <td class="py-3 pr-3">${renderProductTagChips(p.shopify_tags)}</td>
                     <td class="py-3 text-center whitespace-nowrap">
                         <button onclick="editProduct('${p.id}')" class="text-brand-400 hover:text-brand-300 text-sm mr-2">Edit</button>
                         <button onclick="showDeleteProductModal('${p.id}')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
                     </td>
-                </tr>
-            `).join('');
+                </tr>`;
+            }).join('');
         }
 
         function getFilteredProducts() {
@@ -5039,9 +5130,9 @@
         }
 
         function populateFilterDropdowns() {
-            // Get unique categories and ranges
-            const categories = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
-            const ranges = [...new Set(products.map(p => p.range_name).filter(Boolean))].sort();
+            // Get unique categories and ranges (from products + custom catalogue settings)
+            const categories = [...new Set([...products.map(p => p.category).filter(Boolean), ...catalogueCustomCategories])].sort();
+            const ranges = [...new Set([...products.map(p => p.range_name).filter(Boolean), ...catalogueCustomRanges])].sort();
 
             // Preserve current selections
             const currentCategory = document.getElementById('filter-category')?.value || '';
@@ -5118,6 +5209,7 @@
             renderProductTagsUI();
             populateProdCategoryDatalist();
             populateProdRangeDatalist();
+            populateProdFitTypeSelect();
             renderPricingFields({});
 
             document.getElementById('product-modal').classList.remove('hide');
@@ -5139,6 +5231,12 @@
             document.getElementById('prod-weight').value = product.weight_grams || 450;
             document.getElementById('prod-sizes').value = product.sizes || '';
             document.getElementById('prod-description').value = product.description || '';
+            populateProdCategoryDatalist();
+            populateProdRangeDatalist();
+            populateProdFitTypeSelect();
+            // Set fit type after populating the select options
+            const fitTypeEl = document.getElementById('prod-fit-type');
+            if (fitTypeEl) fitTypeEl.value = product.fit_type || 'Adult / Youth';
 
             // Load tier prices
             let tierPrices = {};
@@ -5257,18 +5355,27 @@
         function populateProdCategoryDatalist() {
             const dl = document.getElementById('prod-categories-list');
             if (!dl) return;
-            const cats = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
-            // Also include some sensible defaults if list is empty
+            const fromProducts = products.map(p => p.category).filter(Boolean);
             const defaults = ['Cut & Sew Teamwear','Sublimated Training','Jackets','Football Match Kit','Football Socks','Rugby Match Kit','Basketball Match Kit','Netball','Cricket','Accessories','Goalkeeper Kit','Training Wear'];
-            const all = [...new Set([...cats, ...defaults])].sort();
+            const all = [...new Set([...fromProducts, ...catalogueCustomCategories, ...defaults])].sort();
             dl.innerHTML = all.map(c => `<option value="${escHtml(c)}">`).join('');
         }
 
         function populateProdRangeDatalist() {
             const dl = document.getElementById('prod-ranges-list');
             if (!dl) return;
-            const ranges = [...new Set(products.map(p => p.range_name).filter(Boolean))].sort();
-            dl.innerHTML = ranges.map(r => `<option value="${escHtml(r)}">`).join('');
+            const fromProducts = products.map(p => p.range_name).filter(Boolean);
+            const all = [...new Set([...fromProducts, ...catalogueCustomRanges])].sort();
+            dl.innerHTML = all.map(r => `<option value="${escHtml(r)}">`).join('');
+        }
+
+        function populateProdFitTypeSelect() {
+            const sel = document.getElementById('prod-fit-type');
+            if (!sel) return;
+            const defaults = ['Adult / Youth', "Women's", 'One Size Only'];
+            const all = [...new Set([...defaults, ...catalogueCustomFitTypes])];
+            const current = sel.value;
+            sel.innerHTML = all.map(f => `<option value="${escHtml(f)}" ${f === current ? 'selected' : ''}>${escHtml(f)}</option>`).join('');
         }
 
         // =============================================
@@ -5341,6 +5448,226 @@
             if (idx <= 0) return;
             [brandPricingTiers[idx-1], brandPricingTiers[idx]] = [brandPricingTiers[idx], brandPricingTiers[idx-1]];
             renderPricingTiersList();
+        }
+
+        // =============================================
+        // CATALOGUE SETTINGS
+        // =============================================
+
+        function _csStorageKey() {
+            return `catalogue_settings_${currentBrand?.id || 'default'}`;
+        }
+
+        function loadCatalogueSettings() {
+            try {
+                const raw = localStorage.getItem(_csStorageKey());
+                if (raw) {
+                    const s = JSON.parse(raw);
+                    catalogueCustomCategories = s.categories || [];
+                    catalogueCustomRanges = s.ranges || [];
+                    catalogueCustomFitTypes = s.fitTypes || [];
+                    catalogueActivePriceKey = s.activePriceKey || '';
+                }
+            } catch (e) { /* ignore */ }
+        }
+
+        function saveCatalogueSettings() {
+            try {
+                localStorage.setItem(_csStorageKey(), JSON.stringify({
+                    categories: catalogueCustomCategories,
+                    ranges: catalogueCustomRanges,
+                    fitTypes: catalogueCustomFitTypes,
+                    activePriceKey: catalogueActivePriceKey
+                }));
+            } catch (e) { /* ignore */ }
+        }
+
+        function showCatalogueSettings() {
+            // Render pricing tiers section
+            renderCsTiersList();
+            // Populate active price list dropdown
+            const activeSel = document.getElementById('cs-active-price-list');
+            if (activeSel) {
+                activeSel.innerHTML = brandPricingTiers.map(t =>
+                    `<option value="${escHtml(t.tier_key)}" ${t.tier_key === catalogueActivePriceKey ? 'selected' : ''}>${escHtml(t.tier_name)}</option>`
+                ).join('');
+                if (!catalogueActivePriceKey && brandPricingTiers.length) {
+                    catalogueActivePriceKey = brandPricingTiers[0].tier_key;
+                    activeSel.value = catalogueActivePriceKey;
+                }
+            }
+            // Render categories
+            renderCsCategoriesList();
+            // Render ranges
+            renderCsRangesList();
+            // Render fit types
+            renderCsFitTypesList();
+            document.getElementById('catalogue-settings-modal').classList.remove('hide');
+        }
+
+        function hideCatalogueSettings() {
+            document.getElementById('catalogue-settings-modal').classList.add('hide');
+            saveCatalogueSettings();
+            populateProdCategoryDatalist();
+            populateProdRangeDatalist();
+            populateProdFitTypeSelect();
+            populateFilterDropdowns();
+            renderProductsTable();
+        }
+
+        function renderCsTiersList() {
+            const container = document.getElementById('cs-tiers-list');
+            if (!container) return;
+            if (!brandPricingTiers.length) {
+                container.innerHTML = '<p class="text-gray-600 text-sm">No price lists yet. Add up to 4 below.</p>';
+                return;
+            }
+            container.innerHTML = brandPricingTiers.map((tier, idx) => `
+                <div class="flex items-center justify-between rounded-lg px-4 py-3" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
+                    <div>
+                        <span class="font-medium text-sm">${escHtml(tier.tier_name)}</span>
+                        <span class="text-gray-600 text-xs ml-2 font-mono">${escHtml(tier.tier_key)}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        ${idx > 0 ? `<button onclick="csTierMoveUp(${idx})" class="text-gray-500 hover:text-white text-xs px-2">↑</button>` : ''}
+                        ${brandPricingTiers.length > 1 ? `<button onclick="csRemoveTier('${escHtml(tier.tier_key)}')" class="text-red-400 hover:text-red-300 text-xs">Remove</button>` : ''}
+                    </div>
+                </div>`).join('');
+        }
+
+        async function csAddTier() {
+            if (brandPricingTiers.length >= 4) { showToast('Maximum 4 price lists allowed', 'error'); return; }
+            const keyEl = document.getElementById('cs-new-tier-key');
+            const nameEl = document.getElementById('cs-new-tier-name');
+            const key = (keyEl.value.trim()).toLowerCase().replace(/\s+/g, '_');
+            const name = nameEl.value.trim();
+            if (!key || !name) { showToast('Enter both a key and display name', 'error'); return; }
+            if (brandPricingTiers.find(t => t.tier_key === key)) { showToast('That key already exists', 'error'); return; }
+            const newTier = { brand_id: currentBrand.id, tier_key: key, tier_name: name, sort_order: brandPricingTiers.length };
+            const { data, error } = await supabase.from('brand_pricing_tiers').insert(newTier).select().single();
+            if (error) { showToast(error.message, 'error'); return; }
+            brandPricingTiers.push(data);
+            keyEl.value = ''; nameEl.value = '';
+            renderCsTiersList();
+            showToast(`Price list "${name}" added`);
+        }
+
+        async function csRemoveTier(tierKey) {
+            if (!confirm(`Remove price list "${tierKey}"? Existing saved prices are not deleted.`)) return;
+            const tier = brandPricingTiers.find(t => t.tier_key === tierKey);
+            if (tier && tier.id) {
+                const { error } = await supabase.from('brand_pricing_tiers').update({ is_active: false }).eq('id', tier.id);
+                if (error) { showToast(error.message, 'error'); return; }
+            }
+            brandPricingTiers = brandPricingTiers.filter(t => t.tier_key !== tierKey);
+            if (catalogueActivePriceKey === tierKey) catalogueActivePriceKey = brandPricingTiers[0]?.tier_key || '';
+            renderCsTiersList();
+            const activeSel = document.getElementById('cs-active-price-list');
+            if (activeSel) activeSel.innerHTML = brandPricingTiers.map(t => `<option value="${escHtml(t.tier_key)}" ${t.tier_key === catalogueActivePriceKey ? 'selected' : ''}>${escHtml(t.tier_name)}</option>`).join('');
+            showToast('Price list removed');
+        }
+
+        function csTierMoveUp(idx) {
+            if (idx <= 0) return;
+            [brandPricingTiers[idx-1], brandPricingTiers[idx]] = [brandPricingTiers[idx], brandPricingTiers[idx-1]];
+            renderCsTiersList();
+        }
+
+        function csSetActivePriceList(key) {
+            catalogueActivePriceKey = key;
+            saveCatalogueSettings();
+        }
+
+        function renderCsCategoriesList() {
+            const container = document.getElementById('cs-categories-list');
+            if (!container) return;
+            const fromProducts = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
+            if (!catalogueCustomCategories.length && !fromProducts.length) {
+                container.innerHTML = '<span class="text-gray-600 text-xs italic">No custom categories yet</span>';
+                return;
+            }
+            const allCustom = [...new Set([...catalogueCustomCategories])].sort();
+            container.innerHTML = [
+                ...fromProducts.map(c => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-800/50 text-gray-500">${escHtml(c)}</span>`),
+                ...allCustom.map(c => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-brand-500/10 border border-brand-500/30 text-brand-400">${escHtml(c)}<button type="button" onclick="csRemoveCategory('${escHtml(c)}')" class="text-brand-600 hover:text-red-400 ml-0.5">&times;</button></span>`)
+            ].join('');
+        }
+
+        function csAddCategory() {
+            const input = document.getElementById('cs-new-category');
+            const val = input.value.trim();
+            if (!val) return;
+            if (!catalogueCustomCategories.includes(val)) {
+                catalogueCustomCategories.push(val);
+                renderCsCategoriesList();
+            }
+            input.value = '';
+        }
+
+        function csRemoveCategory(cat) {
+            catalogueCustomCategories = catalogueCustomCategories.filter(c => c !== cat);
+            renderCsCategoriesList();
+        }
+
+        function renderCsRangesList() {
+            const container = document.getElementById('cs-ranges-list');
+            if (!container) return;
+            const fromProducts = [...new Set(products.map(p => p.range_name).filter(Boolean))].sort();
+            if (!catalogueCustomRanges.length && !fromProducts.length) {
+                container.innerHTML = '<span class="text-gray-600 text-xs italic">No custom ranges yet</span>';
+                return;
+            }
+            container.innerHTML = [
+                ...fromProducts.map(r => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-800/50 text-gray-500">${escHtml(r)}</span>`),
+                ...catalogueCustomRanges.map(r => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-brand-500/10 border border-brand-500/30 text-brand-400">${escHtml(r)}<button type="button" onclick="csRemoveRange('${escHtml(r)}')" class="text-brand-600 hover:text-red-400 ml-0.5">&times;</button></span>`)
+            ].join('');
+        }
+
+        function csAddRange() {
+            const input = document.getElementById('cs-new-range');
+            const val = input.value.trim();
+            if (!val) return;
+            if (!catalogueCustomRanges.includes(val)) {
+                catalogueCustomRanges.push(val);
+                renderCsRangesList();
+            }
+            input.value = '';
+        }
+
+        function csRemoveRange(range) {
+            catalogueCustomRanges = catalogueCustomRanges.filter(r => r !== range);
+            renderCsRangesList();
+        }
+
+        function renderCsFitTypesList() {
+            const container = document.getElementById('cs-fittypes-list');
+            if (!container) return;
+            const defaults = ['Adult / Youth', "Women's", 'One Size Only'];
+            if (!catalogueCustomFitTypes.length) {
+                container.innerHTML = defaults.map(f => `<span class="px-2 py-1 rounded text-xs bg-gray-800/50 text-gray-500">${escHtml(f)}</span>`).join('');
+                return;
+            }
+            container.innerHTML = [
+                ...defaults.map(f => `<span class="px-2 py-1 rounded text-xs bg-gray-800/50 text-gray-500">${escHtml(f)}</span>`),
+                ...catalogueCustomFitTypes.map(f => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-brand-500/10 border border-brand-500/30 text-brand-400">${escHtml(f)}<button type="button" onclick="csRemoveFitType('${escHtml(f)}')" class="text-brand-600 hover:text-red-400 ml-0.5">&times;</button></span>`)
+            ].join('');
+        }
+
+        function csAddFitType() {
+            const input = document.getElementById('cs-new-fittype');
+            const val = input.value.trim();
+            if (!val) return;
+            const defaults = ['Adult / Youth', "Women's", 'One Size Only'];
+            if (!defaults.includes(val) && !catalogueCustomFitTypes.includes(val)) {
+                catalogueCustomFitTypes.push(val);
+                renderCsFitTypesList();
+            }
+            input.value = '';
+        }
+
+        function csRemoveFitType(fitType) {
+            catalogueCustomFitTypes = catalogueCustomFitTypes.filter(f => f !== fitType);
+            renderCsFitTypesList();
         }
 
         async function saveProduct() {
@@ -5604,13 +5931,12 @@
         // =============================================
         // STORE CREATOR: price list + CSV download
         // =============================================
-        let _selectedPriceList = 'shop';
+        let _selectedPriceList = 'retail';
 
         function selectPriceList(type) {
             _selectedPriceList = type;
-            const radioMap = { retail: 'pl-retail', partner: 'pl-partner', shop: 'pl-shop' };
-            const radioId = radioMap[type];
-            if (radioId) document.getElementById(radioId).checked = true;
+            const radioEl = document.getElementById(`pl-${type}`);
+            if (radioEl) radioEl.checked = true;
         }
 
         function openCreateStoreModal() {
@@ -5621,7 +5947,26 @@
             document.getElementById('cstore-collection-img').textContent =
                 currentClub.collection_image_url ? '✓ Uploaded' : '⚠️ Not set';
             document.getElementById('cstore-collection-name').textContent = currentClub.name || '—';
-            selectPriceList('shop');
+
+            // Populate price list options dynamically from brandPricingTiers
+            const optionsEl = document.getElementById('price-list-options');
+            if (optionsEl) {
+                if (brandPricingTiers.length) {
+                    optionsEl.innerHTML = brandPricingTiers.map((tier, idx) => {
+                        const isFirst = idx === 0;
+                        const bg = isFirst ? 'background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.25)' : 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)';
+                        const nameClass = isFirst ? 'text-brand-400' : 'text-white';
+                        return `<label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="${bg}" onclick="selectPriceList('${escHtml(tier.tier_key)}')">
+                            <input type="radio" name="price-list" value="${escHtml(tier.tier_key)}" id="pl-${escHtml(tier.tier_key)}" class="accent-brand-500" ${isFirst ? 'checked' : ''}>
+                            <div><p class="text-sm font-semibold ${nameClass}">${escHtml(tier.tier_name)}</p></div>
+                        </label>`;
+                    }).join('');
+                    _selectedPriceList = brandPricingTiers[0].tier_key;
+                } else {
+                    optionsEl.innerHTML = '<p class="text-gray-500 text-sm p-3">No pricing tiers configured. Open Catalogue Settings to add price lists.</p>';
+                    _selectedPriceList = 'retail';
+                }
+            }
             document.getElementById('create-store-modal').classList.remove('hide');
         }
 
@@ -7294,25 +7639,32 @@
                 'Gift card', 'SEO title', 'SEO description'
             ];
 
-            // Price helper: respects priceList selection per fit
+            // Price helper: uses tier_prices[priceList] from the master product (no markup)
             function derivePrice(cp, mp, fit) {
+                const tierPrices = (mp.tier_prices && typeof mp.tier_prices === 'object') ? mp.tier_prices : {};
+                const tp = tierPrices[priceList] || {};
+
                 if (mp.is_single_price) {
-                    const pp = mp.single_partner_price || 0, rp = mp.single_retail_price || 0;
-                    return priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
+                    // Use tier price if available, otherwise fall back to legacy fields
+                    if (tp.youth) return tp.youth;
+                    if (priceList === 'retail') return mp.single_retail_price || 0;
+                    return mp.single_partner_price || mp.single_retail_price || 0;
                 }
                 if (fit === 'Youth') {
-                    const pp = mp.youth_partner_price || 0, rp = mp.youth_retail_price || 0;
-                    return priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
+                    if (tp.youth) return tp.youth;
+                    if (priceList === 'retail') return mp.youth_retail_price || 0;
+                    return mp.youth_partner_price || mp.youth_retail_price || 0;
                 }
                 if (fit === 'Women') {
+                    if (tp.adult) return tp.adult;
                     const pp = mp.women_partner_price || mp.adult_partner_price || 0;
                     const rp = mp.women_retail_price || mp.adult_retail_price || 0;
-                    return priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
+                    return priceList === 'retail' ? rp : pp;
                 }
                 // Adult / Unisex
+                if (tp.adult) return tp.adult || cp.web_price || 0;
                 const pp = mp.adult_partner_price || 0, rp = mp.adult_retail_price || 0;
-                const base = priceList === 'retail' ? rp : priceList === 'partner' ? pp : pp + 2;
-                return base || cp.web_price || 0;
+                return (priceList === 'retail' ? rp : pp) || cp.web_price || 0;
             }
 
             const rows = [];
@@ -8126,9 +8478,12 @@
             for (const productId of bulkSelectedProducts) {
                 const p = products.find(x => x.id === productId);
                 if (!p) continue;
-                const partnerPrice = p.is_single_price ? p.single_partner_price : p.adult_partner_price;
-                const retailPrice  = p.is_single_price ? p.single_retail_price  : p.adult_retail_price;
-                const webPrice = partnerPrice ? (Number(partnerPrice) + 2) : null;
+                const tierPrices = (p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {};
+                const clubTierKey = currentClub?.club_status || 'retail';
+                const tp = tierPrices[clubTierKey] || tierPrices['retail'] || {};
+                const partnerPrice = tp.adult || (p.is_single_price ? p.single_partner_price : p.adult_partner_price);
+                const retailPrice  = tp.youth || (p.is_single_price ? p.single_retail_price  : p.adult_retail_price);
+                const webPrice = partnerPrice ? Number(partnerPrice) : null;
                 const { error } = await supabase.from('club_products').insert({
                     club_id: currentClub.id,
                     product_id: productId,
@@ -8192,11 +8547,12 @@
             openJobRecord(jobId);
         }
 
-        // Reactive: when partner price is typed, auto-update shop price = partner + £2
+        // When partner price changes, mirror to web price if web price is empty
         function onPartnerPriceInput() {
-            const partner = parseFloat(document.getElementById('cp-partner-price').value);
-            if (!isNaN(partner)) {
-                document.getElementById('cp-web-price').value = (partner + 2).toFixed(2);
+            const webEl = document.getElementById('cp-web-price');
+            if (!webEl.value) {
+                const partner = parseFloat(document.getElementById('cp-partner-price').value);
+                if (!isNaN(partner)) webEl.value = partner.toFixed(2);
             }
         }
 
@@ -8211,12 +8567,15 @@
             if (!document.getElementById('cp-custom-name').value && !document.getElementById('edit-club-product-id').value) {
                 document.getElementById('cp-custom-name').value = `${currentClub.name} ${product.item_name}`;
             }
-            // Auto-set prices from master product: partner price first, then web = partner + £2
-            const partnerPrice = product.is_single_price ? product.single_partner_price : product.adult_partner_price;
-            const retailPrice = product.is_single_price ? product.single_retail_price : product.adult_retail_price;
+            // Auto-set prices from master product tier_prices or legacy fields
+            const tierPrices = (product.tier_prices && typeof product.tier_prices === 'object') ? product.tier_prices : {};
+            const clubTierKey = currentClub?.club_status || 'retail';
+            const tp = tierPrices[clubTierKey] || tierPrices['retail'] || {};
+            const partnerPrice = tp.adult || (product.is_single_price ? product.single_partner_price : product.adult_partner_price);
+            const retailPrice = tp.youth || (product.is_single_price ? product.single_retail_price : product.adult_retail_price);
             if (partnerPrice) {
                 document.getElementById('cp-partner-price').value = Number(partnerPrice).toFixed(2);
-                document.getElementById('cp-web-price').value = (Number(partnerPrice) + 2).toFixed(2);
+                document.getElementById('cp-web-price').value = Number(partnerPrice).toFixed(2);
             }
             if (retailPrice) {
                 document.getElementById('cp-non-partner-price').value = Number(retailPrice).toFixed(2);
@@ -8638,7 +8997,7 @@
             const tp = tierPrices[clubTierKey] || tierPrices['retail'] || {};
             const adultPrice = tp.adult || masterProduct.adult_partner_price || masterProduct.adult_retail_price || null;
             const youthPrice = tp.youth || masterProduct.youth_partner_price || masterProduct.youth_retail_price || null;
-            const webPrice = adultPrice ? (parseFloat(adultPrice) + 2) : null;
+            const webPrice = adultPrice ? parseFloat(adultPrice) : null;
 
             const customName = `${currentClub.name} ${masterProduct.item_name}`;
 
@@ -9773,7 +10132,7 @@
             }
             emptyEl.classList.add('hide');
             container.innerHTML = clubProds.map(cp => {
-                const shopPrice = (cp.partner_price + 2).toFixed(2);
+                const shopPrice = (cp.web_price || cp.partner_price || 0).toFixed(2);
                 return `<div class="glass rounded-xl p-4 flex items-center justify-between gap-4">
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-sm">${escHtml(cp.custom_name)}</p>
