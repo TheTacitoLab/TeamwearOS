@@ -4309,6 +4309,9 @@
                     return;
                 }
 
+                // Always reset the guard before a manual login attempt so that
+                // a failed page-load auto-login can never block the user
+                _appInitialising = false;
                 await initApp(data.user);
             } catch (err) {
                 console.error('Login error:', err);
@@ -7696,14 +7699,21 @@
             const { data: { session } } = await supabase.auth.getSession();
 
             if (session?.user) {
-                await initApp(session.user);
+                try {
+                    await initApp(session.user);
+                } catch (err) {
+                    console.error('Auto-login failed:', err);
+                    _appInitialising = false;
+                }
             }
 
             // Listen for auth changes
             supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session?.user) {
+                    _appInitialising = false; // reset before each auth-state-driven init
                     await initApp(session.user);
                 } else if (event === 'SIGNED_OUT') {
+                    _appInitialising = false;
                     document.getElementById('main-app').classList.add('hide');
                     document.getElementById('auth-screen').classList.remove('hide');
                 }
