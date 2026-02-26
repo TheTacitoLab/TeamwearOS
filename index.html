@@ -1344,15 +1344,7 @@
                 <!-- Product Details -->
                 <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
                     <h4 class="font-semibold mb-3 text-brand-400">Product Details</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
-                        <div>
-                            <label class="text-gray-400 text-sm mb-1 block">Fit Type</label>
-                            <select id="prod-fit-type" class="w-full px-3 py-2 rounded-lg" onchange="onFitTypeChange()">
-                                <option value="Adult / Youth">Adult / Youth</option>
-                                <option value="Women's">Women's</option>
-                                <option value="One Size Only">One Size Only</option>
-                            </select>
-                        </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="text-gray-400 text-sm mb-1 block">Weight (grams)</label>
                             <input type="number" id="prod-weight" placeholder="450" class="w-full px-3 py-2 rounded-lg">
@@ -1361,19 +1353,45 @@
                             <label class="text-gray-400 text-sm mb-1 block">COGS (£)</label>
                             <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
                         </div>
-                        <div>
-                            <label class="text-gray-400 text-sm mb-1 block">Adult / All Sizes</label>
-                            <input type="text" id="prod-sizes" placeholder="S,M,L,XL,2XL,3XL" class="w-full px-3 py-2 rounded-lg text-xs">
+                    </div>
+                    <!-- Hidden legacy fit_type for backward compat -->
+                    <input type="hidden" id="prod-fit-type" value="Adult">
+                    <!-- Size Categories — tick all that apply -->
+                    <p class="text-gray-400 text-xs mb-2 font-medium">Size Categories <span class="text-gray-600">(tick all that apply — sizes can be edited below)</span></p>
+                    <div class="space-y-2">
+                        <!-- Adult -->
+                        <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                <input type="checkbox" id="prod-fit-adult" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
+                                <span class="text-sm font-medium">Adult <span class="text-gray-500 font-normal text-xs ml-1">S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL</span></span>
+                            </label>
+                            <div id="prod-adult-sizes-row" class="mt-2 ml-7 hide">
+                                <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
+                                <input type="text" id="prod-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)">
+                            </div>
                         </div>
-                    </div>
-                    <!-- Additional size groups (shown by fit type) -->
-                    <div id="prod-youth-sizes-row" class="mt-3 hide">
-                        <label class="text-gray-400 text-sm mb-1 block">Youth Sizes</label>
-                        <input type="text" id="prod-youth-sizes" placeholder="YXXS,YXS,YS,YM,YL,YXL" class="w-full px-3 py-2 rounded-lg text-xs">
-                    </div>
-                    <div id="prod-women-sizes-row" class="mt-3 hide">
-                        <label class="text-gray-400 text-sm mb-1 block">Women's Sizes</label>
-                        <input type="text" id="prod-women-sizes" placeholder="XS,S,M,L,XL" class="w-full px-3 py-2 rounded-lg text-xs">
+                        <!-- Youth Unisex -->
+                        <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                <input type="checkbox" id="prod-fit-youth" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
+                                <span class="text-sm font-medium">Youth Unisex <span class="text-gray-500 font-normal text-xs ml-1">YXXS, YXS, YS, YM, YL, YXL</span></span>
+                            </label>
+                            <div id="prod-youth-sizes-row" class="mt-2 ml-7 hide">
+                                <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
+                                <input type="text" id="prod-youth-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)">
+                            </div>
+                        </div>
+                        <!-- Women's -->
+                        <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                <input type="checkbox" id="prod-fit-women" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
+                                <span class="text-sm font-medium">Women's <span class="text-gray-500 font-normal text-xs ml-1">6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26</span></span>
+                            </label>
+                            <div id="prod-women-sizes-row" class="mt-2 ml-7 hide">
+                                <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
+                                <input type="text" id="prod-women-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)">
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Shopify Tags (replaces has_addons) -->
@@ -5261,47 +5279,49 @@
 
         function toggleSinglePrice() {
             const isSingle = document.getElementById('prod-single-price').checked;
-            // Disable adult price inputs in dynamic tier fields
             brandPricingTiers.forEach(tier => {
                 const adultEl = document.getElementById(`tier-adult-${tier.tier_key}`);
-                if (adultEl) {
-                    adultEl.disabled = isSingle;
-                    if (isSingle) adultEl.value = '';
-                }
+                if (adultEl) { adultEl.disabled = isSingle; if (isSingle) adultEl.value = ''; }
             });
-            const fitEl = document.getElementById('prod-fit-type');
-            if (fitEl) fitEl.value = isSingle ? 'One Size Only' : 'Adult / Youth';
-            onFitTypeChange();
+            if (isSingle) {
+                ['prod-fit-adult', 'prod-fit-youth', 'prod-fit-women'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.checked = false;
+                });
+            } else {
+                const fAdult = document.getElementById('prod-fit-adult');
+                if (fAdult && !document.getElementById('prod-fit-youth')?.checked && !document.getElementById('prod-fit-women')?.checked) {
+                    fAdult.checked = true;
+                }
+            }
+            onFitsChanged();
         }
 
-        function onFitTypeChange() {
-            const fitVal = document.getElementById('prod-fit-type')?.value || '';
-            const isSingle = fitVal === 'One Size Only' || document.getElementById('prod-single-price')?.checked;
-            const youthRow = document.getElementById('prod-youth-sizes-row');
-            const womenRow = document.getElementById('prod-women-sizes-row');
-            const adultLabel = document.querySelector('label[for="prod-sizes"], #prod-sizes')?.previousElementSibling;
-            if (isSingle) {
-                if (youthRow) youthRow.classList.add('hide');
-                if (womenRow) womenRow.classList.add('hide');
-            } else if (fitVal === "Women's") {
-                if (youthRow) youthRow.classList.add('hide');
-                if (womenRow) womenRow.classList.remove('hide');
-            } else if (fitVal === 'Adult / Youth') {
-                if (youthRow) youthRow.classList.remove('hide');
-                if (womenRow) womenRow.classList.add('hide');
-            } else {
-                // Custom fit type - show all
-                if (youthRow) youthRow.classList.remove('hide');
-                if (womenRow) womenRow.classList.remove('hide');
-            }
-        }
+        // onFitTypeChange kept for backward compat — now delegates to onFitsChanged
+        function onFitTypeChange() { onFitsChanged(); }
 
         function onFitsChanged() {
-            const hasWomen = document.getElementById('prod-fit-women').checked;
-            const hasYouth = document.getElementById('prod-fit-youth').checked;
-            document.getElementById('prod-row-youth').style.display = hasYouth ? '' : 'none';
-            document.getElementById('prod-row-women').classList.toggle('hide', !hasWomen);
-            document.getElementById('prod-women-pricing').classList.toggle('hide', !hasWomen);
+            const hasAdult = document.getElementById('prod-fit-adult')?.checked;
+            const hasYouth = document.getElementById('prod-fit-youth')?.checked;
+            const hasWomen = document.getElementById('prod-fit-women')?.checked;
+            // Show/hide size rows and adult row
+            document.getElementById('prod-adult-sizes-row')?.classList.toggle('hide', !hasAdult);
+            document.getElementById('prod-youth-sizes-row')?.classList.toggle('hide', !hasYouth);
+            document.getElementById('prod-women-sizes-row')?.classList.toggle('hide', !hasWomen);
+            // Pre-fill standard sizes when first ticked (only if currently empty)
+            const adultInput = document.getElementById('prod-sizes');
+            const youthInput = document.getElementById('prod-youth-sizes');
+            const womenInput = document.getElementById('prod-women-sizes');
+            if (hasAdult && adultInput && !adultInput.value) adultInput.value = 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+            if (hasYouth && youthInput && !youthInput.value) youthInput.value = 'YXXS,YXS,YS,YM,YL,YXL';
+            if (hasWomen && womenInput && !womenInput.value) womenInput.value = '6,8,10,12,14,16,18,20,22,24,26';
+            // Sync hidden fit_type for backward compat
+            const parts = [];
+            if (hasAdult) parts.push('Adult');
+            if (hasYouth) parts.push('Youth');
+            if (hasWomen) parts.push("Women's");
+            const fitTypeEl = document.getElementById('prod-fit-type');
+            if (fitTypeEl) fitTypeEl.value = parts.join(' / ') || 'One Size Only';
         }
 
         function showAddProductModal() {
@@ -5314,14 +5334,20 @@
             document.getElementById('prod-category').value = '';
             document.getElementById('prod-range').value = '';
             document.getElementById('prod-single-price').checked = false;
-            document.getElementById('prod-fit-type').value = 'Adult / Youth';
             document.getElementById('prod-weight').value = '450';
+            // Default: Adult only ticked
+            const fAdult = document.getElementById('prod-fit-adult');
+            const fYouth = document.getElementById('prod-fit-youth');
+            const fWomen = document.getElementById('prod-fit-women');
+            if (fAdult) fAdult.checked = true;
+            if (fYouth) fYouth.checked = false;
+            if (fWomen) fWomen.checked = false;
             document.getElementById('prod-sizes').value = 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
             const ySizes = document.getElementById('prod-youth-sizes');
             if (ySizes) ySizes.value = 'YXXS,YXS,YS,YM,YL,YXL';
             const wSizes = document.getElementById('prod-women-sizes');
-            if (wSizes) wSizes.value = '';
-            onFitTypeChange();
+            if (wSizes) wSizes.value = '6,8,10,12,14,16,18,20,22,24,26';
+            onFitsChanged();
             document.getElementById('prod-description').value = '';
 
             // Reset tags
@@ -5354,15 +5380,21 @@
             populateProdCategoryDatalist();
             populateProdRangeDatalist();
             populateProdFitTypeSelect();
-            // Set fit type after populating the select options
-            const fitTypeEl = document.getElementById('prod-fit-type');
-            if (fitTypeEl) fitTypeEl.value = product.fit_type || 'Adult / Youth';
-            // Set size fields
+            // Set fit checkboxes from available_fits
+            const availFits = (product.available_fits || 'adult').split(',').map(f => f.trim().toLowerCase());
+            const fAdult = document.getElementById('prod-fit-adult');
+            const fYouth = document.getElementById('prod-fit-youth');
+            const fWomen = document.getElementById('prod-fit-women');
+            if (fAdult) fAdult.checked = availFits.includes('adult');
+            if (fYouth) fYouth.checked = availFits.includes('youth');
+            if (fWomen) fWomen.checked = availFits.includes('women');
+            // Set size fields (fall back to standard defaults)
+            document.getElementById('prod-sizes').value = product.sizes || 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
             const ySizes = document.getElementById('prod-youth-sizes');
-            if (ySizes) ySizes.value = product.youth_sizes || '';
+            if (ySizes) ySizes.value = product.youth_sizes || 'YXXS,YXS,YS,YM,YL,YXL';
             const wSizes = document.getElementById('prod-women-sizes');
-            if (wSizes) wSizes.value = product.women_sizes || '';
-            onFitTypeChange();
+            if (wSizes) wSizes.value = product.women_sizes || '6,8,10,12,14,16,18,20,22,24,26';
+            onFitsChanged();
 
             // Load tier prices
             let tierPrices = {};
@@ -5864,11 +5896,12 @@
                 youth_sizes: document.getElementById('prod-youth-sizes')?.value.trim() || null,
                 women_sizes: document.getElementById('prod-women-sizes')?.value.trim() || null,
                 available_fits: (() => {
-                    const ft = document.getElementById('prod-fit-type').value;
-                    if (document.getElementById('prod-single-price').checked || ft === 'One Size Only') return 'adult';
-                    if (ft === 'Adult / Youth') return 'adult,youth';
-                    if (ft === "Women's") return 'women';
-                    return 'adult';
+                    if (document.getElementById('prod-single-price').checked) return 'adult';
+                    const fits = [];
+                    if (document.getElementById('prod-fit-adult')?.checked) fits.push('adult');
+                    if (document.getElementById('prod-fit-youth')?.checked) fits.push('youth');
+                    if (document.getElementById('prod-fit-women')?.checked) fits.push('women');
+                    return fits.length ? fits.join(',') : 'adult';
                 })(),
                 has_addons: false,
                 shopify_tags: currentProductTags,
@@ -7808,7 +7841,7 @@
                     if (priceList === 'retail') return mp.youth_retail_price || 0;
                     return mp.youth_partner_price || mp.youth_retail_price || 0;
                 }
-                if (fit === 'Women') {
+                if (fit === "Women's") {
                     if (tp.adult) return tp.adult;
                     const pp = mp.women_partner_price || mp.adult_partner_price || 0;
                     const rp = mp.women_retail_price || mp.adult_retail_price || 0;
@@ -7859,14 +7892,18 @@
                 const hasWomen = fits.includes('women');
                 const multifit = (hasYouth ? 1 : 0) + (hasAdult ? 1 : 0) + (hasWomen ? 1 : 0) > 1;
 
-                // Size arrays
-                let adultSizes = (mp.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
-                let youthSizes = (mp.youth_sizes || '').split(',').map(s => s.trim()).filter(Boolean);
-                if (!youthSizes.length && mp.sizes) {
-                    youthSizes = adultSizes.filter(s => s.startsWith('Y'));
-                    adultSizes = adultSizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+                // Size arrays — use stored values, fall back to standard defaults
+                let adultSizes = (mp.sizes || 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL').split(',').map(s => s.trim()).filter(Boolean);
+                let youthSizes = (mp.youth_sizes || 'YXXS,YXS,YS,YM,YL,YXL').split(',').map(s => s.trim()).filter(Boolean);
+                if (!mp.youth_sizes && mp.sizes) {
+                    // Legacy: if youth sizes not set separately, extract Y-prefixed from adult
+                    const yFromAdult = adultSizes.filter(s => s.startsWith('Y'));
+                    if (yFromAdult.length) {
+                        youthSizes = yFromAdult;
+                        adultSizes = adultSizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+                    }
                 }
-                const womenSizes = (mp.women_sizes || '').split(',').map(s => s.trim()).filter(Boolean);
+                const womenSizes = (mp.women_sizes || '6,8,10,12,14,16,18,20,22,24,26').split(',').map(s => s.trim()).filter(Boolean);
 
                 let variantIndex = 0;
                 const buildRow = (fit, size, price, imgUrl, imgPos) => {
@@ -7927,7 +7964,7 @@
                     }
                     if (hasWomen && womenSizes.length) {
                         womenSizes.forEach(size => {
-                            rows.push(buildRow('Women', size, derivePrice(cp, mp, 'Women'),
+                            rows.push(buildRow("Women's", size, derivePrice(cp, mp, "Women's"),
                                 variantIndex === 1 ? (imageUrls[0] || '') : '', 1));
                         });
                     }
@@ -8425,7 +8462,7 @@
                     return tp.youth || (priceList === 'retail' ? mp.single_retail_price : mp.single_partner_price) || 0;
                 }
                 if (fit === 'Youth') return tp.youth || (priceList === 'retail' ? mp.youth_retail_price : mp.youth_partner_price) || 0;
-                if (fit === 'Women') {
+                if (fit === "Women's") {
                     const rp = mp.women_retail_price || mp.adult_retail_price || 0;
                     const pp = mp.women_partner_price || mp.adult_partner_price || 0;
                     return tp.adult || (priceList === 'retail' ? rp : pp);
@@ -8512,7 +8549,7 @@
                     adultSizes.forEach(size => rows.push(buildRow('Adult', size, derivePrice('Adult'), variantIndex === 0 ? (imgUrls[0] || '') : '', 1)));
                 }
                 if (hasWomen && womenSizes.length) {
-                    womenSizes.forEach(size => rows.push(buildRow('Women', size, derivePrice('Women'), variantIndex === 0 ? (imgUrls[0] || '') : '', 1)));
+                    womenSizes.forEach(size => rows.push(buildRow("Women's", size, derivePrice("Women's"), variantIndex === 0 ? (imgUrls[0] || '') : '', 1)));
                 }
             }
             // Additional images
