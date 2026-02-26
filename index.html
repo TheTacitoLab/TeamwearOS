@@ -1069,6 +1069,17 @@
                 </div>
             </div>
 
+            <!-- No-brand notice (shown when user has no brand assigned) -->
+            <div id="no-brand-notice" class="hide glass rounded-2xl p-6 mb-8 border border-yellow-500/20">
+                <div class="flex items-start gap-4">
+                    <div class="text-yellow-400 text-2xl flex-shrink-0">⚠</div>
+                    <div>
+                        <p class="font-semibold text-yellow-300 mb-1">Account not yet set up</p>
+                        <p class="text-gray-400 text-sm">Your account has been created but hasn't been assigned to a brand yet. Please contact your administrator to be set up with access.</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Main Feature Grid -->
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" id="feature-grid">
 
@@ -4343,11 +4354,22 @@
             document.getElementById('user-email').textContent = user.email;
 
             // Get user profile
-            const { data: profile } = await supabase
+            let { data: profile } = await supabase
                 .from('user_profiles')
                 .select('*, brands(*)')
                 .eq('id', user.id)
                 .single();
+
+            // Auto-create profile if missing (e.g. user registered before the trigger was added)
+            if (!profile) {
+                await supabase.from('user_profiles').insert({ id: user.id, email: user.email, role: 'user' });
+                const { data: newProfile } = await supabase
+                    .from('user_profiles')
+                    .select('*, brands(*)')
+                    .eq('id', user.id)
+                    .single();
+                profile = newProfile;
+            }
 
             currentUserProfile = profile;
             isSuperAdmin = profile?.role === 'super_admin';
@@ -4623,9 +4645,13 @@
             // Update launchpad brand display
             const brandDisplay = document.getElementById('launchpad-brand-display');
             const brandNameEl = document.getElementById('launchpad-brand-name');
+            const noBrandNotice = document.getElementById('no-brand-notice');
             if (currentBrand) {
                 if (brandDisplay) brandDisplay.classList.remove('hide');
                 if (brandNameEl) brandNameEl.textContent = currentBrand.name;
+                if (noBrandNotice) noBrandNotice.classList.add('hide');
+            } else {
+                if (noBrandNotice) noBrandNotice.classList.remove('hide');
             }
 
             // Apply feature toggles to cards
