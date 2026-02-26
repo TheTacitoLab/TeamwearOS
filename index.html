@@ -2975,7 +2975,6 @@
                 <button id="tab-btn-orderforms" onclick="showClubTab('orderforms')">Order Forms</button>
                 <button id="tab-btn-jobs" onclick="showClubTab('jobs')">Jobs</button>
                 <button id="tab-btn-onboarding" onclick="showClubTab('onboarding')">Onboarding</button>
-                <button id="tab-btn-images" onclick="showClubTab('images')">Images</button>
             </div>
 
             <!-- TAB: Overview -->
@@ -3072,13 +3071,15 @@
 
             <!-- TAB: Products -->
             <div id="club-tab-products" class="club-tab-content hide">
-                <div class="section-header">
+                <!-- Header -->
+                <div class="section-header mb-4">
                     <div>
                         <h3 class="font-semibold text-lg">Club Products</h3>
-                        <p class="text-gray-500 text-sm mt-1">Assign master products and set club-specific pricing</p>
+                        <p id="cp-partnership-warning" class="text-yellow-400 text-xs mt-1 hide">⚠️ Set a Partnership Level in Club Info before adding products</p>
+                        <p class="text-gray-500 text-xs mt-1" id="cp-tier-info"></p>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="showMockupUploadModal()" class="btn-primary text-sm flex items-center gap-2" style="background:linear-gradient(135deg,rgba(20,184,166,0.8),rgba(16,185,129,0.8))">
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="toggleMockupUploadSection()" id="cp-upload-toggle-btn" class="btn-secondary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                             Upload Mock-Ups
                         </button>
@@ -3086,17 +3087,52 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                             Bulk Add
                         </button>
-                        <button onclick="showAddClubProductModal()" class="btn-secondary text-sm flex items-center gap-2">
+                        <button onclick="showAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Add
+                            Add Product
                         </button>
                     </div>
                 </div>
-                <div id="club-products-list" class="space-y-3">
-                    <!-- Populated by JS -->
+
+                <!-- Inline Mock-Up Upload Section -->
+                <div id="club-mockup-upload-inline" class="card mb-5 hide">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <h4 class="font-semibold text-sm">Upload Product Mock-Ups</h4>
+                            <p class="text-gray-500 text-xs mt-0.5">Name files as the product code (e.g. <span class="font-mono text-brand-400">APX-ATL-001.png</span>). Images auto-match to products and set the club's pricing from the selected Partnership Level.</p>
+                        </div>
+                        <button onclick="showNamingHelp(event)" class="help-trigger text-xs flex items-center gap-1 flex-shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Naming Help
+                        </button>
+                    </div>
+                    <div id="club-detail-dropzone" class="dropzone p-6 text-center cursor-pointer"
+                        onclick="document.getElementById('club-image-upload').click()"
+                        ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleClubDetailDrop(event)">
+                        <input type="file" id="club-image-upload" accept="image/*" multiple class="hide" onchange="handleClubDetailImageUpload(event)">
+                        <div class="w-10 h-10 mx-auto mb-2 rounded-full bg-brand-500/10 flex items-center justify-center">
+                            <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </div>
+                        <p class="text-white text-sm font-medium mb-1">Drop images or click to browse</p>
+                        <p class="text-gray-600 text-xs">JPG, PNG accepted · Multiple files supported</p>
+                    </div>
+                    <div id="club-detail-upload-progress" class="mt-3 hide">
+                        <div class="flex justify-between mb-1 text-xs text-gray-400">
+                            <span id="club-detail-upload-text">Uploading...</span>
+                            <span id="club-detail-upload-count"></span>
+                        </div>
+                        <div class="progress-bar"><div id="club-detail-upload-bar" class="progress-fill" style="width:0%"></div></div>
+                    </div>
                 </div>
+
+                <!-- Products list -->
+                <div id="club-products-list" class="space-y-3"></div>
                 <div id="club-products-empty" class="hide text-center py-12">
-                    <p class="text-gray-500">No products assigned yet. Add products from the master catalogue.</p>
+                    <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-800 flex items-center justify-center">
+                        <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    <p class="text-gray-500 text-sm font-medium mb-1">No products yet</p>
+                    <p class="text-gray-600 text-xs">Upload mock-up images (auto-creates products) or click Add Product to add manually</p>
                 </div>
             </div>
 
@@ -3219,7 +3255,7 @@
             <!-- Keep legacy id for JS compatibility -->
             <div id="club-tab-shopify" class="hide"></div>
 
-            <!-- TAB: Images (embedded mockups) -->
+            <!-- TAB: Images (embedded mockups) — tab button removed; kept for JS compatibility -->
             <div id="club-tab-images" class="club-tab-content hide">
                 <p class="text-gray-500 text-sm mb-4">Upload product images for Shopify CSV export. Images are matched to master products by filename.</p>
                 <div class="card mb-4">
@@ -3231,9 +3267,9 @@
                         </button>
                     </div>
                     <div id="club-detail-dropzone" class="dropzone p-8 text-center cursor-pointer"
-                        onclick="document.getElementById('club-image-upload').click()"
+                        onclick="document.getElementById('club-image-upload-legacy').click()"
                         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleClubDetailDrop(event)">
-                        <input type="file" id="club-image-upload" accept="image/*" multiple class="hide" onchange="handleClubDetailImageUpload(event)">
+                        <input type="file" id="club-image-upload-legacy" accept="image/*" multiple class="hide" onchange="handleClubDetailImageUpload(event)">
                         <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-brand-500/10 flex items-center justify-center">
                             <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </div>
@@ -3549,9 +3585,10 @@
                     <!-- Active Price List for Catalogue View -->
                     <div class="pt-4 border-t border-white/5">
                         <h4 class="font-semibold text-brand-400 mb-2">Catalogue Display Price</h4>
-                        <p class="text-gray-500 text-xs mb-3">Choose which price list is shown in the Master Product Catalogue table</p>
-                        <select id="cs-active-price-list" class="w-full px-3 py-2 rounded-lg text-sm" onchange="csSetActivePriceList(this.value)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
-                        </select>
+                        <p class="text-gray-500 text-xs mb-3">Choose which price lists are shown as columns in the Master Product Catalogue table (select up to 4)</p>
+                        <div id="cs-active-price-list" class="space-y-2">
+                            <!-- Populated dynamically -->
+                        </div>
                     </div>
 
                     <!-- Categories -->
@@ -4156,7 +4193,7 @@
         let catalogueCustomCategories = [];   // persisted in localStorage per brand
         let catalogueCustomRanges = [];       // persisted in localStorage per brand
         let catalogueCustomFitTypes = [];     // persisted in localStorage per brand
-        let catalogueActivePriceKey = '';     // which tier key to show in the catalogue table
+        let catalogueActivePriceKeys = [];    // which tier keys to show in the catalogue table (array)
         let clubImages = [];
         let orderLines = [];
         let poSequence = 1;
@@ -4437,8 +4474,8 @@
 
             // Load catalogue settings from localStorage
             loadCatalogueSettings();
-            if (!catalogueActivePriceKey && brandPricingTiers.length) {
-                catalogueActivePriceKey = brandPricingTiers[0].tier_key;
+            if (!catalogueActivePriceKeys.length && brandPricingTiers.length) {
+                catalogueActivePriceKeys = [brandPricingTiers[0].tier_key];
             }
 
             // Load PO count for sequence
@@ -5074,27 +5111,43 @@
                 return;
             }
 
-            // Update price column headers to reflect active price list
-            const activeTier = brandPricingTiers.find(t => t.tier_key === catalogueActivePriceKey) || brandPricingTiers[0];
-            const activeTierName = activeTier ? activeTier.tier_name : 'Price';
-            const thYouth = document.getElementById('th-youth-price');
-            const thAdult = document.getElementById('th-adult-price');
-            if (thYouth) thYouth.textContent = `Youth (${activeTierName})`;
-            if (thAdult) thAdult.textContent = `Adult (${activeTierName})`;
+            // Build active tiers array (default to first tier if none selected)
+            const activeTierList = catalogueActivePriceKeys.length
+                ? brandPricingTiers.filter(t => catalogueActivePriceKeys.includes(t.tier_key))
+                : brandPricingTiers.slice(0, 1);
+
+            // Update table header to show one Youth + Adult column per active tier
+            const headerRow = document.getElementById('products-table-header');
+            if (headerRow) {
+                const priceCols = activeTierList.map(t =>
+                    `<th class="pb-3 pr-3 text-right whitespace-nowrap">${escHtml(t.tier_name)} Y</th>` +
+                    `<th class="pb-3 pr-3 text-right whitespace-nowrap">${escHtml(t.tier_name)} A</th>`
+                ).join('');
+                headerRow.innerHTML = `
+                    <th class="pb-3 pr-3 whitespace-nowrap">Code</th>
+                    <th class="pb-3 pr-3">Name</th>
+                    <th class="pb-3 pr-3">Category</th>
+                    <th class="pb-3 pr-3">Range</th>
+                    ${priceCols}
+                    <th class="pb-3 pr-3">Tags</th>
+                    <th class="pb-3 text-center">Actions</th>`;
+            }
 
             tbody.innerHTML = filtered.map(p => {
-                const tierPrices = (p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {};
-                const tp = tierPrices[catalogueActivePriceKey] || {};
-                // Fall back to legacy fields for retail/partner
-                const youthPrice = tp.youth || (catalogueActivePriceKey === 'retail' ? p.youth_retail_price : (catalogueActivePriceKey === 'partner' ? p.youth_partner_price : null));
-                const adultPrice = tp.adult || (catalogueActivePriceKey === 'retail' ? p.adult_retail_price : (catalogueActivePriceKey === 'partner' ? p.adult_partner_price : null));
+                const tierPricesObj = (p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {};
+                const priceCells = activeTierList.map(t => {
+                    const tp = tierPricesObj[t.tier_key] || {};
+                    const y = tp.youth || (t.tier_key === 'retail' ? p.youth_retail_price : (t.tier_key === 'partner' ? p.youth_partner_price : null));
+                    const a = tp.adult || (t.tier_key === 'retail' ? p.adult_retail_price : (t.tier_key === 'partner' ? p.adult_partner_price : null));
+                    return `<td class="py-3 pr-3 text-right text-sm">${y ? '£' + Number(y).toFixed(2) : '-'}</td>` +
+                           `<td class="py-3 pr-3 text-right text-sm">${a ? '£' + Number(a).toFixed(2) : (p.is_single_price ? '<span class="text-gray-600 text-xs">single</span>' : '-')}</td>`;
+                }).join('');
                 return `<tr class="border-b border-gray-800 hover:bg-gray-900/50">
-                    <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap">${escHtml(p.product_code)}</td>
-                    <td class="py-3 pr-3">${escHtml(p.item_name)}</td>
+                    <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap text-xs">${escHtml(p.product_code)}</td>
+                    <td class="py-3 pr-3 text-sm">${escHtml(p.item_name)}</td>
                     <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.category || '-')}</td>
-                    <td class="py-3 pr-3 text-gray-400">${escHtml(p.range_name || '-')}</td>
-                    <td class="py-3 pr-3 text-right">${youthPrice ? '£' + Number(youthPrice).toFixed(2) : '-'}</td>
-                    <td class="py-3 pr-3 text-right">${adultPrice ? '£' + Number(adultPrice).toFixed(2) : (p.is_single_price ? '<span class="text-gray-600 text-xs">single</span>' : '-')}</td>
+                    <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.range_name || '-')}</td>
+                    ${priceCells}
                     <td class="py-3 pr-3">${renderProductTagChips(p.shopify_tags)}</td>
                     <td class="py-3 text-center whitespace-nowrap">
                         <button onclick="editProduct('${p.id}')" class="text-brand-400 hover:text-brand-300 text-sm mr-2">Edit</button>
@@ -5510,7 +5563,7 @@
                     catalogueCustomCategories = s.categories || [];
                     catalogueCustomRanges = s.ranges || [];
                     catalogueCustomFitTypes = s.fitTypes || [];
-                    catalogueActivePriceKey = s.activePriceKey || '';
+                    catalogueActivePriceKeys = s.activePriceKeys || (s.activePriceKey ? [s.activePriceKey] : []);
                 }
             } catch (e) { /* ignore */ }
         }
@@ -5521,7 +5574,7 @@
                     categories: catalogueCustomCategories,
                     ranges: catalogueCustomRanges,
                     fitTypes: catalogueCustomFitTypes,
-                    activePriceKey: catalogueActivePriceKey
+                    activePriceKeys: catalogueActivePriceKeys
                 }));
             } catch (e) { /* ignore */ }
         }
@@ -5529,15 +5582,19 @@
         function showCatalogueSettings() {
             // Render pricing tiers section
             renderCsTiersList();
-            // Populate active price list dropdown
+            // Populate active price list checkboxes
             const activeSel = document.getElementById('cs-active-price-list');
             if (activeSel) {
-                activeSel.innerHTML = brandPricingTiers.map(t =>
-                    `<option value="${escHtml(t.tier_key)}" ${t.tier_key === catalogueActivePriceKey ? 'selected' : ''}>${escHtml(t.tier_name)}</option>`
-                ).join('');
-                if (!catalogueActivePriceKey && brandPricingTiers.length) {
-                    catalogueActivePriceKey = brandPricingTiers[0].tier_key;
-                    activeSel.value = catalogueActivePriceKey;
+                activeSel.innerHTML = brandPricingTiers.map(t => `
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" value="${escHtml(t.tier_key)}" ${catalogueActivePriceKeys.includes(t.tier_key) ? 'checked' : ''} onchange="csToggleActivePriceKey('${escHtml(t.tier_key)}', this.checked)" class="rounded accent-brand-500">
+                        <span class="text-sm">${escHtml(t.tier_name)}</span>
+                    </label>`).join('');
+                if (!catalogueActivePriceKeys.length && brandPricingTiers.length) {
+                    catalogueActivePriceKeys = [brandPricingTiers[0].tier_key];
+                    // check first checkbox
+                    const firstCb = activeSel.querySelector('input[type=checkbox]');
+                    if (firstCb) firstCb.checked = true;
                 }
             }
             // Render categories
@@ -5604,10 +5661,10 @@
                 if (error) { showToast(error.message, 'error'); return; }
             }
             brandPricingTiers = brandPricingTiers.filter(t => t.tier_key !== tierKey);
-            if (catalogueActivePriceKey === tierKey) catalogueActivePriceKey = brandPricingTiers[0]?.tier_key || '';
+            catalogueActivePriceKeys = catalogueActivePriceKeys.filter(k => k !== tierKey);
+            if (!catalogueActivePriceKeys.length && brandPricingTiers.length) catalogueActivePriceKeys = [brandPricingTiers[0].tier_key];
             renderCsTiersList();
-            const activeSel = document.getElementById('cs-active-price-list');
-            if (activeSel) activeSel.innerHTML = brandPricingTiers.map(t => `<option value="${escHtml(t.tier_key)}" ${t.tier_key === catalogueActivePriceKey ? 'selected' : ''}>${escHtml(t.tier_name)}</option>`).join('');
+            showCatalogueSettings();
             showToast('Price list removed');
         }
 
@@ -5618,7 +5675,21 @@
         }
 
         function csSetActivePriceList(key) {
-            catalogueActivePriceKey = key;
+            // Legacy support
+            if (!catalogueActivePriceKeys.includes(key)) catalogueActivePriceKeys.push(key);
+            saveCatalogueSettings();
+        }
+
+        function csToggleActivePriceKey(key, checked) {
+            if (checked) {
+                if (!catalogueActivePriceKeys.includes(key)) catalogueActivePriceKeys.push(key);
+            } else {
+                catalogueActivePriceKeys = catalogueActivePriceKeys.filter(k => k !== key);
+                if (!catalogueActivePriceKeys.length && brandPricingTiers.length) {
+                    catalogueActivePriceKeys = [brandPricingTiers[0].tier_key];
+                    showCatalogueSettings(); // re-render to reflect forced selection
+                }
+            }
             saveCatalogueSettings();
         }
 
@@ -5761,6 +5832,15 @@
                 fit_type: document.getElementById('prod-fit-type').value,
                 weight_grams: parseInt(document.getElementById('prod-weight').value) || 450,
                 sizes: document.getElementById('prod-sizes').value.trim(),
+                youth_sizes: document.getElementById('prod-youth-sizes')?.value.trim() || null,
+                women_sizes: document.getElementById('prod-women-sizes')?.value.trim() || null,
+                available_fits: (() => {
+                    const ft = document.getElementById('prod-fit-type').value;
+                    if (document.getElementById('prod-single-price').checked || ft === 'One Size Only') return 'adult';
+                    if (ft === 'Adult / Youth') return 'adult,youth';
+                    if (ft === "Women's") return 'women';
+                    return 'adult';
+                })(),
                 has_addons: false,
                 shopify_tags: currentProductTags,
                 description: document.getElementById('prod-description').value.trim()
@@ -8336,6 +8416,54 @@
         // =============================================
         // CLUB PRODUCTS
         // =============================================
+
+        function toggleMockupUploadSection() {
+            const section = document.getElementById('club-mockup-upload-inline');
+            if (section) section.classList.toggle('hide');
+        }
+
+        function triggerClubProductImageUpload(cpId, productId) {
+            // Create a hidden file input for per-product image upload
+            const existing = document.getElementById('cp-single-image-upload');
+            if (existing) existing.remove();
+            const input = document.createElement('input');
+            input.type = 'file'; input.id = 'cp-single-image-upload';
+            input.accept = 'image/*'; input.style.display = 'none';
+            input.onchange = (e) => handleSingleClubProductImageUpload(e, cpId, productId);
+            document.body.appendChild(input);
+            input.click();
+        }
+
+        async function handleSingleClubProductImageUpload(event, cpId, productId) {
+            const file = event.target.files[0];
+            if (!file || !currentClub) return;
+            const masterProduct = products.find(p => p.id === productId);
+            if (!masterProduct) { showToast('Master product not found', 'error'); return; }
+            showToast('Uploading image...');
+            const storagePath = `${currentBrand.slug}/${currentClub.suffix}/${file.name}`;
+            const { error: uploadError } = await supabase.storage.from('club-images').upload(storagePath, file, { upsert: true });
+            if (uploadError) { showToast(uploadError.message, 'error'); return; }
+            const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+            const imageUrl = urlData.publicUrl;
+            // Upsert into club_images
+            await supabase.from('club_images').upsert({
+                club_id: currentClub.id, product_id: productId,
+                file_name: file.name, storage_path: storagePath,
+                public_url: imageUrl, uploaded_by: currentUser.id
+            }, { onConflict: 'club_id,product_id' });
+            // Update club_product image_urls
+            const { data: cp } = await supabase.from('club_products').select('image_urls').eq('id', cpId).single();
+            const currentUrls = Array.isArray(cp?.image_urls) ? cp.image_urls : [];
+            if (!currentUrls.includes(imageUrl)) currentUrls.push(imageUrl);
+            await supabase.from('club_products').update({ image_urls: currentUrls }).eq('id', cpId);
+            // Update local state
+            const idx = currentClubProducts.findIndex(p => p.id === cpId);
+            if (idx !== -1) currentClubProducts[idx].image_urls = currentUrls;
+            renderClubProducts();
+            showToast('Image uploaded!');
+            event.target.remove();
+        }
+
         async function loadCurrentClubProducts() {
             if (!currentClub) return;
             const { data } = await supabase.from('club_products')
@@ -8347,48 +8475,72 @@
         function renderClubProducts() {
             const container = document.getElementById('club-products-list');
             const emptyEl = document.getElementById('club-products-empty');
+            // Show partnership level warning
+            const warningEl = document.getElementById('cp-partnership-warning');
+            const tierInfoEl = document.getElementById('cp-tier-info');
+            if (warningEl) warningEl.classList.toggle('hide', !!currentClub?.club_status);
+            if (tierInfoEl && currentClub?.club_status) {
+                const activeTier = brandPricingTiers.find(t => t.tier_key === currentClub.club_status);
+                tierInfoEl.textContent = activeTier ? `Pricing: ${activeTier.tier_name}` : '';
+            } else if (tierInfoEl) { tierInfoEl.textContent = ''; }
+
             if (!currentClubProducts.length) {
                 container.innerHTML = '';
                 emptyEl.classList.remove('hide');
                 return;
             }
             emptyEl.classList.add('hide');
+
             container.innerHTML = currentClubProducts.map(cp => {
                 const syncBadge = cp.shopify_product_id
-                    ? `<span class="text-xs text-green-400">✓ Shopify #${cp.shopify_product_id}</span>`
+                    ? `<span class="text-xs text-green-400">✓ Shopify</span>`
                     : '<span class="text-xs text-gray-600">Not synced</span>';
+                const imgUrls = Array.isArray(cp.image_urls) ? cp.image_urls : (cp.image_urls ? JSON.parse(cp.image_urls) : []);
+                const hasImage = imgUrls.length > 0;
+                const imageSection = hasImage
+                    ? `<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-800">
+                            <img src="${imgUrls[0]}" class="w-full h-full object-cover" loading="lazy">
+                       </div>`
+                    : `<div class="w-16 h-16 rounded-xl flex-shrink-0 bg-gray-800 border border-dashed border-gray-700 flex flex-col items-center justify-center cursor-pointer hover:border-brand-500/50 transition" onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')" title="Upload mock-up for this product">
+                            <svg class="w-5 h-5 text-gray-600 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span class="text-gray-700 text-xs leading-none">Upload</span>
+                       </div>`;
+                const tierKey = currentClub?.club_status || 'retail';
+                const activeTier = brandPricingTiers.find(t => t.tier_key === tierKey);
+                const tierLabel = activeTier ? activeTier.tier_name : tierKey;
                 return `
-                <div class="club-product-card">
-                    <div class="flex items-start justify-between gap-4">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-semibold">${cp.custom_name}</span>
+                <div class="club-product-card" id="cp-card-${cp.id}">
+                    <div class="flex items-start gap-4">
+                        ${imageSection}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="font-semibold text-sm">${escHtml(cp.custom_name)}</span>
                                 ${syncBadge}
                             </div>
-                            <div class="text-xs text-gray-500 mb-3">
-                                <span class="font-mono text-gray-600 mr-2">${cp.products?.product_code || ''}</span>
-                                <span>${cp.products?.item_name || ''}</span> ·
-                                <span>${cp.products?.range_name || ''}</span>
+                            <div class="text-xs text-gray-500 mb-2">
+                                <span class="font-mono text-gray-600 mr-2">${escHtml(cp.products?.product_code || '')}</span>
+                                <span>${escHtml(cp.products?.item_name || '')}</span>
+                                ${cp.products?.range_name ? `· <span>${escHtml(cp.products.range_name)}</span>` : ''}
                             </div>
-                            <div class="grid grid-cols-3 gap-3">
-                                <div class="price-tier-card">
-                                    <p class="text-xs text-gray-500 mb-0.5">Web Price</p>
-                                    <p class="font-semibold">${cp.web_price ? '£' + Number(cp.web_price).toFixed(2) : '-'}</p>
+                            <div class="flex gap-4 text-sm flex-wrap">
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-0.5">Shop Price</p>
+                                    <p class="font-semibold text-brand-400">${cp.web_price ? '£' + Number(cp.web_price).toFixed(2) : '-'}</p>
                                 </div>
-                                <div class="price-tier-card">
-                                    <p class="text-xs text-green-500 mb-0.5">Partner</p>
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-0.5">${escHtml(tierLabel)} Price</p>
                                     <p class="font-semibold">${cp.partner_price ? '£' + Number(cp.partner_price).toFixed(2) : '-'}</p>
                                 </div>
-                                <div class="price-tier-card">
-                                    <p class="text-xs text-gray-400 mb-0.5">Non-Partner</p>
-                                    <p class="font-semibold">${cp.non_partner_price ? '£' + Number(cp.non_partner_price).toFixed(2) : '-'}</p>
+                                <div>
+                                    <p class="text-xs text-gray-500 mb-0.5">Non-Partner</p>
+                                    <p class="font-semibold text-gray-400">${cp.non_partner_price ? '£' + Number(cp.non_partner_price).toFixed(2) : '-'}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex gap-2 flex-shrink-0">
+                        <div class="flex flex-col gap-1.5 flex-shrink-0">
                             <button onclick="editClubProduct('${cp.id}')" class="btn-secondary text-xs py-1 px-3">Edit</button>
                             <button onclick="syncProductToShopify('${cp.id}')" class="btn-secondary text-xs py-1 px-3 text-brand-400">Sync</button>
-                            <button onclick="removeClubProduct('${cp.id}')" class="btn-secondary text-xs py-1 px-2 text-red-400">×</button>
+                            <button onclick="removeClubProduct('${cp.id}')" class="btn-secondary text-xs py-1.5 px-2 text-red-400">Remove</button>
                         </div>
                     </div>
                 </div>`;
@@ -8396,6 +8548,10 @@
         }
 
         function showAddClubProductModal() {
+            if (!currentClub?.club_status) {
+                showToast('Please set a Partnership Level in Club Info before adding products', 'error');
+                return;
+            }
             document.getElementById('club-product-modal-title').textContent = 'Add Club Product';
             document.getElementById('edit-club-product-id').value = '';
             document.getElementById('cp-custom-name').value = '';
@@ -8403,11 +8559,16 @@
             document.getElementById('cp-partner-price').value = '';
             document.getElementById('cp-non-partner-price').value = '';
             document.getElementById('cp-sizes-info').classList.add('hide');
+            // Show which tier is being used
+            const tierKey = currentClub.club_status;
+            const activeTier = brandPricingTiers.find(t => t.tier_key === tierKey);
+            const modalTitle = document.getElementById('club-product-modal-title');
+            if (modalTitle && activeTier) modalTitle.textContent = `Add Club Product — ${activeTier.tier_name} pricing`;
             const assignedIds = currentClubProducts.map(cp => cp.product_id);
             const available = products.filter(p => !assignedIds.includes(p.id));
             const select = document.getElementById('cp-master-product');
             select.innerHTML = '<option value="">Select from master catalogue...</option>' +
-                available.map(p => `<option value="${p.id}">${p.product_code} – ${p.item_name} (${p.range_name})</option>`).join('');
+                available.map(p => `<option value="${p.id}">${escHtml(p.product_code)} – ${escHtml(p.item_name)} (${escHtml(p.range_name)})</option>`).join('');
             select.disabled = false;
             document.getElementById('club-product-modal').classList.remove('hide');
         }
@@ -8515,6 +8676,7 @@
 
         async function saveBulkProducts() {
             if (!currentClub) return;
+            if (!currentClub.club_status) { showToast('Please set a Partnership Level in Club Info before adding products', 'error'); return; }
             if (bulkSelectedProducts.size === 0) { showToast('Select at least one product', 'error'); return; }
             const btn = document.querySelector('#bulk-products-modal .btn-primary');
             if (btn) { btn.disabled = true; btn.textContent = 'Adding…'; }
@@ -8646,10 +8808,10 @@
                 result = await supabase.from('club_products')
                     .update({ web_price: cpData.web_price, partner_price: cpData.partner_price, non_partner_price: cpData.non_partner_price, custom_name: cpData.custom_name, updated_at: new Date().toISOString() })
                     .eq('id', cpId)
-                    .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, has_addons, weight_grams, description)').single();
+                    .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs)').single();
             } else {
                 result = await supabase.from('club_products').insert(cpData)
-                    .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, has_addons, weight_grams, description)').single();
+                    .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs)').single();
             }
             if (result.error) { showToast(result.error.message, 'error'); return; }
             if (cpId) {
@@ -8954,6 +9116,10 @@
 
         async function handleClubDetailImageUpload(event) {
             if (!currentClub) return;
+            if (!currentClub.club_status) {
+                showToast('Please set a Partnership Level in Club Info before uploading mock-ups', 'error');
+                return;
+            }
             selectedClubId = currentClub.id;
             const files = event.target.files;
             if (!files.length) return;
@@ -9025,31 +9191,37 @@
             // Check if club product already exists for this product
             const { data: existing } = await supabase
                 .from('club_products')
-                .select('id')
+                .select('id, image_urls')
                 .eq('club_id', currentClub.id)
                 .eq('product_id', masterProduct.id)
                 .single();
             if (existing) {
-                // Update image URL if we now have one
-                await supabase.from('club_products').update({ image_url: imageUrl }).eq('id', existing.id);
+                // Append new image URL to image_urls array (avoid duplicates)
+                const currentUrls = Array.isArray(existing.image_urls) ? existing.image_urls : [];
+                if (!currentUrls.includes(imageUrl)) currentUrls.push(imageUrl);
+                await supabase.from('club_products').update({ image_urls: currentUrls }).eq('id', existing.id);
+                // Update local state
+                const idx = currentClubProducts.findIndex(p => p.id === existing.id);
+                if (idx !== -1) currentClubProducts[idx].image_urls = currentUrls;
                 return;
             }
 
             // Determine pricing based on club's partnership level
             const clubTierKey = currentClub.club_status || 'retail';
-            const tierPrices = masterProduct.tier_prices || {};
+            const tierPrices = (masterProduct.tier_prices && typeof masterProduct.tier_prices === 'object') ? masterProduct.tier_prices : {};
             const tp = tierPrices[clubTierKey] || tierPrices['retail'] || {};
             const adultPrice = tp.adult || masterProduct.adult_partner_price || masterProduct.adult_retail_price || null;
             const youthPrice = tp.youth || masterProduct.youth_partner_price || masterProduct.youth_retail_price || null;
             const webPrice = adultPrice ? parseFloat(adultPrice) : null;
 
+            // Build custom name using club name as prefix (placeholder replacement)
             const customName = `${currentClub.name} ${masterProduct.item_name}`;
 
             await supabase.from('club_products').insert({
                 club_id: currentClub.id,
                 product_id: masterProduct.id,
                 custom_name: customName,
-                image_url: imageUrl,
+                image_urls: [imageUrl],
                 partner_price: adultPrice,
                 non_partner_price: youthPrice,
                 web_price: webPrice,
