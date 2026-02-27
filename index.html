@@ -202,16 +202,16 @@
            ============================================= */
         .feature-card {
             position: relative; background: #ffffff; border: 1px solid #e2e8f0;
-            border-radius: 20px; padding: 28px; cursor: pointer; transition: all 0.3s ease; overflow: hidden;
+            border-radius: 14px; padding: 16px 18px; cursor: pointer; transition: all 0.3s ease; overflow: hidden;
         }
         .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0; transition: opacity 0.3s ease; }
         .feature-card:hover::before { opacity: 1; }
-        .feature-card:hover { transform: translateY(-3px); border-color: #cbd5e1; box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+        .feature-card:hover { transform: translateY(-2px); border-color: #cbd5e1; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
         .feature-card.disabled-card { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
         .feature-card.coming-soon { opacity: 0.5; cursor: default; }
-        .feature-card .card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
-        .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
-        .feature-card p { font-size: 13px; color: #64748b; line-height: 1.5; }
+        .feature-card .card-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; margin-bottom: 10px; }
+        .feature-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #0f172a; }
+        .feature-card p { font-size: 12px; color: #64748b; line-height: 1.4; }
         .feature-card .card-badge { position: absolute; top: 16px; right: 16px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; }
         .badge-soon { background: #f1f5f9; color: #64748b; }
         .badge-off  { background: rgba(239,68,68,0.1); color: #dc2626; }
@@ -231,8 +231,13 @@
         /* =============================================
            PROSPECTING MODULE
            ============================================= */
-        .prospect-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px 28px; cursor: pointer; transition: all 0.3s ease; }
-        .prospect-card:hover { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.03); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+        .prospect-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; cursor: pointer; transition: all 0.2s ease; }
+        .prospect-card:hover { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.03); box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+
+        /* Compact inline prospect metrics */
+        .prospect-metric-mini { display: flex; align-items: center; gap: 8px; padding: 5px 10px 5px 8px; border-radius: 8px; background: #ffffff; border: 1px solid #e2e8f0; border-left-width: 3px; }
+        .prospect-mini-count { font-size: 17px; font-weight: 900; line-height: 1; }
+        .prospect-mini-label { font-size: 11px; font-weight: 600; color: #64748b; white-space: nowrap; }
 
         /* Lead list */
         .lead-row { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; cursor: pointer; }
@@ -389,10 +394,10 @@
         .stage-nav-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 2px solid #e2e8f0; }
         @media (max-width: 900px) { .stage-nav-grid { grid-template-columns: repeat(4, 1fr); } }
         @media (max-width: 560px) { .stage-nav-grid { grid-template-columns: repeat(2, 1fr); } }
-        .stage-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 14px 8px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; background: #f8fafc; transition: all 0.2s ease; text-align: center; }
+        .stage-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 10px 8px; border-radius: 10px; cursor: pointer; border: 2px solid transparent; background: #f8fafc; transition: all 0.2s ease; text-align: center; }
         .stage-nav-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .stage-nav-btn.active { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-1px); }
-        .stage-nav-btn .sn-count { font-size: 24px; font-weight: 900; line-height: 1; }
+        .stage-nav-btn .sn-count { font-size: 20px; font-weight: 900; line-height: 1; }
         .stage-nav-btn .sn-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: inherit; opacity: 0.85; }
 
         /* Modern back / nav buttons */
@@ -402,6 +407,10 @@
         .nav-home-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px 6px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #6d28d9; background: #ede9fe; border: 1px solid #ddd6fe; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; }
         .nav-home-btn:hover { background: #ddd6fe; color: #5b21b6; border-color: #c4b5fd; }
         .nav-home-btn svg { flex-shrink: 0; }
+
+        /* Current page indicator button */
+        .nav-page-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; color: #0f172a; background: #f1f5f9; border: 1px solid #e2e8f0; white-space: nowrap; }
+        .page-nav-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 
         /* Breadcrumb trail */
         .breadcrumb-trail { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -499,10 +508,11 @@
         .status-partner-plus { background:rgba(168,85,247,0.1);   color:#7c3aed; }
 
         /* Split action grid */
-        .split-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+        .split-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
         @media (max-width: 640px) { .split-action-grid { grid-template-columns: 1fr; } }
-        .split-action-card { padding: 28px; border-radius: 18px; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.25s ease; text-align: center; }
-        .split-action-card:hover { background: #eff6ff; border-color: #bfdbfe; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(59,130,246,0.1); }
+        .split-action-card { padding: 12px 14px; border-radius: 10px; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.25s ease; display: flex; align-items: center; gap: 12px; }
+        .split-action-card:hover { background: #eff6ff; border-color: #bfdbfe; box-shadow: 0 2px 10px rgba(59,130,246,0.08); }
+        .split-action-icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
         /* ── Job Record page: full-width, dynamic ── */
         .job-record-page { width: 100%; padding: 24px 40px 48px; box-sizing: border-box; }
@@ -632,13 +642,13 @@
 
         /* Better feature card sizing */
         @media (min-width: 1280px) {
-            .feature-card { padding: 32px; }
-            .feature-card h3 { font-size: 18px; }
+            .feature-card { padding: 18px 20px; }
+            .feature-card h3 { font-size: 15px; }
         }
 
-        /* Split action grid — make each card larger on wide screens */
+        /* Split action grid — keep compact on all screens */
         @media (min-width: 1024px) {
-            .split-action-card { padding: 36px 32px; }
+            .split-action-card { padding: 14px 18px; }
         }
 
         /* Job / list containers — 2-col on xl, 3-col on 2xl */
@@ -810,22 +820,28 @@
                     </label>
                 </div>
                 <button onclick="hideProfileSettings()" class="w-full btn-primary py-2.5">Done</button>
+
+                <!-- Admin Tools — super admin only -->
+                <div id="settings-admin-section" class="hide mt-4 pt-4 border-t" style="border-color:#e2e8f0">
+                    <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-3">Admin Tools</p>
+                    <button onclick="hideProfileSettings(); showTool('settings')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg mb-2 text-left transition" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-sm font-medium" style="color:#0f172a">Brand Settings</span>
+                    </button>
+                    <button onclick="hideProfileSettings(); showTool('users')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                        <span class="text-sm font-medium" style="color:#0f172a">User Management</span>
+                    </button>
+                </div>
             </div>
         </div>
 
         <!-- Launchpad -->
         <div id="launchpad" class="w-full p-4 md:p-6 lg:px-10">
-            <!-- Welcome header -->
-            <div class="flex items-end justify-between mb-5">
-                <div>
-                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-widest font-medium">Home</p>
-                    <h2 class="text-2xl font-bold">TeamwearOS</h2>
-                    <p class="text-gray-500 text-sm mt-0.5">Your teamwear operations platform</p>
-                </div>
-                <div class="text-right hide" id="launchpad-brand-display">
-                    <p class="text-xs text-gray-600 uppercase tracking-wider">Active Brand</p>
-                    <p id="launchpad-brand-name" class="text-brand-400 font-semibold"></p>
-                </div>
+            <!-- Compact brand display (hidden until brand loaded) -->
+            <div class="hide" id="launchpad-brand-display" style="margin-bottom:12px">
+                <span class="text-xs text-gray-500 font-medium">Active Brand: </span>
+                <span id="launchpad-brand-name" class="text-brand-400 font-semibold text-sm"></span>
             </div>
 
             <!-- No-brand notice (shown when user has no brand assigned) -->
@@ -950,26 +966,8 @@
                 </div>
             </div>
 
-            <!-- Super Admin Section -->
-            <div id="admin-section" class="hide mt-6">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="h-px flex-1" style="background:rgba(139,92,246,0.2)"></div>
-                    <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Admin Tools</span>
-                    <div class="h-px flex-1" style="background:rgba(139,92,246,0.2)"></div>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div onclick="showTool('settings')" class="feature-card" style="border-color:rgba(109,40,217,0.15)">
-                        <div class="card-icon" style="background:#ede9fe;width:40px;height:40px;"><svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-                        <h3 style="font-size:15px">Brand Settings</h3>
-                        <p>Manage brand config and feature toggles</p>
-                    </div>
-                    <div onclick="showTool('users')" class="feature-card" style="border-color:rgba(109,40,217,0.15)">
-                        <div class="card-icon" style="background:#ede9fe;width:40px;height:40px;"><svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg></div>
-                        <h3 style="font-size:15px">User Management</h3>
-                        <p>Assign users to brands and manage access</p>
-                    </div>
-                </div>
-            </div>
+            <!-- admin-section placeholder (moved to Settings modal) -->
+            <div id="admin-section" class="hide"></div>
 
             </div><!-- /LEFT col -->
 
@@ -1000,15 +998,16 @@
 
         <!-- TOOL: Product Database -->
         <div id="tool-products" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
-            <div class="flex items-start justify-between mb-4">
-                <div>
-                    <h2 class="text-2xl font-bold">Master Product Catalogue</h2>
-                    <p class="text-gray-500 text-sm mt-1">The definitive source of truth — all ranges, pricing tiers and size structures for this brand</p>
-                </div>
+            <!-- Page nav row -->
+            <div class="page-nav-row">
+                <button onclick="showLaunchpad()" class="nav-home-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
+                    Products
+                </span>
             </div>
 
             <!-- Uniform Structure Guide -->
@@ -1290,17 +1289,17 @@
         <!-- TOOL: Club Mock-Ups -->
         <!-- TOOL: Design Studio Pipeline Launchpad -->
         <div id="tool-design-studio" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
-
-            <div class="flex items-center justify-between mb-8">
-                <div>
-                    <h2 class="text-2xl font-bold">Design Studio</h2>
-                    <p class="text-gray-500 text-sm mt-1">All design briefs across the pipeline</p>
-                </div>
-                <div class="flex gap-3 items-center">
+            <!-- Page nav row -->
+            <div class="page-nav-row">
+                <button onclick="showLaunchpad()" class="nav-home-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+                    Design Studio
+                </span>
+                <div class="flex gap-2 items-center ml-auto">
                     <span class="text-xs text-gray-500">Filter:</span>
                     <button id="ds-filter-mine" onclick="setDesignFilter('mine')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(236,72,153,0.1);color:#be185d;border:1px solid rgba(236,72,153,0.3)">My Jobs</button>
                     <button id="ds-filter-all" onclick="setDesignFilter('all')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0">All Jobs</button>
@@ -1551,11 +1550,17 @@
 
         <!-- TOOL: Store Generator -->
         <div id="tool-generator" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
-            <h2 class="text-2xl font-bold mb-6">Store Generator</h2>
+            <!-- Page nav row -->
+            <div class="page-nav-row">
+                <button onclick="showLaunchpad()" class="nav-home-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
+                    Store Generator
+                </span>
+            </div>
 
             <div class="glass rounded-2xl p-6 mb-6">
                 <h3 class="font-semibold mb-4">Generate Shopify CSV</h3>
@@ -1671,14 +1676,19 @@
 
         <!-- TOOL: PO Tracker V2 -->
         <div id="tool-po-tracker" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">PO Tracker</h2>
-                <button onclick="openCreatePoModal()" class="bg-brand-500 hover:bg-brand-600 px-5 py-2.5 rounded-lg font-semibold transition flex items-center gap-2">
-                    + New PO
+            <!-- Page nav row -->
+            <div class="page-nav-row">
+                <button onclick="showLaunchpad()" class="nav-home-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
+                    Production
+                </span>
+                <button onclick="openCreatePoModal()" class="btn-primary text-sm flex items-center gap-2 ml-auto">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    New PO
                 </button>
             </div>
 
@@ -2003,72 +2013,81 @@
              TOOL: PROSPECTING
              ============================================================ -->
         <div id="tool-prospecting" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
+            <!-- Page nav row -->
+            <div class="page-nav-row">
+                <button onclick="showLaunchpad()" class="nav-home-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
+                    Prospecting
+                </span>
+            </div>
 
             <!-- Prospecting Sub-Launchpad (home view) -->
             <div id="prospect-home">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold">Prospecting</h2>
-                    <p class="text-gray-500 text-sm mt-1">Track and manage your leads pipeline</p>
+                <!-- Inline metrics + quick actions bar -->
+                <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <div class="prospect-metric-mini" style="border-left-color:#2563eb">
+                            <span id="pm-not-contacted" class="prospect-mini-count" style="color:#1d4ed8">0</span>
+                            <span class="prospect-mini-label">Not Contacted</span>
+                        </div>
+                        <div class="prospect-metric-mini" style="border-left-color:#6d28d9">
+                            <span id="pm-in-discussion" class="prospect-mini-count" style="color:#6d28d9">0</span>
+                            <span class="prospect-mini-label">In Discussion</span>
+                        </div>
+                        <div class="prospect-metric-mini" style="border-left-color:#16a34a">
+                            <span id="pm-converted" class="prospect-mini-count" style="color:#16a34a">0</span>
+                            <span class="prospect-mini-label">Converted</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Lead
+                        </button>
+                        <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
+                        <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
+                    </div>
                 </div>
 
-                <!-- Key Metrics Row -->
-                <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="prospect-metric-card" style="border-left:4px solid #2563eb">
-                        <p class="prospect-metric-count" style="color:#1d4ed8" id="pm-not-contacted">0</p>
-                        <p class="prospect-metric-label">Not Contacted</p>
-                    </div>
-                    <div class="prospect-metric-card" style="border-left:4px solid #6d28d9">
-                        <p class="prospect-metric-count" style="color:#6d28d9" id="pm-in-discussion">0</p>
-                        <p class="prospect-metric-label">In Discussion</p>
-                    </div>
-                    <div class="prospect-metric-card" style="border-left:4px solid #16a34a">
-                        <p class="prospect-metric-count" style="color:#16a34a" id="pm-converted">0</p>
-                        <p class="prospect-metric-label">Converted to Job</p>
-                    </div>
-                </div>
-
-                <div class="grid md:grid-cols-2 gap-5 mb-8">
+                <!-- Slim prospect-cards -->
+                <div class="grid md:grid-cols-2 gap-3">
                     <!-- Not Contacted -->
                     <div onclick="showProspectView('not-contacted')" class="prospect-card">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:#dbeafe"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg></div>
-                            <span id="nc-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">Not Contacted</h3>
-                        <p class="text-gray-500 text-sm">New leads waiting to be contacted. Filter by sport and county.</p>
-                        <div class="mt-5 flex items-center gap-2 text-brand-400 text-sm font-semibold">
-                            View list
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <div class="flex items-center gap-4">
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
+                                <svg class="w-5 h-5" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-sm">Not Contacted</h3>
+                                    <span id="nc-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
+                                </div>
+                                <p class="text-gray-500 text-xs mt-0.5">New leads waiting to be contacted. Filter by sport and county.</p>
+                            </div>
+                            <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
                     </div>
 
                     <!-- In Discussion -->
                     <div onclick="showProspectView('in-discussion')" class="prospect-card">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg></div>
-                            <span id="id-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
-                        </div>
-                        <h3 class="text-xl font-bold mb-2">In Discussion</h3>
-                        <p class="text-gray-500 text-sm">Active conversations on a visual Kanban board with customisable stages.</p>
-                        <div class="mt-5 flex items-center gap-2 text-sm font-semibold" style="color:#6d28d9">
-                            View board
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <div class="flex items-center gap-4">
+                            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#ede9fe">
+                                <svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-bold text-sm">In Discussion</h3>
+                                    <span id="id-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
+                                </div>
+                                <p class="text-gray-500 text-xs mt-0.5">Active conversations on a visual Kanban board with customisable stages.</p>
+                            </div>
+                            <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
                     </div>
-                </div>
-
-                <!-- Quick actions -->
-                <div class="flex flex-wrap gap-3">
-                    <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Lead
-                    </button>
-                    <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
-                    <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
                 </div>
             </div>
 
@@ -2351,18 +2370,21 @@
              TOOL: SALES
              ============================================================ -->
         <div id="tool-sales" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
+            <!-- Page nav row -->
+            <div class="page-nav-row">
+                <button onclick="showLaunchpad()" class="nav-home-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6v4m-3-2h6"/></svg>
+                    Sales
+                </span>
+            </div>
 
             <!-- SALES HOME -->
             <div id="sales-home">
-                <div class="mb-8">
-                    <h2 class="text-2xl font-bold">Sales</h2>
-                    <p class="text-gray-500 text-sm mt-1">Manage jobs, design briefs and your sales pipeline</p>
-                </div>
-                <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-5">
                     <div onclick="openNewJobModal()" class="feature-card accent-purple" style="cursor:pointer">
                         <div class="card-icon" style="background:rgba(139,92,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#7c3aed" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg></div>
                         <h3>Create New Job</h3>
@@ -2827,26 +2849,39 @@
              TOOL: CLUBS (Enhanced)
              ============================================================ -->
         <div id="tool-clubs" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold">Clubs</h2>
-                <p class="text-gray-500 text-sm mt-1">Manage all your clubs, products and Shopify stores</p>
+            <!-- Page nav row -->
+            <div class="page-nav-row">
+                <button onclick="showLaunchpad()" class="nav-home-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M9 21V5.25A2.25 2.25 0 0111.25 3h1.5A2.25 2.25 0 0115 5.25V21m-6 0h6M3.75 21V10.5A2.25 2.25 0 016 8.25h.75M20.25 21V10.5a2.25 2.25 0 00-2.25-2.25H17.25"/></svg>
+                    Clubs
+                </span>
             </div>
 
-            <!-- Split action grid -->
-            <div class="split-action-grid mb-8">
+            <!-- Compact split action grid -->
+            <div class="split-action-grid">
                 <div onclick="showCreateClubModal()" class="split-action-card">
-                    <div class="text-4xl mb-3">➕</div>
-                    <h3 class="text-lg font-bold mb-1">Create New Club</h3>
-                    <p class="text-gray-500 text-sm">Set up a brand new club record with all details</p>
+                    <div class="split-action-icon" style="background:#ede9fe">
+                        <svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-sm">Create New Club</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">Set up a brand new club record</p>
+                    </div>
+                    <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </div>
                 <div onclick="showClubSearch()" class="split-action-card">
-                    <div class="text-4xl mb-3">🔍</div>
-                    <h3 class="text-lg font-bold mb-1">Search Clubs</h3>
-                    <p class="text-gray-500 text-sm">Find and manage existing clubs by name, sport or county</p>
+                    <div class="split-action-icon" style="background:#dbeafe">
+                        <svg class="w-5 h-5" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-bold text-sm">Search Clubs</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">Find and manage existing clubs</p>
+                    </div>
+                    <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </div>
             </div>
 
@@ -4639,11 +4674,14 @@
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('launchpad').classList.remove('hide');
 
-            // Show admin section only for super admins
-            if (isSuperAdmin) {
-                document.getElementById('admin-section').classList.remove('hide');
-            } else {
-                document.getElementById('admin-section').classList.add('hide');
+            // Show admin tools in Settings modal only for super admins (admin-section moved to settings)
+            const settingsAdminSection = document.getElementById('settings-admin-section');
+            if (settingsAdminSection) {
+                if (isSuperAdmin) {
+                    settingsAdminSection.classList.remove('hide');
+                } else {
+                    settingsAdminSection.classList.add('hide');
+                }
             }
 
             // Update launchpad brand display
@@ -12205,6 +12243,12 @@
             document.getElementById('profile-email-display').textContent = currentUser?.email || '';
             document.getElementById('scope-all').checked = viewScope !== 'mine';
             document.getElementById('scope-mine').checked = viewScope === 'mine';
+            // Show admin tools for super admins
+            const adminSec = document.getElementById('settings-admin-section');
+            if (adminSec) {
+                if (isSuperAdmin) adminSec.classList.remove('hide');
+                else adminSec.classList.add('hide');
+            }
             document.getElementById('profile-settings-modal').classList.remove('hide');
         }
 
