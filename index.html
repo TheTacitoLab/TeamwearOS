@@ -295,7 +295,89 @@
         .stage-quote       { background:rgba(124,58,237,0.12);  color:#7c3aed; }
         .stage-paid        { background:rgba(22,163,74,0.12);   color:#15803d; }
         .stage-onboarding  { background:rgba(14,165,233,0.12);  color:#0284c7; }
-        .stage-completed   { background:rgba(190,24,93,0.10);   color:#be185d; }
+        .stage-completed   { background:rgba(22,163,74,0.18);   color:#15803d; font-weight:800; }
+
+        /* Completed stage nav button — solid green block */
+        .stage-nav-btn-completed {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+            border-color: #15803d !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 14px rgba(22,163,74,0.35) !important;
+        }
+        .stage-nav-btn-completed .sn-count,
+        .stage-nav-btn-completed .sn-label { color: #ffffff !important; opacity: 1 !important; }
+
+        /* Timeline done steps — green */
+        .tl-step.done:not(:last-child)::after { background: rgba(22,163,74,0.4) !important; }
+        .tl-dot.done { background: rgba(22,163,74,0.2) !important; border-color: rgba(22,163,74,0.6) !important; }
+        .tl-step.done .tl-label { color: rgba(22,163,74,0.85) !important; }
+
+        /* No-club warning highlight on job cards */
+        .no-club-warning { color: #dc2626 !important; font-weight: 700; }
+        .job-card-no-club { border-left: 3px solid #dc2626 !important; }
+
+        /* Task item in activity feed */
+        .task-item { background: #fff7ed; border: 1px solid rgba(234,179,8,0.35); border-radius: 10px; padding: 10px 12px; position: relative; }
+        .task-item.task-done { background: rgba(22,163,74,0.06); border-color: rgba(22,163,74,0.3); opacity: 0.75; }
+        .task-checkbox { width: 16px; height: 16px; cursor: pointer; accent-color: #16a34a; flex-shrink: 0; margin-top: 1px; }
+
+        /* Activity tab toggle */
+        .act-tab-btn { padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid #e2e8f0; background: #f8fafc; color: #64748b; transition: all 0.15s; white-space: nowrap; }
+        .act-tab-btn.active { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+        .act-tab-btn.task-tab.active { background: #fff7ed; color: #c2410c; border-color: rgba(234,179,8,0.5); }
+
+        /* Home activity feed styles */
+        .home-feed-panel {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px;
+            display: flex; flex-direction: column; overflow: hidden;
+            max-height: calc(100vh - 160px); min-height: 420px;
+        }
+        .home-feed-header { padding: 16px 20px 12px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
+        .home-feed-body { flex: 1; overflow-y: auto; padding: 10px 12px; }
+        .home-feed-body::-webkit-scrollbar { width: 4px; }
+        .home-feed-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .home-feed-item {
+            display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px;
+            border-radius: 10px; background: #f8fafc; border: 1px solid #e2e8f0;
+            margin-bottom: 8px; transition: all 0.15s;
+        }
+        .home-feed-item:hover { border-color: #cbd5e1; }
+        .home-feed-item.task-feed-item { background: #fff7ed; border-color: rgba(234,179,8,0.3); }
+        .feed-action-btn { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; font-size: 12px; transition: all 0.15s; flex-shrink: 0; }
+        .feed-action-btn:hover { transform: scale(1.1); }
+        .feed-action-btn.btn-dismiss:hover { background: #fee2e2; border-color: #fca5a5; }
+        .feed-action-btn.btn-done:hover { background: rgba(22,163,74,0.1); border-color: rgba(22,163,74,0.4); }
+        .feed-action-btn.btn-like:hover { background: #eff6ff; border-color: #bfdbfe; }
+
+        /* Launchpad 2-col layout */
+        .launchpad-main-grid {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 1280px) { .launchpad-main-grid { grid-template-columns: 1fr 300px; } }
+        @media (max-width: 960px) { .launchpad-main-grid { grid-template-columns: 1fr; } .home-feed-panel { max-height: 400px; } }
+
+        /* Prospecting metrics bar */
+        .prospect-metric-card {
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
+            padding: 14px 18px; display: flex; flex-direction: column; gap: 2px; flex: 1;
+        }
+        .prospect-metric-count { font-size: 28px; font-weight: 900; line-height: 1; }
+        .prospect-metric-label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.4px; }
+
+        /* Multi-user assignment */
+        .user-chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; background: rgba(59,130,246,0.1); color: #2563eb; border: 1px solid rgba(59,130,246,0.2); }
+        .user-assign-list { display: flex; flex-direction: column; gap: 3px; max-height: 160px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px; background: #f8fafc; }
+        .user-assign-item { display: flex; align-items: center; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; transition: background 0.12s; font-size: 13px; }
+        .user-assign-item:hover { background: #eff6ff; }
+        .user-assign-item input[type=checkbox] { accent-color: #3b82f6; width: 14px; height: 14px; cursor: pointer; }
+
+        /* Convert to Job button */
+        .btn-convert { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white !important; font-weight: 700; padding: 8px 16px; border-radius: 8px; font-size: 12px; border: none; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+        .btn-convert:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(22,163,74,0.4); }
+        .btn-convert * { color: white !important; }
 
         .job-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: all 0.25s ease; }
         .job-card:hover { border-color: #cbd5e1; background: #fafafa; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
@@ -732,13 +814,13 @@
         </div>
 
         <!-- Launchpad -->
-        <div id="launchpad" class="w-full p-6 md:p-8 lg:px-12">
+        <div id="launchpad" class="w-full p-4 md:p-6 lg:px-10">
             <!-- Welcome header -->
-            <div class="flex items-end justify-between mb-8">
+            <div class="flex items-end justify-between mb-5">
                 <div>
-                    <p class="text-sm text-gray-500 mb-1 uppercase tracking-widest font-medium">Home</p>
-                    <h2 class="text-3xl font-bold">TeamwearOS</h2>
-                    <p class="text-gray-500 text-sm mt-1">Your teamwear operations platform</p>
+                    <p class="text-xs text-gray-500 mb-1 uppercase tracking-widest font-medium">Home</p>
+                    <h2 class="text-2xl font-bold">TeamwearOS</h2>
+                    <p class="text-gray-500 text-sm mt-0.5">Your teamwear operations platform</p>
                 </div>
                 <div class="text-right hide" id="launchpad-brand-display">
                     <p class="text-xs text-gray-600 uppercase tracking-wider">Active Brand</p>
@@ -747,7 +829,7 @@
             </div>
 
             <!-- No-brand notice (shown when user has no brand assigned) -->
-            <div id="no-brand-notice" class="hide glass rounded-2xl p-6 mb-8 border border-yellow-500/20">
+            <div id="no-brand-notice" class="hide glass rounded-2xl p-6 mb-5 border border-yellow-500/20">
                 <div class="flex items-start gap-4">
                     <div class="text-yellow-400 text-2xl flex-shrink-0">⚠</div>
                     <div>
@@ -757,8 +839,14 @@
                 </div>
             </div>
 
+            <!-- Main 2/3 + 1/3 layout -->
+            <div class="launchpad-main-grid">
+
+            <!-- LEFT: Feature Grid + Stats (2/3) -->
+            <div>
+
             <!-- Main Feature Grid -->
-            <div class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5" id="feature-grid">
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3" id="feature-grid">
 
                 <!-- Prospecting -->
                 <div id="fc-prospecting" onclick="showTool('prospecting')" class="feature-card accent-teal">
@@ -843,7 +931,7 @@
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
                 <div class="stat-card">
                     <p class="text-xs text-gray-500 mb-1">Products</p>
                     <p id="stat-products" class="text-2xl font-bold text-brand-400">0</p>
@@ -863,25 +951,51 @@
             </div>
 
             <!-- Super Admin Section -->
-            <div id="admin-section" class="hide mt-10">
-                <div class="flex items-center gap-3 mb-5">
+            <div id="admin-section" class="hide mt-6">
+                <div class="flex items-center gap-3 mb-4">
                     <div class="h-px flex-1" style="background:rgba(139,92,246,0.2)"></div>
                     <span class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Admin Tools</span>
                     <div class="h-px flex-1" style="background:rgba(139,92,246,0.2)"></div>
                 </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="grid grid-cols-2 gap-3">
                     <div onclick="showTool('settings')" class="feature-card" style="border-color:rgba(109,40,217,0.15)">
-                        <div class="card-icon" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
-                        <h3>Brand Settings</h3>
-                        <p>Manage brand config, salespeople and feature toggles</p>
+                        <div class="card-icon" style="background:#ede9fe;width:40px;height:40px;"><svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                        <h3 style="font-size:15px">Brand Settings</h3>
+                        <p>Manage brand config and feature toggles</p>
                     </div>
                     <div onclick="showTool('users')" class="feature-card" style="border-color:rgba(109,40,217,0.15)">
-                        <div class="card-icon" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg></div>
-                        <h3>User Management</h3>
+                        <div class="card-icon" style="background:#ede9fe;width:40px;height:40px;"><svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg></div>
+                        <h3 style="font-size:15px">User Management</h3>
                         <p>Assign users to brands and manage access</p>
                     </div>
                 </div>
             </div>
+
+            </div><!-- /LEFT col -->
+
+            <!-- RIGHT: Activity Feed (1/3) -->
+            <div class="home-feed-panel">
+                <div class="home-feed-header">
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-sm font-bold" style="color:#0f172a">Activity Feed</h3>
+                        <button onclick="loadHomeActivityFeed()" class="text-xs text-brand-400 hover:text-brand-500 font-semibold">Refresh</button>
+                    </div>
+                    <p class="text-xs text-gray-500">New comments &amp; tasks on your assigned records</p>
+                    <!-- Tasks In Progress section label -->
+                    <div class="mt-3 pt-3 border-t border-gray-100" id="home-tasks-header" style="display:none">
+                        <p class="text-xs font-bold text-orange-600 uppercase tracking-wider">Tasks In Progress</p>
+                    </div>
+                    <div id="home-tasks-list" class="mt-2"></div>
+                </div>
+                <div class="home-feed-body" id="home-activity-feed-list">
+                    <div class="empty-state" style="padding:40px 20px">
+                        <div class="empty-icon" style="font-size:32px">📋</div>
+                        <p style="font-size:12px">No recent activity. Activities from your assigned records will appear here.</p>
+                    </div>
+                </div>
+            </div><!-- /RIGHT col -->
+
+            </div><!-- /launchpad-main-grid -->
         </div>
 
         <!-- TOOL: Product Database -->
@@ -1896,9 +2010,25 @@
 
             <!-- Prospecting Sub-Launchpad (home view) -->
             <div id="prospect-home">
-                <div class="mb-8">
+                <div class="mb-6">
                     <h2 class="text-2xl font-bold">Prospecting</h2>
                     <p class="text-gray-500 text-sm mt-1">Track and manage your leads pipeline</p>
+                </div>
+
+                <!-- Key Metrics Row -->
+                <div class="grid grid-cols-3 gap-4 mb-6">
+                    <div class="prospect-metric-card" style="border-left:4px solid #2563eb">
+                        <p class="prospect-metric-count" style="color:#1d4ed8" id="pm-not-contacted">0</p>
+                        <p class="prospect-metric-label">Not Contacted</p>
+                    </div>
+                    <div class="prospect-metric-card" style="border-left:4px solid #6d28d9">
+                        <p class="prospect-metric-count" style="color:#6d28d9" id="pm-in-discussion">0</p>
+                        <p class="prospect-metric-label">In Discussion</p>
+                    </div>
+                    <div class="prospect-metric-card" style="border-left:4px solid #16a34a">
+                        <p class="prospect-metric-count" style="color:#16a34a" id="pm-converted">0</p>
+                        <p class="prospect-metric-label">Converted to Job</p>
+                    </div>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-5 mb-8">
@@ -2130,6 +2260,18 @@
                                 <button onclick="document.getElementById('add-contact-form').classList.add('hide')" class="btn-secondary text-xs py-2 px-4">Cancel</button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Convert to Job banner (shown for existing leads) -->
+                    <div id="lead-convert-banner" class="hide mt-4 mb-2 p-3 rounded-xl flex items-center justify-between gap-3" style="background:rgba(22,163,74,0.06);border:1px solid rgba(22,163,74,0.25)">
+                        <div>
+                            <p class="text-sm font-bold" style="color:#15803d">Ready to convert this lead?</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Create a Sales Job from this lead with pre-filled details</p>
+                        </div>
+                        <button onclick="convertLeadToJob(currentLeadId)" class="btn-convert flex-shrink-0">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            Convert to Job
+                        </button>
                     </div>
 
                     <!-- Action buttons -->
@@ -2390,10 +2532,20 @@
                 <div class="glass rounded-2xl p-5">
                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Job Details</h4>
                     <div id="jr-overview-details" class="space-y-3"></div>
-                    <!-- Assigned user row -->
+                    <!-- Assigned users (multi-user) -->
                     <div class="mt-4 pt-4 border-t border-gray-800">
-                        <label class="text-xs text-gray-500 mb-2 block">Assigned To</label>
-                        <select id="jr-assigned-user" onchange="saveJobAssignment(this.value)" class="w-full px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a">
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs text-gray-500">Assigned To</label>
+                            <span class="text-xs text-gray-600">Select multiple for collaboration</span>
+                        </div>
+                        <div id="jr-assigned-users-list" class="user-assign-list mb-2">
+                            <!-- Populated by JS -->
+                        </div>
+                        <div id="jr-assigned-users-chips" class="flex flex-wrap gap-1 mt-1">
+                            <!-- Chips shown here -->
+                        </div>
+                        <!-- Legacy hidden select for backward compatibility -->
+                        <select id="jr-assigned-user" class="hide">
                             <option value="">Unassigned</option>
                         </select>
                     </div>
@@ -2512,13 +2664,25 @@
                 <!-- ── Column 3: Activity & Comments sidebar ── -->
                 <div class="jr-activity-sidebar">
                     <div class="jr-activity-sidebar-header">
-                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">Activity</h4>
-                        <p class="text-xs text-gray-700">Notes &amp; comments</p>
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Activity</h4>
+                        </div>
+                        <!-- Tab toggle: All / Comments / Tasks -->
+                        <div class="flex gap-1" id="jr-activity-tabs">
+                            <button class="act-tab-btn active" id="jr-tab-all" onclick="setActivityTab('all')">All</button>
+                            <button class="act-tab-btn" id="jr-tab-notes" onclick="setActivityTab('notes')">Comments</button>
+                            <button class="act-tab-btn task-tab" id="jr-tab-tasks" onclick="setActivityTab('tasks')">Tasks</button>
+                        </div>
                     </div>
                     <div id="jr-activity-log" class="jr-activity-sidebar-feed space-y-1">
                         <!-- Populated by JS -->
                     </div>
                     <div class="jr-activity-sidebar-input">
+                        <!-- Input type toggle -->
+                        <div class="flex gap-1 mb-2" id="jr-input-type-row">
+                            <button id="jr-input-comment-btn" onclick="setInputType('comment')" class="act-tab-btn active text-xs" style="flex:1">+ Comment</button>
+                            <button id="jr-input-task-btn" onclick="setInputType('task')" class="act-tab-btn task-tab text-xs" style="flex:1">+ Task</button>
+                        </div>
                         <div class="flex gap-2">
                             <input type="text" id="jr-activity-input" placeholder="Add a comment…" class="flex-1 px-3 py-2 rounded-lg text-xs" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a" onkeydown="if(event.key==='Enter')addJobActivity()">
                             <button onclick="addJobActivity()" class="btn-primary text-xs px-3 py-2">Post</button>
@@ -4442,6 +4606,15 @@
             if (ncBadge) ncBadge.textContent = ncLeads;
             if (idBadge) idBadge.textContent = idLeads;
 
+            // Prospecting 3 key metrics
+            const convertedLeads = leads.filter(l => l.status === 'converted' || l.converted_to_job_id).length;
+            const pmNc = document.getElementById('pm-not-contacted');
+            const pmId = document.getElementById('pm-in-discussion');
+            const pmConv = document.getElementById('pm-converted');
+            if (pmNc) pmNc.textContent = ncLeads;
+            if (pmId) pmId.textContent = idLeads;
+            if (pmConv) pmConv.textContent = convertedLeads;
+
             // Sales stats
             updateSalesBadges();
 
@@ -4487,6 +4660,9 @@
 
             // Apply feature toggles to cards
             applyFeatureToggles();
+
+            // Load home activity feed
+            setTimeout(() => loadHomeActivityFeed(), 100);
         }
 
         function applyFeatureToggles() {
@@ -10245,7 +10421,7 @@
             { key: 'quote',             label: 'Quote',             colorClass: 'stage-quote',      color: '#7c3aed', bg: 'rgba(124,58,237,0.1)'  },
             { key: 'paid',              label: 'Paid',              colorClass: 'stage-paid',       color: '#15803d', bg: 'rgba(22,163,74,0.1)'   },
             { key: 'on_boarding',       label: 'On-Boarding',       colorClass: 'stage-onboarding', color: '#0284c7', bg: 'rgba(14,165,233,0.1)'  },
-            { key: 'completed',         label: 'Completed',         colorClass: 'stage-completed',  color: '#be185d', bg: 'rgba(190,24,93,0.08)'  }
+            { key: 'completed',         label: 'Completed ✓',       colorClass: 'stage-completed',  color: '#16a34a', bg: 'rgba(22,163,74,0.12)'  }
         ];
 
         const JOB_TYPE_LABELS = {
@@ -10312,6 +10488,7 @@
             const grid = document.getElementById('stage-nav-grid');
             if (!grid) return;
             const liveJobs = jobs.filter(j => j.stage !== 'completed');
+            const completedJobs = jobs.filter(j => j.stage === 'completed');
             const liveStages = JOB_STAGES.filter(s => s.key !== 'completed');
             grid.innerHTML = liveStages.map(s => {
                 const count = liveJobs.filter(j => j.stage === s.key).length;
@@ -10328,6 +10505,10 @@
                 style="background:${!salesViewStageFilter ? 'rgba(37,99,235,0.08)' : '#f8fafc'};border-color:${!salesViewStageFilter ? '#2563eb' : '#e2e8f0'}">
                 <span class="sn-count" style="color:${!salesViewStageFilter ? '#2563eb' : '#475569'}">${liveJobs.length}</span>
                 <span class="sn-label" style="color:${!salesViewStageFilter ? '#2563eb' : '#94a3b8'}">All Live</span>
+            </div>
+            <div class="stage-nav-btn stage-nav-btn-completed" onclick="showSalesView('completed')" title="View completed jobs">
+                <span class="sn-count">${completedJobs.length}</span>
+                <span class="sn-label">Completed ✓</span>
             </div>`;
         }
 
@@ -10385,10 +10566,14 @@
 
         function renderJobCard(job) {
             const stage = JOB_STAGES.find(s => s.key === job.stage) || JOB_STAGES[0];
-            const clubName = job.clubs?.name || 'No club linked';
+            const hasClub = !!job.clubs?.name;
+            const clubName = hasClub ? job.clubs.name : '⚠ No club linked';
+            const clubStyle = hasClub ? '' : 'color:#dc2626;font-weight:700';
             const days = Math.floor((new Date() - new Date(job.created_at)) / 86400000);
             const ownerName = getUserDisplayName(job.created_by);
-            return `<div class="job-card" onclick="openJobRecord('${job.id}')">
+            const noClubClass = hasClub ? '' : ' job-card-no-club';
+            return `<div class="job-card${noClubClass}" onclick="openJobRecord('${job.id}')">
+                ${!hasClub ? `<div class="flex items-center gap-1 mb-2 px-2 py-1 rounded-lg" style="background:#fee2e2;border:1px solid #fca5a5"><svg class="w-3 h-3" fill="none" stroke="#dc2626" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><span style="font-size:10px;font-weight:700;color:#dc2626">No club linked</span></div>` : ''}
                 <div class="flex items-start justify-between gap-4">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
@@ -10397,7 +10582,7 @@
                             ${job.range_approved ? '<span class="stage-pill stage-paid" style="font-size:10px">Range ✓</span>' : ''}
                         </div>
                         <p class="job-name truncate">${escHtml(job.job_name)}</p>
-                        <p class="job-meta">${escHtml(clubName)} · ${JOB_TYPE_LABELS[job.job_type] || job.job_type} · ${CHANNEL_LABELS[job.channel] || job.channel}${ownerName !== '—' ? ` · <span style="color:#64748b">Owner: ${escHtml(ownerName)}</span>` : ''}</p>
+                        <p class="job-meta"><span style="${clubStyle}">${escHtml(clubName)}</span> · ${JOB_TYPE_LABELS[job.job_type] || job.job_type} · ${CHANNEL_LABELS[job.channel] || job.channel}${ownerName !== '—' ? ` · <span style="color:#64748b">Owner: ${escHtml(ownerName)}</span>` : ''}</p>
                     </div>
                     <div class="text-right flex-shrink-0">
                         <p class="text-xs text-gray-600">${days}d ago</p>
@@ -10475,6 +10660,21 @@
                 if (error) { showToast('Error creating job: ' + error.message, 'error'); return; }
                 showToast('Job created');
                 closeJobModal();
+                // Check if this was a lead conversion
+                const convertLeadId = document.getElementById('job-modal')._convertingFromLeadId;
+                if (convertLeadId) {
+                    document.getElementById('job-modal')._convertingFromLeadId = null;
+                    // Hide convert notice
+                    const noticeEl = document.getElementById('job-modal-convert-notice');
+                    if (noticeEl) noticeEl.style.display = 'none';
+                    await supabase.from('leads').update({
+                        status: 'converted',
+                        converted_to_job_id: data.id
+                    }).eq('id', convertLeadId);
+                    await loadLeads();
+                    updateStats();
+                    showToast('Lead successfully converted to Job!', 'success');
+                }
                 await loadJobs();
                 updateSalesBadges();
                 openJobRecord(data.id);
@@ -10537,9 +10737,18 @@
 
             renderJobHeader();
             showJobTab('overview');
-            // Load activity log and populate user assignment dropdown
+            // Load activity log and populate user assignment (multi-user)
             await Promise.all([loadJobActivity(), loadBrandUsers()]);
+            // Populate multi-user assignment list
+            const currentAssignedIds = currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []);
+            populateMultiUserAssign('jr-assigned-users-list', 'jr-assigned-users-chips', currentAssignedIds);
+            // Also populate hidden legacy dropdown for any backward-compat code
             populateUserAssignDropdown('jr-assigned-user', currentJob?.assigned_user_id);
+            // Reset activity tab
+            jobActivityTabFilter = 'all';
+            jobInputType = 'comment';
+            setActivityTab('all');
+            setInputType('comment');
         }
 
         // Helper to open job record from design studio (sets right tab)
@@ -10567,7 +10776,19 @@
             document.getElementById('jr-type').textContent = JOB_TYPE_LABELS[currentJob.job_type] || currentJob.job_type;
             document.getElementById('jr-club-type').textContent = CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type;
             document.getElementById('jr-channel').textContent = CHANNEL_LABELS[currentJob.channel] || currentJob.channel;
-            document.getElementById('jr-club-link').textContent = currentJob.clubs?.name || '—';
+            const clubLinkEl = document.getElementById('jr-club-link');
+            if (clubLinkEl) {
+                if (currentJob.clubs?.name) {
+                    clubLinkEl.textContent = currentJob.clubs.name;
+                    clubLinkEl.style.color = '';
+                    clubLinkEl.title = '';
+                } else {
+                    clubLinkEl.textContent = '⚠ No club linked';
+                    clubLinkEl.style.color = '#dc2626';
+                    clubLinkEl.style.fontWeight = '700';
+                    clubLinkEl.title = 'This job has no club linked — please link a club';
+                }
+            }
             document.getElementById('jr-created').textContent = new Date(currentJob.created_at).toLocaleDateString('en-GB');
             const days = Math.floor((new Date() - new Date(currentJob.created_at)) / 86400000);
             document.getElementById('jr-days-open').textContent = `${days} day${days !== 1 ? 's' : ''}`;
@@ -10577,7 +10798,7 @@
 
         const JOB_STAGE_COLORS = {
             discovery: '#9ca3af', concepts: '#3b82f6', awaiting_approval: '#7c3aed',
-            quote: '#1d4ed8', paid: '#15803d', on_boarding: '#6d28d9', completed: '#be185d'
+            quote: '#1d4ed8', paid: '#15803d', on_boarding: '#6d28d9', completed: '#16a34a'
         };
 
         function renderJobStagePills() {
@@ -10586,8 +10807,15 @@
             container.innerHTML = JOB_STAGES.map(s => {
                 const active = (currentJob?.stage || 'discovery') === s.key;
                 const c = JOB_STAGE_COLORS[s.key] || '#888';
+                const isCompleted = s.key === 'completed';
+                let style = '';
+                if (active && isCompleted) {
+                    style = `background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-color:#15803d;box-shadow:0 4px 14px rgba(22,163,74,0.35);font-weight:800;`;
+                } else if (active) {
+                    style = `color:${c};border-color:${c};background:${c}18;`;
+                }
                 return `<button onclick="updateJobStage('${s.key}')" class="stage-pill-btn${active ? ' active' : ''}"
-                    style="${active ? `color:${c};border-color:${c};background:${c}18` : ''}">${s.label}</button>`;
+                    style="${style}">${s.label}</button>`;
             }).join('');
         }
 
@@ -11910,47 +12138,10 @@
             renderJobActivity();
         }
 
-        function renderJobActivity() {
-            const container = document.getElementById('jr-activity-log');
-            if (!container) return;
-            if (!jobActivityLog.length) {
-                container.innerHTML = '<p class="text-xs text-gray-700 py-4 text-center">No activity yet.</p>';
-                return;
-            }
-            container.innerHTML = jobActivityLog.map(entry => {
-                const initial = (entry.user_name || '?').charAt(0).toUpperCase();
-                const ts = new Date(entry.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-                const typeColour = { status_change: '#6d28d9', assignment: '#2563eb', system: '#64748b', note: '#3b82f6' };
-                const col = typeColour[entry.activity_type] || '#3b82f6';
-                return `<div class="activity-entry">
-                    <div class="activity-avatar" style="background:${col}18;color:${col}">${initial}</div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-gray-300">${escHtml(entry.user_name)}</p>
-                        <p class="text-xs text-gray-400 mt-0.5">${escHtml(entry.message)}</p>
-                        <p class="text-xs text-gray-700 mt-0.5">${ts}</p>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        async function addJobActivity(message, type) {
-            const input = document.getElementById('jr-activity-input');
-            const msg = message || input?.value?.trim();
-            if (!msg) return;
-            const userName = currentUserProfile?.email?.split('@')[0] || 'Unknown';
-            const { data, error } = await supabase.from('job_activity').insert({
-                job_id: currentJobId,
-                brand_id: currentBrand.id,
-                user_id: currentUser?.id,
-                user_name: userName,
-                message: msg,
-                activity_type: type || 'note'
-            }).select().single();
-            if (error) { showToast('Error adding activity', 'error'); return; }
-            jobActivityLog.unshift(data);
-            if (input) input.value = '';
-            renderJobActivity();
-        }
+        // renderJobActivity and addJobActivity are defined later in ACTIVITY TABS section
+        // with full task/filter support. Stub here for hoisting:
+        function renderJobActivity() { /* overridden below */ }
+        async function addJobActivity(message, type) { /* overridden below */ }
 
         // =============================================
         // CLUB ACTIVITY LOG
@@ -12379,11 +12570,17 @@
                         ${lead.amount_of_teams ? `<span class="text-xs text-gray-600">${lead.amount_of_teams} team${lead.amount_of_teams !== 1 ? 's' : ''}</span>` : ''}
                     </div>
                     <div class="flex gap-2 flex-shrink-0">
+                        <button onclick="event.stopPropagation();convertLeadToJob('${lead.id}')"
+                            class="btn-convert text-xs"
+                            title="Convert to Sales Job">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            Convert to Job
+                        </button>
                         <button onclick="event.stopPropagation();moveLeadToDiscussion('${lead.id}')"
                             class="text-xs px-3 py-1.5 rounded-lg font-semibold transition"
                             style="background:#ede9fe;color:#6d28d9;border:1px solid rgba(139,92,246,0.2)"
                             title="Move to In Discussion">
-                            Move to Discussion →
+                            Discussion →
                         </button>
                         <button onclick="event.stopPropagation();archiveLeadById('${lead.id}','not_interested')"
                             class="text-xs px-2 py-1.5 rounded-lg transition"
@@ -12460,6 +12657,13 @@
                         <div class="kanban-card-meta">
                             ${lead.sport ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>` : ''}
                             ${lead.county ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
+                        </div>
+                        <div class="mt-2 pt-2" style="border-top:1px solid #f1f5f9">
+                            <button onclick="event.stopPropagation();convertLeadToJob('${lead.id}')"
+                                class="btn-convert w-full justify-center" style="font-size:11px;padding:5px 8px">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                Convert to Job
+                            </button>
                         </div>
                     </div>
                 `).join('');
@@ -12627,6 +12831,17 @@
                 document.getElementById('lead-status').value = lead.status || 'not_contacted';
                 document.getElementById('lead-stage').value = lead.kanban_stage_id || '';
                 dangerActions.style.removeProperty('display');
+                // Show convert banner only if not already converted
+                const convertBanner = document.getElementById('lead-convert-banner');
+                if (convertBanner) {
+                    if (lead.status === 'converted' || lead.converted_to_job_id) {
+                        convertBanner.innerHTML = `<div><p class="text-sm font-bold" style="color:#15803d">✓ Already converted to a Sales Job</p><p class="text-xs text-gray-500 mt-0.5">This lead has been converted to a job</p></div>`;
+                        convertBanner.classList.remove('hide');
+                    } else {
+                        convertBanner.innerHTML = `<div><p class="text-sm font-bold" style="color:#15803d">Ready to convert this lead?</p><p class="text-xs text-gray-500 mt-0.5">Create a Sales Job from this lead with pre-filled details</p></div><button onclick="convertLeadToJob(currentLeadId)" class="btn-convert flex-shrink-0"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>Convert to Job</button>`;
+                        convertBanner.classList.remove('hide');
+                    }
+                }
 
                 // Load contacts
                 const { data: contacts } = await supabase
@@ -12651,6 +12866,8 @@
                 document.getElementById('lead-status').value = defaultStatus;
                 document.getElementById('lead-stage').value = defaultStatus === 'in_discussion' ? (kanbanStages[0]?.id || '') : '';
                 dangerActions.style.display = 'none';
+                const convertBanner = document.getElementById('lead-convert-banner');
+                if (convertBanner) convertBanner.classList.add('hide');
             }
 
             toggleKanbanStageField();
@@ -12871,6 +13088,362 @@
                     }, 2000);
                 }
             });
+        }
+
+        // =============================================
+        // CONVERT LEAD TO JOB
+        // =============================================
+        async function convertLeadToJob(leadId) {
+            if (!leadId) return;
+            const lead = leads.find(l => l.id === leadId);
+            if (!lead) { showToast('Lead not found', 'error'); return; }
+
+            // Close lead modal if open
+            closeLeadModal();
+
+            // Pre-fill job modal with lead data
+            currentJobId = null;
+            document.getElementById('job-modal-title').textContent = 'Convert Lead to Job';
+            document.getElementById('job-name').value = lead.lead_name || lead.club_name || '';
+            document.getElementById('job-description').value = lead.notes || '';
+            if (document.getElementById('job-type')) document.getElementById('job-type').value = 'new_club';
+
+            // Store the lead ID for post-save conversion marking
+            document.getElementById('job-modal')._convertingFromLeadId = leadId;
+
+            // Show the job modal
+            document.getElementById('job-modal').classList.remove('hide');
+
+            // Add a visible notice at top of modal
+            let noticeEl = document.getElementById('job-modal-convert-notice');
+            if (!noticeEl) {
+                const modalBody = document.querySelector('#job-modal .p-5:not(.sticky)');
+                if (modalBody) {
+                    noticeEl = document.createElement('div');
+                    noticeEl.id = 'job-modal-convert-notice';
+                    noticeEl.className = 'mb-4 p-3 rounded-xl';
+                    noticeEl.style.cssText = 'background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.3)';
+                    modalBody.insertBefore(noticeEl, modalBody.firstChild);
+                }
+            }
+            if (noticeEl) {
+                noticeEl.innerHTML = `<p class="text-sm font-bold" style="color:#15803d">Converting from Lead: ${escHtml(lead.lead_name)}</p><p class="text-xs text-gray-500 mt-0.5">Pre-filled from lead data. Complete the remaining job details below.</p>`;
+                noticeEl.style.display = 'block';
+            }
+        }
+
+        // =============================================
+        // ACTIVITY TABS (Notes/Tasks/All)
+        // =============================================
+        let jobActivityTabFilter = 'all'; // 'all', 'notes', 'tasks'
+        let jobInputType = 'comment'; // 'comment' or 'task'
+
+        function setActivityTab(tab) {
+            jobActivityTabFilter = tab;
+            ['all','notes','tasks'].forEach(t => {
+                const btn = document.getElementById(`jr-tab-${t}`);
+                if (btn) btn.classList.toggle('active', t === tab);
+            });
+            renderJobActivity();
+        }
+
+        function setInputType(type) {
+            jobInputType = type;
+            const commentBtn = document.getElementById('jr-input-comment-btn');
+            const taskBtn = document.getElementById('jr-input-task-btn');
+            const input = document.getElementById('jr-activity-input');
+            if (commentBtn) commentBtn.classList.toggle('active', type === 'comment');
+            if (taskBtn) taskBtn.classList.toggle('active', type === 'task');
+            if (input) {
+                input.placeholder = type === 'task' ? 'Add a task…' : 'Add a comment…';
+            }
+        }
+
+        function renderJobActivity() {
+            const container = document.getElementById('jr-activity-log');
+            if (!container) return;
+            let entries = jobActivityLog;
+            if (jobActivityTabFilter === 'notes') {
+                entries = entries.filter(e => e.activity_type !== 'task');
+            } else if (jobActivityTabFilter === 'tasks') {
+                entries = entries.filter(e => e.activity_type === 'task');
+            }
+            if (!entries.length) {
+                const emptyMsg = jobActivityTabFilter === 'tasks'
+                    ? 'No tasks yet. Add a task using the "+ Task" button.'
+                    : jobActivityTabFilter === 'notes'
+                    ? 'No comments yet.'
+                    : 'No activity yet.';
+                container.innerHTML = `<p class="text-xs text-gray-700 py-4 text-center">${emptyMsg}</p>`;
+                return;
+            }
+            container.innerHTML = entries.map(entry => {
+                const initial = (entry.user_name || '?').charAt(0).toUpperCase();
+                const ts = new Date(entry.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+                const isTask = entry.activity_type === 'task';
+                const taskDone = entry.task_completed;
+                const typeColour = { status_change: '#6d28d9', assignment: '#2563eb', system: '#64748b', note: '#3b82f6', task: '#c2410c' };
+                const col = typeColour[entry.activity_type] || '#3b82f6';
+                if (isTask) {
+                    return `<div class="task-item${taskDone ? ' task-done' : ''} mb-2">
+                        <div class="flex items-start gap-2">
+                            <input type="checkbox" class="task-checkbox mt-0.5" ${taskDone ? 'checked' : ''} onchange="toggleTaskComplete('${entry.id}',this.checked)" title="Mark task complete">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-semibold" style="color:#c2410c">📋 Task</p>
+                                <p class="text-xs text-gray-700 mt-0.5${taskDone ? ' line-through' : ''}">${escHtml(entry.message)}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">${escHtml(entry.user_name)} · ${ts}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+                return `<div class="activity-entry">
+                    <div class="activity-avatar" style="background:${col}18;color:${col}">${initial}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-gray-300">${escHtml(entry.user_name)}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">${escHtml(entry.message)}</p>
+                        <p class="text-xs text-gray-700 mt-0.5">${ts}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Full implementation of addJobActivity with task support:
+        addJobActivity = async function(message, type) {
+            const input = document.getElementById('jr-activity-input');
+            const msg = message || input?.value?.trim();
+            if (!msg) return;
+            const actType = type || (jobInputType === 'task' ? 'task' : 'note');
+            const userName = currentUserProfile?.email?.split('@')[0] || 'Unknown';
+            const { data, error } = await supabase.from('job_activity').insert({
+                job_id: currentJobId,
+                brand_id: currentBrand.id,
+                user_id: currentUser?.id,
+                user_name: userName,
+                message: msg,
+                activity_type: actType,
+                task_completed: false
+            }).select().single();
+            if (error) { showToast('Error adding activity', 'error'); return; }
+            jobActivityLog.unshift(data);
+            if (input) input.value = '';
+            renderJobActivity();
+            // Trigger feed refresh if on launchpad
+            loadHomeActivityFeed();
+        };
+
+        async function toggleTaskComplete(activityId, completed) {
+            const { error } = await supabase.from('job_activity')
+                .update({ task_completed: completed })
+                .eq('id', activityId);
+            if (error) { showToast('Error updating task', 'error'); return; }
+            const entry = jobActivityLog.find(e => e.id === activityId);
+            if (entry) entry.task_completed = completed;
+            renderJobActivity();
+            showToast(completed ? 'Task marked complete ✓' : 'Task reopened');
+        }
+
+        // =============================================
+        // HOME ACTIVITY FEED
+        // =============================================
+        let homeActivityFeed = [];
+
+        async function loadHomeActivityFeed() {
+            if (!currentUser || !currentBrand) return;
+            try {
+                // Get jobs assigned to current user (via assigned_user_ids OR assigned_user_id)
+                const { data: assignedJobs } = await supabase
+                    .from('jobs')
+                    .select('id, job_name, job_number')
+                    .eq('brand_id', currentBrand.id)
+                    .or(`assigned_user_id.eq.${currentUser.id},assigned_user_ids.cs.{"${currentUser.id}"}`);
+
+                const jobIds = (assignedJobs || []).map(j => j.id);
+                if (jobIds.length === 0) {
+                    homeActivityFeed = [];
+                    renderHomeActivityFeed();
+                    return;
+                }
+
+                const { data: activities } = await supabase
+                    .from('job_activity')
+                    .select('*, jobs(id,job_name,job_number)')
+                    .in('job_id', jobIds)
+                    .order('created_at', { ascending: false })
+                    .limit(30);
+
+                homeActivityFeed = (activities || []).filter(a => {
+                    // Exclude activities added by the current user themselves (optional)
+                    // Also exclude if dismissed by current user
+                    const dismissed = a.dismissed_by || [];
+                    return !dismissed.includes(currentUser.id);
+                });
+
+                renderHomeActivityFeed();
+            } catch(e) {
+                console.warn('Activity feed error:', e);
+            }
+        }
+
+        function renderHomeActivityFeed() {
+            const container = document.getElementById('home-activity-feed-list');
+            if (!container) return;
+
+            // Split: tasks in progress vs all activities
+            const tasksInProgress = homeActivityFeed.filter(a => a.activity_type === 'task' && !a.task_completed);
+            const tasksHeader = document.getElementById('home-tasks-header');
+            const tasksList = document.getElementById('home-tasks-list');
+
+            if (tasksInProgress.length > 0) {
+                if (tasksHeader) tasksHeader.style.display = '';
+                if (tasksList) {
+                    tasksList.innerHTML = tasksInProgress.slice(0, 3).map(a => `
+                        <div class="flex items-center gap-2 mb-1 px-2 py-1.5 rounded-lg" style="background:#fff7ed;border:1px solid rgba(234,179,8,0.3)">
+                            <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="#c2410c" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                            <p class="text-xs text-gray-700 flex-1 truncate">${escHtml(a.message)}</p>
+                            <button onclick="completeFeedTask('${a.id}')" class="feed-action-btn btn-done" title="Mark complete">✓</button>
+                        </div>
+                    `).join('');
+                }
+            } else {
+                if (tasksHeader) tasksHeader.style.display = 'none';
+                if (tasksList) tasksList.innerHTML = '';
+            }
+
+            if (homeActivityFeed.length === 0) {
+                container.innerHTML = `<div style="padding:40px 20px;text-align:center"><div style="font-size:32px;margin-bottom:10px">📋</div><p style="font-size:12px;color:#94a3b8">No recent activity. Activities from your assigned records will appear here.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = homeActivityFeed.map(activity => {
+                const isTask = activity.activity_type === 'task';
+                const ts = new Date(activity.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+                const jobName = activity.jobs?.job_name || activity.jobs?.job_number || 'Unknown Job';
+                const typeIcon = isTask ? '📋' : '💬';
+                const typeColor = isTask ? '#c2410c' : '#2563eb';
+                return `<div class="home-feed-item${isTask ? ' task-feed-item' : ''}">
+                    <div style="font-size:16px;flex-shrink:0;margin-top:2px">${typeIcon}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold truncate" style="color:${typeColor}">${isTask ? 'Task' : 'Comment'} · <span style="color:#64748b;font-weight:600">${escHtml(jobName)}</span></p>
+                        <p class="text-xs text-gray-600 mt-0.5 truncate">${escHtml(activity.message)}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">${escHtml(activity.user_name)} · ${ts}</p>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button onclick="dismissFeedActivity('${activity.id}')" class="feed-action-btn btn-dismiss" title="Dismiss">✕</button>
+                        ${isTask && !activity.task_completed ? `<button onclick="completeFeedTask('${activity.id}')" class="feed-action-btn btn-done" title="Complete task">✓</button>` : ''}
+                        <button onclick="likeFeedActivity('${activity.id}')" class="feed-action-btn btn-like" title="Acknowledge">👍</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function dismissFeedActivity(activityId) {
+            if (!currentUser) return;
+            // Add current user to dismissed_by array
+            const { error } = await supabase.from('job_activity')
+                .update({ dismissed_by: supabase.rpc ? undefined : undefined }) // Use RPC for array append
+                .eq('id', activityId);
+
+            // Fallback: just remove from local feed immediately
+            homeActivityFeed = homeActivityFeed.filter(a => a.id !== activityId);
+            renderHomeActivityFeed();
+
+            // Background: update dismissed_by in DB
+            try {
+                const { data: current } = await supabase.from('job_activity').select('dismissed_by').eq('id', activityId).single();
+                const existingDismissed = current?.dismissed_by || [];
+                if (!existingDismissed.includes(currentUser.id)) {
+                    await supabase.from('job_activity')
+                        .update({ dismissed_by: [...existingDismissed, currentUser.id] })
+                        .eq('id', activityId);
+                }
+            } catch(e) { /* ignore */ }
+        }
+
+        async function completeFeedTask(activityId) {
+            const { error } = await supabase.from('job_activity')
+                .update({ task_completed: true })
+                .eq('id', activityId);
+            if (error) { showToast('Error completing task', 'error'); return; }
+            const entry = homeActivityFeed.find(a => a.id === activityId);
+            if (entry) entry.task_completed = true;
+            // Also update in jobActivityLog if currently viewing same job
+            const jEntry = jobActivityLog.find(a => a.id === activityId);
+            if (jEntry) { jEntry.task_completed = true; renderJobActivity(); }
+            renderHomeActivityFeed();
+            showToast('Task completed ✓');
+        }
+
+        async function likeFeedActivity(activityId) {
+            // Visual feedback only — just a thumbs up acknowledgement
+            const btn = document.querySelector(`[onclick="likeFeedActivity('${activityId}')"]`);
+            if (btn) { btn.textContent = '✅'; btn.disabled = true; }
+            showToast('Activity acknowledged 👍');
+        }
+
+        // =============================================
+        // MULTI-USER ASSIGNMENT
+        // =============================================
+        function populateMultiUserAssign(containerId, chipsId, currentAssignedIds) {
+            const container = document.getElementById(containerId);
+            const chipsEl = document.getElementById(chipsId);
+            if (!container) return;
+            const assigned = currentAssignedIds || [];
+            container.innerHTML = brandUsers.map(u => {
+                const isChecked = assigned.includes(u.id);
+                const displayName = u.email.split('@')[0];
+                return `<label class="user-assign-item">
+                    <input type="checkbox" value="${u.id}" ${isChecked ? 'checked' : ''}
+                        onchange="onUserAssignChange('${containerId}','${chipsId}')">
+                    <span>${escHtml(displayName)}</span>
+                    ${isChecked ? '<span style="margin-left:auto;font-size:10px;color:#3b82f6">Assigned ✓</span>' : ''}
+                </label>`;
+            }).join('');
+            updateAssignChips(containerId, chipsId);
+        }
+
+        function onUserAssignChange(containerId, chipsId) {
+            updateAssignChips(containerId, chipsId);
+            // Auto-save
+            const selected = getSelectedUserIds(containerId);
+            if (containerId === 'jr-assigned-users-list') {
+                saveMultiUserAssignment('job', selected);
+            }
+        }
+
+        function getSelectedUserIds(containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return [];
+            return Array.from(container.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+        }
+
+        function updateAssignChips(containerId, chipsId) {
+            const selected = getSelectedUserIds(containerId);
+            const chipsEl = document.getElementById(chipsId);
+            if (!chipsEl) return;
+            if (selected.length === 0) {
+                chipsEl.innerHTML = '<span class="text-xs text-gray-500">No one assigned</span>';
+                return;
+            }
+            chipsEl.innerHTML = selected.map(uid => {
+                const u = brandUsers.find(u => u.id === uid);
+                const name = u ? u.email.split('@')[0] : 'Unknown';
+                return `<span class="user-chip">${escHtml(name)}</span>`;
+            }).join('');
+        }
+
+        async function saveMultiUserAssignment(type, userIds) {
+            if (!currentJobId && type === 'job') return;
+            const primaryUserId = userIds[0] || null; // backward compat: first user = primary
+            const { error } = await supabase.from('jobs').update({
+                assigned_user_id: primaryUserId,
+                assigned_user_ids: userIds
+            }).eq('id', currentJobId);
+            if (error) { showToast('Error saving assignment', 'error'); return; }
+            if (currentJob) {
+                currentJob.assigned_user_id = primaryUserId;
+                currentJob.assigned_user_ids = userIds;
+            }
+            showToast('Assignment saved');
         }
 
         // =============================================
