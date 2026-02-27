@@ -11,24 +11,24 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; }
-        .glass { background: rgba(20,20,20,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; }
+        .glass { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
         .hide { display: none !important; }
-        input, select, textarea { background: #111; border: 1px solid #222; color: #fff; transition: all 0.2s ease; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20,184,166,0.15); }
-        input::placeholder { color: #555; }
-        
+        input, select, textarea { background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a; transition: all 0.2s ease; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20,184,166,0.12); }
+        input::placeholder { color: #94a3b8; }
+
         /* Brand colors */
-        .text-brand-400 { color: #2dd4bf; }
-        .text-brand-500 { color: #14b8a6; }
-        .text-brand-600 { color: #0d9488; }
+        .text-brand-400 { color: #0d9488; }
+        .text-brand-500 { color: #0f766e; }
+        .text-brand-600 { color: #115e59; }
         .bg-brand-400 { background-color: #2dd4bf; }
         .bg-brand-500 { background-color: #14b8a6; }
         .bg-brand-600 { background-color: #0d9488; }
-        .bg-brand-500\/20 { background-color: rgba(20,184,166,0.2); }
+        .bg-brand-500\/20 { background-color: rgba(20,184,166,0.12); }
         .hover\:bg-brand-600:hover { background-color: #0d9488; }
-        .hover\:text-brand-300:hover { color: #5eead4; }
-        .hover\:text-brand-400:hover { color: #2dd4bf; }
+        .hover\:text-brand-300:hover { color: #0d9488; }
+        .hover\:text-brand-400:hover { color: #0d9488; }
         .hover\:border-brand-500:hover { border-color: #14b8a6; }
         .border-brand-500 { border-color: #14b8a6; }
         
@@ -45,910 +45,361 @@
         }
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(20,184,166,0.4);
+            box-shadow: 0 4px 20px rgba(20,184,166,0.35);
         }
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
         .btn-secondary {
-            background: rgba(255,255,255,0.05);
-            color: #999;
+            background: #ffffff;
+            color: #475569;
             font-weight: 500;
             padding: 10px 20px;
             border-radius: 8px;
             transition: all 0.2s ease;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid #e2e8f0;
         }
         .btn-secondary:hover {
-            background: rgba(255,255,255,0.1);
-            color: #fff;
-            border-color: rgba(255,255,255,0.2);
+            background: #f8fafc;
+            color: #0f172a;
+            border-color: #cbd5e1;
         }
-        
+
         /* Card styles */
         .card {
-            background: rgba(20,20,20,0.6);
-            border: 1px solid rgba(255,255,255,0.06);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
             border-radius: 16px;
             padding: 24px;
             transition: all 0.3s ease;
         }
-        .card:hover {
-            border-color: rgba(20,184,166,0.3);
-        }
-        .card-interactive {
-            cursor: pointer;
-        }
-        .card-interactive:hover {
-            background: rgba(20,184,166,0.05);
-            transform: translateY(-2px);
-        }
-        
+        .card:hover { border-color: rgba(20,184,166,0.3); }
+        .card-interactive { cursor: pointer; }
+        .card-interactive:hover { background: rgba(20,184,166,0.03); transform: translateY(-2px); }
+
         /* Dropzone */
         .dropzone {
-            border: 2px dashed rgba(255,255,255,0.15);
+            border: 2px dashed #e2e8f0;
             border-radius: 12px;
             transition: all 0.3s ease;
-            background: rgba(255,255,255,0.02);
+            background: #fafafa;
         }
-        .dropzone:hover {
-            border-color: #14b8a6;
-            background: rgba(20,184,166,0.08);
-        }
-        .dropzone.drag-over {
-            border-color: #14b8a6;
-            background: rgba(20,184,166,0.15);
-            transform: scale(1.01);
-        }
-        
+        .dropzone:hover { border-color: #14b8a6; background: rgba(20,184,166,0.04); }
+        .dropzone.drag-over { border-color: #14b8a6; background: rgba(20,184,166,0.08); transform: scale(1.01); }
+
         /* Loading spinner */
         .spinner {
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255,255,255,0.2);
+            width: 20px; height: 20px;
+            border: 2px solid rgba(0,0,0,0.1);
             border-top-color: #14b8a6;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
+        @keyframes spin { to { transform: rotate(360deg); } }
+
         /* Progress bar */
-        .progress-bar {
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #14b8a6, #2dd4bf);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-        
-        /* Tooltip / Help popup */
-        .help-trigger {
-            color: #666;
-            cursor: help;
-            transition: color 0.2s;
-        }
-        .help-trigger:hover {
-            color: #14b8a6;
-        }
+        .progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #14b8a6, #2dd4bf); border-radius: 2px; transition: width 0.3s ease; }
+
+        /* Tooltip */
+        .help-trigger { color: #94a3b8; cursor: help; transition: color 0.2s; }
+        .help-trigger:hover { color: #14b8a6; }
         .tooltip {
-            position: absolute;
-            background: #1a1a1a;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 16px;
-            z-index: 100;
-            max-width: 320px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            animation: fadeIn 0.2s ease;
+            position: absolute; background: #ffffff; border: 1px solid #e2e8f0;
+            border-radius: 12px; padding: 16px; z-index: 100; max-width: 320px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12); animation: fadeIn 0.2s ease; color: #0f172a;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
         /* Club card */
         .club-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: all 0.2s ease;
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease;
         }
-        .club-card:hover {
-            background: rgba(20,184,166,0.08);
-            border-color: rgba(20,184,166,0.3);
-        }
-        
+        .club-card:hover { background: rgba(20,184,166,0.04); border-color: rgba(20,184,166,0.3); }
+
         /* Status badges */
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        .badge-success {
-            background: rgba(34,197,94,0.15);
-            color: #22c55e;
-        }
-        .badge-warning {
-            background: rgba(234,179,8,0.15);
-            color: #eab308;
-        }
-        .badge-info {
-            background: rgba(20,184,166,0.15);
-            color: #14b8a6;
-        }
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .badge-success { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .badge-warning { background: rgba(234,179,8,0.1); color: #b45309; }
+        .badge-info    { background: rgba(20,184,166,0.1); color: #0d9488; }
         
         /* Image grid item */
-        .image-item {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 10px;
-            overflow: hidden;
-            background: #111;
-            transition: all 0.2s ease;
-        }
-        .image-item:hover {
-            transform: scale(1.03);
-        }
-        .image-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .image-item .overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        .image-item:hover .overlay {
-            opacity: 1;
-        }
-        
-        /* Section divider */
-        .section-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 16px;
-        }
-        
-        /* Pulse animation for active states */
-        .pulse-border {
-            animation: pulseBorder 2s infinite;
-        }
-        @keyframes pulseBorder {
-            0%, 100% { border-color: rgba(20,184,166,0.3); }
-            50% { border-color: rgba(20,184,166,0.6); }
-        }
+        .image-item { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #f1f5f9; transition: all 0.2s ease; }
+        .image-item:hover { transform: scale(1.03); }
+        .image-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-item .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s ease; }
+        .image-item:hover .overlay { opacity: 1; }
+
+        /* Section title */
+        .section-title { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+
+        /* Pulse animation */
+        .pulse-border { animation: pulseBorder 2s infinite; }
+        @keyframes pulseBorder { 0%, 100% { border-color: rgba(20,184,166,0.3); } 50% { border-color: rgba(20,184,166,0.6); } }
 
         /* =============================================
            NEW STYLES: Club Dashboard, Order Forms etc.
            ============================================= */
 
         /* Tab navigation */
-        .tab-nav {
-            display: flex;
-            gap: 4px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-            margin-bottom: 24px;
-        }
-        .tab-nav button {
-            padding: 10px 18px;
-            border-radius: 8px 8px 0 0;
-            font-size: 13px;
-            font-weight: 500;
-            color: #666;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-        .tab-nav button:hover {
-            color: #ccc;
-            background: rgba(255,255,255,0.04);
-        }
-        .tab-nav button.active {
-            color: #14b8a6;
-            background: rgba(20,184,166,0.1);
-            border-bottom: 2px solid #14b8a6;
-        }
+        .tab-nav { display: flex; gap: 4px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; }
+        .tab-nav button { padding: 10px 18px; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 500; color: #64748b; background: transparent; border: none; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
+        .tab-nav button:hover { color: #0f172a; background: #f8fafc; }
+        .tab-nav button.active { color: #0d9488; background: rgba(20,184,166,0.08); border-bottom: 2px solid #14b8a6; }
 
-        /* Club list card (enhanced) */
-        .club-list-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px;
-            padding: 16px 20px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .club-list-card:hover {
-            background: rgba(20,184,166,0.05);
-            border-color: rgba(20,184,166,0.3);
-        }
+        /* Club list card */
+        .club-list-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px 20px; transition: all 0.2s ease; cursor: pointer; }
+        .club-list-card:hover { background: rgba(20,184,166,0.04); border-color: rgba(20,184,166,0.3); }
 
-        /* Partner / Non-partner badge */
-        .badge-partner {
-            background: rgba(20,184,166,0.15);
-            color: #14b8a6;
-        }
-        .badge-nonpartner {
-            background: rgba(100,100,100,0.15);
-            color: #888;
-        }
-        .badge-danger {
-            background: rgba(239,68,68,0.15);
-            color: #f87171;
-        }
+        /* Partner badges */
+        .badge-partner    { background: rgba(20,184,166,0.1);  color: #0d9488; }
+        .badge-nonpartner { background: rgba(100,100,100,0.08); color: #64748b; }
+        .badge-danger     { background: rgba(239,68,68,0.1);   color: #dc2626; }
 
         /* Price tier card */
-        .price-tier-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 10px;
-            padding: 14px;
-        }
+        .price-tier-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; }
 
         /* Club product card */
-        .club-product-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 16px;
-            transition: all 0.2s ease;
-        }
-        .club-product-card:hover {
-            border-color: rgba(20,184,166,0.2);
-        }
+        .club-product-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; transition: all 0.2s ease; }
+        .club-product-card:hover { border-color: rgba(20,184,166,0.25); }
 
         /* Shopify sync status */
-        .sync-status-synced {
-            color: #22c55e;
-        }
-        .sync-status-pending {
-            color: #eab308;
-        }
-        .sync-status-none {
-            color: #555;
-        }
+        .sync-status-synced { color: #16a34a; }
+        .sync-status-pending { color: #b45309; }
+        .sync-status-none   { color: #94a3b8; }
 
         /* Order form card */
-        .order-form-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 18px 20px;
-            transition: all 0.2s ease;
-        }
-        .order-form-card:hover {
-            border-color: rgba(20,184,166,0.2);
-        }
+        .order-form-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; transition: all 0.2s ease; }
+        .order-form-card:hover { border-color: rgba(20,184,166,0.25); }
 
         /* Submission card */
-        .submission-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 16px;
-        }
+        .submission-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
 
-        /* Public order form styles */
-        #public-form-view {
-            min-height: 100vh;
-            background: #0a0a0a;
-        }
-        .public-form-header {
-            background: rgba(20,20,20,0.9);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            padding: 20px 24px;
-        }
-        .player-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 60px 1fr 80px auto;
-            gap: 8px;
-            align-items: center;
-        }
-        @media (max-width: 768px) {
-            .player-row {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
+        /* Public order form */
+        #public-form-view { min-height: 100vh; background: #f1f5f9; }
+        .public-form-header { background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 20px 24px; }
+        .player-row { display: grid; grid-template-columns: 2fr 1fr 60px 1fr 80px auto; gap: 8px; align-items: center; }
+        @media (max-width: 768px) { .player-row { grid-template-columns: 1fr 1fr; } }
 
         /* Submission items table */
-        .items-table th {
-            font-size: 11px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 8px 10px;
-        }
-        .items-table td {
-            padding: 10px;
-            border-top: 1px solid rgba(255,255,255,0.04);
-            font-size: 13px;
-        }
+        .items-table th { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 10px; }
+        .items-table td { padding: 10px; border-top: 1px solid #f1f5f9; font-size: 13px; }
 
-        /* Section header with action */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
+        /* Section header */
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 
         /* Info row */
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-            font-size: 14px;
-        }
-        .info-row:last-child {
-            border-bottom: none;
-        }
-        .info-label { color: #666; }
-        .info-value { color: #ddd; }
+        .info-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #64748b; }
+        .info-value { color: #0f172a; }
 
         /* =============================================
            ENHANCED LAUNCHPAD
            ============================================= */
         .feature-card {
-            position: relative;
-            background: rgba(15,15,15,0.8);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 20px;
-            padding: 28px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            overflow: hidden;
+            position: relative; background: #ffffff; border: 1px solid #e2e8f0;
+            border-radius: 20px; padding: 28px; cursor: pointer; transition: all 0.3s ease; overflow: hidden;
         }
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
+        .feature-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; opacity: 0; transition: opacity 0.3s ease; }
         .feature-card:hover::before { opacity: 1; }
-        .feature-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(255,255,255,0.15);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        }
-        .feature-card.disabled-card {
-            opacity: 0.45;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .feature-card.coming-soon {
-            opacity: 0.5;
-            cursor: default;
-        }
-        .feature-card .card-icon {
-            width: 52px; height: 52px;
-            border-radius: 14px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px;
-            margin-bottom: 16px;
-        }
-        .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
-        .feature-card p { font-size: 13px; color: #666; line-height: 1.5; }
-        .feature-card .card-badge {
-            position: absolute;
-            top: 16px; right: 16px;
-            font-size: 10px; font-weight: 600;
-            padding: 3px 8px; border-radius: 20px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-        .badge-soon { background: rgba(255,255,255,0.07); color: #666; }
-        .badge-off { background: rgba(239,68,68,0.15); color: #f87171; }
-        .badge-new { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+        .feature-card:hover { transform: translateY(-3px); border-color: #cbd5e1; box-shadow: 0 12px 40px rgba(0,0,0,0.1); }
+        .feature-card.disabled-card { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+        .feature-card.coming-soon { opacity: 0.5; cursor: default; }
+        .feature-card .card-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 16px; }
+        .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
+        .feature-card p { font-size: 13px; color: #64748b; line-height: 1.5; }
+        .feature-card .card-badge { position: absolute; top: 16px; right: 16px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; }
+        .badge-soon { background: #f1f5f9; color: #64748b; }
+        .badge-off  { background: rgba(239,68,68,0.1); color: #dc2626; }
+        .badge-new  { background: rgba(20,184,166,0.1); color: #0d9488; }
 
         /* Card accent gradients */
-        .accent-teal::before { background: linear-gradient(90deg, #14b8a6, #06b6d4); }
+        .accent-teal::before   { background: linear-gradient(90deg, #14b8a6, #06b6d4); }
         .accent-purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
-        .accent-blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+        .accent-blue::before   { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
         .accent-orange::before { background: linear-gradient(90deg, #f97316, #fb923c); }
-        .accent-pink::before { background: linear-gradient(90deg, #ec4899, #f472b6); }
-        .accent-green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .accent-pink::before   { background: linear-gradient(90deg, #ec4899, #f472b6); }
+        .accent-green::before  { background: linear-gradient(90deg, #22c55e, #4ade80); }
 
-        /* Stats bar */
-        .stat-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 16px 20px;
-        }
+        /* Stat card */
+        .stat-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; }
 
         /* =============================================
            PROSPECTING MODULE
            ============================================= */
-        .prospect-card {
-            background: rgba(15,15,15,0.9);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px;
-            padding: 24px 28px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .prospect-card:hover {
-            border-color: rgba(20,184,166,0.4);
-            background: rgba(20,184,166,0.04);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        }
+        .prospect-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px 28px; cursor: pointer; transition: all 0.3s ease; }
+        .prospect-card:hover { border-color: rgba(20,184,166,0.4); background: rgba(20,184,166,0.03); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
 
         /* Lead list */
-        .lead-row {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 14px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .lead-row:hover {
-            background: rgba(20,184,166,0.05);
-            border-color: rgba(20,184,166,0.2);
-        }
-        .lead-sport-badge {
-            font-size: 11px; font-weight: 600;
-            padding: 3px 8px; border-radius: 6px;
-            background: rgba(20,184,166,0.12);
-            color: #2dd4bf;
-            white-space: nowrap;
-        }
-        .lead-county-badge {
-            font-size: 11px; font-weight: 500;
-            padding: 3px 8px; border-radius: 6px;
-            background: rgba(255,255,255,0.06);
-            color: #999;
-            white-space: nowrap;
-        }
+        .lead-row { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; cursor: pointer; }
+        .lead-row:hover { background: rgba(20,184,166,0.04); border-color: rgba(20,184,166,0.25); }
+        .lead-sport-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(20,184,166,0.1); color: #0d9488; white-space: nowrap; }
+        .lead-county-badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: #f1f5f9; color: #64748b; white-space: nowrap; }
 
         /* Kanban board */
-        .kanban-board {
-            display: flex;
-            gap: 16px;
-            overflow-x: auto;
-            padding-bottom: 16px;
-            min-height: 500px;
-            align-items: flex-start;
-        }
+        .kanban-board { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 16px; min-height: 500px; align-items: flex-start; }
         .kanban-board::-webkit-scrollbar { height: 4px; }
-        .kanban-board::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-        .kanban-board::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .kanban-board::-webkit-scrollbar-track { background: #f1f5f9; }
+        .kanban-board::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
+        .kanban-column { flex: 0 0 320px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; min-height: 400px; }
+        .kanban-column.drag-over { border-color: rgba(20,184,166,0.4); background: rgba(20,184,166,0.03); }
+        .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+        .kanban-col-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; }
+        .kanban-count { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #e2e8f0; color: #64748b; }
+        .kanban-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; }
+        .kanban-card:hover { border-color: rgba(20,184,166,0.3); background: rgba(20,184,166,0.03); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .kanban-card.dragging { opacity: 0.5; transform: rotate(2deg); }
+        .kanban-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #0f172a; }
+        .kanban-card-club  { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+        .kanban-card-meta  { display: flex; gap: 6px; flex-wrap: wrap; }
 
-        .kanban-column {
-            flex: 0 0 320px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px;
-            padding: 16px;
-            min-height: 400px;
-        }
-        .kanban-column.drag-over {
-            border-color: rgba(20,184,166,0.4);
-            background: rgba(20,184,166,0.04);
-        }
-        .kanban-col-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 14px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .kanban-col-title {
-            font-size: 13px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            color: #aaa;
-        }
-        .kanban-count {
-            font-size: 12px; font-weight: 600;
-            padding: 2px 8px; border-radius: 10px;
-            background: rgba(255,255,255,0.07);
-            color: #777;
-        }
-
-        .kanban-card {
-            background: rgba(20,20,20,0.9);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            draggable: true;
-        }
-        .kanban-card:hover {
-            border-color: rgba(20,184,166,0.3);
-            background: rgba(20,184,166,0.04);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-        }
-        .kanban-card.dragging {
-            opacity: 0.5;
-            transform: rotate(2deg);
-        }
-        .kanban-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-        .kanban-card-club { font-size: 12px; color: #888; margin-bottom: 8px; }
-        .kanban-card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
-
-        /* Feature toggle toggle switch */
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 24px;
-        }
+        /* Toggle switch */
+        .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255,255,255,0.1);
-            transition: .3s;
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 16px; width: 16px;
-            left: 3px; bottom: 3px;
-            background: #666;
-            transition: .3s;
-            border-radius: 50%;
-        }
-        input:checked + .toggle-slider { background: rgba(20,184,166,0.3); border-color: #14b8a6; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e2e8f0; transition: .3s; border-radius: 24px; border: 1px solid #cbd5e1; }
+        .toggle-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #94a3b8; transition: .3s; border-radius: 50%; }
+        input:checked + .toggle-slider { background: rgba(20,184,166,0.2); border-color: #14b8a6; }
         input:checked + .toggle-slider:before { transform: translateX(20px); background: #14b8a6; }
 
-        /* Search & filter bar */
-        .filter-bar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-        .filter-bar input, .filter-bar select {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: #ddd;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        .filter-bar input:focus, .filter-bar select:focus {
-            border-color: #14b8a6;
-            outline: none;
-        }
+        /* Filter bar */
+        .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-bar input, .filter-bar select { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; padding: 8px 14px; border-radius: 8px; font-size: 13px; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: #14b8a6; outline: none; }
 
-        /* Lead modal sections */
-        .modal-section {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .modal-section-title {
-            font-size: 11px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            color: #555;
-            margin-bottom: 12px;
-        }
+        /* Modal sections */
+        .modal-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .modal-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #64748b; margin-bottom: 12px; }
 
-        /* Contact card in modal */
-        .contact-card {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 8px;
-            position: relative;
-        }
-        .contact-card .contact-name { font-size: 14px; font-weight: 600; }
-        .contact-card .contact-details { font-size: 12px; color: #777; margin-top: 4px; }
+        /* Contact card */
+        .contact-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; position: relative; }
+        .contact-card .contact-name    { font-size: 14px; font-weight: 600; color: #0f172a; }
+        .contact-card .contact-details { font-size: 12px; color: #64748b; margin-top: 4px; }
 
         /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #555;
-        }
-        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+        .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.6; }
         .empty-state p { font-size: 14px; }
 
         /* =============================================
            SALES MODULE
            ============================================= */
-        .stage-pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 11px; font-weight: 700;
-            padding: 4px 12px; border-radius: 20px;
-            text-transform: uppercase; letter-spacing: 0.5px;
-            cursor: pointer; transition: all 0.2s ease;
-        }
+        .stage-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s ease; }
         .stage-pill.active { box-shadow: 0 0 0 1px currentColor; }
-        .stage-discovery   { background:rgba(107,114,128,0.12); color:#9ca3af; }
-        .stage-concepts    { background:rgba(59,130,246,0.12);  color:#60a5fa; }
-        .stage-awaiting    { background:rgba(234,179,8,0.12);   color:#facc15; }
-        .stage-quote       { background:rgba(20,184,166,0.12);  color:#2dd4bf; }
-        .stage-paid        { background:rgba(34,197,94,0.12);   color:#4ade80; }
-        .stage-onboarding  { background:rgba(168,85,247,0.12);  color:#c084fc; }
-        .stage-completed   { background:rgba(255,255,255,0.06); color:#6b7280; }
+        .stage-discovery   { background:rgba(107,114,128,0.1);  color:#4b5563; }
+        .stage-concepts    { background:rgba(59,130,246,0.1);   color:#2563eb; }
+        .stage-awaiting    { background:rgba(234,179,8,0.1);    color:#b45309; }
+        .stage-quote       { background:rgba(20,184,166,0.1);   color:#0d9488; }
+        .stage-paid        { background:rgba(34,197,94,0.1);    color:#16a34a; }
+        .stage-onboarding  { background:rgba(168,85,247,0.1);   color:#7c3aed; }
+        .stage-completed   { background:#f1f5f9;                color:#64748b; }
 
-        .job-card {
-            background: rgba(15,15,15,0.9);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 14px;
-            padding: 18px 20px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-        .job-card:hover {
-            border-color: rgba(255,255,255,0.14);
-            background: rgba(25,25,25,0.95);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-        }
-        .job-card .job-number { font-size: 11px; color: #555; font-family: monospace; }
-        .job-card .job-name   { font-size: 15px; font-weight: 700; margin: 4px 0; }
-        .job-card .job-meta   { font-size: 12px; color: #666; }
+        .job-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: all 0.25s ease; }
+        .job-card:hover { border-color: #cbd5e1; background: #fafafa; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .job-card .job-number { font-size: 11px; color: #94a3b8; font-family: monospace; }
+        .job-card .job-name   { font-size: 15px; font-weight: 700; margin: 4px 0; color: #0f172a; }
+        .job-card .job-meta   { font-size: 12px; color: #64748b; }
 
-        /* Stage grid header (Live Jobs) */
-        .stage-nav-grid {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .stage-nav-btn {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            padding: 12px 16px; border-radius: 12px; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(255,255,255,0.02);
-            transition: all 0.2s ease;
-            min-width: 90px; text-align: center;
-        }
-        .stage-nav-btn:hover, .stage-nav-btn.active {
-            background: rgba(255,255,255,0.06);
-            border-color: rgba(255,255,255,0.12);
-        }
-        .stage-nav-btn .sn-count { font-size: 20px; font-weight: 800; }
-        .stage-nav-btn .sn-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #666; }
+        /* Stage grid */
+        .stage-nav-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
+        .stage-nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 16px; border-radius: 12px; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.2s ease; min-width: 90px; text-align: center; }
+        .stage-nav-btn:hover, .stage-nav-btn.active { background: #f8fafc; border-color: #cbd5e1; }
+        .stage-nav-btn .sn-count { font-size: 20px; font-weight: 800; color: #0f172a; }
+        .stage-nav-btn .sn-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
         .stage-nav-btn.active .sn-label { color: inherit; }
 
-        /* Job record tabs */
+        /* Job tab nav */
         .job-tab-nav { display: flex; gap: 2px; margin-bottom: 20px; flex-wrap: wrap; }
-        .job-tab-btn {
-            padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
-            color: #666; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent;
-        }
-        .job-tab-btn:hover { color: #ccc; background: rgba(255,255,255,0.04); }
-        .job-tab-btn.active { color: #fff; background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.1); }
+        .job-tab-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; }
+        .job-tab-btn:hover  { color: #0f172a; background: #f8fafc; }
+        .job-tab-btn.active { color: #0f172a; background: #f1f5f9; border-color: #e2e8f0; }
 
-        /* Design Studio pipeline cards */
-        .design-stage-card {
-            background: rgba(15,15,15,0.9);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 16px;
-            padding: 16px;
-            transition: all 0.2s ease;
-        }
-        .design-stage-card:hover {
-            border-color: rgba(236,72,153,0.3);
-            background: rgba(236,72,153,0.03);
-        }
-        .design-stage-active {
-            border-color: rgba(236,72,153,0.4) !important;
-            background: rgba(236,72,153,0.06) !important;
-        }
-        .design-job-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 14px;
-            padding: 16px;
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .design-job-card:hover {
-            border-color: rgba(236,72,153,0.3);
-            background: rgba(236,72,153,0.03);
-        }
-        /* Design status action buttons */
-        .ds-status-btn {
-            flex: 1;
-            padding: 10px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.2s ease;
-        }
+        /* Design Studio */
+        .design-stage-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; transition: all 0.2s ease; }
+        .design-stage-card:hover { border-color: rgba(236,72,153,0.3); background: rgba(236,72,153,0.02); }
+        .design-stage-active { border-color: rgba(236,72,153,0.4) !important; background: rgba(236,72,153,0.05) !important; }
+        .design-job-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; transition: all 0.2s ease; cursor: pointer; }
+        .design-job-card:hover { border-color: rgba(236,72,153,0.3); background: rgba(236,72,153,0.02); }
+
+        /* Design status buttons */
+        .ds-status-btn { flex: 1; padding: 10px 8px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center; cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease; }
         .ds-status-btn.active { box-shadow: 0 0 0 2px currentColor; }
-        /* Activity log */
-        .activity-entry {
-            display: flex;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.04);
-        }
-        .activity-entry:last-child { border-bottom: none; }
-        .activity-avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: rgba(20,184,166,0.12);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 700; color: #2dd4bf;
-            flex-shrink: 0;
-        }
-        /* Club team card */
-        .club-team-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px;
-            padding: 14px 16px;
-        }
 
-        /* Design version cards */
-        .version-card {
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255,255,255,0.07);
-            border-radius: 12px;
-            padding: 16px;
-            transition: all 0.2s ease;
-        }
-        .version-card.approved { border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.04); }
-        .version-card.rejected { border-color: rgba(239,68,68,0.2); background: rgba(239,68,68,0.03); opacity: 0.7; }
+        /* Activity log */
+        .activity-entry { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
+        .activity-entry:last-child { border-bottom: none; }
+        .activity-avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(20,184,166,0.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #0d9488; flex-shrink: 0; }
+
+        /* Club team card */
+        .club-team-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; }
+
+        /* Version cards */
+        .version-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; transition: all 0.2s ease; }
+        .version-card.approved { border-color: rgba(34,197,94,0.4); background: rgba(34,197,94,0.04); }
+        .version-card.rejected { border-color: rgba(239,68,68,0.25); background: rgba(239,68,68,0.03); opacity: 0.7; }
         .version-label { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; }
 
-        /* Design status badge */
-        .design-status-new           { background:rgba(107,114,128,0.12); color:#9ca3af; }
-        .design-status-in_progress   { background:rgba(59,130,246,0.12);  color:#60a5fa; }
-        .design-status-revisions     { background:rgba(234,179,8,0.12);   color:#facc15; }
-        .design-status-in_review     { background:rgba(168,85,247,0.12);  color:#c084fc; }
-        .design-status-awaiting_approval { background:rgba(249,115,22,0.12); color:#fb923c; }
-        .design-status-complete      { background:rgba(34,197,94,0.12);   color:#4ade80; }
+        /* Design status badges */
+        .design-status-new               { background:rgba(107,114,128,0.1);  color:#4b5563; }
+        .design-status-in_progress       { background:rgba(59,130,246,0.1);   color:#2563eb; }
+        .design-status-revisions         { background:rgba(234,179,8,0.1);    color:#b45309; }
+        .design-status-in_review         { background:rgba(168,85,247,0.1);   color:#7c3aed; }
+        .design-status-awaiting_approval { background:rgba(249,115,22,0.1);   color:#ea580c; }
+        .design-status-complete          { background:rgba(34,197,94,0.1);    color:#16a34a; }
 
         /* Pantone swatch */
-        .pantone-swatch {
-            width: 32px; height: 32px; border-radius: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: inline-block; cursor: pointer; flex-shrink: 0;
-        }
+        .pantone-swatch { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; display: inline-block; cursor: pointer; flex-shrink: 0; }
 
-        /* ── Design stage filter row (single-line) ── */
+        /* Design stage filter */
         #ds-stage-nav { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:24px; }
         #ds-stage-nav::-webkit-scrollbar { height:3px; }
         #ds-stage-nav::-webkit-scrollbar-track { background:transparent; }
-        #ds-stage-nav::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:2px; }
-        .ds-filter-chip {
-            display:flex; align-items:center; gap:8px; padding:8px 16px;
-            border-radius:40px; border:1px solid rgba(255,255,255,0.08);
-            background:rgba(255,255,255,0.03); cursor:pointer;
-            transition:all 0.2s; white-space:nowrap; flex-shrink:0;
-        }
+        #ds-stage-nav::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+        .ds-filter-chip { display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:40px; border:1px solid #e2e8f0; background:#ffffff; cursor:pointer; transition:all 0.2s; white-space:nowrap; flex-shrink:0; }
         .ds-filter-chip:hover { border-color:rgba(236,72,153,0.3); }
-        .ds-filter-chip.active { background:rgba(236,72,153,0.08); border-color:rgba(236,72,153,0.35); }
-        .ds-filter-chip .chip-count { font-size:13px; font-weight:700; }
-        .ds-filter-chip .chip-label { font-size:12px; font-weight:600; color:#aaa; }
-        .ds-filter-chip.active .chip-label { color:#f472b6; }
+        .ds-filter-chip.active { background:rgba(236,72,153,0.06); border-color:rgba(236,72,153,0.35); }
+        .ds-filter-chip .chip-count { font-size:13px; font-weight:700; color:#0f172a; }
+        .ds-filter-chip .chip-label { font-size:12px; font-weight:600; color:#64748b; }
+        .ds-filter-chip.active .chip-label { color:#db2777; }
 
-        /* ── Job stage pills ── */
+        /* Stage pill selector */
         .stage-pill-selector { display:flex; gap:4px; flex-wrap:wrap; }
-        .stage-pill-btn {
-            padding:5px 13px; border-radius:20px; font-size:12px; font-weight:700;
-            cursor:pointer; transition:all 0.18s; border:1px solid rgba(255,255,255,0.08);
-            background:rgba(255,255,255,0.04); color:#555; letter-spacing:0.2px;
-        }
-        .stage-pill-btn:hover { color:#ccc; background:rgba(255,255,255,0.07); }
-        .stage-pill-btn.active { color:#fff; box-shadow:0 0 0 1.5px currentColor; }
+        .stage-pill-btn { padding:5px 13px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.18s; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; letter-spacing:0.2px; }
+        .stage-pill-btn:hover  { color:#0f172a; background:#f1f5f9; }
+        .stage-pill-btn.active { color:#0f172a; box-shadow:0 0 0 1.5px currentColor; }
         .design-stage-row { display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
 
-        /* ── Bulk product selector ── */
-        .product-select-item {
-            display:flex; align-items:center; gap-3; padding:10px 12px;
-            border-radius:10px; border:1px solid rgba(255,255,255,0.06);
-            background:rgba(255,255,255,0.02); cursor:pointer; transition:all 0.15s;
-            gap:10px;
-        }
-        .product-select-item:hover { border-color:rgba(20,184,166,0.3); background:rgba(20,184,166,0.04); }
-        .product-select-item.selected { border-color:rgba(20,184,166,0.4); background:rgba(20,184,166,0.07); }
+        /* Bulk product selector */
+        .product-select-item { display:flex; align-items:center; gap-3; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; background:#ffffff; cursor:pointer; transition:all 0.15s; gap:10px; }
+        .product-select-item:hover    { border-color:rgba(20,184,166,0.3); background:rgba(20,184,166,0.03); }
+        .product-select-item.selected { border-color:rgba(20,184,166,0.4); background:rgba(20,184,166,0.06); }
         .product-select-item input[type=checkbox] { accent-color:#14b8a6; width:15px; height:15px; flex-shrink:0; cursor:pointer; }
 
-        /* ── Annotation pin ── */
-        .ann-pin {
-            position:absolute; transform:translate(-50%,-100%);
-            display:flex; flex-direction:column; align-items:center;
-            pointer-events:none; z-index:10;
-        }
-        .ann-pin-bubble {
-            width:24px; height:24px; border-radius:50%;
-            display:flex; align-items:center; justify-content:center;
-            font-size:11px; font-weight:800; color:#fff;
-            box-shadow:0 2px 8px rgba(0,0,0,0.6);
-        }
-        .ann-pin-arrow {
-            width:0; height:0;
-            border-left:5px solid transparent;
-            border-right:5px solid transparent;
-            margin-top:-1px;
-        }
+        /* Annotation pin */
+        .ann-pin { position:absolute; transform:translate(-50%,-100%); display:flex; flex-direction:column; align-items:center; pointer-events:none; z-index:10; }
+        .ann-pin-bubble { width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+        .ann-pin-arrow { width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; margin-top:-1px; }
 
-        /* ── Design activity feed ── */
-        .feed-item {
-            padding:12px 14px; border-radius:12px;
-            background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06);
-            transition:all 0.15s;
-        }
-        .feed-item:hover { border-color:rgba(255,255,255,0.1); }
+        /* Design activity feed */
+        .feed-item { padding:12px 14px; border-radius:12px; background:#f8fafc; border:1px solid #e2e8f0; transition:all 0.15s; }
+        .feed-item:hover { border-color:#cbd5e1; }
 
-        /* ── Annotation overlay ── */
+        /* Annotation overlay */
         #ann-img-container { position:relative; display:inline-block; max-width:100%; }
         #ann-img-container img { display:block; max-width:100%; border-radius:10px; user-select:none; }
         #ann-overlay { position:absolute; inset:0; cursor:crosshair; border-radius:10px; }
 
         /* Club status badges */
-        .status-retail       { background:rgba(107,114,128,0.12); color:#9ca3af; }
-        .status-partner      { background:rgba(20,184,166,0.12);  color:#2dd4bf; }
-        .status-partner-plus { background:rgba(168,85,247,0.12);  color:#c084fc; }
+        .status-retail       { background:rgba(107,114,128,0.1);  color:#4b5563; }
+        .status-partner      { background:rgba(20,184,166,0.1);   color:#0d9488; }
+        .status-partner-plus { background:rgba(168,85,247,0.1);   color:#7c3aed; }
 
-        /* Split grid (clubs portal) */
+        /* Split action grid */
         .split-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
         @media (max-width: 640px) { .split-action-grid { grid-template-columns: 1fr; } }
-        .split-action-card {
-            padding: 28px; border-radius: 18px; cursor: pointer;
-            border: 1px solid rgba(255,255,255,0.07);
-            background: rgba(255,255,255,0.02);
-            transition: all 0.25s ease; text-align: center;
-        }
-        .split-action-card:hover {
-            background: rgba(255,255,255,0.05);
-            border-color: rgba(255,255,255,0.12);
-            transform: translateY(-2px);
-        }
+        .split-action-card { padding: 28px; border-radius: 18px; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.25s ease; text-align: center; }
+        .split-action-card:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-2px); }
 
         /* ── Job Record page: full-width, dynamic ── */
         .job-record-page { width: 100%; padding: 24px 40px 48px; box-sizing: border-box; }
@@ -1102,6 +553,30 @@
                 grid-template-columns: repeat(3, 1fr);
             }
         }
+
+        /* ── Tailwind dark-mode overrides → light theme ── */
+        .text-white  { color: #0f172a !important; }
+        .text-gray-400 { color: #64748b !important; }
+        .text-gray-500 { color: #64748b !important; }
+        .text-gray-600 { color: #475569 !important; }
+        .text-gray-700 { color: #374151 !important; }
+        .text-gray-800 { color: #1e293b !important; }
+        .bg-gray-900, .bg-gray-800 { background-color: #f8fafc !important; }
+        .bg-gray-700   { background-color: #f1f5f9 !important; }
+        .bg-gray-600   { background-color: #e2e8f0 !important; }
+        .border-gray-800, .border-gray-700 { border-color: #e2e8f0 !important; }
+        .border-white  { border-color: #e2e8f0 !important; }
+        .border-white\/5, .border-opacity-5 { border-color: #f1f5f9 !important; }
+        .hover\:text-white:hover  { color: #0f172a !important; }
+        .hover\:bg-white\/5:hover { background-color: #f8fafc !important; }
+        /* Keep btn-primary text white */
+        .btn-primary, .btn-primary * { color: white !important; }
+        /* Modal backdrops stay dark */
+        .bg-black\/80 { background-color: rgba(15,23,42,0.65) !important; }
+        /* Purple role badge fix */
+        .text-purple-400 { color: #7c3aed !important; }
+        /* Brand selector on header */
+        .bg-gray-900.border.border-gray-700 { background: #f8fafc !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -1148,7 +623,7 @@
             <div class="flex items-center gap-3">
                 <button onclick="showLaunchpad()" class="text-2xl font-bold text-brand-400 hover:text-brand-300">TeamwearOS</button>
                 <div id="brand-selector" class="hide flex items-center gap-2">
-                    <select id="brand-select" onchange="switchBrand(this.value)" class="bg-gray-900 border border-gray-700 text-brand-400 text-sm px-3 py-1 rounded-lg">
+                    <select id="brand-select" onchange="switchBrand(this.value)" class="text-sm px-3 py-1 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0d9488">
                     </select>
                     <button onclick="showCreateBrand()" class="text-brand-400 hover:text-brand-300 text-sm px-2">+ New</button>
                 </div>
@@ -1169,7 +644,7 @@
                 <input type="text" id="new-brand-name" placeholder="Brand name (e.g. ROKOR Teamwear)" class="w-full px-4 py-3 rounded-lg mb-3">
                 <input type="text" id="new-brand-slug" placeholder="Slug (e.g. rokor-teamwear)" class="w-full px-4 py-3 rounded-lg mb-4">
                 <div class="flex gap-3">
-                    <button onclick="hideCreateBrand()" class="flex-1 bg-gray-700 hover:bg-gray-600 py-3 rounded-lg">Cancel</button>
+                    <button onclick="hideCreateBrand()" class="flex-1 btn-secondary py-3 rounded-lg">Cancel</button>
                     <button onclick="createBrand()" class="flex-1 bg-brand-500 hover:bg-brand-600 py-3 rounded-lg font-semibold">Create Brand</button>
                 </div>
             </div>
@@ -1182,11 +657,11 @@
                     <h3 class="text-lg font-bold">Profile &amp; Settings</h3>
                     <button onclick="hideProfileSettings()" class="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
                 </div>
-                <div class="mb-5 pb-4 border-b border-gray-800">
+                <div class="mb-5 pb-4 border-b" style="border-color:#e2e8f0">
                     <p class="text-xs text-gray-500 mb-1">Signed in as</p>
-                    <p id="profile-email-display" class="font-semibold text-white text-sm"></p>
+                    <p id="profile-email-display" class="font-semibold text-sm" style="color:#0f172a"></p>
                 </div>
-                <div class="bg-gray-800/50 rounded-xl p-4 mb-4">
+                <div class="rounded-xl p-4 mb-4" style="background:#f8fafc;border:1px solid #e2e8f0">
                     <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wider">Record Visibility</p>
                     <label class="flex items-start gap-3 cursor-pointer mb-3 p-2 rounded-lg hover:bg-white/5 transition">
                         <input type="radio" name="view-scope" value="all" id="scope-all" onchange="updateViewScope('all')" class="mt-0.5 accent-brand-500 flex-shrink-0">
@@ -1244,7 +719,7 @@
                     <p>Track leads, manage early conversations and monitor conversion pipeline</p>
                     <div class="mt-4 flex items-center gap-2">
                         <span id="stat-leads-nc" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(20,184,166,0.1);color:#2dd4bf">0 new leads</span>
-                        <span id="stat-leads-id" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(255,255,255,0.05);color:#888">0 in discussion</span>
+                        <span id="stat-leads-id" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 in discussion</span>
                     </div>
                 </div>
 
@@ -1256,7 +731,7 @@
                     <p>Manage jobs, design briefs, club products and order pipeline</p>
                     <div class="mt-4 flex items-center gap-2">
                         <span id="stat-jobs-live" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(139,92,246,0.1);color:#a78bfa">0 live jobs</span>
-                        <span id="stat-jobs-done" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(255,255,255,0.04);color:#666">0 completed</span>
+                        <span id="stat-jobs-done" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 completed</span>
                     </div>
                 </div>
 
@@ -1290,7 +765,7 @@
                     <p>Design pipeline — track briefs by stage from working to approved</p>
                     <div class="mt-4 flex items-center gap-2">
                         <span id="stat-design-active" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(236,72,153,0.1);color:#f472b6">0 active</span>
-                        <span id="stat-design-review" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(255,255,255,0.04);color:#666">0 in review</span>
+                        <span id="stat-design-review" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 in review</span>
                     </div>
                 </div>
 
@@ -1557,36 +1032,36 @@
                     <p class="text-gray-400 text-xs mb-2 font-medium">Size Categories <span class="text-gray-600">(tick all that apply — sizes can be edited below)</span></p>
                     <div class="space-y-2">
                         <!-- Adult -->
-                        <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                        <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <label class="flex items-center gap-3 cursor-pointer select-none">
                                 <input type="checkbox" id="prod-fit-adult" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
                                 <span class="text-sm font-medium">Adult <span class="text-gray-500 font-normal text-xs ml-1">S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL</span></span>
                             </label>
                             <div id="prod-adult-sizes-row" class="mt-2 ml-7 hide">
                                 <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
-                                <input type="text" id="prod-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)">
+                                <input type="text" id="prod-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
                             </div>
                         </div>
                         <!-- Youth Unisex -->
-                        <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                        <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <label class="flex items-center gap-3 cursor-pointer select-none">
                                 <input type="checkbox" id="prod-fit-youth" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
                                 <span class="text-sm font-medium">Youth Unisex <span class="text-gray-500 font-normal text-xs ml-1">YXXS, YXS, YS, YM, YL, YXL</span></span>
                             </label>
                             <div id="prod-youth-sizes-row" class="mt-2 ml-7 hide">
                                 <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
-                                <input type="text" id="prod-youth-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)">
+                                <input type="text" id="prod-youth-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
                             </div>
                         </div>
                         <!-- Women's -->
-                        <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                        <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <label class="flex items-center gap-3 cursor-pointer select-none">
                                 <input type="checkbox" id="prod-fit-women" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
                                 <span class="text-sm font-medium">Women's <span class="text-gray-500 font-normal text-xs ml-1">6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26</span></span>
                             </label>
                             <div id="prod-women-sizes-row" class="mt-2 ml-7 hide">
                                 <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
-                                <input type="text" id="prod-women-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1)">
+                                <input type="text" id="prod-women-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
                             </div>
                         </div>
                     </div>
@@ -1664,7 +1139,7 @@
                 <div class="flex gap-3 items-center">
                     <span class="text-xs text-gray-500">Filter:</span>
                     <button id="ds-filter-mine" onclick="setDesignFilter('mine')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)">My Jobs</button>
-                    <button id="ds-filter-all" onclick="setDesignFilter('all')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(255,255,255,0.05);color:#888;border:1px solid rgba(255,255,255,0.08)">All Jobs</button>
+                    <button id="ds-filter-all" onclick="setDesignFilter('all')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0">All Jobs</button>
                 </div>
             </div>
 
@@ -2579,7 +2054,7 @@
                             <!-- Populated by JS -->
                         </div>
                         <!-- Add contact form (hidden by default) -->
-                        <div id="add-contact-form" class="hide" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px">
+                        <div id="add-contact-form" class="hide" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
                             <p class="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-3">New Contact</p>
                             <div class="grid grid-cols-2 gap-3 mb-3">
                                 <input type="text" id="contact-first-name" placeholder="First name" class="px-3 py-2 rounded-lg text-sm">
@@ -2630,7 +2105,7 @@
                     <div id="stages-list" class="space-y-2 mb-4">
                         <!-- Populated by JS -->
                     </div>
-                    <div id="add-stage-form" class="hide mb-4" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px">
+                    <div id="add-stage-form" class="hide mb-4" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
                         <div class="flex gap-3 items-end">
                             <div class="flex-1">
                                 <label class="text-xs text-gray-500 mb-1 block">Stage Name</label>
@@ -2638,7 +2113,7 @@
                             </div>
                             <div>
                                 <label class="text-xs text-gray-500 mb-1 block">Colour</label>
-                                <input type="color" id="new-stage-color" value="#14b8a6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#111;border:1px solid #333">
+                                <input type="color" id="new-stage-color" value="#14b8a6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#f8fafc;border:1px solid #e2e8f0">
                             </div>
                             <button onclick="saveNewStage()" class="btn-primary text-sm py-2">Add</button>
                         </div>
@@ -2861,7 +2336,7 @@
                     <!-- Assigned user row -->
                     <div class="mt-4 pt-4 border-t border-gray-800">
                         <label class="text-xs text-gray-500 mb-2 block">Assigned To</label>
-                        <select id="jr-assigned-user" onchange="saveJobAssignment(this.value)" class="w-full px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd">
+                        <select id="jr-assigned-user" onchange="saveJobAssignment(this.value)" class="w-full px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a">
                             <option value="">Unassigned</option>
                         </select>
                     </div>
@@ -2876,7 +2351,7 @@
                         <p class="text-gray-500 text-sm mt-0.5">Products created for this job's club. Pricing from the club's partnership level.</p>
                     </div>
                     <div class="flex gap-3">
-                        <div id="jr-range-approved-wrap" class="flex items-center gap-2 px-4 py-2 rounded-lg" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)">
+                        <div id="jr-range-approved-wrap" class="flex items-center gap-2 px-4 py-2 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <input type="checkbox" id="jr-range-approved" onchange="toggleRangeApproved(this.checked)" class="w-4 h-4">
                             <label for="jr-range-approved" class="text-sm font-semibold text-gray-300 cursor-pointer">Range Approved</label>
                         </div>
@@ -2967,7 +2442,7 @@
                     </div>
                     <div class="mt-6">
                         <p class="text-xs text-gray-500 mb-2">Production worksheet is auto-generated from the approved order form. It includes the PO number at the top and excludes commercial pricing.</p>
-                        <div id="jr-production-status" class="p-4 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                        <div id="jr-production-status" class="p-4 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <p class="text-sm text-gray-600">No order form approved yet. Approve an order form to enable worksheet generation.</p>
                         </div>
                     </div>
@@ -2988,7 +2463,7 @@
                     </div>
                     <div class="jr-activity-sidebar-input">
                         <div class="flex gap-2">
-                            <input type="text" id="jr-activity-input" placeholder="Add a comment…" class="flex-1 px-3 py-2 rounded-lg text-xs" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd" onkeydown="if(event.key==='Enter')addJobActivity()">
+                            <input type="text" id="jr-activity-input" placeholder="Add a comment…" class="flex-1 px-3 py-2 rounded-lg text-xs" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a" onkeydown="if(event.key==='Enter')addJobActivity()">
                             <button onclick="addJobActivity()" class="btn-primary text-xs px-3 py-2">Post</button>
                         </div>
                     </div>
@@ -3287,7 +2762,7 @@
                     <div class="card md:col-span-2">
                         <div class="flex items-start justify-between mb-4">
                             <h3 class="font-semibold text-brand-400">Club Details</h3>
-                            <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:rgba(255,255,255,0.05)">Edit</button>
+                            <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:#f1f5f9">Edit</button>
                         </div>
                         <div id="club-overview-info"><!-- Populated by JS --></div>
                     </div>
@@ -3298,7 +2773,7 @@
                         <div class="mb-4">
                             <p class="text-xs text-gray-500 mb-2">Club Logo / Crest</p>
                             <div class="flex items-start gap-3">
-                                <div id="club-crest-display" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.1)">🏟️</div>
+                                <div id="club-crest-display" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl flex-shrink-0" style="background:#f8fafc;border:1px dashed #e2e8f0">🏟️</div>
                                 <div class="flex flex-col gap-2 justify-center">
                                     <button onclick="document.getElementById('club-logo-upload-inline').click()" class="text-xs btn-secondary px-3 py-1.5">Upload Logo</button>
                                     <input type="file" id="club-logo-upload-inline" accept="image/*" class="hide" onchange="uploadClubLogoInline(event)">
@@ -3471,7 +2946,7 @@
                         </button>
                     </div>
                     <!-- Products with images summary -->
-                    <div id="onboard-images-summary" class="p-3 rounded-xl mt-2" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                    <div id="onboard-images-summary" class="p-3 rounded-xl mt-2" style="background:#f8fafc;border:1px solid #e2e8f0">
                         <p class="text-xs text-gray-500">Club products with images: <span id="onboard-image-count" class="text-white font-semibold">0</span> of <span id="onboard-total-count" class="text-white font-semibold">0</span></p>
                     </div>
                 </div>
@@ -3488,8 +2963,8 @@
                         </div>
                     </div>
                     <!-- Collection image upload -->
-                    <div class="flex items-center gap-4 mb-4 p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
-                        <div id="onboard-coll-img-preview" class="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 text-xl" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15)">🏟️</div>
+                    <div class="flex items-center gap-4 mb-4 p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <div id="onboard-coll-img-preview" class="w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 text-xl" style="background:#f8fafc;border:1px dashed #e2e8f0">🏟️</div>
                         <div class="flex-1 min-w-0">
                             <p class="text-xs font-medium text-gray-300 mb-0.5">Collection Image</p>
                             <p class="text-xs text-gray-600">Recommended: 1200×600px. Used as the Shopify collection banner.</p>
@@ -3524,7 +2999,7 @@
                     <div class="flex gap-3 items-end flex-wrap">
                         <div class="flex-1" style="min-width:200px">
                             <label class="text-xs text-gray-500 mb-1.5 block">Select Product</label>
-                            <select id="onboard-single-product-select" class="w-full px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#ddd">
+                            <select id="onboard-single-product-select" class="w-full px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a">
                                 <option value="">Choose a club product...</option>
                             </select>
                         </div>
@@ -3545,7 +3020,7 @@
                         </div>
                     </div>
                     <div id="club-shopify-products-status" class="space-y-2 mb-3"></div>
-                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                         <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:#555"></span>
                         <p class="text-sm text-gray-500">Sync not yet enabled — coming soon</p>
                     </div>
@@ -3651,7 +3126,7 @@
                     </div>
                     <div class="jr-activity-sidebar-input">
                         <div class="flex gap-2">
-                            <input type="text" id="club-activity-input" placeholder="Add a comment…" class="flex-1 px-3 py-2 rounded-lg text-xs" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd" onkeydown="if(event.key==='Enter')addClubActivity()">
+                            <input type="text" id="club-activity-input" placeholder="Add a comment…" class="flex-1 px-3 py-2 rounded-lg text-xs" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a" onkeydown="if(event.key==='Enter')addClubActivity()">
                             <button onclick="addClubActivity()" class="btn-primary text-xs px-3 py-2">Post</button>
                         </div>
                     </div>
@@ -3771,7 +3246,7 @@
                             <div class="bg-gray-900 rounded-xl p-3">
                                 <p class="text-gray-500 text-xs mb-2">Main</p>
                                 <div class="flex items-center gap-2 mb-2">
-                                    <input type="color" id="club-pantone-main" value="#14b8a6" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid rgba(255,255,255,0.15)" oninput="syncHexInput('club-pantone-main','club-hex-main')">
+                                    <input type="color" id="club-pantone-main" value="#14b8a6" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid #e2e8f0" oninput="syncHexInput('club-pantone-main','club-hex-main')">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-gray-600 text-xs mb-1">Hex</p>
                                         <input type="text" id="club-hex-main" placeholder="#14b8a6" maxlength="7" class="w-full px-2 py-1 rounded text-xs font-mono" oninput="syncColorPicker('club-hex-main','club-pantone-main')">
@@ -3782,7 +3257,7 @@
                             <div class="bg-gray-900 rounded-xl p-3">
                                 <p class="text-gray-500 text-xs mb-2">Secondary</p>
                                 <div class="flex items-center gap-2 mb-2">
-                                    <input type="color" id="club-pantone-sec" value="#ffffff" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid rgba(255,255,255,0.15)" oninput="syncHexInput('club-pantone-sec','club-hex-sec')">
+                                    <input type="color" id="club-pantone-sec" value="#ffffff" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid #e2e8f0" oninput="syncHexInput('club-pantone-sec','club-hex-sec')">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-gray-600 text-xs mb-1">Hex</p>
                                         <input type="text" id="club-hex-sec" placeholder="#ffffff" maxlength="7" class="w-full px-2 py-1 rounded text-xs font-mono" oninput="syncColorPicker('club-hex-sec','club-pantone-sec')">
@@ -3793,7 +3268,7 @@
                             <div class="bg-gray-900 rounded-xl p-3">
                                 <p class="text-gray-500 text-xs mb-2">Accent</p>
                                 <div class="flex items-center gap-2 mb-2">
-                                    <input type="color" id="club-pantone-acc" value="#000000" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid rgba(255,255,255,0.15)" oninput="syncHexInput('club-pantone-acc','club-hex-acc')">
+                                    <input type="color" id="club-pantone-acc" value="#000000" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid #e2e8f0" oninput="syncHexInput('club-pantone-acc','club-hex-acc')">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-gray-600 text-xs mb-1">Hex</p>
                                         <input type="text" id="club-hex-acc" placeholder="#000000" maxlength="7" class="w-full px-2 py-1 rounded text-xs font-mono" oninput="syncColorPicker('club-hex-acc','club-pantone-acc')">
@@ -3809,7 +3284,7 @@
                 <div class="modal-section">
                     <p class="modal-section-title">Club Logo</p>
                     <div class="flex items-center gap-4">
-                        <div id="club-logo-preview" class="w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(255,255,255,0.04);border:1px dashed rgba(255,255,255,0.15)"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg></div>
+                        <div id="club-logo-preview" class="w-20 h-20 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#f8fafc;border:1px dashed #e2e8f0"><svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg></div>
                         <div class="flex-1">
                             <input type="file" id="club-logo-upload" accept="image/*" class="hide" onchange="previewClubLogo(event)">
                             <button onclick="document.getElementById('club-logo-upload').click()" class="btn-secondary text-sm mb-2 w-full">Upload Logo / Crest</button>
@@ -3923,8 +3398,8 @@
                         </div>
                         <div id="cs-tiers-list" class="space-y-2 mb-3"></div>
                         <div class="flex gap-2">
-                            <input type="text" id="cs-new-tier-key" placeholder="Key e.g. partner_plus" class="flex-1 px-3 py-2 rounded-lg text-sm font-mono" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
-                            <input type="text" id="cs-new-tier-name" placeholder="Display name e.g. Partner+" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <input type="text" id="cs-new-tier-key" placeholder="Key e.g. partner_plus" class="flex-1 px-3 py-2 rounded-lg text-sm font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <input type="text" id="cs-new-tier-name" placeholder="Display name e.g. Partner+" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <button onclick="csAddTier()" class="btn-primary text-sm px-4">Add</button>
                         </div>
                     </div>
@@ -3944,7 +3419,7 @@
                         <p class="text-gray-500 text-xs mb-3">Custom categories available when adding products (products already in the catalogue are included automatically)</p>
                         <div id="cs-categories-list" class="flex flex-wrap gap-2 mb-3 min-h-6"></div>
                         <div class="flex gap-2">
-                            <input type="text" id="cs-new-category" placeholder="e.g. Goalkeeper Kit" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <input type="text" id="cs-new-category" placeholder="e.g. Goalkeeper Kit" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <button onclick="csAddCategory()" class="btn-primary text-sm px-4">Add</button>
                         </div>
                     </div>
@@ -3955,7 +3430,7 @@
                         <p class="text-gray-500 text-xs mb-3">Custom ranges available when adding products</p>
                         <div id="cs-ranges-list" class="flex flex-wrap gap-2 mb-3 min-h-6"></div>
                         <div class="flex gap-2">
-                            <input type="text" id="cs-new-range" placeholder="e.g. Atlas, Warrior, Pro" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <input type="text" id="cs-new-range" placeholder="e.g. Atlas, Warrior, Pro" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <button onclick="csAddRange()" class="btn-primary text-sm px-4">Add</button>
                         </div>
                     </div>
@@ -3966,7 +3441,7 @@
                         <p class="text-gray-500 text-xs mb-3">Available fit type options in the product form</p>
                         <div id="cs-fittypes-list" class="flex flex-wrap gap-2 mb-3 min-h-6"></div>
                         <div class="flex gap-2">
-                            <input type="text" id="cs-new-fittype" placeholder="e.g. Ladies Fit, Junior" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1)">
+                            <input type="text" id="cs-new-fittype" placeholder="e.g. Ladies Fit, Junior" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <button onclick="csAddFitType()" class="btn-primary text-sm px-4">Add</button>
                         </div>
                     </div>
@@ -4116,7 +3591,7 @@
                         </div>
                     </div>
 
-                    <div id="store-preview-info" class="mb-5 p-4 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06)">
+                    <div id="store-preview-info" class="mb-5 p-4 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                         <p class="text-xs text-gray-500 mb-2">Store overview</p>
                         <div class="grid grid-cols-2 gap-3 text-sm">
                             <div><p class="text-gray-500 text-xs">Club</p><p id="cstore-club-name" class="font-semibold">—</p></div>
@@ -5745,7 +5220,7 @@
             }
             container.innerHTML = brandPricingTiers.map(tier => {
                 const tp = tierPrices[tier.tier_key] || {};
-                return `<div class="rounded-lg p-3" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+                return `<div class="rounded-lg p-3" style="background:#f8fafc;border:1px solid #e2e8f0">
                     <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">${escHtml(tier.tier_name)}</p>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
@@ -5994,7 +5469,7 @@
                 return;
             }
             container.innerHTML = brandPricingTiers.map((tier, idx) => `
-                <div class="flex items-center justify-between rounded-lg px-4 py-3" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)">
+                <div class="flex items-center justify-between rounded-lg px-4 py-3" style="background:#f8fafc;border:1px solid #e2e8f0">
                     <div>
                         <span class="font-medium text-sm">${escHtml(tier.tier_name)}</span>
                         <span class="text-gray-600 text-xs ml-2 font-mono">${escHtml(tier.tier_key)}</span>
@@ -8773,7 +8248,7 @@
                     formsEmpty?.classList.add('hide');
                     const baseUrl = window.location.origin + window.location.pathname;
                     formsList.innerHTML = currentOrderForms.map(f => `
-                        <div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
+                        <div class="flex items-center justify-between p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <div>
                                 <p class="text-sm font-semibold">${escHtml(f.title)}</p>
                                 <p class="text-xs text-gray-500">${f.season || ''} · ${f.is_active ? '<span style="color:#4ade80">Active</span>' : 'Closed'}</p>
@@ -8796,8 +8271,8 @@
                     { done: currentOrderForms.some(f => f.is_active), label: 'Order form live' },
                 ];
                 checklistEl.innerHTML = checks.map(c => `
-                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
-                        <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-sm" style="${c.done ? 'background:rgba(34,197,94,0.15);color:#4ade80' : 'background:rgba(255,255,255,0.05);color:#555'}">
+                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <span class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-sm" style="${c.done ? 'background:rgba(34,197,94,0.12);color:#16a34a' : 'background:#f1f5f9;color:#94a3b8'}">
                             ${c.done ? '✓' : '○'}
                         </span>
                         <span class="text-sm ${c.done ? 'text-gray-300' : 'text-gray-600'}">${c.label}</span>
@@ -10691,7 +10166,7 @@
                             ${job.range_approved ? '<span class="stage-pill stage-paid" style="font-size:10px">Range ✓</span>' : ''}
                         </div>
                         <p class="job-name truncate">${escHtml(job.job_name)}</p>
-                        <p class="job-meta">${escHtml(clubName)} · ${JOB_TYPE_LABELS[job.job_type] || job.job_type} · ${CHANNEL_LABELS[job.channel] || job.channel}${ownerName !== '—' ? ` · <span style="color:#555">Owner: ${escHtml(ownerName)}</span>` : ''}</p>
+                        <p class="job-meta">${escHtml(clubName)} · ${JOB_TYPE_LABELS[job.job_type] || job.job_type} · ${CHANNEL_LABELS[job.channel] || job.channel}${ownerName !== '—' ? ` · <span style="color:#64748b">Owner: ${escHtml(ownerName)}</span>` : ''}</p>
                     </div>
                     <div class="text-right flex-shrink-0">
                         <p class="text-xs text-gray-600">${days}d ago</p>
@@ -11247,23 +10722,23 @@
                             <div>
                                 <p class="text-xs text-gray-500 mb-2">Club Logo</p>
                                 <div class="flex items-center gap-3">
-                                    <div class="w-16 h-16 rounded-xl flex items-center justify-center text-2xl" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">${logoSrc ? `<img src="${escHtml(logoSrc)}" class="w-full h-full object-contain rounded-xl">` : '🏟️'}</div>
+                                    <div class="w-16 h-16 rounded-xl flex items-center justify-center text-2xl" style="background:#f8fafc;border:1px solid #e2e8f0">${logoSrc ? `<img src="${escHtml(logoSrc)}" class="w-full h-full object-contain rounded-xl">` : '🏟️'}</div>
                                     ${logoSrc ? `<a href="${escHtml(logoSrc)}" download class="text-xs btn-secondary px-3 py-1.5">Download</a>` : '<p class="text-xs text-gray-600">No logo uploaded</p>'}
                                 </div>
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500 mb-2">Pantone Colours <span class="text-gray-700">(overrideable per job)</span></p>
                                 <div class="flex gap-2 items-center mb-2">
-                                    <div class="pantone-swatch" style="background:${escHtml(pm)};width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)"></div>
-                                    <div class="pantone-swatch" style="background:${escHtml(ps)};width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)"></div>
-                                    <div class="pantone-swatch" style="background:${escHtml(pa)};width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,0.1)"></div>
+                                    <div class="pantone-swatch" style="background:${escHtml(pm)};width:28px;height:28px;border-radius:6px;border:1px solid #e2e8f0"></div>
+                                    <div class="pantone-swatch" style="background:${escHtml(ps)};width:28px;height:28px;border-radius:6px;border:1px solid #e2e8f0"></div>
+                                    <div class="pantone-swatch" style="background:${escHtml(pa)};width:28px;height:28px;border-radius:6px;border:1px solid #e2e8f0"></div>
                                     <button onclick="toggleJobColourOverride()" class="text-xs text-brand-400 hover:text-brand-300 ml-2">Override colours</button>
                                 </div>
                                 <div id="job-colour-override" class="hide">
                                     <div class="flex gap-3">
-                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(pm)}" oninput="updateJobPantone('main',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#111;border:1px solid #333"><span class="text-xs text-gray-500">Main</span></div>
-                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(ps)}" oninput="updateJobPantone('secondary',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#111;border:1px solid #333"><span class="text-xs text-gray-500">Secondary</span></div>
-                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(pa)}" oninput="updateJobPantone('accent',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#111;border:1px solid #333"><span class="text-xs text-gray-500">Accent</span></div>
+                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(pm)}" oninput="updateJobPantone('main',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#f8fafc;border:1px solid #e2e8f0"><span class="text-xs text-gray-500">Main</span></div>
+                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(ps)}" oninput="updateJobPantone('secondary',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#f8fafc;border:1px solid #e2e8f0"><span class="text-xs text-gray-500">Secondary</span></div>
+                                        <div class="flex items-center gap-1"><input type="color" value="${escHtml(pa)}" oninput="updateJobPantone('accent',this.value)" class="h-7 w-9 rounded cursor-pointer" style="padding:1px;background:#f8fafc;border:1px solid #e2e8f0"><span class="text-xs text-gray-500">Accent</span></div>
                                         <button onclick="saveJobColours()" class="btn-primary text-xs px-3 py-1.5">Save</button>
                                     </div>
                                 </div>
@@ -11282,7 +10757,7 @@
             ].map(b => {
                 const active = s === b.key;
                 const btnLabel = (b.key === 'in_review' && s === 'in_review') ? '👁️ In Review' : b.label;
-                return `<button onclick="updateDesignStatus('${b.key}')" class="ds-status-btn ${active ? 'active' : ''}" style="color:${b.color};background:${active ? b.bg : 'rgba(255,255,255,0.03)'};border-color:${active ? b.border : 'rgba(255,255,255,0.07)'}">${btnLabel}</button>`;
+                return `<button onclick="updateDesignStatus('${b.key}')" class="ds-status-btn ${active ? 'active' : ''}" style="color:${b.color};background:${active ? b.bg : '#f8fafc'};border-color:${active ? b.border : '#e2e8f0'}">${btnLabel}</button>`;
             }).join('');
 
             container.innerHTML = `
@@ -11314,11 +10789,11 @@
                                 <option value="bespoke" ${currentDesignTask.design_appetite==='bespoke'?'selected':''}>Bespoke — fully custom</option>
                             </select>
                             <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+                                <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                                     <p class="text-xs text-gray-500">Job Type</p>
                                     <p class="font-semibold mt-0.5">${JOB_TYPE_LABELS[currentJob?.job_type] || '—'}</p>
                                 </div>
-                                <div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06)">
+                                <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                                     <p class="text-xs text-gray-500">Days Open</p>
                                     <p class="font-semibold mt-0.5">${days}</p>
                                 </div>
@@ -11380,10 +10855,10 @@
                     </div>
                     ${v.file_url
                         ? `<div class="mt-3 cursor-pointer" onclick="openAnnotationModal('${v.id}')">
-                               <img src="${escHtml(v.file_url)}" class="rounded-lg max-h-64 object-contain w-full" alt="V${v.version_number}" style="border:1px solid rgba(255,255,255,0.08)">
+                               <img src="${escHtml(v.file_url)}" class="rounded-lg max-h-64 object-contain w-full" alt="V${v.version_number}" style="border:1px solid #e2e8f0">
                                <p class="text-xs text-gray-600 mt-1">Click image to annotate</p>
                            </div>`
-                        : `<div class="mt-3 p-4 rounded-xl text-center" style="background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.08)">
+                        : `<div class="mt-3 p-4 rounded-xl text-center" style="background:#f8fafc;border:1px dashed #e2e8f0">
                                <p class="text-xs text-gray-600 mb-2">No image uploaded</p>
                                <button onclick="uploadVersionFileFor('${v.id}')" class="text-xs btn-secondary px-3 py-1.5">Upload Image</button>
                            </div>`}
@@ -11661,7 +11136,7 @@
                     </div>
                     <textarea class="ann-comment-input w-full px-2 py-1.5 rounded-lg text-sm resize-none" rows="2"
                         placeholder="Add comment…" oninput="updateAnnotationComment(${i},this.value)"
-                        style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd">${escHtml(a.comment)}</textarea>
+                        style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a">${escHtml(a.comment)}</textarea>
                 </div>`;
             }).join('');
         }
@@ -12448,7 +11923,7 @@
                 <div class="flex items-start justify-between gap-3">
                     <div>
                         <p class="font-semibold">${escHtml(f.title)}</p>
-                        <p class="text-xs text-gray-500 mt-0.5">${f.season || ''} ${f.is_active ? '<span style="color:#4ade80">● Active</span>' : '<span style="color:#555">● Closed</span>'}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">${f.season || ''} ${f.is_active ? '<span style="color:#16a34a">● Active</span>' : '<span style="color:#94a3b8">● Closed</span>'}</p>
                     </div>
                     <div class="flex gap-2">
                         <button onclick="copyFormLink('${baseUrl}?form=${f.token}')" class="text-xs btn-secondary py-1 px-3">Copy Link</button>
@@ -12522,7 +11997,7 @@
             if (!container) return;
             container.innerHTML = FEATURES.map(f => {
                 const enabled = featureToggles[f.key] !== false;
-                return `<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
+                return `<div class="flex items-center justify-between p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                     <div class="flex items-center gap-3">
                         <span class="text-xl">${f.icon}</span>
                         <div>
@@ -12646,7 +12121,7 @@
                         </button>
                         <button onclick="event.stopPropagation();archiveLeadById('${lead.id}','not_interested')"
                             class="text-xs px-2 py-1.5 rounded-lg transition"
-                            style="background:rgba(255,255,255,0.04);color:#666"
+                            style="background:#f1f5f9;color:#64748b"
                             title="Archive as Not Interested">
                             Archive
                         </button>
@@ -12732,7 +12207,7 @@
                             <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.name)}</span>
                             <span class="kanban-count">${stageLeads.length}</span>
                         </div>
-                        ${cards || `<div style="color:#444;font-size:13px;padding:8px 0;text-align:center">Drop leads here</div>`}
+                        ${cards || `<div style="color:#94a3b8;font-size:13px;padding:8px 0;text-align:center">Drop leads here</div>`}
                     </div>
                 `;
             }).join('');
@@ -12788,7 +12263,7 @@
                 container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No stages yet. Add your first stage below.</p>';
             } else {
                 container.innerHTML = kanbanStages.map(stage => `
-                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05)">
+                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                         <span class="w-3 h-3 rounded-full flex-shrink-0" style="background:${stage.color}"></span>
                         <span class="flex-1 text-sm font-medium">${escHtml(stage.name)}</span>
                         <span class="text-xs text-gray-600">${leads.filter(l=>l.kanban_stage_id===stage.id).length} leads</span>
