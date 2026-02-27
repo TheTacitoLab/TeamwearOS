@@ -15,26 +15,26 @@
         .glass { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
         .hide { display: none !important; }
         input, select, textarea { background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a; transition: all 0.2s ease; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #14b8a6; box-shadow: 0 0 0 3px rgba(20,184,166,0.12); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
         input::placeholder { color: #94a3b8; }
 
-        /* Brand colors */
-        .text-brand-400 { color: #0d9488; }
-        .text-brand-500 { color: #0f766e; }
-        .text-brand-600 { color: #115e59; }
-        .bg-brand-400 { background-color: #2dd4bf; }
-        .bg-brand-500 { background-color: #14b8a6; }
-        .bg-brand-600 { background-color: #0d9488; }
-        .bg-brand-500\/20 { background-color: rgba(20,184,166,0.12); }
-        .hover\:bg-brand-600:hover { background-color: #0d9488; }
-        .hover\:text-brand-300:hover { color: #0d9488; }
-        .hover\:text-brand-400:hover { color: #0d9488; }
-        .hover\:border-brand-500:hover { border-color: #14b8a6; }
-        .border-brand-500 { border-color: #14b8a6; }
+        /* Brand colors — Blue */
+        .text-brand-400 { color: #2563eb; }
+        .text-brand-500 { color: #1d4ed8; }
+        .text-brand-600 { color: #1e40af; }
+        .bg-brand-400 { background-color: #60a5fa; }
+        .bg-brand-500 { background-color: #3b82f6; }
+        .bg-brand-600 { background-color: #2563eb; }
+        .bg-brand-500\/20 { background-color: rgba(59,130,246,0.12); }
+        .hover\:bg-brand-600:hover { background-color: #2563eb; }
+        .hover\:text-brand-300:hover { color: #93c5fd; }
+        .hover\:text-brand-400:hover { color: #2563eb; }
+        .hover\:border-brand-500:hover { border-color: #3b82f6; }
+        .border-brand-500 { border-color: #3b82f6; }
         
         /* Modern button styles */
         .btn-primary {
-            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
             font-weight: 600;
             padding: 12px 24px;
@@ -45,7 +45,7 @@
         }
         .btn-primary:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 20px rgba(20,184,166,0.35);
+            box-shadow: 0 4px 20px rgba(59,130,246,0.35);
         }
         .btn-primary:active { transform: translateY(0); }
         .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
@@ -58,11 +58,13 @@
             border-radius: 8px;
             transition: all 0.2s ease;
             border: 1px solid #e2e8f0;
+            cursor: pointer;
         }
         .btn-secondary:hover {
-            background: #f8fafc;
-            color: #0f172a;
-            border-color: #cbd5e1;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+            box-shadow: 0 2px 8px rgba(59,130,246,0.12);
         }
 
         /* Card styles */
@@ -73,9 +75,9 @@
             padding: 24px;
             transition: all 0.3s ease;
         }
-        .card:hover { border-color: rgba(20,184,166,0.3); }
+        .card:hover { border-color: rgba(59,130,246,0.3); }
         .card-interactive { cursor: pointer; }
-        .card-interactive:hover { background: rgba(20,184,166,0.03); transform: translateY(-2px); }
+        .card-interactive:hover { background: rgba(59,130,246,0.03); transform: translateY(-2px); }
 
         /* Dropzone */
         .dropzone {
@@ -84,14 +86,14 @@
             transition: all 0.3s ease;
             background: #fafafa;
         }
-        .dropzone:hover { border-color: #14b8a6; background: rgba(20,184,166,0.04); }
-        .dropzone.drag-over { border-color: #14b8a6; background: rgba(20,184,166,0.08); transform: scale(1.01); }
+        .dropzone:hover { border-color: #3b82f6; background: rgba(59,130,246,0.04); }
+        .dropzone.drag-over { border-color: #3b82f6; background: rgba(59,130,246,0.08); transform: scale(1.01); }
 
         /* Loading spinner */
         .spinner {
             width: 20px; height: 20px;
             border: 2px solid rgba(0,0,0,0.1);
-            border-top-color: #14b8a6;
+            border-top-color: #3b82f6;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
@@ -99,11 +101,11 @@
 
         /* Progress bar */
         .progress-bar { height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #14b8a6, #2dd4bf); border-radius: 2px; transition: width 0.3s ease; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); border-radius: 2px; transition: width 0.3s ease; }
 
         /* Tooltip */
         .help-trigger { color: #94a3b8; cursor: help; transition: color 0.2s; }
-        .help-trigger:hover { color: #14b8a6; }
+        .help-trigger:hover { color: #3b82f6; }
         .tooltip {
             position: absolute; background: #ffffff; border: 1px solid #e2e8f0;
             border-radius: 12px; padding: 16px; z-index: 100; max-width: 320px;
@@ -116,13 +118,13 @@
             background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;
             padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease;
         }
-        .club-card:hover { background: rgba(20,184,166,0.04); border-color: rgba(20,184,166,0.3); }
+        .club-card:hover { background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.3); }
 
         /* Status badges */
         .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
         .badge-success { background: rgba(34,197,94,0.1); color: #16a34a; }
         .badge-warning { background: rgba(234,179,8,0.1); color: #b45309; }
-        .badge-info    { background: rgba(20,184,166,0.1); color: #0d9488; }
+        .badge-info    { background: rgba(59,130,246,0.1); color: #2563eb; }
         
         /* Image grid item */
         .image-item { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: #f1f5f9; transition: all 0.2s ease; }
@@ -136,7 +138,7 @@
 
         /* Pulse animation */
         .pulse-border { animation: pulseBorder 2s infinite; }
-        @keyframes pulseBorder { 0%, 100% { border-color: rgba(20,184,166,0.3); } 50% { border-color: rgba(20,184,166,0.6); } }
+        @keyframes pulseBorder { 0%, 100% { border-color: rgba(59,130,246,0.3); } 50% { border-color: rgba(59,130,246,0.6); } }
 
         /* =============================================
            NEW STYLES: Club Dashboard, Order Forms etc.
@@ -145,15 +147,15 @@
         /* Tab navigation */
         .tab-nav { display: flex; gap: 4px; border-bottom: 1px solid #e2e8f0; margin-bottom: 24px; }
         .tab-nav button { padding: 10px 18px; border-radius: 8px 8px 0 0; font-size: 13px; font-weight: 500; color: #64748b; background: transparent; border: none; cursor: pointer; transition: all 0.2s ease; white-space: nowrap; }
-        .tab-nav button:hover { color: #0f172a; background: #f8fafc; }
-        .tab-nav button.active { color: #0d9488; background: rgba(20,184,166,0.08); border-bottom: 2px solid #14b8a6; }
+        .tab-nav button:hover { color: #1d4ed8; background: rgba(59,130,246,0.06); }
+        .tab-nav button.active { color: #2563eb; background: rgba(59,130,246,0.08); border-bottom: 2px solid #3b82f6; }
 
         /* Club list card */
         .club-list-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px 20px; transition: all 0.2s ease; cursor: pointer; }
-        .club-list-card:hover { background: rgba(20,184,166,0.04); border-color: rgba(20,184,166,0.3); }
+        .club-list-card:hover { background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.3); }
 
         /* Partner badges */
-        .badge-partner    { background: rgba(20,184,166,0.1);  color: #0d9488; }
+        .badge-partner    { background: rgba(59,130,246,0.1);  color: #2563eb; }
         .badge-nonpartner { background: rgba(100,100,100,0.08); color: #64748b; }
         .badge-danger     { background: rgba(239,68,68,0.1);   color: #dc2626; }
 
@@ -162,7 +164,7 @@
 
         /* Club product card */
         .club-product-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; transition: all 0.2s ease; }
-        .club-product-card:hover { border-color: rgba(20,184,166,0.25); }
+        .club-product-card:hover { border-color: rgba(59,130,246,0.25); }
 
         /* Shopify sync status */
         .sync-status-synced { color: #16a34a; }
@@ -171,7 +173,7 @@
 
         /* Order form card */
         .order-form-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px 20px; transition: all 0.2s ease; }
-        .order-form-card:hover { border-color: rgba(20,184,166,0.25); }
+        .order-form-card:hover { border-color: rgba(59,130,246,0.25); }
 
         /* Submission card */
         .submission-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; }
@@ -213,10 +215,10 @@
         .feature-card .card-badge { position: absolute; top: 16px; right: 16px; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: 0.5px; text-transform: uppercase; }
         .badge-soon { background: #f1f5f9; color: #64748b; }
         .badge-off  { background: rgba(239,68,68,0.1); color: #dc2626; }
-        .badge-new  { background: rgba(20,184,166,0.1); color: #0d9488; }
+        .badge-new  { background: rgba(59,130,246,0.1); color: #2563eb; }
 
         /* Card accent gradients */
-        .accent-teal::before   { background: linear-gradient(90deg, #14b8a6, #06b6d4); }
+        .accent-teal::before   { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
         .accent-purple::before { background: linear-gradient(90deg, #8b5cf6, #a78bfa); }
         .accent-blue::before   { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
         .accent-orange::before { background: linear-gradient(90deg, #f97316, #fb923c); }
@@ -230,12 +232,12 @@
            PROSPECTING MODULE
            ============================================= */
         .prospect-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px 28px; cursor: pointer; transition: all 0.3s ease; }
-        .prospect-card:hover { border-color: rgba(20,184,166,0.4); background: rgba(20,184,166,0.03); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+        .prospect-card:hover { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.03); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
 
         /* Lead list */
         .lead-row { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; transition: all 0.2s ease; cursor: pointer; }
-        .lead-row:hover { background: rgba(20,184,166,0.04); border-color: rgba(20,184,166,0.25); }
-        .lead-sport-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(20,184,166,0.1); color: #0d9488; white-space: nowrap; }
+        .lead-row:hover { background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.25); }
+        .lead-sport-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 6px; background: rgba(59,130,246,0.1); color: #2563eb; white-space: nowrap; }
         .lead-county-badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 6px; background: #f1f5f9; color: #64748b; white-space: nowrap; }
 
         /* Kanban board */
@@ -244,12 +246,12 @@
         .kanban-board::-webkit-scrollbar-track { background: #f1f5f9; }
         .kanban-board::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
         .kanban-column { flex: 0 0 320px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px; min-height: 400px; }
-        .kanban-column.drag-over { border-color: rgba(20,184,166,0.4); background: rgba(20,184,166,0.03); }
+        .kanban-column.drag-over { border-color: rgba(59,130,246,0.4); background: rgba(59,130,246,0.03); }
         .kanban-col-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
         .kanban-col-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; }
         .kanban-count { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #e2e8f0; color: #64748b; }
         .kanban-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s ease; }
-        .kanban-card:hover { border-color: rgba(20,184,166,0.3); background: rgba(20,184,166,0.03); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .kanban-card:hover { border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.03); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
         .kanban-card.dragging { opacity: 0.5; transform: rotate(2deg); }
         .kanban-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #0f172a; }
         .kanban-card-club  { font-size: 12px; color: #64748b; margin-bottom: 8px; }
@@ -260,13 +262,13 @@
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #e2e8f0; transition: .3s; border-radius: 24px; border: 1px solid #cbd5e1; }
         .toggle-slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background: #94a3b8; transition: .3s; border-radius: 50%; }
-        input:checked + .toggle-slider { background: rgba(20,184,166,0.2); border-color: #14b8a6; }
-        input:checked + .toggle-slider:before { transform: translateX(20px); background: #14b8a6; }
+        input:checked + .toggle-slider { background: rgba(59,130,246,0.2); border-color: #3b82f6; }
+        input:checked + .toggle-slider:before { transform: translateX(20px); background: #3b82f6; }
 
         /* Filter bar */
         .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .filter-bar input, .filter-bar select { background: #ffffff; border: 1px solid #e2e8f0; color: #0f172a; padding: 8px 14px; border-radius: 8px; font-size: 13px; }
-        .filter-bar input:focus, .filter-bar select:focus { border-color: #14b8a6; outline: none; }
+        .filter-bar input:focus, .filter-bar select:focus { border-color: #3b82f6; outline: none; }
 
         /* Modal sections */
         .modal-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
@@ -290,7 +292,7 @@
         .stage-discovery   { background:rgba(107,114,128,0.1);  color:#4b5563; }
         .stage-concepts    { background:rgba(59,130,246,0.1);   color:#2563eb; }
         .stage-awaiting    { background:rgba(234,179,8,0.1);    color:#b45309; }
-        .stage-quote       { background:rgba(20,184,166,0.1);   color:#0d9488; }
+        .stage-quote       { background:rgba(59,130,246,0.12);  color:#1d4ed8; }
         .stage-paid        { background:rgba(34,197,94,0.1);    color:#16a34a; }
         .stage-onboarding  { background:rgba(168,85,247,0.1);   color:#7c3aed; }
         .stage-completed   { background:#f1f5f9;                color:#64748b; }
@@ -304,16 +306,17 @@
         /* Stage grid */
         .stage-nav-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
         .stage-nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 16px; border-radius: 12px; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.2s ease; min-width: 90px; text-align: center; }
-        .stage-nav-btn:hover, .stage-nav-btn.active { background: #f8fafc; border-color: #cbd5e1; }
+        .stage-nav-btn:hover { background: #eff6ff; border-color: #bfdbfe; box-shadow: 0 2px 8px rgba(59,130,246,0.1); }
+        .stage-nav-btn.active { background: #eff6ff; border-color: #93c5fd; box-shadow: 0 2px 8px rgba(59,130,246,0.15); }
         .stage-nav-btn .sn-count { font-size: 20px; font-weight: 800; color: #0f172a; }
         .stage-nav-btn .sn-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
-        .stage-nav-btn.active .sn-label { color: inherit; }
+        .stage-nav-btn.active .sn-label { color: #2563eb; }
 
         /* Job tab nav */
         .job-tab-nav { display: flex; gap: 2px; margin-bottom: 20px; flex-wrap: wrap; }
         .job-tab-btn { padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #64748b; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; }
-        .job-tab-btn:hover  { color: #0f172a; background: #f8fafc; }
-        .job-tab-btn.active { color: #0f172a; background: #f1f5f9; border-color: #e2e8f0; }
+        .job-tab-btn:hover  { color: #1d4ed8; background: rgba(59,130,246,0.06); box-shadow: 0 2px 8px rgba(59,130,246,0.08); }
+        .job-tab-btn.active { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
 
         /* Design Studio */
         .design-stage-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 16px; transition: all 0.2s ease; }
@@ -329,7 +332,7 @@
         /* Activity log */
         .activity-entry { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
         .activity-entry:last-child { border-bottom: none; }
-        .activity-avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(20,184,166,0.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #0d9488; flex-shrink: 0; }
+        .activity-avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(59,130,246,0.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #2563eb; flex-shrink: 0; }
 
         /* Club team card */
         .club-team-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 16px; }
@@ -366,15 +369,15 @@
         /* Stage pill selector */
         .stage-pill-selector { display:flex; gap:4px; flex-wrap:wrap; }
         .stage-pill-btn { padding:5px 13px; border-radius:20px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.18s; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; letter-spacing:0.2px; }
-        .stage-pill-btn:hover  { color:#0f172a; background:#f1f5f9; }
-        .stage-pill-btn.active { color:#0f172a; box-shadow:0 0 0 1.5px currentColor; }
+        .stage-pill-btn:hover  { color:#1d4ed8; background:#eff6ff; border-color:#bfdbfe; }
+        .stage-pill-btn.active { color:#1d4ed8; background:#eff6ff; border-color:#93c5fd; box-shadow:0 0 0 1.5px #3b82f6; }
         .design-stage-row { display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
 
         /* Bulk product selector */
         .product-select-item { display:flex; align-items:center; gap-3; padding:10px 12px; border-radius:10px; border:1px solid #e2e8f0; background:#ffffff; cursor:pointer; transition:all 0.15s; gap:10px; }
-        .product-select-item:hover    { border-color:rgba(20,184,166,0.3); background:rgba(20,184,166,0.03); }
-        .product-select-item.selected { border-color:rgba(20,184,166,0.4); background:rgba(20,184,166,0.06); }
-        .product-select-item input[type=checkbox] { accent-color:#14b8a6; width:15px; height:15px; flex-shrink:0; cursor:pointer; }
+        .product-select-item:hover    { border-color:rgba(59,130,246,0.3); background:rgba(59,130,246,0.03); }
+        .product-select-item.selected { border-color:rgba(59,130,246,0.4); background:rgba(59,130,246,0.06); }
+        .product-select-item input[type=checkbox] { accent-color:#3b82f6; width:15px; height:15px; flex-shrink:0; cursor:pointer; }
 
         /* Annotation pin */
         .ann-pin { position:absolute; transform:translate(-50%,-100%); display:flex; flex-direction:column; align-items:center; pointer-events:none; z-index:10; }
@@ -392,14 +395,14 @@
 
         /* Club status badges */
         .status-retail       { background:rgba(107,114,128,0.1);  color:#4b5563; }
-        .status-partner      { background:rgba(20,184,166,0.1);   color:#0d9488; }
+        .status-partner      { background:rgba(59,130,246,0.1);   color:#2563eb; }
         .status-partner-plus { background:rgba(168,85,247,0.1);   color:#7c3aed; }
 
         /* Split action grid */
         .split-action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
         @media (max-width: 640px) { .split-action-grid { grid-template-columns: 1fr; } }
         .split-action-card { padding: 28px; border-radius: 18px; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.25s ease; text-align: center; }
-        .split-action-card:hover { background: #f8fafc; border-color: #cbd5e1; transform: translateY(-2px); }
+        .split-action-card:hover { background: #eff6ff; border-color: #bfdbfe; transform: translateY(-2px); box-shadow: 0 4px 16px rgba(59,130,246,0.1); }
 
         /* ── Job Record page: full-width, dynamic ── */
         .job-record-page { width: 100%; padding: 24px 40px 48px; box-sizing: border-box; }
@@ -427,53 +430,57 @@
         .jr-middle-col { min-width: 0; }
         .jr-pipelines-col { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
 
-        /* Right column: activity sidebar */
+        /* Right column: activity sidebar — light theme */
         .jr-activity-sidebar {
             position: sticky; top: 74px;
-            background: rgba(15,15,15,0.7); border: 1px solid rgba(255,255,255,0.07);
+            background: #ffffff; border: 1px solid #e2e8f0;
             border-radius: 14px; display: flex; flex-direction: column;
             max-height: calc(100vh - 94px); overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
         .jr-activity-sidebar-header {
-            padding: 14px 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 14px 16px 12px; border-bottom: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
         .jr-activity-sidebar-feed {
             flex: 1; overflow-y: auto; padding: 10px 12px;
         }
         .jr-activity-sidebar-feed::-webkit-scrollbar { width: 4px; }
-        .jr-activity-sidebar-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .jr-activity-sidebar-feed::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
         .jr-activity-sidebar-input {
-            padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
+            padding: 10px 12px; border-top: 1px solid #e2e8f0; flex-shrink: 0;
+            background: #f8fafc;
         }
 
-        /* Side nav (now lives inside jr-left-col, no longer needs its own sticky) */
+        /* Side nav — light theme, blue accents */
         .record-side-nav {
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            background: #ffffff; border: 1px solid #e2e8f0;
             border-radius: 14px; padding: 6px;
             display: flex; flex-direction: column; gap: 1px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         @media (max-width: 767px) { .record-side-nav { flex-direction: row; flex-wrap: wrap; } }
         .record-nav-item {
             display: flex; align-items: center; gap: 9px; padding: 10px 14px;
-            border-radius: 9px; font-size: 13px; font-weight: 600; color: #555;
+            border-radius: 9px; font-size: 13px; font-weight: 600; color: #64748b;
             cursor: pointer; transition: all 0.18s; width: 100%; text-align: left;
-            border: none; background: none; white-space: nowrap;
+            border: 1px solid transparent; background: none; white-space: nowrap;
         }
-        .record-nav-item:hover { color: #ccc; background: rgba(255,255,255,0.05); }
-        .record-nav-item.active { color: #fff; background: rgba(255,255,255,0.08); }
-        .record-nav-item svg { flex-shrink: 0; color: #444; transition: color 0.18s; }
-        .record-nav-item.active svg { color: #2dd4bf; }
-        .record-nav-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 4px 6px; }
+        .record-nav-item:hover { color: #1d4ed8; background: rgba(59,130,246,0.07); border-color: transparent; box-shadow: 0 1px 4px rgba(59,130,246,0.1); }
+        .record-nav-item.active { color: #1d4ed8; background: #eff6ff; border-color: #bfdbfe; }
+        .record-nav-item svg { flex-shrink: 0; color: #94a3b8; transition: color 0.18s; }
+        .record-nav-item:hover svg { color: #3b82f6; }
+        .record-nav-item.active svg { color: #3b82f6; }
+        .record-nav-divider { height: 1px; background: #e2e8f0; margin: 4px 6px; }
 
         /* ── Record timeline bar across the top ── */
         .record-timeline {
             display: flex; align-items: center; gap: 0;
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            background: #ffffff; border: 1px solid #e2e8f0;
             border-radius: 14px; padding: 14px 24px; overflow-x: auto; margin-bottom: 20px;
         }
         .record-timeline::-webkit-scrollbar { height: 3px; }
-        .record-timeline::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .record-timeline::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 2px; }
         .tl-step {
             display: flex; flex-direction: column; align-items: center; gap: 6px;
             flex: 1; min-width: 68px; position: relative; cursor: pointer;
@@ -481,22 +488,22 @@
         .tl-step:not(:last-child)::after {
             content: ''; position: absolute; top: 8px;
             left: calc(50% + 12px); right: calc(-50% + 12px);
-            height: 2px; background: rgba(255,255,255,0.07); pointer-events: none;
+            height: 2px; background: #e2e8f0; pointer-events: none;
         }
-        .tl-step.done:not(:last-child)::after { background: rgba(20,184,166,0.2); }
+        .tl-step.done:not(:last-child)::after { background: rgba(59,130,246,0.25); }
         .tl-dot {
             width: 20px; height: 20px; border-radius: 50%;
-            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.08);
+            background: #f1f5f9; border: 2px solid #e2e8f0;
             position: relative; z-index: 1; transition: all 0.2s; flex-shrink: 0;
         }
-        .tl-dot.done { background: rgba(20,184,166,0.15); border-color: rgba(20,184,166,0.3); }
-        .tl-dot.active { background: #14b8a6; border-color: #0d9488; box-shadow: 0 0 0 4px rgba(20,184,166,0.12); }
+        .tl-dot.done { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.4); }
+        .tl-dot.active { background: #3b82f6; border-color: #2563eb; box-shadow: 0 0 0 4px rgba(59,130,246,0.15); }
         .tl-label {
             font-size: 10px; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.35px; color: #444; text-align: center; white-space: nowrap;
+            letter-spacing: 0.35px; color: #94a3b8; text-align: center; white-space: nowrap;
         }
-        .tl-step.done .tl-label { color: rgba(20,184,166,0.55); }
-        .tl-step.active .tl-label { color: #2dd4bf; }
+        .tl-step.done .tl-label { color: rgba(59,130,246,0.65); }
+        .tl-step.active .tl-label { color: #2563eb; }
         .record-content { min-width: 0; }
 
         /* ── Full-width app layout improvements ── */
@@ -556,27 +563,51 @@
 
         /* ── Tailwind dark-mode overrides → light theme ── */
         .text-white  { color: #0f172a !important; }
+        .text-gray-300 { color: #64748b !important; }
         .text-gray-400 { color: #64748b !important; }
         .text-gray-500 { color: #64748b !important; }
         .text-gray-600 { color: #475569 !important; }
         .text-gray-700 { color: #374151 !important; }
         .text-gray-800 { color: #1e293b !important; }
+        /* Neon Tailwind light variants → accessible darker shades */
+        .text-brand-300 { color: #3b82f6 !important; }
+        .text-blue-300  { color: #2563eb !important; }
+        .text-cyan-300  { color: #0e7490 !important; }
+        .text-yellow-300 { color: #d97706 !important; }
+        .text-orange-300 { color: #c2410c !important; }
+        .text-green-300  { color: #16a34a !important; }
+        .text-red-300    { color: #dc2626 !important; }
+        .text-purple-300 { color: #7c3aed !important; }
         .bg-gray-900, .bg-gray-800 { background-color: #f8fafc !important; }
         .bg-gray-700   { background-color: #f1f5f9 !important; }
         .bg-gray-600   { background-color: #e2e8f0 !important; }
         .border-gray-800, .border-gray-700 { border-color: #e2e8f0 !important; }
         .border-white  { border-color: #e2e8f0 !important; }
         .border-white\/5, .border-opacity-5 { border-color: #f1f5f9 !important; }
-        .hover\:text-white:hover  { color: #0f172a !important; }
-        .hover\:bg-white\/5:hover { background-color: #f8fafc !important; }
+        .hover\:text-white:hover  { color: #1d4ed8 !important; }
+        .hover\:bg-white\/5:hover { background-color: #eff6ff !important; }
         /* Keep btn-primary text white */
         .btn-primary, .btn-primary * { color: white !important; }
         /* Modal backdrops stay dark */
         .bg-black\/80 { background-color: rgba(15,23,42,0.65) !important; }
-        /* Purple role badge fix */
+        /* Neon Tailwind 400-series → accessible darker shades */
         .text-purple-400 { color: #7c3aed !important; }
+        .text-green-400  { color: #15803d !important; }
+        .text-yellow-400 { color: #d97706 !important; }
+        .text-orange-400 { color: #c2410c !important; }
+        .text-red-400    { color: #dc2626 !important; }
+        .text-blue-400   { color: #2563eb !important; }
+        .text-pink-400   { color: #be185d !important; }
+        .hover\:text-red-300:hover    { color: #b91c1c !important; }
+        .hover\:text-orange-300:hover { color: #9a3412 !important; }
+        .hover\:text-green-300:hover  { color: #166534 !important; }
         /* Brand selector on header */
         .bg-gray-900.border.border-gray-700 { background: #f8fafc !important; border-color: #e2e8f0 !important; color: #0f172a !important; }
+        /* Secondary action buttons (bg-gray-700 pattern) — ensure visibility on light bg */
+        button.bg-gray-700, button.bg-gray-600 { border: 1px solid #e2e8f0; color: #374151 !important; }
+        button.bg-gray-700:hover, button.bg-gray-600:hover { background-color: #e2e8f0 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: #cbd5e1; }
+        /* Back navigation buttons */
+        button.text-gray-400:hover { color: #1d4ed8 !important; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -623,7 +654,7 @@
             <div class="flex items-center gap-3">
                 <button onclick="showLaunchpad()" class="text-2xl font-bold text-brand-400 hover:text-brand-300">TeamwearOS</button>
                 <div id="brand-selector" class="hide flex items-center gap-2">
-                    <select id="brand-select" onchange="switchBrand(this.value)" class="text-sm px-3 py-1 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0d9488">
+                    <select id="brand-select" onchange="switchBrand(this.value)" class="text-sm px-3 py-1 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#2563eb">
                     </select>
                     <button onclick="showCreateBrand()" class="text-brand-400 hover:text-brand-300 text-sm px-2">+ New</button>
                 </div>
@@ -714,11 +745,11 @@
                 <!-- Prospecting -->
                 <div id="fc-prospecting" onclick="showTool('prospecting')" class="feature-card accent-teal">
                     <span class="card-badge badge-new" id="badge-prospecting" style="display:none">Off</span>
-                    <div class="card-icon" style="background:rgba(20,184,166,0.12)"><svg class="w-7 h-7" fill="none" stroke="#2dd4bf" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="#2dd4bf"/></svg></div>
+                    <div class="card-icon" style="background:#dbeafe"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="#1d4ed8"/></svg></div>
                     <h3>Prospecting</h3>
                     <p>Track leads, manage early conversations and monitor conversion pipeline</p>
                     <div class="mt-4 flex items-center gap-2">
-                        <span id="stat-leads-nc" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(20,184,166,0.1);color:#2dd4bf">0 new leads</span>
+                        <span id="stat-leads-nc" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#dbeafe;color:#1d4ed8">0 new leads</span>
                         <span id="stat-leads-id" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 in discussion</span>
                     </div>
                 </div>
@@ -726,11 +757,11 @@
                 <!-- Sales -->
                 <div id="fc-sales" onclick="showTool('sales')" class="feature-card accent-purple">
                     <span class="card-badge badge-new" id="badge-sales" style="display:none">Off</span>
-                    <div class="card-icon" style="background:rgba(139,92,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#a78bfa" viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6v4m-3-2h6"/></svg></div>
+                    <div class="card-icon" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6v4m-3-2h6"/></svg></div>
                     <h3>Sales</h3>
                     <p>Manage jobs, design briefs, club products and order pipeline</p>
                     <div class="mt-4 flex items-center gap-2">
-                        <span id="stat-jobs-live" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(139,92,246,0.1);color:#a78bfa">0 live jobs</span>
+                        <span id="stat-jobs-live" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#ede9fe;color:#6d28d9">0 live jobs</span>
                         <span id="stat-jobs-done" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 completed</span>
                     </div>
                 </div>
@@ -738,33 +769,33 @@
                 <!-- Clubs -->
                 <div id="fc-clubs" onclick="showTool('clubs')" class="feature-card accent-purple">
                     <span class="card-badge badge-new" id="badge-clubs" style="display:none">Off</span>
-                    <div class="card-icon" style="background:rgba(139,92,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#a78bfa" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M9 21V5.25A2.25 2.25 0 0111.25 3h1.5A2.25 2.25 0 0115 5.25V21m-6 0h6M3.75 21V10.5A2.25 2.25 0 016 8.25h.75M20.25 21V10.5a2.25 2.25 0 00-2.25-2.25H17.25"/></svg></div>
+                    <div class="card-icon" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M9 21V5.25A2.25 2.25 0 0111.25 3h1.5A2.25 2.25 0 0115 5.25V21m-6 0h6M3.75 21V10.5A2.25 2.25 0 016 8.25h.75M20.25 21V10.5a2.25 2.25 0 00-2.25-2.25H17.25"/></svg></div>
                     <h3>Clubs</h3>
                     <p>Manage clubs, custom products, order forms and Shopify collections</p>
                     <div class="mt-4">
-                        <span id="stat-clubs-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(139,92,246,0.1);color:#a78bfa">0 clubs</span>
+                        <span id="stat-clubs-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#ede9fe;color:#6d28d9">0 clubs</span>
                     </div>
                 </div>
 
                 <!-- Production -->
                 <div id="fc-production" onclick="showTool('po-tracker')" class="feature-card accent-orange">
                     <span class="card-badge badge-new" id="badge-production" style="display:none">Off</span>
-                    <div class="card-icon" style="background:rgba(249,115,22,0.12)"><svg class="w-7 h-7" fill="none" stroke="#fb923c" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg></div>
+                    <div class="card-icon" style="background:#ffedd5"><svg class="w-7 h-7" fill="none" stroke="#c2410c" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg></div>
                     <h3>Production</h3>
                     <p>Purchase orders, factory tracking and delivery management</p>
                     <div class="mt-4">
-                        <span id="stat-pos-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(249,115,22,0.1);color:#fb923c">0 active POs</span>
+                        <span id="stat-pos-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#ffedd5;color:#c2410c">0 active POs</span>
                     </div>
                 </div>
 
                 <!-- Design Studio -->
                 <div id="fc-design" onclick="showTool('design-studio')" class="feature-card accent-pink">
                     <span class="card-badge badge-new" id="badge-design" style="display:none">Off</span>
-                    <div class="card-icon" style="background:rgba(236,72,153,0.12)"><svg class="w-7 h-7" fill="none" stroke="#f472b6" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg></div>
+                    <div class="card-icon" style="background:#fce7f3"><svg class="w-7 h-7" fill="none" stroke="#be185d" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg></div>
                     <h3>Design Studio</h3>
                     <p>Design pipeline — track briefs by stage from working to approved</p>
                     <div class="mt-4 flex items-center gap-2">
-                        <span id="stat-design-active" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(236,72,153,0.1);color:#f472b6">0 active</span>
+                        <span id="stat-design-active" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#fce7f3;color:#be185d">0 active</span>
                         <span id="stat-design-review" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 in review</span>
                     </div>
                 </div>
@@ -772,22 +803,22 @@
                 <!-- Store Generator -->
                 <div id="fc-store" onclick="showTool('generator')" class="feature-card accent-blue">
                     <span class="card-badge badge-new" id="badge-store" style="display:none">Off</span>
-                    <div class="card-icon" style="background:rgba(59,130,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#60a5fa" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg></div>
+                    <div class="card-icon" style="background:#dbeafe"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg></div>
                     <h3>Store Generator</h3>
                     <p>Generate Shopify CSV imports and sync products to your store</p>
                     <div class="mt-4">
-                        <span id="stat-products-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(59,130,246,0.1);color:#60a5fa">0 products</span>
+                        <span id="stat-products-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#dbeafe;color:#1d4ed8">0 products</span>
                     </div>
                 </div>
 
                 <!-- Product Database -->
                 <div id="fc-products" onclick="showTool('products')" class="feature-card accent-teal">
                     <span class="card-badge badge-new" id="badge-products" style="display:none">Off</span>
-                    <div class="card-icon" style="background:rgba(20,184,166,0.12)"><svg class="w-7 h-7" fill="none" stroke="#2dd4bf" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg></div>
+                    <div class="card-icon" style="background:#dbeafe"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg></div>
                     <h3>Product Database</h3>
                     <p>Master catalogue — product codes, pricing and size structure for all ranges</p>
                     <div class="mt-4">
-                        <span id="stat-products-db" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:rgba(20,184,166,0.1);color:#2dd4bf">0 products</span>
+                        <span id="stat-products-db" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#dbeafe;color:#1d4ed8">0 products</span>
                     </div>
                 </div>
 
@@ -801,15 +832,15 @@
                 </div>
                 <div class="stat-card">
                     <p class="text-xs text-gray-500 mb-1">Clubs</p>
-                    <p id="stat-clubs" class="text-2xl font-bold" style="color:#a78bfa">0</p>
+                    <p id="stat-clubs" class="text-2xl font-bold" style="color:#6d28d9">0</p>
                 </div>
                 <div class="stat-card">
                     <p class="text-xs text-gray-500 mb-1">Active POs</p>
-                    <p id="stat-orders" class="text-2xl font-bold" style="color:#60a5fa">0</p>
+                    <p id="stat-orders" class="text-2xl font-bold" style="color:#2563eb">0</p>
                 </div>
                 <div class="stat-card">
                     <p class="text-xs text-gray-500 mb-1">Leads</p>
-                    <p id="stat-salespeople" class="text-2xl font-bold" style="color:#fb923c">0</p>
+                    <p id="stat-salespeople" class="text-2xl font-bold" style="color:#c2410c">0</p>
                 </div>
             </div>
 
@@ -821,13 +852,13 @@
                     <div class="h-px flex-1" style="background:rgba(139,92,246,0.2)"></div>
                 </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    <div onclick="showTool('settings')" class="feature-card" style="border-color:rgba(139,92,246,0.15)">
-                        <div class="card-icon" style="background:rgba(139,92,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#a78bfa" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+                    <div onclick="showTool('settings')" class="feature-card" style="border-color:rgba(109,40,217,0.15)">
+                        <div class="card-icon" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
                         <h3>Brand Settings</h3>
                         <p>Manage brand config, salespeople and feature toggles</p>
                     </div>
-                    <div onclick="showTool('users')" class="feature-card" style="border-color:rgba(139,92,246,0.15)">
-                        <div class="card-icon" style="background:rgba(139,92,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#a78bfa" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg></div>
+                    <div onclick="showTool('users')" class="feature-card" style="border-color:rgba(109,40,217,0.15)">
+                        <div class="card-icon" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg></div>
                         <h3>User Management</h3>
                         <p>Assign users to brands and manage access</p>
                     </div>
@@ -848,7 +879,7 @@
             </div>
 
             <!-- Uniform Structure Guide -->
-            <div class="glass rounded-2xl p-4 mb-6 border" style="border-color:rgba(20,184,166,0.2)">
+            <div class="glass rounded-2xl p-4 mb-6 border" style="border-color:rgba(59,130,246,0.2)">
                 <div class="flex items-start gap-3">
                     <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
                     <div class="flex-1">
@@ -1138,7 +1169,7 @@
                 </div>
                 <div class="flex gap-3 items-center">
                     <span class="text-xs text-gray-500">Filter:</span>
-                    <button id="ds-filter-mine" onclick="setDesignFilter('mine')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)">My Jobs</button>
+                    <button id="ds-filter-mine" onclick="setDesignFilter('mine')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(236,72,153,0.1);color:#be185d;border:1px solid rgba(236,72,153,0.3)">My Jobs</button>
                     <button id="ds-filter-all" onclick="setDesignFilter('all')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0">All Jobs</button>
                 </div>
             </div>
@@ -1154,23 +1185,23 @@
                     <span class="chip-label">New</span>
                 </div>
                 <div onclick="filterDesignByStage('in_progress')" id="ds-stage-in_progress" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#fbbf24" id="ds-count-in_progress">0</span>
+                    <span class="chip-count" style="color:#d97706" id="ds-count-in_progress">0</span>
                     <span class="chip-label">Working</span>
                 </div>
                 <div onclick="filterDesignByStage('in_review')" id="ds-stage-in_review" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#60a5fa" id="ds-count-in_review">0</span>
+                    <span class="chip-count" style="color:#2563eb" id="ds-count-in_review">0</span>
                     <span class="chip-label">In Review</span>
                 </div>
                 <div onclick="filterDesignByStage('revisions')" id="ds-stage-revisions" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#fb7185" id="ds-count-revisions">0</span>
+                    <span class="chip-count" style="color:#dc2626" id="ds-count-revisions">0</span>
                     <span class="chip-label">Revisions</span>
                 </div>
                 <div onclick="filterDesignByStage('awaiting_approval')" id="ds-stage-awaiting_approval" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#a78bfa" id="ds-count-awaiting_approval">0</span>
+                    <span class="chip-count" style="color:#7c3aed" id="ds-count-awaiting_approval">0</span>
                     <span class="chip-label">Awaiting Approval</span>
                 </div>
                 <div onclick="filterDesignByStage('complete')" id="ds-stage-complete" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#4ade80" id="ds-count-complete">0</span>
+                    <span class="chip-count" style="color:#16a34a" id="ds-count-complete">0</span>
                     <span class="chip-label">Approved</span>
                 </div>
             </div>
@@ -1851,8 +1882,8 @@
                     <!-- Not Contacted -->
                     <div onclick="showProspectView('not-contacted')" class="prospect-card">
                         <div class="flex items-start justify-between mb-4">
-                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:rgba(20,184,166,0.1)"><svg class="w-7 h-7" fill="none" stroke="#2dd4bf" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg></div>
-                            <span id="nc-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(20,184,166,0.12);color:#2dd4bf">0</span>
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:#dbeafe"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg></div>
+                            <span id="nc-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
                         </div>
                         <h3 class="text-xl font-bold mb-2">Not Contacted</h3>
                         <p class="text-gray-500 text-sm">New leads waiting to be contacted. Filter by sport and county.</p>
@@ -1865,12 +1896,12 @@
                     <!-- In Discussion -->
                     <div onclick="showProspectView('in-discussion')" class="prospect-card">
                         <div class="flex items-start justify-between mb-4">
-                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:rgba(139,92,246,0.1)"><svg class="w-7 h-7" fill="none" stroke="#a78bfa" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg></div>
-                            <span id="id-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(139,92,246,0.12);color:#a78bfa">0</span>
+                            <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg></div>
+                            <span id="id-count-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
                         </div>
                         <h3 class="text-xl font-bold mb-2">In Discussion</h3>
                         <p class="text-gray-500 text-sm">Active conversations on a visual Kanban board with customisable stages.</p>
-                        <div class="mt-5 flex items-center gap-2 text-sm font-semibold" style="color:#a78bfa">
+                        <div class="mt-5 flex items-center gap-2 text-sm font-semibold" style="color:#6d28d9">
                             View board
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
@@ -1897,7 +1928,7 @@
                             Back
                         </button>
                         <h3 class="text-xl font-bold">Not Contacted</h3>
-                        <span id="nc-list-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:rgba(20,184,166,0.1);color:#2dd4bf">0</span>
+                        <span id="nc-list-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
                     </div>
                     <button onclick="openLeadModal(null, 'not_contacted')" class="btn-primary text-sm flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
@@ -1935,7 +1966,7 @@
                             Back
                         </button>
                         <h3 class="text-xl font-bold">In Discussion</h3>
-                        <span id="id-board-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:rgba(139,92,246,0.1);color:#a78bfa">0</span>
+                        <span id="id-board-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
                     </div>
                     <div class="flex gap-3">
                         <button onclick="openStageConfig()" class="btn-secondary text-sm flex items-center gap-2">
@@ -2113,7 +2144,7 @@
                             </div>
                             <div>
                                 <label class="text-xs text-gray-500 mb-1 block">Colour</label>
-                                <input type="color" id="new-stage-color" value="#14b8a6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#f8fafc;border:1px solid #e2e8f0">
+                                <input type="color" id="new-stage-color" value="#3b82f6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#f8fafc;border:1px solid #e2e8f0">
                             </div>
                             <button onclick="saveNewStage()" class="btn-primary text-sm py-2">Add</button>
                         </div>
@@ -2137,7 +2168,7 @@
                     <button onclick="document.getElementById('leads-csv-import-modal').classList.add('hide')" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-5">✕</button>
                 </div>
                 <div class="p-5">
-                    <div class="mb-4 p-3 rounded-lg text-sm" style="background:rgba(20,184,166,0.07);border:1px solid rgba(20,184,166,0.15)">
+                    <div class="mb-4 p-3 rounded-lg text-sm" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.15)">
                         <p class="text-brand-400 font-semibold mb-1">Required CSV columns:</p>
                         <p class="text-gray-400 text-xs font-mono">lead_name, club_name, sport, county, location, sport_level, amount_of_teams, notes</p>
                     </div>
@@ -2174,8 +2205,8 @@
                     </div>
                     <div onclick="showSalesView('live')" class="feature-card accent-teal" style="cursor:pointer">
                         <div class="flex items-start justify-between mb-4">
-                            <div class="card-icon" style="background:rgba(20,184,166,0.12);margin-bottom:0">🔥</div>
-                            <span id="sales-live-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(20,184,166,0.12);color:#2dd4bf">0</span>
+                            <div class="card-icon" style="background:#dbeafe;margin-bottom:0">🔥</div>
+                            <span id="sales-live-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
                         </div>
                         <h3>Live Jobs</h3>
                         <p>Active jobs across all pipeline stages</p>
@@ -2183,7 +2214,7 @@
                     <div onclick="showSalesView('completed')" class="feature-card accent-green" style="cursor:pointer">
                         <div class="flex items-start justify-between mb-4">
                             <div class="card-icon" style="background:rgba(34,197,94,0.12);margin-bottom:0">✅</div>
-                            <span id="sales-done-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(34,197,94,0.1);color:#4ade80">0</span>
+                            <span id="sales-done-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(34,197,94,0.12);color:#15803d">0</span>
                         </div>
                         <h3>Completed</h3>
                         <p>All finished jobs and historical records</p>
@@ -2680,7 +2711,7 @@
                     <div class="glass rounded-2xl p-4">
                         <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(20,184,166,0.1)">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
                                     <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
                                 </div>
                                 <div class="min-w-0">
@@ -2806,11 +2837,11 @@
                     </div>
                     <div class="stat-card">
                         <p class="text-xs text-gray-500 mb-1">Active Forms</p>
-                        <p id="overview-stat-forms" class="text-2xl font-bold" style="color:#4ade80">0</p>
+                        <p id="overview-stat-forms" class="text-2xl font-bold" style="color:#16a34a">0</p>
                     </div>
                     <div class="stat-card">
                         <p class="text-xs text-gray-500 mb-1">Submissions</p>
-                        <p id="overview-stat-submissions" class="text-2xl font-bold" style="color:#60a5fa">0</p>
+                        <p id="overview-stat-submissions" class="text-2xl font-bold" style="color:#2563eb">0</p>
                     </div>
                     <div class="stat-card">
                         <p class="text-xs text-gray-500 mb-1">Shopify Synced</p>
@@ -2935,7 +2966,7 @@
                     <div class="flex items-start justify-between mb-3">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">1</span>
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:#dbeafe;color:#1d4ed8">1</span>
                                 <h3 class="font-semibold">Club Range &amp; Mock-Ups</h3>
                             </div>
                             <p class="text-gray-500 text-sm">Upload finished mock-up images for this club. TeamwearOS reads the filename and auto-creates club products from the master catalogue.</p>
@@ -2956,7 +2987,7 @@
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">2</span>
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:#dbeafe;color:#1d4ed8">2</span>
                                 <h3 class="font-semibold">Create Club Shop with CSV</h3>
                             </div>
                             <p class="text-gray-500 text-sm">Generate a complete Shopify import CSV for all club products. Select the price list to use — the CSV maps all product fields, sizes, variants and images ready for collection creation in Shopify.</p>
@@ -2990,7 +3021,7 @@
                     <div class="flex items-start justify-between mb-4">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">3</span>
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:#dbeafe;color:#1d4ed8">3</span>
                                 <h3 class="font-semibold">Add New Product To Collection</h3>
                             </div>
                             <p class="text-gray-500 text-sm">Select an individual club product to download a single-product CSV. Upload this to Shopify to add that product to the team collection without regenerating the entire shop.</p>
@@ -3013,7 +3044,7 @@
                 <!-- Step 4: Product Sync (AI — coming soon) -->
                 <div class="card mb-5">
                     <div class="flex items-start gap-3 mb-3">
-                        <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5" style="background:rgba(20,184,166,0.2);color:#2dd4bf">4</span>
+                        <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5" style="background:#dbeafe;color:#1d4ed8">4</span>
                         <div>
                             <h3 class="font-semibold mb-1">Product Sync</h3>
                             <p class="text-gray-500 text-sm">AI-powered live sync to your Shopify store. New products added in TeamwearOS will be automatically created in Shopify and added to the team collection — no manual CSV uploads required.</p>
@@ -3031,7 +3062,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:rgba(20,184,166,0.2);color:#2dd4bf">5</span>
+                                <span class="w-6 h-6 rounded-full text-xs font-bold flex items-center justify-center" style="background:#dbeafe;color:#1d4ed8">5</span>
                                 <h3 class="font-semibold">Order Forms</h3>
                             </div>
                             <p class="text-gray-500 text-sm mt-0.5">Create direct order links for the club to collect individual kit orders</p>
@@ -3246,10 +3277,10 @@
                             <div class="bg-gray-900 rounded-xl p-3">
                                 <p class="text-gray-500 text-xs mb-2">Main</p>
                                 <div class="flex items-center gap-2 mb-2">
-                                    <input type="color" id="club-pantone-main" value="#14b8a6" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid #e2e8f0" oninput="syncHexInput('club-pantone-main','club-hex-main')">
+                                    <input type="color" id="club-pantone-main" value="#3b82f6" class="h-10 w-10 rounded-lg cursor-pointer flex-shrink-0" style="padding:2px;background:transparent;border:2px solid #e2e8f0" oninput="syncHexInput('club-pantone-main','club-hex-main')">
                                     <div class="flex-1 min-w-0">
                                         <p class="text-gray-600 text-xs mb-1">Hex</p>
-                                        <input type="text" id="club-hex-main" placeholder="#14b8a6" maxlength="7" class="w-full px-2 py-1 rounded text-xs font-mono" oninput="syncColorPicker('club-hex-main','club-pantone-main')">
+                                        <input type="text" id="club-hex-main" placeholder="#3b82f6" maxlength="7" class="w-full px-2 py-1 rounded text-xs font-mono" oninput="syncColorPicker('club-hex-main','club-pantone-main')">
                                     </div>
                                 </div>
                                 <input type="text" id="club-pantone-main-text" placeholder="Pantone ref e.g. 355 C" class="w-full px-2 py-1 rounded text-xs text-gray-500" title="Pantone reference code">
@@ -3519,7 +3550,7 @@
                 </div>
 
                 <!-- Filename guide -->
-                <div class="mx-6 mt-4 p-4 rounded-xl text-xs font-mono" style="background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2)">
+                <div class="mx-6 mt-4 p-4 rounded-xl text-xs font-mono" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2)">
                     <p class="text-brand-400 font-semibold mb-1.5 font-sans text-sm">Filename naming convention</p>
                     <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-400">
                         <span><span class="text-white">APX-COR-001.png</span> → Front view, product V1</span>
@@ -3546,9 +3577,9 @@
                     <div class="flex items-center justify-between mb-2">
                         <p class="text-sm font-semibold"><span id="mockup-file-count">0</span> files selected</p>
                         <div class="flex gap-2 text-xs">
-                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(34,197,94,0.12);color:#4ade80">■ matched</span>
-                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(239,68,68,0.12);color:#f87171">■ no match</span>
-                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(251,191,36,0.12);color:#fbbf24">■ new variant</span>
+                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(34,197,94,0.12);color:#16a34a">■ matched</span>
+                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(239,68,68,0.12);color:#dc2626">■ no match</span>
+                            <span class="px-2 py-0.5 rounded-full" style="background:rgba(217,119,6,0.1);color:#d97706">■ new variant</span>
                         </div>
                     </div>
                     <div class="overflow-y-auto max-h-52">
@@ -3683,8 +3714,8 @@
                         <span class="text-xs text-gray-500">Click image to place markers</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button onclick="declineAnnotatedVersion()" class="text-sm px-4 py-2 rounded-lg font-semibold" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.3)">Decline</button>
-                        <button onclick="approveAnnotatedVersion()" class="text-sm px-4 py-2 rounded-lg font-semibold" style="background:rgba(34,197,94,0.12);color:#4ade80;border:1px solid rgba(34,197,94,0.3)">Approve</button>
+                        <button onclick="declineAnnotatedVersion()" class="text-sm px-4 py-2 rounded-lg font-semibold" style="background:rgba(239,68,68,0.1);color:#dc2626;border:1px solid rgba(239,68,68,0.3)">Decline</button>
+                        <button onclick="approveAnnotatedVersion()" class="text-sm px-4 py-2 rounded-lg font-semibold" style="background:rgba(34,197,94,0.1);color:#16a34a;border:1px solid rgba(34,197,94,0.3)">Approve</button>
                         <button onclick="saveAnnotations()" class="btn-primary text-sm">Save Feedback</button>
                         <button onclick="closeAnnotationModal()" class="text-gray-400 hover:text-white text-2xl ml-1">&times;</button>
                     </div>
@@ -5924,7 +5955,7 @@
                 if (brandPricingTiers.length) {
                     optionsEl.innerHTML = brandPricingTiers.map((tier, idx) => {
                         const isFirst = idx === 0;
-                        const bg = isFirst ? 'background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.25)' : 'background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07)';
+                        const bg = isFirst ? 'background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.25)' : 'background:#f8fafc;border:1px solid #e2e8f0';
                         const nameClass = isFirst ? 'text-brand-400' : 'text-white';
                         return `<label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="${bg}" onclick="selectPriceList('${escHtml(tier.tier_key)}')">
                             <input type="radio" name="price-list" value="${escHtml(tier.tier_key)}" id="pl-${escHtml(tier.tier_key)}" class="accent-brand-500" ${isFirst ? 'checked' : ''}>
@@ -7529,7 +7560,7 @@
                 return `<div class="club-list-card" onclick="openClubDashboard('${club.id}')">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(20,184,166,0.08)">
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
                                 <span class="text-brand-400 font-bold text-sm">${((club.suffix || club.name.substring(0,2))).substring(0,2)}</span>
                             </div>
                             <div>
@@ -7839,8 +7870,8 @@
             populatePartnershipLevelSelect('retail');
             populateSalespersonSelect(null);
             // Colours
-            document.getElementById('club-pantone-main').value = '#14b8a6';
-            document.getElementById('club-hex-main').value = '#14b8a6';
+            document.getElementById('club-pantone-main').value = '#3b82f6';
+            document.getElementById('club-hex-main').value = '#3b82f6';
             document.getElementById('club-pantone-sec').value = '#ffffff';
             document.getElementById('club-hex-sec').value = '#ffffff';
             document.getElementById('club-pantone-acc').value = '#000000';
@@ -7874,7 +7905,7 @@
             document.getElementById('club-town').value = currentClub.address_town || '';
             document.getElementById('club-county').value = currentClub.address_county || '';
             document.getElementById('club-postcode').value = currentClub.address_postcode || '';
-            const mainColor = currentClub.pantone_main || '#14b8a6';
+            const mainColor = currentClub.pantone_main || '#3b82f6';
             const secColor = currentClub.pantone_secondary || '#ffffff';
             const accColor = currentClub.pantone_accent || '#000000';
             document.getElementById('club-pantone-main').value = mainColor;
@@ -8251,7 +8282,7 @@
                         <div class="flex items-center justify-between p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <div>
                                 <p class="text-sm font-semibold">${escHtml(f.title)}</p>
-                                <p class="text-xs text-gray-500">${f.season || ''} · ${f.is_active ? '<span style="color:#4ade80">Active</span>' : 'Closed'}</p>
+                                <p class="text-xs text-gray-500">${f.season || ''} · ${f.is_active ? '<span style="color:#16a34a;font-weight:600">Active</span>' : 'Closed'}</p>
                             </div>
                             <div class="flex gap-2">
                                 <button onclick="copyFormLink('${baseUrl}?form=${f.token}')" class="text-xs btn-secondary py-1 px-3">Copy Link</button>
@@ -10330,8 +10361,8 @@
         }
 
         const JOB_STAGE_COLORS = {
-            discovery: '#9ca3af', concepts: '#60a5fa', awaiting_approval: '#a78bfa',
-            quote: '#fb923c', paid: '#4ade80', on_boarding: '#2dd4bf', completed: '#f472b6'
+            discovery: '#9ca3af', concepts: '#3b82f6', awaiting_approval: '#7c3aed',
+            quote: '#1d4ed8', paid: '#15803d', on_boarding: '#6d28d9', completed: '#be185d'
         };
 
         function renderJobStagePills() {
@@ -10350,8 +10381,8 @@
             in_review: 'In Review', revisions: 'Revisions', awaiting_approval: 'Awaiting Approval', complete: 'Complete'
         };
         const DESIGN_STAGE_COLORS = {
-            not_started: '#555', briefed: '#9ca3af', in_progress: '#fbbf24',
-            in_review: '#60a5fa', revisions: '#fb7185', awaiting_approval: '#a78bfa', complete: '#4ade80'
+            not_started: '#64748b', briefed: '#64748b', in_progress: '#d97706',
+            in_review: '#2563eb', revisions: '#dc2626', awaiting_approval: '#7c3aed', complete: '#16a34a'
         };
         const DESIGN_STAGES_ORDER = ['not_started','briefed','in_progress','in_review','revisions','awaiting_approval','complete'];
 
@@ -10511,7 +10542,7 @@
             container.innerHTML = `<div class="glass rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-5">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold" style="background:rgba(20,184,166,0.12);color:#2dd4bf">${(club.name||'').substring(0,2).toUpperCase()}</div>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-bold" style="background:#dbeafe;color:#1d4ed8">${(club.name||'').substring(0,2).toUpperCase()}</div>
                         <div>
                             <h4 class="font-bold text-lg">${escHtml(club.name)}</h4>
                             <span class="badge ${clubBadgeClass} text-xs">${escHtml(clubTierName)}</span>
@@ -10712,7 +10743,7 @@
                 const club = clubs.find(c => c.id === currentJob.club_id);
                 if (club) {
                     const logoSrc = currentJob.logo_url_override || club.logo_url || club.club_crest_url;
-                    const pm = currentJob.pantone_main || club.pantone_main || '#14b8a6';
+                    const pm = currentJob.pantone_main || club.pantone_main || '#3b82f6';
                     const ps = currentJob.pantone_secondary || club.pantone_secondary || '#ffffff';
                     const pa = currentJob.pantone_accent || club.pantone_accent || '#000000';
                     assetsHtml = `
@@ -10750,10 +10781,10 @@
 
             // Status action buttons
             const statusBtns = [
-                { key: 'in_progress', label: '✏️ Working',         color: '#fbbf24', bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)' },
-                { key: 'in_review',   label: '👁️ Send For Review', color: '#60a5fa', bg: 'rgba(96,165,250,0.12)',  border: 'rgba(96,165,250,0.3)' },
-                { key: 'revisions',   label: '🔄 Revisions',       color: '#fb7185', bg: 'rgba(251,113,133,0.12)', border: 'rgba(251,113,133,0.3)' },
-                { key: 'complete',    label: '✅ Approved',         color: '#4ade80', bg: 'rgba(74,222,128,0.12)',  border: 'rgba(74,222,128,0.3)' }
+                { key: 'in_progress', label: '✏️ Working',         color: '#d97706', bg: 'rgba(217,119,6,0.1)',   border: 'rgba(217,119,6,0.3)' },
+                { key: 'in_review',   label: '👁️ Send For Review', color: '#2563eb', bg: 'rgba(37,99,235,0.1)',   border: 'rgba(37,99,235,0.3)' },
+                { key: 'revisions',   label: '🔄 Revisions',       color: '#dc2626', bg: 'rgba(220,38,38,0.1)',   border: 'rgba(220,38,38,0.3)' },
+                { key: 'complete',    label: '✅ Approved',         color: '#16a34a', bg: 'rgba(22,163,74,0.1)',   border: 'rgba(22,163,74,0.3)' }
             ].map(b => {
                 const active = s === b.key;
                 const btnLabel = (b.key === 'in_review' && s === 'in_review') ? '👁️ In Review' : b.label;
@@ -10838,16 +10869,16 @@
                             <div class="flex items-center gap-3 mb-2">
                                 <span class="version-label">${escHtml(v.version_label || ('V' + v.version_number))}</span>
                                 ${v.status === 'approved' ? '<span class="stage-pill stage-paid">Approved ✓</span>' : ''}
-                                ${v.status === 'rejected' ? '<span style="background:rgba(239,68,68,0.1);color:#f87171;font-size:11px;padding:3px 10px;border-radius:20px">Declined</span>' : ''}
+                                ${v.status === 'rejected' ? '<span style="background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;padding:3px 10px;border-radius:20px">Declined</span>' : ''}
                             </div>
                             ${v.notes ? `<p class="text-sm text-gray-400">${escHtml(v.notes)}</p>` : ''}
                             <p class="text-xs text-gray-600 mt-0.5">${new Date(v.created_at).toLocaleDateString('en-GB')}</p>
                         </div>
                         <div class="flex gap-2 flex-shrink-0 flex-wrap justify-end">
-                            ${canAnnotate ? `<button onclick="openAnnotationModal('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(96,165,250,0.1);color:#60a5fa;border:1px solid rgba(96,165,250,0.2)">Annotate</button>` : ''}
+                            ${canAnnotate ? `<button onclick="openAnnotationModal('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(37,99,235,0.1);color:#2563eb;border:1px solid rgba(37,99,235,0.2)">Annotate</button>` : ''}
                             ${v.status === 'pending' ? `
-                                <button onclick="approveDesignVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.2)">Approve</button>
-                                <button onclick="declineVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2)">Decline</button>
+                                <button onclick="approveDesignVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(22,163,74,0.1);color:#16a34a;border:1px solid rgba(22,163,74,0.2)">Approve</button>
+                                <button onclick="declineVersion('${v.id}')" class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="background:rgba(239,68,68,0.1);color:#dc2626;border:1px solid rgba(239,68,68,0.2)">Decline</button>
                             ` : ''}
                             ${v.status === 'approved' ? `<button onclick="unapproveDesignVersion('${v.id}')" class="text-xs px-2 py-1.5 text-gray-500 hover:text-gray-300 btn-secondary">Unset</button>` : ''}
                             ${v.status === 'rejected' ? `<button onclick="unapproveDesignVersion('${v.id}')" class="text-xs px-2 py-1.5 text-gray-500 hover:text-gray-300 btn-secondary">Reset</button>` : ''}
@@ -11358,11 +11389,11 @@
         function setDesignFilter(f) {
             designStudioFilter = f;
             document.getElementById('ds-filter-mine').style.cssText = f === 'mine'
-                ? 'background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)'
-                : 'background:rgba(255,255,255,0.05);color:#888;border:1px solid rgba(255,255,255,0.08)';
+                ? 'background:rgba(236,72,153,0.1);color:#be185d;border:1px solid rgba(236,72,153,0.3)'
+                : 'background:#f8fafc;color:#64748b;border:1px solid #e2e8f0';
             document.getElementById('ds-filter-all').style.cssText = f === 'all'
-                ? 'background:rgba(236,72,153,0.15);color:#f472b6;border:1px solid rgba(236,72,153,0.3)'
-                : 'background:rgba(255,255,255,0.05);color:#888;border:1px solid rgba(255,255,255,0.08)';
+                ? 'background:rgba(236,72,153,0.1);color:#be185d;border:1px solid rgba(236,72,153,0.3)'
+                : 'background:#f8fafc;color:#64748b;border:1px solid #e2e8f0';
             renderDesignStudio();
         }
 
@@ -11402,7 +11433,7 @@
                 return;
             }
             empty.classList.add('hide');
-            const statusColour = { new:'#2dd4bf', in_progress:'#fbbf24', revisions:'#fb7185', in_review:'#60a5fa', awaiting_approval:'#a78bfa', complete:'#4ade80' };
+            const statusColour = { new:'#3b82f6', in_progress:'#d97706', revisions:'#dc2626', in_review:'#7c3aed', awaiting_approval:'#c2410c', complete:'#15803d' };
             container.innerHTML = tasks.map(dt => {
                 const job = dt.jobs;
                 const club = job?.clubs;
@@ -11457,7 +11488,7 @@
 
         function renderDesignBriefLog() {
             if (!designBriefLog.length) return '<p class="text-xs text-gray-700">No status changes logged yet.</p>';
-            const colours = { new:'#9ca3af', in_progress:'#fbbf24', revisions:'#fb7185', in_review:'#60a5fa', awaiting_approval:'#a78bfa', complete:'#4ade80' };
+            const colours = { new:'#64748b', in_progress:'#d97706', revisions:'#dc2626', in_review:'#2563eb', awaiting_approval:'#7c3aed', complete:'#16a34a' };
             return designBriefLog.map(entry => {
                 const oldLabel = DESIGN_STATUS_LABELS[entry.old_status] || entry.old_status || '—';
                 const newLabel = DESIGN_STATUS_LABELS[entry.new_status] || entry.new_status;
@@ -11524,7 +11555,7 @@
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-1">
                                 <span class="font-semibold text-sm">👕 ${escHtml(t.team_name)}</span>
-                                ${t.age_group ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:rgba(20,184,166,0.1);color:#2dd4bf">${escHtml(t.age_group)}</span>` : ''}
+                                ${t.age_group ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:#dbeafe;color:#1d4ed8">${escHtml(t.age_group)}</span>` : ''}
                                 ${t.gender ? `<span class="text-xs text-gray-600">${escHtml(t.gender)}</span>` : ''}
                             </div>
                             ${t.coach_name ? `<p class="text-xs text-gray-400">Coach: ${escHtml(t.coach_name)}${t.coach_email ? ` · <a href="mailto:${escHtml(t.coach_email)}" class="text-brand-400 hover:underline">${escHtml(t.coach_email)}</a>` : ''}${t.coach_phone ? ` · ${escHtml(t.coach_phone)}` : ''}</p>` : ''}
@@ -11614,7 +11645,7 @@
                 ${current ? (() => {
                     const t = teams.find(x => x.id === current);
                     if (!t) return '';
-                    return `<div class="p-3 rounded-xl" style="background:rgba(20,184,166,0.06);border:1px solid rgba(20,184,166,0.2)">
+                    return `<div class="p-3 rounded-xl" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2)">
                         <p class="text-xs text-brand-400 font-semibold mb-1">Selected: ${escHtml(t.team_name)}</p>
                         ${t.coach_name ? `<p class="text-xs text-gray-400">Coach: ${escHtml(t.coach_name)}${t.coach_email ? ` · ${escHtml(t.coach_email)}` : ''}</p>` : ''}
                     </div>`;
@@ -11654,8 +11685,8 @@
             container.innerHTML = jobActivityLog.map(entry => {
                 const initial = (entry.user_name || '?').charAt(0).toUpperCase();
                 const ts = new Date(entry.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-                const typeColour = { status_change: '#a78bfa', assignment: '#60a5fa', system: '#9ca3af', note: '#2dd4bf' };
-                const col = typeColour[entry.activity_type] || '#2dd4bf';
+                const typeColour = { status_change: '#6d28d9', assignment: '#2563eb', system: '#64748b', note: '#3b82f6' };
+                const col = typeColour[entry.activity_type] || '#3b82f6';
                 return `<div class="activity-entry">
                     <div class="activity-avatar" style="background:${col}18;color:${col}">${initial}</div>
                     <div class="flex-1 min-w-0">
@@ -11706,11 +11737,11 @@
                 container.innerHTML = '<p class="text-xs text-gray-700 py-4 text-center">No activity yet.</p>';
                 return;
             }
-            const typeColour = { status_change: '#a78bfa', assignment: '#60a5fa', system: '#9ca3af', note: '#2dd4bf' };
+            const typeColour = { status_change: '#6d28d9', assignment: '#2563eb', system: '#64748b', note: '#3b82f6' };
             container.innerHTML = clubActivityLog.map(entry => {
                 const initial = (entry.user_name || '?').charAt(0).toUpperCase();
                 const ts = new Date(entry.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                const col = typeColour[entry.activity_type] || '#2dd4bf';
+                const col = typeColour[entry.activity_type] || '#3b82f6';
                 return `<div class="activity-entry">
                     <div class="activity-avatar" style="background:${col}18;color:${col}">${initial}</div>
                     <div class="flex-1 min-w-0">
@@ -12043,7 +12074,7 @@
         async function seedDefaultStages() {
             if (!currentBrand) return;
             const defaults = [
-                { brand_id: currentBrand.id, name: 'Initial Contact', color: '#14b8a6', position: 0 },
+                { brand_id: currentBrand.id, name: 'Initial Contact', color: '#3b82f6', position: 0 },
                 { brand_id: currentBrand.id, name: 'Proposal Sent', color: '#8b5cf6', position: 1 },
                 { brand_id: currentBrand.id, name: 'Decision Pending', color: '#f97316', position: 2 }
             ];
@@ -12115,7 +12146,7 @@
                     <div class="flex gap-2 flex-shrink-0">
                         <button onclick="event.stopPropagation();moveLeadToDiscussion('${lead.id}')"
                             class="text-xs px-3 py-1.5 rounded-lg font-semibold transition"
-                            style="background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.2)"
+                            style="background:#ede9fe;color:#6d28d9;border:1px solid rgba(139,92,246,0.2)"
                             title="Move to In Discussion">
                             Move to Discussion →
                         </button>
@@ -12282,7 +12313,7 @@
             document.getElementById('add-stage-form').classList.remove('hide');
             document.getElementById('add-stage-btn').style.display = 'none';
             document.getElementById('new-stage-name').value = '';
-            document.getElementById('new-stage-color').value = '#14b8a6';
+            document.getElementById('new-stage-color').value = '#3b82f6';
         }
 
         async function saveNewStage() {
@@ -12408,7 +12439,7 @@
             }
             container.innerHTML = editingLeadContacts.map((c, i) => `
                 <div class="contact-card">
-                    ${c.is_primary ? '<span class="absolute top-2 right-2 text-xs px-2 py-0.5 rounded" style="background:rgba(20,184,166,0.1);color:#2dd4bf">Primary</span>' : ''}
+                    ${c.is_primary ? '<span class="absolute top-2 right-2 text-xs px-2 py-0.5 rounded" style="background:#dbeafe;color:#1d4ed8">Primary</span>' : ''}
                     <div class="contact-name">${escHtml((c.first_name || '') + ' ' + (c.last_name || '')).trim() || 'Unnamed contact'}</div>
                     <div class="contact-details">
                         ${c.role ? `<span>${escHtml(c.role)}</span>` : ''}
