@@ -289,13 +289,13 @@
            ============================================= */
         .stage-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s ease; }
         .stage-pill.active { box-shadow: 0 0 0 1px currentColor; }
-        .stage-discovery   { background:rgba(107,114,128,0.1);  color:#4b5563; }
-        .stage-concepts    { background:rgba(59,130,246,0.1);   color:#2563eb; }
-        .stage-awaiting    { background:rgba(234,179,8,0.1);    color:#b45309; }
-        .stage-quote       { background:rgba(59,130,246,0.12);  color:#1d4ed8; }
-        .stage-paid        { background:rgba(34,197,94,0.1);    color:#16a34a; }
-        .stage-onboarding  { background:rgba(168,85,247,0.1);   color:#7c3aed; }
-        .stage-completed   { background:#f1f5f9;                color:#64748b; }
+        .stage-discovery   { background:rgba(100,116,139,0.12); color:#475569; }
+        .stage-concepts    { background:rgba(59,130,246,0.12);  color:#2563eb; }
+        .stage-awaiting    { background:rgba(245,158,11,0.12);  color:#d97706; }
+        .stage-quote       { background:rgba(124,58,237,0.12);  color:#7c3aed; }
+        .stage-paid        { background:rgba(22,163,74,0.12);   color:#15803d; }
+        .stage-onboarding  { background:rgba(14,165,233,0.12);  color:#0284c7; }
+        .stage-completed   { background:rgba(190,24,93,0.10);   color:#be185d; }
 
         .job-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px 20px; cursor: pointer; transition: all 0.25s ease; }
         .job-card:hover { border-color: #cbd5e1; background: #fafafa; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
@@ -303,14 +303,32 @@
         .job-card .job-name   { font-size: 15px; font-weight: 700; margin: 4px 0; color: #0f172a; }
         .job-card .job-meta   { font-size: 12px; color: #64748b; }
 
-        /* Stage grid */
-        .stage-nav-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #e2e8f0; }
-        .stage-nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px 16px; border-radius: 12px; cursor: pointer; border: 1px solid #e2e8f0; background: #ffffff; transition: all 0.2s ease; min-width: 90px; text-align: center; }
-        .stage-nav-btn:hover { background: #eff6ff; border-color: #bfdbfe; box-shadow: 0 2px 8px rgba(59,130,246,0.1); }
-        .stage-nav-btn.active { background: #eff6ff; border-color: #93c5fd; box-shadow: 0 2px 8px rgba(59,130,246,0.15); }
-        .stage-nav-btn .sn-count { font-size: 20px; font-weight: 800; color: #0f172a; }
-        .stage-nav-btn .sn-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; }
-        .stage-nav-btn.active .sn-label { color: #2563eb; }
+        /* Stage grid — full-width columns, one per stage */
+        .stage-nav-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 2px solid #e2e8f0; }
+        @media (max-width: 900px) { .stage-nav-grid { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 560px) { .stage-nav-grid { grid-template-columns: repeat(2, 1fr); } }
+        .stage-nav-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 14px 8px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; background: #f8fafc; transition: all 0.2s ease; text-align: center; }
+        .stage-nav-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .stage-nav-btn.active { box-shadow: 0 4px 16px rgba(0,0,0,0.12); transform: translateY(-1px); }
+        .stage-nav-btn .sn-count { font-size: 24px; font-weight: 900; line-height: 1; }
+        .stage-nav-btn .sn-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: inherit; opacity: 0.85; }
+
+        /* Modern back / nav buttons */
+        .nav-back-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px 6px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #4b5563; background: #f1f5f9; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; }
+        .nav-back-btn:hover { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+        .nav-back-btn svg { flex-shrink: 0; }
+        .nav-home-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px 6px 10px; border-radius: 20px; font-size: 13px; font-weight: 600; color: #6d28d9; background: #ede9fe; border: 1px solid #ddd6fe; cursor: pointer; transition: all 0.18s ease; white-space: nowrap; }
+        .nav-home-btn:hover { background: #ddd6fe; color: #5b21b6; border-color: #c4b5fd; }
+        .nav-home-btn svg { flex-shrink: 0; }
+
+        /* Breadcrumb trail */
+        .breadcrumb-trail { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin-bottom: 20px; }
+        .bc-item { font-size: 12px; font-weight: 600; color: #2563eb; cursor: pointer; padding: 2px 6px; border-radius: 6px; transition: background 0.15s; }
+        .bc-item:hover { background: #eff6ff; }
+        .bc-item.bc-current { color: #0f172a; cursor: default; }
+        .bc-item.bc-current:hover { background: transparent; }
+        .bc-sep { font-size: 11px; color: #cbd5e1; font-weight: 400; }
+        .bc-home-icon { display: inline-flex; align-items: center; gap: 4px; }
 
         /* Job tab nav */
         .job-tab-nav { display: flex; gap: 2px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -868,8 +886,9 @@
 
         <!-- TOOL: Product Database -->
         <div id="tool-products" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-                ← Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             <div class="flex items-start justify-between mb-4">
                 <div>
@@ -1157,9 +1176,9 @@
         <!-- TOOL: Club Mock-Ups -->
         <!-- TOOL: Design Studio Pipeline Launchpad -->
         <div id="tool-design-studio" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
 
             <div class="flex items-center justify-between mb-8">
@@ -1236,9 +1255,9 @@
         </div>
 
         <div id="tool-mockups" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             
             <div class="flex items-center justify-between mb-8">
@@ -1418,8 +1437,9 @@
 
         <!-- TOOL: Store Generator -->
         <div id="tool-generator" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-                ← Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             <h2 class="text-2xl font-bold mb-6">Store Generator</h2>
 
@@ -1472,8 +1492,9 @@
 
         <!-- TOOL: Factory Orders -->
         <div id="tool-orders" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-                ← Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             <h2 class="text-2xl font-bold mb-6">Factory Order Form</h2>
 
@@ -1536,8 +1557,9 @@
 
         <!-- TOOL: PO Tracker V2 -->
         <div id="tool-po-tracker" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-                ← Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-2xl font-bold">PO Tracker</h2>
@@ -1679,8 +1701,9 @@
 
         <!-- TOOL: Brand Settings (Super Admin Only) -->
         <div id="tool-settings" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-                ← Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             <h2 class="text-2xl font-bold mb-6">Brand Settings</h2>
             <p class="text-purple-400 mb-6">Managing: <span id="settings-brand-name" class="font-semibold"></span></p>
@@ -1782,9 +1805,9 @@
 
         <!-- TOOL: User Management (Super Admin Only) -->
         <div id="tool-users" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             <div class="flex items-center justify-between mb-2">
                 <div>
@@ -1866,9 +1889,9 @@
              TOOL: PROSPECTING
              ============================================================ -->
         <div id="tool-prospecting" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
 
             <!-- Prospecting Sub-Launchpad (home view) -->
@@ -2186,9 +2209,9 @@
              TOOL: SALES
              ============================================================ -->
         <div id="tool-sales" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
 
             <!-- SALES HOME -->
@@ -2199,13 +2222,13 @@
                 </div>
                 <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mb-8">
                     <div onclick="openNewJobModal()" class="feature-card accent-purple" style="cursor:pointer">
-                        <div class="card-icon" style="background:rgba(139,92,246,0.12)">✨</div>
+                        <div class="card-icon" style="background:rgba(139,92,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#7c3aed" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg></div>
                         <h3>Create New Job</h3>
                         <p>Start a new job record and kick off the sales process</p>
                     </div>
                     <div onclick="showSalesView('live')" class="feature-card accent-teal" style="cursor:pointer">
                         <div class="flex items-start justify-between mb-4">
-                            <div class="card-icon" style="background:#dbeafe;margin-bottom:0">🔥</div>
+                            <div class="card-icon" style="background:#dbeafe;margin-bottom:0"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg></div>
                             <span id="sales-live-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
                         </div>
                         <h3>Live Jobs</h3>
@@ -2213,7 +2236,7 @@
                     </div>
                     <div onclick="showSalesView('completed')" class="feature-card accent-green" style="cursor:pointer">
                         <div class="flex items-start justify-between mb-4">
-                            <div class="card-icon" style="background:rgba(34,197,94,0.12);margin-bottom:0">✅</div>
+                            <div class="card-icon" style="background:rgba(34,197,94,0.12);margin-bottom:0"><svg class="w-7 h-7" fill="none" stroke="#15803d" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
                             <span id="sales-done-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(34,197,94,0.12);color:#15803d">0</span>
                         </div>
                         <h3>Completed</h3>
@@ -2230,8 +2253,9 @@
             <!-- LIVE JOBS VIEW -->
             <div id="sales-live-view" class="hide">
                 <div class="flex items-center gap-3 mb-6">
-                    <button onclick="showSalesView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
+                    <button onclick="showSalesView('home')" class="nav-back-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        Sales
                     </button>
                     <h3 class="text-xl font-bold">Live Jobs</h3>
                 </div>
@@ -2251,8 +2275,9 @@
             <!-- COMPLETED JOBS VIEW -->
             <div id="sales-completed-view" class="hide">
                 <div class="flex items-center gap-3 mb-6">
-                    <button onclick="showSalesView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>Back
+                    <button onclick="showSalesView('home')" class="nav-back-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        Sales
                     </button>
                     <h3 class="text-xl font-bold">Completed Jobs</h3>
                 </div>
@@ -2265,11 +2290,12 @@
              ============================================================ -->
         <div id="tool-job-record" class="hide job-record-page">
             <!-- Back navigation -->
-            <div class="flex items-center gap-3 mb-5">
-                <button onclick="closeJobRecord()" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    Back to Sales
+            <div class="flex items-center gap-3 mb-5 flex-wrap">
+                <button onclick="closeJobRecord()" id="job-back-btn" class="nav-back-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <span id="job-back-label">Back to Sales</span>
                 </button>
+                <div id="job-breadcrumb" class="breadcrumb-trail"></div>
             </div>
 
             <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (pipelines+content) | right (activity) -->
@@ -2637,9 +2663,9 @@
              TOOL: CLUBS (Enhanced)
              ============================================================ -->
         <div id="tool-clubs" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
             <div class="mb-6">
                 <h2 class="text-2xl font-bold">Clubs</h2>
@@ -2697,10 +2723,13 @@
              TOOL: CLUB DETAIL DASHBOARD
              ============================================================ -->
         <div id="tool-club-detail" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="goBack()" id="club-detail-back-btn" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                <span id="club-detail-back-label">Back to Clubs</span>
-            </button>
+            <div class="flex items-center gap-3 mb-6 flex-wrap">
+                <button onclick="goBack()" id="club-detail-back-btn" class="nav-back-btn">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <span id="club-detail-back-label">Back to Clubs</span>
+                </button>
+                <div id="club-breadcrumb" class="breadcrumb-trail"></div>
+            </div>
 
             <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (timeline+content) | right (activity) -->
             <div class="jr-three-col">
@@ -3170,9 +3199,9 @@
              TOOL: ORDER FORMS (Global view - all submissions)
              ============================================================ -->
         <div id="tool-order-forms" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                Back to Launchpad
+            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Launchpad
             </button>
 
             <div class="flex items-center justify-between mb-6">
@@ -3371,6 +3400,16 @@
                     </div>
                 </div>
 
+                <!-- External Links -->
+                <div class="modal-section">
+                    <p class="modal-section-title">External Links</p>
+                    <div>
+                        <label class="text-gray-400 text-xs mb-1 block">Google Drive Folder URL</label>
+                        <input type="url" id="club-google-drive-url" placeholder="https://drive.google.com/drive/folders/..." class="w-full px-3 py-2 rounded-lg text-sm">
+                        <p class="text-gray-600 text-xs mt-1">Paste the club's Google Drive folder link — a shortcut button will appear on the club overview.</p>
+                    </div>
+                </div>
+
                 <!-- Hidden legacy partner checkbox for JS compatibility -->
                 <input type="hidden" id="club-is-partner" value="false">
 
@@ -3457,11 +3496,12 @@
 
                     <!-- Ranges -->
                     <div class="pt-4 border-t border-white/5">
-                        <h4 class="font-semibold text-brand-400 mb-2">Ranges</h4>
-                        <p class="text-gray-500 text-xs mb-3">Custom ranges available when adding products</p>
-                        <div id="cs-ranges-list" class="flex flex-wrap gap-2 mb-3 min-h-6"></div>
-                        <div class="flex gap-2">
-                            <input type="text" id="cs-new-range" placeholder="e.g. Atlas, Warrior, Pro" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <h4 class="font-semibold text-brand-400 mb-1">Ranges</h4>
+                        <p class="text-gray-500 text-xs mb-3">Set range names and SKU prefixes — click any row to edit inline. Prefixes apply to all products in that range.</p>
+                        <div id="cs-ranges-list" class="space-y-2 mb-3"></div>
+                        <div class="flex gap-2 flex-wrap">
+                            <input type="text" id="cs-new-range" placeholder="Range name e.g. Atlas" class="flex-1 min-w-28 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <input type="text" id="cs-new-range-prefix" placeholder="SKU prefix e.g. APX/ATL" class="flex-1 min-w-32 px-3 py-2 rounded-lg text-sm font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <button onclick="csAddRange()" class="btn-primary text-sm px-4">Add</button>
                         </div>
                     </div>
@@ -4020,7 +4060,8 @@
         let brandShopifyTags = [];    // brand_shopify_tags rows for current brand
         let currentProductTags = [];  // tags currently applied to product being edited
         let catalogueCustomCategories = [];   // persisted in localStorage per brand
-        let catalogueCustomRanges = [];       // persisted in localStorage per brand
+        let catalogueCustomRanges = [];       // [{name, prefix}] persisted in localStorage per brand
+        let catalogueRangePrefixes = {};      // {rangeName: skuPrefix} — covers DB ranges AND custom ranges
         let catalogueCustomFitTypes = [];     // persisted in localStorage per brand
         let catalogueActivePriceKeys = [];    // which tier keys to show in the catalogue table (array)
         let clubImages = [];
@@ -4420,6 +4461,8 @@
         // NAVIGATION
         // =============================================
         function showLaunchpad() {
+            if (typeof navStack !== 'undefined') { navStack = []; }
+            if (typeof navTrail !== 'undefined') { navTrail = []; renderBreadcrumb(); }
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('launchpad').classList.remove('hide');
 
@@ -4478,6 +4521,17 @@
             if ((tool === 'settings' || tool === 'users') && !isSuperAdmin) {
                 showToast('Access denied. Super admin only.', 'error');
                 return;
+            }
+
+            // Reset nav when explicitly navigating to a top-level tool
+            navStack = [];
+            if (navTrail.length === 0 || navTrail[navTrail.length - 1]?.type !== 'tool' || navTrail[navTrail.length - 1]?.tool !== tool) {
+                const TOOL_LABELS = { products: 'Product Database', clubs: 'Clubs', 'design-studio': 'Design Studio',
+                    mockups: 'Mock-Ups', generator: 'Store Generator', orders: 'Factory Orders',
+                    settings: 'Brand Settings', users: 'User Management', 'po-tracker': 'Production',
+                    prospecting: 'Prospecting', sales: 'Sales', 'order-forms': 'Order Forms' };
+                navTrail = [{ label: 'Home', type: 'launchpad' }, { label: TOOL_LABELS[tool] || tool, type: 'tool', tool }];
+                renderBreadcrumb();
             }
 
             document.getElementById('launchpad').classList.add('hide');
@@ -5057,7 +5111,7 @@
         function populateFilterDropdowns() {
             // Get unique categories and ranges (from products + custom catalogue settings)
             const categories = [...new Set([...products.map(p => p.category).filter(Boolean), ...catalogueCustomCategories])].sort();
-            const ranges = [...new Set([...products.map(p => p.range_name).filter(Boolean), ...catalogueCustomRanges])].sort();
+            const ranges = [...new Set([...products.map(p => p.range_name).filter(Boolean), ...catalogueCustomRanges.map(r => typeof r === 'string' ? r : r.name)])].sort();
 
             // Preserve current selections
             const currentCategory = document.getElementById('filter-category')?.value || '';
@@ -5338,7 +5392,7 @@
             const dl = document.getElementById('prod-ranges-list');
             if (!dl) return;
             const fromProducts = products.map(p => p.range_name).filter(Boolean);
-            const all = [...new Set([...fromProducts, ...catalogueCustomRanges])].sort();
+            const all = [...new Set([...fromProducts, ...catalogueCustomRanges.map(r => typeof r === 'string' ? r : r.name)])].sort();
             dl.innerHTML = all.map(r => `<option value="${escHtml(r)}">`).join('');
         }
 
@@ -5437,7 +5491,15 @@
                 if (raw) {
                     const s = JSON.parse(raw);
                     catalogueCustomCategories = s.categories || [];
-                    catalogueCustomRanges = s.ranges || [];
+                    // Migrate: old string[] → new {name, prefix}[]
+                    catalogueCustomRanges = (s.ranges || []).map(r =>
+                        typeof r === 'string' ? { name: r, prefix: '' } : r
+                    );
+                    catalogueRangePrefixes = s.rangePrefixes || {};
+                    // Backfill prefixes from migrated custom ranges
+                    catalogueCustomRanges.forEach(r => {
+                        if (r.prefix && !catalogueRangePrefixes[r.name]) catalogueRangePrefixes[r.name] = r.prefix;
+                    });
                     catalogueCustomFitTypes = s.fitTypes || [];
                     catalogueActivePriceKeys = s.activePriceKeys || (s.activePriceKey ? [s.activePriceKey] : []);
                 }
@@ -5449,6 +5511,7 @@
                 localStorage.setItem(_csStorageKey(), JSON.stringify({
                     categories: catalogueCustomCategories,
                     ranges: catalogueCustomRanges,
+                    rangePrefixes: catalogueRangePrefixes,
                     fitTypes: catalogueCustomFitTypes,
                     activePriceKeys: catalogueActivePriceKeys
                 }));
@@ -5604,30 +5667,70 @@
             const container = document.getElementById('cs-ranges-list');
             if (!container) return;
             const fromProducts = [...new Set(products.map(p => p.range_name).filter(Boolean))].sort();
-            if (!catalogueCustomRanges.length && !fromProducts.length) {
-                container.innerHTML = '<span class="text-gray-600 text-xs italic">No custom ranges yet</span>';
+            const customNames = catalogueCustomRanges.map(r => typeof r === 'string' ? r : r.name);
+            // Unified list: DB ranges + custom ranges, deduped
+            const allNames = [...new Set([...fromProducts, ...customNames])].sort();
+            if (!allNames.length) {
+                container.innerHTML = '<p class="text-gray-500 text-xs italic">No ranges yet. Add a range below.</p>';
                 return;
             }
-            container.innerHTML = [
-                ...fromProducts.map(r => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-800/50 text-gray-500">${escHtml(r)}</span>`),
-                ...catalogueCustomRanges.map(r => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-brand-500/10 border border-brand-500/30 text-brand-400">${escHtml(r)}<button type="button" onclick="csRemoveRange('${escHtml(r)}')" class="text-brand-600 hover:text-red-400 ml-0.5">&times;</button></span>`)
-            ].join('');
+            container.innerHTML = allNames.map(name => {
+                const isCustom = customNames.includes(name);
+                const customEntry = catalogueCustomRanges.find(r => (typeof r === 'string' ? r : r.name) === name);
+                const prefix = catalogueRangePrefixes[name] || (customEntry?.prefix) || '';
+                return `<div class="flex items-center gap-3 rounded-lg px-3 py-2.5" style="background:#f8fafc;border:1px solid #e2e8f0" data-range-name="${escHtml(name)}">
+                    <div class="flex-1 min-w-0">
+                        <span class="font-semibold text-sm text-gray-800">${escHtml(name)}</span>
+                        <span class="text-xs ml-2 px-1.5 py-0.5 rounded" style="${isCustom ? 'background:#ede9fe;color:#7c3aed' : 'background:#f1f5f9;color:#94a3b8'}">${isCustom ? 'Custom' : 'Catalogue'}</span>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <label class="text-xs text-gray-500 whitespace-nowrap">SKU Prefix</label>
+                        <input type="text" value="${escHtml(prefix)}"
+                            placeholder="e.g. APX/ATL"
+                            class="px-2 py-1 rounded text-xs font-mono w-32"
+                            style="background:#fff;border:1px solid #cbd5e1"
+                            oninput="csSetRangePrefixFromInput(this)">
+                    </div>
+                    ${isCustom ? `<button onclick="csRemoveRange('${escHtml(name).replace(/'/g,'&#39;')}')" class="text-red-400 hover:text-red-600 text-xs px-2 py-1 rounded hover:bg-red-50 transition flex-shrink-0">&times; Remove</button>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        function csSetRangePrefixFromInput(el) {
+            const row = el.closest('[data-range-name]');
+            if (!row) return;
+            const name = row.dataset.rangeName;
+            const prefix = el.value.trim();
+            catalogueRangePrefixes[name] = prefix;
+            // If it's a custom range, update the object too
+            const idx = catalogueCustomRanges.findIndex(r => (typeof r === 'string' ? r : r.name) === name);
+            if (idx >= 0) {
+                catalogueCustomRanges[idx] = { name, prefix };
+            }
+            saveCatalogueSettings();
         }
 
         function csAddRange() {
-            const input = document.getElementById('cs-new-range');
-            const val = input.value.trim();
-            if (!val) return;
-            if (!catalogueCustomRanges.includes(val)) {
-                catalogueCustomRanges.push(val);
-                renderCsRangesList();
+            const nameInput = document.getElementById('cs-new-range');
+            const prefixInput = document.getElementById('cs-new-range-prefix');
+            const name = nameInput.value.trim();
+            const prefix = prefixInput ? prefixInput.value.trim() : '';
+            if (!name) return;
+            const customNames = catalogueCustomRanges.map(r => typeof r === 'string' ? r : r.name);
+            if (!customNames.includes(name)) {
+                catalogueCustomRanges.push({ name, prefix });
             }
-            input.value = '';
+            if (prefix) catalogueRangePrefixes[name] = prefix;
+            nameInput.value = '';
+            if (prefixInput) prefixInput.value = '';
+            renderCsRangesList();
+            saveCatalogueSettings();
         }
 
-        function csRemoveRange(range) {
-            catalogueCustomRanges = catalogueCustomRanges.filter(r => r !== range);
+        function csRemoveRange(name) {
+            catalogueCustomRanges = catalogueCustomRanges.filter(r => (typeof r === 'string' ? r : r.name) !== name);
             renderCsRangesList();
+            saveCatalogueSettings();
         }
 
         function renderCsFitTypesList() {
@@ -7493,17 +7596,73 @@
         // NAVIGATION STACK
         // =============================================
         let navStack = [];
+        let navTrail = []; // Full breadcrumb trail: [{label, type, ...}]
 
         function pushNav(ctx) {
             navStack.push(ctx);
         }
 
+        function pushTrail(item) {
+            // Avoid duplicate entries at the same position
+            if (navTrail.length > 0) {
+                const last = navTrail[navTrail.length - 1];
+                if (last.type === item.type && last.label === item.label &&
+                    last.tool === item.tool && last.jobId === item.jobId && last.clubId === item.clubId) return;
+            }
+            navTrail.push(item);
+            renderBreadcrumb();
+        }
+
+        function renderBreadcrumb() {
+            if (typeof navTrail === 'undefined' || !Array.isArray(navTrail)) return;
+            // Render breadcrumb trail in job-breadcrumb and club-breadcrumb elements
+            const trailHtml = navTrail.length <= 1 ? '' : navTrail.map((item, i) => {
+                const isLast = i === navTrail.length - 1;
+                const label = escHtml(item.label);
+                if (isLast) return `<span class="bc-item bc-current">${label}</span>`;
+                return `<button class="bc-item" onclick="_bcNavigateTo(${i})">${label}</button>`;
+            }).join('<span class="bc-sep">›</span>');
+
+            ['job-breadcrumb','club-breadcrumb'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = trailHtml;
+            });
+        }
+
+        function _bcNavigateTo(index) {
+            const item = navTrail[index];
+            if (!item) return;
+            navTrail = navTrail.slice(0, index + 1);
+            navStack = navTrail.slice(0, index).map(t => ({ ...t }));
+            switch (item.type) {
+                case 'launchpad': navTrail = []; navStack = []; showLaunchpad(); break;
+                case 'tool':
+                    showTool(item.tool);
+                    if (item.tool === 'sales' && item.view) setTimeout(() => showSalesView(item.view), 0);
+                    break;
+                case 'job': openJobRecord(item.jobId); break;
+                case 'club-detail': openClubDashboard(item.clubId); break;
+            }
+            renderBreadcrumb();
+        }
+
         function goBack() {
             const prev = navStack.pop();
-            if (!prev) { showLaunchpad(); return; }
+            if (navTrail.length > 0) navTrail.pop();
+            if (!prev) {
+                // Fallback: if in club-detail, go to clubs; if in job-record, go to sales
+                if (!document.getElementById('tool-club-detail').classList.contains('hide')) {
+                    navTrail = []; renderBreadcrumb(); showTool('clubs'); return;
+                }
+                if (!document.getElementById('tool-job-record').classList.contains('hide')) {
+                    navTrail = []; renderBreadcrumb(); showTool('sales'); return;
+                }
+                navTrail = []; renderBreadcrumb(); showLaunchpad(); return;
+            }
+            renderBreadcrumb();
             switch (prev.type) {
                 case 'launchpad':
-                    showLaunchpad(); break;
+                    navTrail = []; showLaunchpad(); break;
                 case 'tool':
                     showTool(prev.tool);
                     if (prev.tool === 'sales' && prev.view) setTimeout(() => showSalesView(prev.view), 0);
@@ -7513,7 +7672,7 @@
                 case 'club-detail':
                     openClubDashboard(prev.clubId); break;
                 default:
-                    showLaunchpad();
+                    navTrail = []; showLaunchpad();
             }
         }
 
@@ -7522,9 +7681,14 @@
             if (lbl) lbl.textContent = label;
         }
 
+        function setJobBackLabel(label) {
+            const lbl = document.getElementById('job-back-label');
+            if (lbl) lbl.textContent = label;
+        }
+
         // Open club from within a job record (pushes job record to stack)
         function openClubFromJob(clubId) {
-            pushNav({ type: 'job', jobId: currentJobId, label: 'Back to Job' });
+            pushNav({ type: 'job', jobId: currentJobId, label: currentJob?.job_name || 'Job' });
             setClubDetailBackLabel('Back to Job');
             openClubDashboard(clubId);
         }
@@ -7862,7 +8026,8 @@
             document.getElementById('club-modal-title').textContent = 'Create New Club';
             document.getElementById('edit-club-id').value = '';
             ['club-name','club-suffix','club-slug','club-league','club-addr1','club-addr2',
-             'club-town','club-county','club-postcode','club-contact-name','club-contact-email','club-contact-phone'].forEach(id => {
+             'club-town','club-county','club-postcode','club-contact-name','club-contact-email','club-contact-phone',
+             'club-google-drive-url'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
@@ -7920,6 +8085,8 @@
             document.getElementById('club-contact-name').value = currentClub.contact_name || '';
             document.getElementById('club-contact-email').value = currentClub.contact_email || '';
             document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
+            const driveUrlEl = document.getElementById('club-google-drive-url');
+            if (driveUrlEl) driveUrlEl.value = currentClub.google_drive_url || '';
             const suffixStatus = document.getElementById('suffix-status');
             if (suffixStatus) { suffixStatus.textContent = '✓ Saved'; suffixStatus.className = 'absolute right-2 top-1/2 -translate-y-1/2 text-xs text-green-400'; }
             // Logo preview
@@ -8088,6 +8255,7 @@
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
+                google_drive_url: document.getElementById('club-google-drive-url')?.value.trim() || null,
                 logo_url: logoUrl
             };
             let result;
@@ -8139,6 +8307,24 @@
         async function openClubDashboard(clubId) {
             const club = clubs.find(c => c.id === clubId);
             if (!club) return;
+            // Push current context to navStack if not already coming from a tracked context
+            const lastStack = navStack.length > 0 ? navStack[navStack.length - 1] : null;
+            if (!lastStack || (lastStack.type !== 'club-detail' && lastStack.type !== 'job')) {
+                if (!document.getElementById('tool-clubs').classList.contains('hide')) {
+                    navStack.push({ type: 'tool', tool: 'clubs', label: 'Clubs' });
+                } else if (!document.getElementById('tool-sales').classList.contains('hide')) {
+                    navStack.push({ type: 'tool', tool: 'sales', view: 'live', label: 'Live Jobs' });
+                }
+            }
+            // Build breadcrumb trail entry
+            const backLabel = lastStack?.type === 'job' ? 'Back to Job' : 'Clubs';
+            if (navTrail.length === 0) navTrail = [{ label: 'Home', type: 'launchpad' }];
+            // Ensure "Clubs" is in trail if coming from clubs tool
+            if (lastStack?.tool === 'clubs' && !navTrail.find(t => t.tool === 'clubs')) {
+                navTrail.push({ label: 'Clubs', type: 'tool', tool: 'clubs' });
+            }
+            navTrail.push({ label: club.name, type: 'club-detail', clubId });
+
             currentClub = club;
             currentClubProducts = [];
             currentOrderForms = [];
@@ -8146,15 +8332,14 @@
             document.getElementById('launchpad').classList.add('hide');
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('tool-club-detail').classList.remove('hide');
-            // Update back label from navStack context (if pushed from a job, label was already set)
+            // Update back label from navStack context
             const backLbl = document.getElementById('club-detail-back-label');
-            if (backLbl && navStack.length > 0) {
-                const top = navStack[navStack.length - 1];
-                if (top.type === 'job') backLbl.textContent = 'Back to Job';
-                else backLbl.textContent = 'Back to Clubs';
-            } else if (backLbl) {
-                backLbl.textContent = 'Back to Clubs';
+            if (backLbl) {
+                if (lastStack?.type === 'job') backLbl.textContent = 'Back to Job';
+                else if (lastStack?.tool === 'sales') backLbl.textContent = 'Live Jobs';
+                else backLbl.textContent = 'Clubs';
             }
+            renderBreadcrumb();
             updateClubDetailHeader();
             showClubTab('overview');
             renderClubTimeline();
@@ -8477,7 +8662,16 @@
             ];
             el.innerHTML = rows.map(([label, value]) =>
                 `<div class="info-row"><span class="info-label">${escHtml(label)}</span><span class="info-value">${escHtml(value)}</span></div>`
-            ).join('');
+            ).join('') + (currentClub.google_drive_url ? `
+                <div class="mt-4 pt-4" style="border-top:1px solid #e2e8f0">
+                    <a href="${escHtml(currentClub.google_drive_url)}" target="_blank" rel="noopener noreferrer"
+                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-md"
+                        style="background:#e8f0fe;color:#1558d6;border:1px solid #c5d3f8">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2 2m-2-2v4"/></svg>
+                        Google Drive Folder
+                        <svg class="w-3 h-3 opacity-60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </div>` : '');
 
             // Update branding panel — prefer logo_url, fall back to club_crest_url
             const crestEl = document.getElementById('club-crest-display');
@@ -10045,13 +10239,13 @@
         let salesViewStageFilter = null;
 
         const JOB_STAGES = [
-            { key: 'discovery',         label: 'Discovery',         colorClass: 'stage-discovery' },
-            { key: 'concepts',          label: 'Concepts',          colorClass: 'stage-concepts' },
-            { key: 'awaiting_approval', label: 'Awaiting Approval', colorClass: 'stage-awaiting' },
-            { key: 'quote',             label: 'Quote',             colorClass: 'stage-quote' },
-            { key: 'paid',              label: 'Paid',              colorClass: 'stage-paid' },
-            { key: 'on_boarding',       label: 'On-Boarding',       colorClass: 'stage-onboarding' },
-            { key: 'completed',         label: 'Completed',         colorClass: 'stage-completed' }
+            { key: 'discovery',         label: 'Discovery',         colorClass: 'stage-discovery',  color: '#64748b', bg: 'rgba(100,116,139,0.12)' },
+            { key: 'concepts',          label: 'Concepts',          colorClass: 'stage-concepts',   color: '#2563eb', bg: 'rgba(37,99,235,0.1)'   },
+            { key: 'awaiting_approval', label: 'Awaiting Approval', colorClass: 'stage-awaiting',   color: '#d97706', bg: 'rgba(217,119,6,0.1)'   },
+            { key: 'quote',             label: 'Quote',             colorClass: 'stage-quote',      color: '#7c3aed', bg: 'rgba(124,58,237,0.1)'  },
+            { key: 'paid',              label: 'Paid',              colorClass: 'stage-paid',       color: '#15803d', bg: 'rgba(22,163,74,0.1)'   },
+            { key: 'on_boarding',       label: 'On-Boarding',       colorClass: 'stage-onboarding', color: '#0284c7', bg: 'rgba(14,165,233,0.1)'  },
+            { key: 'completed',         label: 'Completed',         colorClass: 'stage-completed',  color: '#be185d', bg: 'rgba(190,24,93,0.08)'  }
         ];
 
         const JOB_TYPE_LABELS = {
@@ -10118,16 +10312,22 @@
             const grid = document.getElementById('stage-nav-grid');
             if (!grid) return;
             const liveJobs = jobs.filter(j => j.stage !== 'completed');
-            grid.innerHTML = JOB_STAGES.map(s => {
+            const liveStages = JOB_STAGES.filter(s => s.key !== 'completed');
+            grid.innerHTML = liveStages.map(s => {
                 const count = liveJobs.filter(j => j.stage === s.key).length;
                 const isActive = salesViewStageFilter === s.key;
-                return `<div class="stage-nav-btn ${isActive ? 'active ' + s.colorClass : ''}" onclick="filterByStage('${s.key}')">
-                    <span class="sn-count ${s.colorClass}">${count}</span>
-                    <span class="sn-label">${s.label}</span>
+                const activeBg = s.bg;
+                const activeBorder = s.color;
+                const inactiveBorder = s.color + '30';
+                return `<div class="stage-nav-btn${isActive ? ' active' : ''}" onclick="filterByStage('${s.key}')"
+                    style="background:${isActive ? activeBg : '#ffffff'};border-color:${isActive ? activeBorder : inactiveBorder};color:${isActive ? s.color : '#64748b'}">
+                    <span class="sn-count" style="color:${s.color}">${count}</span>
+                    <span class="sn-label" style="color:${isActive ? s.color : '#94a3b8'}">${s.label}</span>
                 </div>`;
-            }).join('') + `<div class="stage-nav-btn ${!salesViewStageFilter ? 'active' : ''}" onclick="filterByStage(null)" style="margin-left:auto">
-                <span class="sn-count" style="color:#666">${liveJobs.length}</span>
-                <span class="sn-label">All</span>
+            }).join('') + `<div class="stage-nav-btn${!salesViewStageFilter ? ' active' : ''}" onclick="filterByStage(null)"
+                style="background:${!salesViewStageFilter ? 'rgba(37,99,235,0.08)' : '#f8fafc'};border-color:${!salesViewStageFilter ? '#2563eb' : '#e2e8f0'}">
+                <span class="sn-count" style="color:${!salesViewStageFilter ? '#2563eb' : '#475569'}">${liveJobs.length}</span>
+                <span class="sn-label" style="color:${!salesViewStageFilter ? '#2563eb' : '#94a3b8'}">All Live</span>
             </div>`;
         }
 
@@ -10299,13 +10499,20 @@
             currentJobId = jobId;
             // Push current view to navStack if not already navigating
             if (!navStack.length || navStack[navStack.length-1].type !== 'job') {
-                // detect current visible tool to push as back context
-                if (!document.getElementById('tool-sales').classList.contains('hide')) {
-                    navStack.push({ type: 'tool', tool: 'sales', view: 'live' });
+                // detect current visible tool/context to push as back context
+                if (!document.getElementById('tool-club-detail').classList.contains('hide') && currentClub) {
+                    navStack.push({ type: 'club-detail', clubId: currentClub.id, label: currentClub.name });
+                    // Update job back label
+                    setJobBackLabel('Back to ' + currentClub.name);
+                } else if (!document.getElementById('tool-sales').classList.contains('hide')) {
+                    navStack.push({ type: 'tool', tool: 'sales', view: 'live', label: 'Live Jobs' });
+                    setJobBackLabel('Live Jobs');
                 } else if (!document.getElementById('tool-design-studio').classList.contains('hide')) {
-                    navStack.push({ type: 'tool', tool: 'design-studio' });
+                    navStack.push({ type: 'tool', tool: 'design-studio', label: 'Design Studio' });
+                    setJobBackLabel('Design Studio');
+                } else {
+                    setJobBackLabel('Sales');
                 }
-                // (other push contexts are handled by the calling function e.g. openJobFromClub)
             }
             // Load from DB fresh
             const { data: job } = await supabase
@@ -10319,6 +10526,14 @@
             document.getElementById('launchpad').classList.add('hide');
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('tool-job-record').classList.remove('hide');
+
+            // Update breadcrumb trail
+            if (navTrail.length === 0) navTrail = [{ label: 'Home', type: 'launchpad' }];
+            const lastTrail = navTrail[navTrail.length - 1];
+            if (lastTrail?.type !== 'job' || lastTrail?.jobId !== jobId) {
+                navTrail.push({ label: currentJob?.job_name || currentJob?.job_number || 'Job', type: 'job', jobId });
+            }
+            renderBreadcrumb();
 
             renderJobHeader();
             showJobTab('overview');
@@ -11549,25 +11764,45 @@
                 return;
             }
             empty.classList.add('hide');
-            container.innerHTML = currentClubTeams.map(t => `
-                <div class="club-team-card">
+            container.innerHTML = currentClubTeams.map(t => {
+                const linkedJobs = jobs.filter(j => j.club_team_id === t.id);
+                const liveLinkedJobs = linkedJobs.filter(j => j.stage !== 'completed');
+                const jobsHtml = linkedJobs.length ? `
+                    <div class="mt-2 pt-2 flex flex-wrap gap-1.5" style="border-top:1px solid #f1f5f9">
+                        <span class="text-xs text-gray-500 self-center">Linked Jobs:</span>
+                        ${linkedJobs.map(j => {
+                            const stage = JOB_STAGES.find(s => s.key === j.stage);
+                            const isLive = j.stage !== 'completed';
+                            return `<button onclick="openJobRecord('${j.id}')" class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full font-semibold transition hover:opacity-80"
+                                style="background:${isLive ? (stage?.bg || '#f1f5f9') : '#f1f5f9'};color:${isLive ? (stage?.color || '#64748b') : '#64748b'};border:1px solid ${isLive ? (stage?.color || '#e2e8f0') + '40' : '#e2e8f0'}">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                ${escHtml(j.job_name || j.job_number || 'Job')}
+                            </button>`;
+                        }).join('')}
+                    </div>` : '';
+                return `<div class="club-team-card">
                     <div class="flex items-start justify-between gap-3">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-semibold text-sm">👕 ${escHtml(t.team_name)}</span>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="font-semibold text-sm flex items-center gap-1.5">
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    ${escHtml(t.team_name)}
+                                </span>
                                 ${t.age_group ? `<span class="text-xs px-2 py-0.5 rounded-full" style="background:#dbeafe;color:#1d4ed8">${escHtml(t.age_group)}</span>` : ''}
-                                ${t.gender ? `<span class="text-xs text-gray-600">${escHtml(t.gender)}</span>` : ''}
+                                ${t.gender ? `<span class="text-xs text-gray-500">${escHtml(t.gender)}</span>` : ''}
+                                ${liveLinkedJobs.length > 0 ? `<span class="text-xs px-2 py-0.5 rounded-full font-semibold" style="background:rgba(37,99,235,0.1);color:#2563eb">${liveLinkedJobs.length} live job${liveLinkedJobs.length !== 1 ? 's' : ''}</span>` : ''}
                             </div>
                             ${t.coach_name ? `<p class="text-xs text-gray-400">Coach: ${escHtml(t.coach_name)}${t.coach_email ? ` · <a href="mailto:${escHtml(t.coach_email)}" class="text-brand-400 hover:underline">${escHtml(t.coach_email)}</a>` : ''}${t.coach_phone ? ` · ${escHtml(t.coach_phone)}` : ''}</p>` : ''}
-                            ${t.notes ? `<p class="text-xs text-gray-600 mt-1">${escHtml(t.notes)}</p>` : ''}
+                            ${t.notes ? `<p class="text-xs text-gray-500 mt-1 italic">${escHtml(t.notes)}</p>` : ''}
+                            ${jobsHtml}
                         </div>
                         <div class="flex gap-2 flex-shrink-0">
                             <button onclick="openClubTeamModal('${t.id}')" class="text-xs btn-secondary px-3 py-1.5">Edit</button>
                             <button onclick="deleteClubTeam('${t.id}')" class="text-xs text-red-400 hover:text-red-300 px-2 py-1.5">Delete</button>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         function openClubTeamModal(teamId) {
