@@ -3196,84 +3196,89 @@
                 <span id="club-detail-back-label">Back to Clubs</span>
             </button>
 
-            <!-- Club record header -->
-            <div class="glass rounded-2xl p-5 mb-4">
-                <div class="flex items-start justify-between flex-wrap gap-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(20,184,166,0.1)">
-                            <span id="club-detail-initials" class="text-brand-400 font-bold text-xl"></span>
+            <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (timeline+content) | right (activity) -->
+            <div class="jr-three-col">
+
+                <!-- ── Column 1: Compact club info card + sticky nav menu ── -->
+                <div class="jr-left-col">
+                    <!-- Compact club info card -->
+                    <div class="glass rounded-2xl p-4">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(20,184,166,0.1)">
+                                    <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
+                                </div>
+                                <div class="min-w-0">
+                                    <h2 id="club-detail-name" class="text-sm font-bold leading-tight truncate"></h2>
+                                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                                        <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
                         </div>
-                        <div>
-                            <div class="flex items-center gap-3 flex-wrap">
-                                <h2 id="club-detail-name" class="text-2xl font-bold"></h2>
-                                <span id="club-detail-partner-badge" class="badge text-xs"></span>
-                            </div>
-                            <div class="flex items-center gap-3 mt-1">
-                                <span id="club-detail-sport" class="text-gray-500 text-sm"></span>
-                                <span id="club-detail-suffix" class="text-gray-600 font-mono text-xs"></span>
-                            </div>
+                        <div class="pt-3 border-t border-gray-800 space-y-2">
+                            <div><span class="text-xs text-gray-600">Sport</span><p id="club-detail-sport" class="text-xs font-semibold mt-0.5">—</p></div>
+                            <div><span class="text-xs text-gray-600">Suffix</span><p id="club-detail-suffix" class="text-xs font-semibold font-mono mt-0.5">—</p></div>
                         </div>
                     </div>
-                    <button onclick="showEditClubModal()" class="btn-secondary text-sm flex-shrink-0">Edit Club Info</button>
+                    <!-- Sticky navigation menu -->
+                    <div class="record-side-nav" id="club-record-nav">
+                        <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            Overview
+                        </button>
+                        <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Teams
+                        </button>
+                        <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            Club Products
+                        </button>
+                        <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Order Forms
+                        </button>
+                        <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            Jobs
+                        </button>
+                        <div class="record-nav-divider"></div>
+                        <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            Onboarding
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Timeline: Club onboarding progress -->
-            <div class="record-timeline" id="club-record-timeline">
-                <div class="tl-step" id="club-tl-profile">
-                    <div class="tl-dot"></div>
-                    <span class="tl-label">Profile</span>
-                </div>
-                <div class="tl-step" id="club-tl-products">
-                    <div class="tl-dot"></div>
-                    <span class="tl-label">Products</span>
-                </div>
-                <div class="tl-step" id="club-tl-mockups">
-                    <div class="tl-dot"></div>
-                    <span class="tl-label">Mock-Ups</span>
-                </div>
-                <div class="tl-step" id="club-tl-store">
-                    <div class="tl-dot"></div>
-                    <span class="tl-label">Store</span>
-                </div>
-                <div class="tl-step" id="club-tl-active">
-                    <div class="tl-dot"></div>
-                    <span class="tl-label">Active</span>
-                </div>
-            </div>
-
-            <!-- Record layout: side nav + content -->
-            <div class="record-layout">
-                <!-- Side nav -->
-                <div class="record-side-nav" id="club-record-nav">
-                    <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                        Overview
-                    </button>
-                    <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Teams
-                    </button>
-                    <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        Club Products
-                    </button>
-                    <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Order Forms
-                    </button>
-                    <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        Jobs
-                    </button>
-                    <div class="record-nav-divider"></div>
-                    <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                        Onboarding
-                    </button>
-                </div>
-                <!-- Content area -->
-                <div class="record-content">
+                <!-- ── Column 2: Timeline at top + tab content ── -->
+                <div class="jr-middle-col">
+                    <!-- Onboarding timeline (slim at top, same width as content) -->
+                    <div class="record-timeline" style="margin-bottom:16px" id="club-record-timeline">
+                        <div class="tl-step" id="club-tl-profile">
+                            <div class="tl-dot"></div>
+                            <span class="tl-label">Profile</span>
+                        </div>
+                        <div class="tl-step" id="club-tl-products">
+                            <div class="tl-dot"></div>
+                            <span class="tl-label">Products</span>
+                        </div>
+                        <div class="tl-step" id="club-tl-mockups">
+                            <div class="tl-dot"></div>
+                            <span class="tl-label">Mock-Ups</span>
+                        </div>
+                        <div class="tl-step" id="club-tl-store">
+                            <div class="tl-dot"></div>
+                            <span class="tl-label">Store</span>
+                        </div>
+                        <div class="tl-step" id="club-tl-active">
+                            <div class="tl-dot"></div>
+                            <span class="tl-label">Active</span>
+                        </div>
+                    </div>
+                    <!-- Tab content area -->
+                    <div class="record-content">
 
             <!-- TAB: Overview -->
             <div id="club-tab-overview" class="club-tab-content">
@@ -3633,7 +3638,26 @@
             </div>
 
                 </div><!-- /record-content -->
-            </div><!-- /record-layout -->
+                </div><!-- /jr-middle-col -->
+
+                <!-- ── Column 3: Activity & Comments sidebar ── -->
+                <div class="jr-activity-sidebar">
+                    <div class="jr-activity-sidebar-header">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">Activity</h4>
+                        <p class="text-xs text-gray-700">Notes &amp; comments</p>
+                    </div>
+                    <div id="club-activity-log" class="jr-activity-sidebar-feed space-y-1">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="jr-activity-sidebar-input">
+                        <div class="flex gap-2">
+                            <input type="text" id="club-activity-input" placeholder="Add a comment…" class="flex-1 px-3 py-2 rounded-lg text-xs" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd" onkeydown="if(event.key==='Enter')addClubActivity()">
+                            <button onclick="addClubActivity()" class="btn-primary text-xs px-3 py-2">Post</button>
+                        </div>
+                    </div>
+                </div><!-- /jr-activity-sidebar -->
+
+            </div><!-- /jr-three-col -->
         </div>
 
         <!-- ============================================================
@@ -8628,7 +8652,7 @@
             updateClubDetailHeader();
             showClubTab('overview');
             renderClubTimeline();
-            await Promise.all([loadCurrentClubProducts(), loadCurrentClubOrderForms()]);
+            await Promise.all([loadCurrentClubProducts(), loadCurrentClubOrderForms(), loadClubActivity()]);
             renderClubOverviewInfo();
             updateOverviewStats();
             renderClubTimeline(); // re-render with product data loaded
@@ -12185,6 +12209,61 @@
             jobActivityLog.unshift(data);
             if (input) input.value = '';
             renderJobActivity();
+        }
+
+        // =============================================
+        // CLUB ACTIVITY LOG
+        // =============================================
+        let clubActivityLog = [];
+
+        async function loadClubActivity() {
+            if (!currentClub?.id) return;
+            const { data } = await supabase.from('club_activity')
+                .select('*').eq('club_id', currentClub.id).order('created_at', { ascending: false });
+            clubActivityLog = data || [];
+            renderClubActivity();
+        }
+
+        function renderClubActivity() {
+            const container = document.getElementById('club-activity-log');
+            if (!container) return;
+            if (!clubActivityLog.length) {
+                container.innerHTML = '<p class="text-xs text-gray-700 py-4 text-center">No activity yet.</p>';
+                return;
+            }
+            const typeColour = { status_change: '#a78bfa', assignment: '#60a5fa', system: '#9ca3af', note: '#2dd4bf' };
+            container.innerHTML = clubActivityLog.map(entry => {
+                const initial = (entry.user_name || '?').charAt(0).toUpperCase();
+                const ts = new Date(entry.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                const col = typeColour[entry.activity_type] || '#2dd4bf';
+                return `<div class="activity-entry">
+                    <div class="activity-avatar" style="background:${col}18;color:${col}">${initial}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-semibold text-gray-300">${escHtml(entry.user_name)}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">${escHtml(entry.message)}</p>
+                        <p class="text-xs text-gray-700 mt-0.5">${ts}</p>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function addClubActivity(message, type) {
+            const input = document.getElementById('club-activity-input');
+            const msg = message || input?.value?.trim();
+            if (!msg || !currentClub?.id) return;
+            const userName = currentUserProfile?.email?.split('@')[0] || 'Unknown';
+            const { data, error } = await supabase.from('club_activity').insert({
+                club_id: currentClub.id,
+                brand_id: currentBrand.id,
+                user_id: currentUser?.id,
+                user_name: userName,
+                message: msg,
+                activity_type: type || 'note'
+            }).select().single();
+            if (error) { showToast('Error adding activity', 'error'); return; }
+            clubActivityLog.unshift(data);
+            if (input) input.value = '';
+            renderClubActivity();
         }
 
         // =============================================
