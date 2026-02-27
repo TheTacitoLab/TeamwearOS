@@ -556,7 +556,7 @@
         .kanban-board::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
         .kanban-column {
-            flex: 0 0 300px;
+            flex: 0 0 320px;
             background: rgba(255,255,255,0.02);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 14px;
@@ -951,19 +951,21 @@
         }
 
         /* ── Job Record page: full-width, dynamic ── */
-        .job-record-page { width: 100%; padding: 20px 32px; box-sizing: border-box; }
-        @media (max-width: 900px) { .job-record-page { padding: 16px; } }
+        .job-record-page { width: 100%; padding: 24px 40px 48px; box-sizing: border-box; }
+        @media (min-width: 1280px) { .job-record-page { padding: 28px 56px 56px; } }
+        @media (max-width: 900px) { .job-record-page { padding: 16px 16px 32px; } }
 
         /* ── Top header grid: compact info card (left) + pipelines stack (right) ── */
         .jr-top-grid {
-            display: grid; grid-template-columns: 300px 1fr; gap: 16px;
-            align-items: start; margin-bottom: 16px;
+            display: grid; grid-template-columns: 340px 1fr; gap: 20px;
+            align-items: start; margin-bottom: 20px;
         }
         @media (max-width: 900px) { .jr-top-grid { grid-template-columns: 1fr; } }
         .jr-pipelines-col { display: flex; flex-direction: column; gap: 12px; }
 
         /* ── Record page layout: side nav + content ── */
-        .record-layout { display: grid; grid-template-columns: 210px 1fr; gap: 16px; align-items: start; }
+        .record-layout { display: grid; grid-template-columns: 230px 1fr; gap: 20px; align-items: start; }
+        @media (min-width: 1280px) { .record-layout { grid-template-columns: 250px 1fr; gap: 24px; } }
         @media (max-width: 767px) { .record-layout { grid-template-columns: 1fr; } }
         .record-side-nav {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
@@ -972,7 +974,7 @@
         }
         @media (max-width: 767px) { .record-side-nav { flex-direction: row; flex-wrap: wrap; position: static; } }
         .record-nav-item {
-            display: flex; align-items: center; gap: 9px; padding: 9px 12px;
+            display: flex; align-items: center; gap: 9px; padding: 10px 14px;
             border-radius: 9px; font-size: 13px; font-weight: 600; color: #555;
             cursor: pointer; transition: all 0.18s; width: 100%; text-align: left;
             border: none; background: none; white-space: nowrap;
@@ -987,7 +989,7 @@
         .record-timeline {
             display: flex; align-items: center; gap: 0;
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px; padding: 12px 20px; overflow-x: auto; margin-bottom: 16px;
+            border-radius: 14px; padding: 14px 24px; overflow-x: auto; margin-bottom: 20px;
         }
         .record-timeline::-webkit-scrollbar { height: 3px; }
         .record-timeline::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
@@ -1002,7 +1004,7 @@
         }
         .tl-step.done:not(:last-child)::after { background: rgba(20,184,166,0.2); }
         .tl-dot {
-            width: 18px; height: 18px; border-radius: 50%;
+            width: 20px; height: 20px; border-radius: 50%;
             background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.08);
             position: relative; z-index: 1; transition: all 0.2s; flex-shrink: 0;
         }
@@ -1015,6 +1017,61 @@
         .tl-step.done .tl-label { color: rgba(20,184,166,0.55); }
         .tl-step.active .tl-label { color: #2dd4bf; }
         .record-content { min-width: 0; }
+
+        /* ── Full-width app layout improvements ── */
+        html, body { overflow-x: hidden; }
+        #main-app { width: 100%; min-height: 100vh; display: flex; flex-direction: column; }
+
+        /* Kanban board fills available width */
+        .kanban-board { width: 100%; }
+        @media (min-width: 1280px) { .kanban-column { flex: 0 0 340px; } }
+        @media (min-width: 1600px) { .kanban-column { flex: 0 0 360px; } }
+
+        /* Global submissions grid on wide screens */
+        @media (min-width: 1280px) {
+            #global-submissions-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            #global-submissions-list > * + * { margin-top: 0; }
+        }
+        @media (min-width: 1600px) {
+            #global-submissions-list { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* Prospecting nc-list — cancel space-y-2 when grid kicks in */
+        @media (min-width: 1280px) { #nc-list > * + * { margin-top: 0; } }
+
+        /* Stat cards — even spacing on large screens */
+        .stat-card { flex: 1; }
+
+        /* Better feature card sizing */
+        @media (min-width: 1280px) {
+            .feature-card { padding: 32px; }
+            .feature-card h3 { font-size: 18px; }
+        }
+
+        /* Split action grid — make each card larger on wide screens */
+        @media (min-width: 1024px) {
+            .split-action-card { padding: 36px 32px; }
+        }
+
+        /* Job / list containers — 2-col on xl, 3-col on 2xl */
+        @media (min-width: 1280px) {
+            #live-jobs-list, #completed-jobs-list, #sales-recent-jobs,
+            #clubs-enhanced-list, #clubs-recent-list, #po-list, #ds-jobs-list {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            /* Cancel space-y-3 margin stacking inside grids */
+            #live-jobs-list > * + *, #completed-jobs-list > * + *, #sales-recent-jobs > * + *,
+            #clubs-enhanced-list > * + *, #clubs-recent-list > * + *, #po-list > * + *,
+            #ds-jobs-list > * + * { margin-top: 0; }
+        }
+        @media (min-width: 1600px) {
+            #live-jobs-list, #completed-jobs-list,
+            #clubs-enhanced-list, #clubs-recent-list, #ds-jobs-list {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -1057,7 +1114,7 @@
     <!-- MAIN APP -->
     <div id="main-app" class="hide">
         <!-- Header -->
-        <header class="glass sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
+        <header class="glass sticky top-0 z-40 px-6 md:px-10 lg:px-12 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <button onclick="showLaunchpad()" class="text-2xl font-bold text-brand-400 hover:text-brand-300">TeamwearOS</button>
                 <div id="brand-selector" class="hide flex items-center gap-2">
@@ -1121,9 +1178,9 @@
         </div>
 
         <!-- Launchpad -->
-        <div id="launchpad" class="p-8 max-w-6xl mx-auto">
+        <div id="launchpad" class="w-full p-6 md:p-8 lg:px-12">
             <!-- Welcome header -->
-            <div class="flex items-end justify-between mb-10">
+            <div class="flex items-end justify-between mb-8">
                 <div>
                     <p class="text-sm text-gray-500 mb-1 uppercase tracking-widest font-medium">Home</p>
                     <h2 class="text-3xl font-bold">TeamwearOS</h2>
@@ -1147,7 +1204,7 @@
             </div>
 
             <!-- Main Feature Grid -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5" id="feature-grid">
+            <div class="grid sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5" id="feature-grid">
 
                 <!-- Prospecting -->
                 <div id="fc-prospecting" onclick="showTool('prospecting')" class="feature-card accent-teal">
@@ -1232,7 +1289,7 @@
             </div>
 
             <!-- Quick Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
                 <div class="stat-card">
                     <p class="text-xs text-gray-500 mb-1">Products</p>
                     <p id="stat-products" class="text-2xl font-bold text-brand-400">0</p>
@@ -1274,7 +1331,7 @@
         </div>
 
         <!-- TOOL: Product Database -->
-        <div id="tool-products" class="hide p-8 max-w-7xl mx-auto">
+        <div id="tool-products" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
                 ← Back to Launchpad
             </button>
@@ -1563,7 +1620,7 @@
 
         <!-- TOOL: Club Mock-Ups -->
         <!-- TOOL: Design Studio Pipeline Launchpad -->
-        <div id="tool-design-studio" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+        <div id="tool-design-studio" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
@@ -1642,7 +1699,7 @@
             </div>
         </div>
 
-        <div id="tool-mockups" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+        <div id="tool-mockups" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
@@ -1791,7 +1848,7 @@
                 <div id="images-empty" class="text-center py-12 hide">
                     <p class="text-gray-500">No product images uploaded yet</p>
                 </div>
-                <div id="images-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
+                <div id="images-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-10 gap-3">
                     <!-- Populated by JS -->
                 </div>
             </div>
@@ -1824,7 +1881,7 @@
         </div>
 
         <!-- TOOL: Store Generator -->
-        <div id="tool-generator" class="hide p-8 max-w-6xl mx-auto">
+        <div id="tool-generator" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
                 ← Back to Launchpad
             </button>
@@ -1878,7 +1935,7 @@
         </div>
 
         <!-- TOOL: Factory Orders -->
-        <div id="tool-orders" class="hide p-8 max-w-6xl mx-auto">
+        <div id="tool-orders" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
                 ← Back to Launchpad
             </button>
@@ -1942,7 +1999,7 @@
         </div>
 
         <!-- TOOL: PO Tracker V2 -->
-        <div id="tool-po-tracker" class="hide p-8 max-w-6xl mx-auto">
+        <div id="tool-po-tracker" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
                 ← Back to Launchpad
             </button>
@@ -2085,7 +2142,7 @@
         </div>
 
         <!-- TOOL: Brand Settings (Super Admin Only) -->
-        <div id="tool-settings" class="hide p-8 max-w-6xl mx-auto">
+        <div id="tool-settings" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
                 ← Back to Launchpad
             </button>
@@ -2188,7 +2245,7 @@
         </div>
 
         <!-- TOOL: User Management (Super Admin Only) -->
-        <div id="tool-users" class="hide p-8 max-w-6xl mx-auto">
+        <div id="tool-users" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-400 hover:text-white mb-4 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
@@ -2272,7 +2329,7 @@
         <!-- ============================================================
              TOOL: PROSPECTING
              ============================================================ -->
-        <div id="tool-prospecting" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+        <div id="tool-prospecting" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
@@ -2359,7 +2416,7 @@
                     <button onclick="exportLeadsCSV('not_contacted')" class="btn-secondary text-sm">Export CSV</button>
                 </div>
 
-                <div id="nc-list" class="space-y-2">
+                <div id="nc-list" class="space-y-2 xl:grid xl:grid-cols-2 xl:gap-3 xl:space-y-0 2xl:grid-cols-3">
                     <!-- Populated by JS -->
                 </div>
             </div>
@@ -2592,7 +2649,7 @@
         <!-- ============================================================
              TOOL: SALES
              ============================================================ -->
-        <div id="tool-sales" class="hide p-6 md:p-8 max-w-7xl mx-auto">
+        <div id="tool-sales" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
@@ -2604,7 +2661,7 @@
                     <h2 class="text-2xl font-bold">Sales</h2>
                     <p class="text-gray-500 text-sm mt-1">Manage jobs, design briefs and your sales pipeline</p>
                 </div>
-                <div class="grid md:grid-cols-3 gap-5 mb-8">
+                <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5 mb-8">
                     <div onclick="openNewJobModal()" class="feature-card accent-purple" style="cursor:pointer">
                         <div class="card-icon" style="background:rgba(139,92,246,0.12)">✨</div>
                         <h3>Create New Job</h3>
@@ -3037,7 +3094,7 @@
         <!-- ============================================================
              TOOL: CLUBS (Enhanced)
              ============================================================ -->
-        <div id="tool-clubs" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+        <div id="tool-clubs" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
@@ -3097,7 +3154,7 @@
         <!-- ============================================================
              TOOL: CLUB DETAIL DASHBOARD
              ============================================================ -->
-        <div id="tool-club-detail" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+        <div id="tool-club-detail" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="goBack()" id="club-detail-back-btn" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 <span id="club-detail-back-label">Back to Clubs</span>
@@ -3517,7 +3574,7 @@
                         <h3 class="font-semibold">Uploaded Images (<span id="club-detail-image-count">0</span>)</h3>
                         <span id="club-detail-collection-badge" class="badge"></span>
                     </div>
-                    <div id="club-detail-images-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 gap-3">
+                    <div id="club-detail-images-grid" class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-10 gap-3">
                         <!-- Populated by JS -->
                     </div>
                     <div id="club-detail-images-empty" class="hide text-center py-8 text-gray-600 text-sm">No images uploaded yet</div>
@@ -3546,7 +3603,7 @@
         <!-- ============================================================
              TOOL: ORDER FORMS (Global view - all submissions)
              ============================================================ -->
-        <div id="tool-order-forms" class="hide p-6 md:p-8 max-w-6xl mx-auto">
+        <div id="tool-order-forms" class="hide w-full p-6 md:p-8 lg:px-12">
             <button onclick="showLaunchpad()" class="text-gray-500 hover:text-white mb-6 flex items-center gap-2 text-sm transition">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 Back to Launchpad
