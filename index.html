@@ -949,6 +949,60 @@
             border-color: rgba(255,255,255,0.12);
             transform: translateY(-2px);
         }
+
+        /* ── Record page layout: side nav + content ── */
+        .record-layout { display: grid; grid-template-columns: 192px 1fr; gap: 16px; align-items: start; }
+        @media (max-width: 767px) { .record-layout { grid-template-columns: 1fr; } }
+        .record-side-nav {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 6px; position: sticky; top: 74px;
+            display: flex; flex-direction: column; gap: 1px;
+        }
+        @media (max-width: 767px) { .record-side-nav { flex-direction: row; flex-wrap: wrap; position: static; } }
+        .record-nav-item {
+            display: flex; align-items: center; gap: 9px; padding: 9px 12px;
+            border-radius: 9px; font-size: 13px; font-weight: 600; color: #555;
+            cursor: pointer; transition: all 0.18s; width: 100%; text-align: left;
+            border: none; background: none; white-space: nowrap;
+        }
+        .record-nav-item:hover { color: #ccc; background: rgba(255,255,255,0.05); }
+        .record-nav-item.active { color: #fff; background: rgba(255,255,255,0.08); }
+        .record-nav-item svg { flex-shrink: 0; color: #444; transition: color 0.18s; }
+        .record-nav-item.active svg { color: #2dd4bf; }
+        .record-nav-divider { height: 1px; background: rgba(255,255,255,0.05); margin: 4px 6px; }
+
+        /* ── Record timeline bar across the top ── */
+        .record-timeline {
+            display: flex; align-items: center; gap: 0;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 12px 20px; overflow-x: auto; margin-bottom: 16px;
+        }
+        .record-timeline::-webkit-scrollbar { height: 3px; }
+        .record-timeline::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .tl-step {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            flex: 1; min-width: 68px; position: relative; cursor: pointer;
+        }
+        .tl-step:not(:last-child)::after {
+            content: ''; position: absolute; top: 8px;
+            left: calc(50% + 12px); right: calc(-50% + 12px);
+            height: 2px; background: rgba(255,255,255,0.07); pointer-events: none;
+        }
+        .tl-step.done:not(:last-child)::after { background: rgba(20,184,166,0.2); }
+        .tl-dot {
+            width: 18px; height: 18px; border-radius: 50%;
+            background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.08);
+            position: relative; z-index: 1; transition: all 0.2s; flex-shrink: 0;
+        }
+        .tl-dot.done { background: rgba(20,184,166,0.15); border-color: rgba(20,184,166,0.3); }
+        .tl-dot.active { background: #14b8a6; border-color: #0d9488; box-shadow: 0 0 0 4px rgba(20,184,166,0.12); }
+        .tl-label {
+            font-size: 10px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.35px; color: #444; text-align: center; white-space: nowrap;
+        }
+        .tl-step.done .tl-label { color: rgba(20,184,166,0.55); }
+        .tl-step.active .tl-label { color: #2dd4bf; }
+        .record-content { min-width: 0; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -2612,47 +2666,18 @@
                 </button>
             </div>
 
-            <!-- Job header -->
-            <div class="glass rounded-2xl p-6 mb-6">
-                <div class="flex items-start justify-between flex-wrap gap-4 mb-5">
+            <!-- Record header - compact -->
+            <div class="glass rounded-2xl p-5 mb-4">
+                <div class="flex items-start justify-between flex-wrap gap-4">
                     <div>
-                        <div class="flex items-center gap-3 mb-1">
-                            <span id="jr-job-number" class="text-xs text-gray-600 font-mono"></span>
-                        </div>
+                        <span id="jr-job-number" class="text-xs text-gray-600 font-mono block mb-1"></span>
                         <h2 id="jr-job-name" class="text-2xl font-bold mb-1">Job Name</h2>
                         <p id="jr-job-desc" class="text-gray-500 text-sm"></p>
                     </div>
                     <button onclick="openEditJobModal()" class="btn-secondary text-sm flex-shrink-0">Edit Job</button>
                 </div>
-
-                <!-- Job Stage pills -->
-                <div class="mb-4">
-                    <p class="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Job Stage</p>
-                    <div class="stage-pill-selector" id="jr-stage-pills">
-                        <!-- Populated by renderJobStagePills() -->
-                    </div>
-                    <!-- Hidden select kept for JS compat -->
-                    <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
-                        <option value="discovery">Discovery</option>
-                        <option value="concepts">Concepts</option>
-                        <option value="awaiting_approval">Awaiting Approval</option>
-                        <option value="quote">Quote</option>
-                        <option value="paid">Paid</option>
-                        <option value="on_boarding">On-Boarding</option>
-                        <option value="completed">Completed</option>
-                    </select>
-                </div>
-
-                <!-- Design Stage pills -->
-                <div class="mb-4">
-                    <p class="text-xs text-gray-500 mb-2 font-semibold uppercase tracking-wider">Design Stage</p>
-                    <div class="design-stage-row" id="jr-design-stage-pills">
-                        <!-- Populated by renderDesignStagePills() -->
-                    </div>
-                </div>
-
                 <!-- Quick meta -->
-                <div class="flex gap-6 mt-4 flex-wrap border-t border-gray-800 pt-4" id="jr-meta-row">
+                <div class="flex gap-5 mt-4 pt-4 border-t border-gray-800 flex-wrap" id="jr-meta-row">
                     <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-sm font-semibold mt-0.5">—</p></div>
                     <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-sm font-semibold mt-0.5">—</p></div>
                     <div><span class="text-xs text-gray-600">Channel</span><p id="jr-channel" class="text-sm font-semibold mt-0.5">—</p></div>
@@ -2662,16 +2687,63 @@
                 </div>
             </div>
 
-            <!-- Tab navigation -->
-            <div class="job-tab-nav">
-                <button class="job-tab-btn active" onclick="showJobTab('overview')" id="jt-overview">Overview</button>
-                <button class="job-tab-btn" onclick="showJobTab('products')" id="jt-products">Products</button>
-                <button class="job-tab-btn" onclick="showJobTab('club')" id="jt-club">Club Record</button>
-                <button class="job-tab-btn" onclick="showJobTab('team')" id="jt-team">Team</button>
-                <button class="job-tab-btn" onclick="showJobTab('design')" id="jt-design">Design Studio</button>
-                <button class="job-tab-btn" onclick="showJobTab('orderform')" id="jt-orderform">Order Form</button>
-                <button class="job-tab-btn" onclick="showJobTab('production')" id="jt-production">Production</button>
+            <!-- Timeline: Job Stage + Design Stage -->
+            <div class="record-timeline">
+                <div class="flex-1 flex items-center flex-wrap gap-1" id="jr-stage-pills">
+                    <!-- Populated by renderJobStagePills() -->
+                </div>
+                <!-- Hidden select kept for JS compat -->
+                <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
+                    <option value="discovery">Discovery</option>
+                    <option value="concepts">Concepts</option>
+                    <option value="awaiting_approval">Awaiting Approval</option>
+                    <option value="quote">Quote</option>
+                    <option value="paid">Paid</option>
+                    <option value="on_boarding">On-Boarding</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <div class="ml-4 pl-4 border-l border-gray-800 flex items-center gap-3 flex-shrink-0">
+                    <span class="text-xs text-gray-600 font-semibold uppercase tracking-wider whitespace-nowrap">Design</span>
+                    <div class="design-stage-row" id="jr-design-stage-pills"></div>
+                </div>
             </div>
+
+            <!-- Record layout: side nav + content -->
+            <div class="record-layout">
+                <!-- Side nav -->
+                <div class="record-side-nav" id="job-record-nav">
+                    <button class="record-nav-item active" onclick="showJobTab('overview')" id="jt-overview">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                        Overview
+                    </button>
+                    <button class="record-nav-item" onclick="showJobTab('products')" id="jt-products">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        Products
+                    </button>
+                    <button class="record-nav-item" onclick="showJobTab('club')" id="jt-club">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        Club Record
+                    </button>
+                    <button class="record-nav-item" onclick="showJobTab('team')" id="jt-team">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Team
+                    </button>
+                    <div class="record-nav-divider"></div>
+                    <button class="record-nav-item" onclick="showJobTab('design')" id="jt-design">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                        Design Studio
+                    </button>
+                    <button class="record-nav-item" onclick="showJobTab('orderform')" id="jt-orderform">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Order Form
+                    </button>
+                    <button class="record-nav-item" onclick="showJobTab('production')" id="jt-production">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+                        Production
+                    </button>
+                </div>
+                <!-- Content area -->
+                <div class="record-content">
 
             <!-- TAB: Overview -->
             <div id="jt-content-overview">
@@ -2808,6 +2880,9 @@
                     </div>
                 </div>
             </div>
+
+                </div><!-- /record-content -->
+            </div><!-- /record-layout -->
         </div>
 
         <!-- MODAL: New/Edit Job -->
@@ -3009,35 +3084,84 @@
                 <span id="club-detail-back-label">Back to Clubs</span>
             </button>
 
-            <!-- Club header -->
-            <div class="flex items-start justify-between mb-6">
-                <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 rounded-xl bg-brand-500/10 flex items-center justify-center">
-                        <span id="club-detail-initials" class="text-brand-400 font-bold text-xl"></span>
-                    </div>
-                    <div>
-                        <div class="flex items-center gap-3">
-                            <h2 id="club-detail-name" class="text-2xl font-bold"></h2>
-                            <span id="club-detail-partner-badge" class="badge text-xs"></span>
+            <!-- Club record header -->
+            <div class="glass rounded-2xl p-5 mb-4">
+                <div class="flex items-start justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(20,184,166,0.1)">
+                            <span id="club-detail-initials" class="text-brand-400 font-bold text-xl"></span>
                         </div>
-                        <div class="flex items-center gap-3 mt-1">
-                            <span id="club-detail-sport" class="text-gray-500 text-sm"></span>
-                            <span id="club-detail-suffix" class="text-gray-600 font-mono text-xs"></span>
+                        <div>
+                            <div class="flex items-center gap-3 flex-wrap">
+                                <h2 id="club-detail-name" class="text-2xl font-bold"></h2>
+                                <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                            </div>
+                            <div class="flex items-center gap-3 mt-1">
+                                <span id="club-detail-sport" class="text-gray-500 text-sm"></span>
+                                <span id="club-detail-suffix" class="text-gray-600 font-mono text-xs"></span>
+                            </div>
                         </div>
                     </div>
+                    <button onclick="showEditClubModal()" class="btn-secondary text-sm flex-shrink-0">Edit Club Info</button>
                 </div>
-                <button onclick="showEditClubModal()" class="btn-secondary text-sm">Edit Club Info</button>
             </div>
 
-            <!-- Tab navigation -->
-            <div class="tab-nav">
-                <button id="tab-btn-overview" onclick="showClubTab('overview')" class="active">Overview</button>
-                <button id="tab-btn-teams" onclick="showClubTab('teams')">Teams</button>
-                <button id="tab-btn-products" onclick="showClubTab('products')">Club Products</button>
-                <button id="tab-btn-orderforms" onclick="showClubTab('orderforms')">Order Forms</button>
-                <button id="tab-btn-jobs" onclick="showClubTab('jobs')">Jobs</button>
-                <button id="tab-btn-onboarding" onclick="showClubTab('onboarding')">Onboarding</button>
+            <!-- Timeline: Club onboarding progress -->
+            <div class="record-timeline" id="club-record-timeline">
+                <div class="tl-step" id="club-tl-profile">
+                    <div class="tl-dot"></div>
+                    <span class="tl-label">Profile</span>
+                </div>
+                <div class="tl-step" id="club-tl-products">
+                    <div class="tl-dot"></div>
+                    <span class="tl-label">Products</span>
+                </div>
+                <div class="tl-step" id="club-tl-mockups">
+                    <div class="tl-dot"></div>
+                    <span class="tl-label">Mock-Ups</span>
+                </div>
+                <div class="tl-step" id="club-tl-store">
+                    <div class="tl-dot"></div>
+                    <span class="tl-label">Store</span>
+                </div>
+                <div class="tl-step" id="club-tl-active">
+                    <div class="tl-dot"></div>
+                    <span class="tl-label">Active</span>
+                </div>
             </div>
+
+            <!-- Record layout: side nav + content -->
+            <div class="record-layout">
+                <!-- Side nav -->
+                <div class="record-side-nav" id="club-record-nav">
+                    <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                        Overview
+                    </button>
+                    <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Teams
+                    </button>
+                    <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        Club Products
+                    </button>
+                    <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Order Forms
+                    </button>
+                    <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        Jobs
+                    </button>
+                    <div class="record-nav-divider"></div>
+                    <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        Onboarding
+                    </button>
+                </div>
+                <!-- Content area -->
+                <div class="record-content">
 
             <!-- TAB: Overview -->
             <div id="club-tab-overview" class="club-tab-content">
@@ -3395,6 +3519,9 @@
                     <p class="text-gray-500">No jobs linked to this club yet.</p>
                 </div>
             </div>
+
+                </div><!-- /record-content -->
+            </div><!-- /record-layout -->
         </div>
 
         <!-- ============================================================
@@ -8388,9 +8515,11 @@
             }
             updateClubDetailHeader();
             showClubTab('overview');
+            renderClubTimeline();
             await Promise.all([loadCurrentClubProducts(), loadCurrentClubOrderForms()]);
             renderClubOverviewInfo();
             updateOverviewStats();
+            renderClubTimeline(); // re-render with product data loaded
         }
 
         // Dynamic tier name/badge lookup (works with any brand tier)
@@ -8418,7 +8547,7 @@
         function showClubTab(tab) {
             currentClubTab = tab;
             document.querySelectorAll('.club-tab-content').forEach(el => el.classList.add('hide'));
-            document.querySelectorAll('.tab-nav button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#club-record-nav .record-nav-item').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`club-tab-${tab}`)?.classList.remove('hide');
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
             if (tab === 'overview') renderClubOverviewInfo();
@@ -8429,6 +8558,42 @@
             if (tab === 'onboarding') { renderShopifySyncStatus(); renderOnboardingTab(); }
             if (tab === 'shopify') renderShopifySyncStatus(); // legacy compatibility
             if (tab === 'images') loadClubDetailImages();
+        }
+
+        function renderClubTimeline() {
+            if (!currentClub) return;
+            const steps = {
+                profile:  !!(currentClub.name && currentClub.sport),
+                products: !!(currentClubProducts && currentClubProducts.length > 0),
+                mockups:  !!(currentClub.has_images),
+                store:    !!(currentClub.shopify_collection_id),
+                active:   !!(currentClub.shopify_collection_id && currentClub.has_images)
+            };
+            const keys = ['profile','products','mockups','store','active'];
+            // Find the active (first incomplete) step
+            let activeFound = false;
+            keys.forEach(key => {
+                const el = document.getElementById(`club-tl-${key}`);
+                if (!el) return;
+                const dot = el.querySelector('.tl-dot');
+                if (!dot) return;
+                if (steps[key] && !activeFound) {
+                    dot.className = 'tl-dot done';
+                    el.className = 'tl-step done';
+                } else if (!steps[key] && !activeFound) {
+                    dot.className = 'tl-dot active';
+                    el.className = 'tl-step active';
+                    activeFound = true;
+                } else {
+                    dot.className = 'tl-dot';
+                    el.className = 'tl-step';
+                }
+            });
+            // If all done, mark active as done too
+            if (!activeFound) {
+                const el = document.getElementById('club-tl-active');
+                if (el) { el.className = 'tl-step done'; const dot = el.querySelector('.tl-dot'); if (dot) dot.className = 'tl-dot done'; }
+            }
         }
 
         function renderOnboardingTab() {
