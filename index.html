@@ -955,24 +955,54 @@
         @media (min-width: 1280px) { .job-record-page { padding: 28px 56px 56px; } }
         @media (max-width: 900px) { .job-record-page { padding: 16px 16px 32px; } }
 
-        /* ── Top header grid: compact info card (left) + pipelines stack (right) ── */
-        .jr-top-grid {
-            display: grid; grid-template-columns: 340px 1fr; gap: 20px;
-            align-items: start; margin-bottom: 20px;
+        /* ── Job Record: unified 3-column layout ── */
+        .jr-three-col {
+            display: grid;
+            grid-template-columns: 240px 1fr 280px;
+            gap: 20px;
+            align-items: start;
         }
-        @media (max-width: 900px) { .jr-top-grid { grid-template-columns: 1fr; } }
-        .jr-pipelines-col { display: flex; flex-direction: column; gap: 12px; }
+        @media (max-width: 1200px) { .jr-three-col { grid-template-columns: 220px 1fr; } .jr-activity-sidebar { display: none !important; } }
+        @media (max-width: 767px) { .jr-three-col { grid-template-columns: 1fr; } }
 
-        /* ── Record page layout: side nav + content ── */
-        .record-layout { display: grid; grid-template-columns: 230px 1fr; gap: 20px; align-items: start; }
-        @media (min-width: 1280px) { .record-layout { grid-template-columns: 250px 1fr; gap: 24px; } }
-        @media (max-width: 767px) { .record-layout { grid-template-columns: 1fr; } }
+        /* Left column: job info card + sticky nav */
+        .jr-left-col {
+            display: flex; flex-direction: column; gap: 14px;
+            position: sticky; top: 74px;
+        }
+        @media (max-width: 767px) { .jr-left-col { position: static; } }
+
+        /* Middle column: pipelines at top + content below */
+        .jr-middle-col { min-width: 0; }
+        .jr-pipelines-col { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+        /* Right column: activity sidebar */
+        .jr-activity-sidebar {
+            position: sticky; top: 74px;
+            background: rgba(15,15,15,0.7); border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 14px; display: flex; flex-direction: column;
+            max-height: calc(100vh - 94px); overflow: hidden;
+        }
+        .jr-activity-sidebar-header {
+            padding: 14px 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.06);
+            flex-shrink: 0;
+        }
+        .jr-activity-sidebar-feed {
+            flex: 1; overflow-y: auto; padding: 10px 12px;
+        }
+        .jr-activity-sidebar-feed::-webkit-scrollbar { width: 4px; }
+        .jr-activity-sidebar-feed::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+        .jr-activity-sidebar-input {
+            padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.06); flex-shrink: 0;
+        }
+
+        /* Side nav (now lives inside jr-left-col, no longer needs its own sticky) */
         .record-side-nav {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px; padding: 6px; position: sticky; top: 74px;
+            border-radius: 14px; padding: 6px;
             display: flex; flex-direction: column; gap: 1px;
         }
-        @media (max-width: 767px) { .record-side-nav { flex-direction: row; flex-wrap: wrap; position: static; } }
+        @media (max-width: 767px) { .record-side-nav { flex-direction: row; flex-wrap: wrap; } }
         .record-nav-item {
             display: flex; align-items: center; gap: 9px; padding: 10px 14px;
             border-radius: 9px; font-size: 13px; font-weight: 600; color: #555;
@@ -2736,117 +2766,104 @@
                 </button>
             </div>
 
-            <!-- TOP GRID: Compact job info (left) + Pipeline cards stacked (right) -->
-            <div class="jr-top-grid">
-                <!-- Left: compact job info card -->
-                <div class="glass rounded-2xl p-4">
-                    <div class="flex items-start justify-between gap-3 mb-3">
-                        <div class="min-w-0">
-                            <span id="jr-job-number" class="text-xs text-gray-600 font-mono block mb-1"></span>
-                            <h2 id="jr-job-name" class="text-lg font-bold mb-1 leading-tight">Job Name</h2>
-                            <p id="jr-job-desc" class="text-gray-500 text-xs leading-relaxed"></p>
+            <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (pipelines+content) | right (activity) -->
+            <div class="jr-three-col">
+
+                <!-- ── Column 1: Job info card + sticky nav menu ── -->
+                <div class="jr-left-col">
+                    <!-- Compact job info card -->
+                    <div class="glass rounded-2xl p-4">
+                        <div class="flex items-start justify-between gap-3 mb-3">
+                            <div class="min-w-0">
+                                <span id="jr-job-number" class="text-xs text-gray-600 font-mono block mb-1"></span>
+                                <h2 id="jr-job-name" class="text-lg font-bold mb-1 leading-tight">Job Name</h2>
+                                <p id="jr-job-desc" class="text-gray-500 text-xs leading-relaxed"></p>
+                            </div>
+                            <button onclick="openEditJobModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
                         </div>
-                        <button onclick="openEditJobModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
+                        <div class="grid grid-cols-2 gap-y-2 pt-3 border-t border-gray-800" id="jr-meta-row">
+                            <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-xs font-semibold mt-0.5">—</p></div>
+                            <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-xs font-semibold mt-0.5">—</p></div>
+                            <div><span class="text-xs text-gray-600">Channel</span><p id="jr-channel" class="text-xs font-semibold mt-0.5">—</p></div>
+                            <div><span class="text-xs text-gray-600">Linked Club</span><p id="jr-club-link" class="text-xs font-semibold mt-0.5">—</p></div>
+                            <div><span class="text-xs text-gray-600">Created</span><p id="jr-created" class="text-xs font-semibold mt-0.5">—</p></div>
+                            <div><span class="text-xs text-gray-600">Days Open</span><p id="jr-days-open" class="text-xs font-semibold mt-0.5">—</p></div>
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-y-2 pt-3 border-t border-gray-800" id="jr-meta-row">
-                        <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-xs font-semibold mt-0.5">—</p></div>
-                        <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-xs font-semibold mt-0.5">—</p></div>
-                        <div><span class="text-xs text-gray-600">Channel</span><p id="jr-channel" class="text-xs font-semibold mt-0.5">—</p></div>
-                        <div><span class="text-xs text-gray-600">Linked Club</span><p id="jr-club-link" class="text-xs font-semibold mt-0.5">—</p></div>
-                        <div><span class="text-xs text-gray-600">Created</span><p id="jr-created" class="text-xs font-semibold mt-0.5">—</p></div>
-                        <div><span class="text-xs text-gray-600">Days Open</span><p id="jr-days-open" class="text-xs font-semibold mt-0.5">—</p></div>
+                    <!-- Sticky navigation menu -->
+                    <div class="record-side-nav" id="job-record-nav">
+                        <button class="record-nav-item active" onclick="showJobTab('overview')" id="jt-overview">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            Overview
+                        </button>
+                        <button class="record-nav-item" onclick="showJobTab('products')" id="jt-products">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            Products
+                        </button>
+                        <button class="record-nav-item" onclick="showJobTab('club')" id="jt-club">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                            Club Record
+                        </button>
+                        <button class="record-nav-item" onclick="showJobTab('team')" id="jt-team">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Team
+                        </button>
+                        <div class="record-nav-divider"></div>
+                        <button class="record-nav-item" onclick="showJobTab('design')" id="jt-design">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                            Design Studio
+                        </button>
+                        <button class="record-nav-item" onclick="showJobTab('orderform')" id="jt-orderform">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Order Form
+                        </button>
+                        <button class="record-nav-item" onclick="showJobTab('production')" id="jt-production">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+                            Production
+                        </button>
                     </div>
                 </div>
 
-                <!-- Right: pipeline cards stacked vertically -->
-                <div class="jr-pipelines-col">
-                    <!-- Job Stage Pipeline -->
-                    <div class="glass rounded-2xl p-4">
-                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Job Stage</span>
-                        <div class="flex flex-wrap gap-1" id="jr-stage-pills">
-                            <!-- Populated by renderJobStagePills() -->
+                <!-- ── Column 2: Pipeline rows + tab content ── -->
+                <div class="jr-middle-col">
+                    <!-- Pipeline cards (slim at top) -->
+                    <div class="jr-pipelines-col">
+                        <!-- Job Stage Pipeline -->
+                        <div class="glass rounded-2xl p-4">
+                            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Job Stage</span>
+                            <div class="flex flex-wrap gap-1" id="jr-stage-pills">
+                                <!-- Populated by renderJobStagePills() -->
+                            </div>
+                            <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
+                                <option value="discovery">Discovery</option>
+                                <option value="concepts">Concepts</option>
+                                <option value="awaiting_approval">Awaiting Approval</option>
+                                <option value="quote">Quote</option>
+                                <option value="paid">Paid</option>
+                                <option value="on_boarding">On-Boarding</option>
+                                <option value="completed">Completed</option>
+                            </select>
                         </div>
-                        <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
-                            <option value="discovery">Discovery</option>
-                            <option value="concepts">Concepts</option>
-                            <option value="awaiting_approval">Awaiting Approval</option>
-                            <option value="quote">Quote</option>
-                            <option value="paid">Paid</option>
-                            <option value="on_boarding">On-Boarding</option>
-                            <option value="completed">Completed</option>
-                        </select>
+                        <!-- Design Stage Pipeline -->
+                        <div class="glass rounded-2xl p-4">
+                            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Stage</span>
+                            <div class="design-stage-row" id="jr-design-stage-pills"></div>
+                        </div>
                     </div>
-                    <!-- Design Stage Pipeline -->
-                    <div class="glass rounded-2xl p-4">
-                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Stage</span>
-                        <div class="design-stage-row" id="jr-design-stage-pills"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Record layout: side nav + content -->
-            <div class="record-layout">
-                <!-- Side nav -->
-                <div class="record-side-nav" id="job-record-nav">
-                    <button class="record-nav-item active" onclick="showJobTab('overview')" id="jt-overview">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                        Overview
-                    </button>
-                    <button class="record-nav-item" onclick="showJobTab('products')" id="jt-products">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        Products
-                    </button>
-                    <button class="record-nav-item" onclick="showJobTab('club')" id="jt-club">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        Club Record
-                    </button>
-                    <button class="record-nav-item" onclick="showJobTab('team')" id="jt-team">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Team
-                    </button>
-                    <div class="record-nav-divider"></div>
-                    <button class="record-nav-item" onclick="showJobTab('design')" id="jt-design">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        Design Studio
-                    </button>
-                    <button class="record-nav-item" onclick="showJobTab('orderform')" id="jt-orderform">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        Order Form
-                    </button>
-                    <button class="record-nav-item" onclick="showJobTab('production')" id="jt-production">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
-                        Production
-                    </button>
-                </div>
-                <!-- Content area -->
-                <div class="record-content">
+                    <!-- Tab content area -->
+                    <div class="record-content">
 
             <!-- TAB: Overview -->
             <div id="jt-content-overview">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div class="glass rounded-2xl p-5">
-                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Job Details</h4>
-                        <div id="jr-overview-details" class="space-y-3"></div>
-                        <!-- Assigned user row -->
-                        <div class="mt-4 pt-4 border-t border-gray-800">
-                            <label class="text-xs text-gray-500 mb-2 block">Assigned To</label>
-                            <select id="jr-assigned-user" onchange="saveJobAssignment(this.value)" class="w-full px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd">
-                                <option value="">Unassigned</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- Activity Log -->
-                    <div class="glass rounded-2xl p-5 flex flex-col">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Activity Log</h4>
-                        </div>
-                        <div id="jr-activity-log" class="flex-1 overflow-y-auto max-h-64 mb-3 space-y-1">
-                            <!-- Populated by JS -->
-                        </div>
-                        <div class="flex gap-2 mt-auto">
-                            <input type="text" id="jr-activity-input" placeholder="Add a note..." class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd" onkeydown="if(event.key==='Enter')addJobActivity()">
-                            <button onclick="addJobActivity()" class="btn-primary text-sm px-4">Post</button>
-                        </div>
+                <div class="glass rounded-2xl p-5">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Job Details</h4>
+                    <div id="jr-overview-details" class="space-y-3"></div>
+                    <!-- Assigned user row -->
+                    <div class="mt-4 pt-4 border-t border-gray-800">
+                        <label class="text-xs text-gray-500 mb-2 block">Assigned To</label>
+                        <select id="jr-assigned-user" onchange="saveJobAssignment(this.value)" class="w-full px-3 py-2 rounded-lg text-sm" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd">
+                            <option value="">Unassigned</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -2958,7 +2975,26 @@
             </div>
 
                 </div><!-- /record-content -->
-            </div><!-- /record-layout -->
+                </div><!-- /jr-middle-col -->
+
+                <!-- ── Column 3: Activity & Comments sidebar ── -->
+                <div class="jr-activity-sidebar">
+                    <div class="jr-activity-sidebar-header">
+                        <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">Activity</h4>
+                        <p class="text-xs text-gray-700">Notes &amp; comments</p>
+                    </div>
+                    <div id="jr-activity-log" class="jr-activity-sidebar-feed space-y-1">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="jr-activity-sidebar-input">
+                        <div class="flex gap-2">
+                            <input type="text" id="jr-activity-input" placeholder="Add a comment…" class="flex-1 px-3 py-2 rounded-lg text-xs" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#ddd" onkeydown="if(event.key==='Enter')addJobActivity()">
+                            <button onclick="addJobActivity()" class="btn-primary text-xs px-3 py-2">Post</button>
+                        </div>
+                    </div>
+                </div><!-- /jr-activity-sidebar -->
+
+            </div><!-- /jr-three-col -->
         </div>
 
         <!-- MODAL: New/Edit Job -->
