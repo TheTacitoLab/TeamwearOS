@@ -950,8 +950,20 @@
             transform: translateY(-2px);
         }
 
+        /* ── Job Record page: full-width, dynamic ── */
+        .job-record-page { width: 100%; padding: 20px 32px; box-sizing: border-box; }
+        @media (max-width: 900px) { .job-record-page { padding: 16px; } }
+
+        /* ── Top header grid: compact info card (left) + pipelines stack (right) ── */
+        .jr-top-grid {
+            display: grid; grid-template-columns: 300px 1fr; gap: 16px;
+            align-items: start; margin-bottom: 16px;
+        }
+        @media (max-width: 900px) { .jr-top-grid { grid-template-columns: 1fr; } }
+        .jr-pipelines-col { display: flex; flex-direction: column; gap: 12px; }
+
         /* ── Record page layout: side nav + content ── */
-        .record-layout { display: grid; grid-template-columns: 192px 1fr; gap: 16px; align-items: start; }
+        .record-layout { display: grid; grid-template-columns: 210px 1fr; gap: 16px; align-items: start; }
         @media (max-width: 767px) { .record-layout { grid-template-columns: 1fr; } }
         .record-side-nav {
             background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
@@ -2658,53 +2670,60 @@
         <!-- ============================================================
              TOOL: JOB RECORD (Full page, 7 tabs)
              ============================================================ -->
-        <div id="tool-job-record" class="hide p-6 md:p-8 max-w-7xl mx-auto">
-            <div class="flex items-center gap-3 mb-6">
+        <div id="tool-job-record" class="hide job-record-page">
+            <!-- Back navigation -->
+            <div class="flex items-center gap-3 mb-5">
                 <button onclick="closeJobRecord()" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     Back to Sales
                 </button>
             </div>
 
-            <!-- Record header - compact -->
-            <div class="glass rounded-2xl p-5 mb-4">
-                <div class="flex items-start justify-between flex-wrap gap-4">
-                    <div>
-                        <span id="jr-job-number" class="text-xs text-gray-600 font-mono block mb-1"></span>
-                        <h2 id="jr-job-name" class="text-2xl font-bold mb-1">Job Name</h2>
-                        <p id="jr-job-desc" class="text-gray-500 text-sm"></p>
+            <!-- TOP GRID: Compact job info (left) + Pipeline cards stacked (right) -->
+            <div class="jr-top-grid">
+                <!-- Left: compact job info card -->
+                <div class="glass rounded-2xl p-4">
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="min-w-0">
+                            <span id="jr-job-number" class="text-xs text-gray-600 font-mono block mb-1"></span>
+                            <h2 id="jr-job-name" class="text-lg font-bold mb-1 leading-tight">Job Name</h2>
+                            <p id="jr-job-desc" class="text-gray-500 text-xs leading-relaxed"></p>
+                        </div>
+                        <button onclick="openEditJobModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
                     </div>
-                    <button onclick="openEditJobModal()" class="btn-secondary text-sm flex-shrink-0">Edit Job</button>
+                    <div class="grid grid-cols-2 gap-y-2 pt-3 border-t border-gray-800" id="jr-meta-row">
+                        <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-xs font-semibold mt-0.5">—</p></div>
+                        <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-xs font-semibold mt-0.5">—</p></div>
+                        <div><span class="text-xs text-gray-600">Channel</span><p id="jr-channel" class="text-xs font-semibold mt-0.5">—</p></div>
+                        <div><span class="text-xs text-gray-600">Linked Club</span><p id="jr-club-link" class="text-xs font-semibold mt-0.5">—</p></div>
+                        <div><span class="text-xs text-gray-600">Created</span><p id="jr-created" class="text-xs font-semibold mt-0.5">—</p></div>
+                        <div><span class="text-xs text-gray-600">Days Open</span><p id="jr-days-open" class="text-xs font-semibold mt-0.5">—</p></div>
+                    </div>
                 </div>
-                <!-- Quick meta -->
-                <div class="flex gap-5 mt-4 pt-4 border-t border-gray-800 flex-wrap" id="jr-meta-row">
-                    <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-sm font-semibold mt-0.5">—</p></div>
-                    <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-sm font-semibold mt-0.5">—</p></div>
-                    <div><span class="text-xs text-gray-600">Channel</span><p id="jr-channel" class="text-sm font-semibold mt-0.5">—</p></div>
-                    <div><span class="text-xs text-gray-600">Linked Club</span><p id="jr-club-link" class="text-sm font-semibold mt-0.5">—</p></div>
-                    <div><span class="text-xs text-gray-600">Created</span><p id="jr-created" class="text-sm font-semibold mt-0.5">—</p></div>
-                    <div><span class="text-xs text-gray-600">Days Open</span><p id="jr-days-open" class="text-sm font-semibold mt-0.5">—</p></div>
-                </div>
-            </div>
 
-            <!-- Timeline: Job Stage + Design Stage -->
-            <div class="record-timeline">
-                <div class="flex-1 flex items-center flex-wrap gap-1" id="jr-stage-pills">
-                    <!-- Populated by renderJobStagePills() -->
-                </div>
-                <!-- Hidden select kept for JS compat -->
-                <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
-                    <option value="discovery">Discovery</option>
-                    <option value="concepts">Concepts</option>
-                    <option value="awaiting_approval">Awaiting Approval</option>
-                    <option value="quote">Quote</option>
-                    <option value="paid">Paid</option>
-                    <option value="on_boarding">On-Boarding</option>
-                    <option value="completed">Completed</option>
-                </select>
-                <div class="ml-4 pl-4 border-l border-gray-800 flex items-center gap-3 flex-shrink-0">
-                    <span class="text-xs text-gray-600 font-semibold uppercase tracking-wider whitespace-nowrap">Design</span>
-                    <div class="design-stage-row" id="jr-design-stage-pills"></div>
+                <!-- Right: pipeline cards stacked vertically -->
+                <div class="jr-pipelines-col">
+                    <!-- Job Stage Pipeline -->
+                    <div class="glass rounded-2xl p-4">
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Job Stage</span>
+                        <div class="flex flex-wrap gap-1" id="jr-stage-pills">
+                            <!-- Populated by renderJobStagePills() -->
+                        </div>
+                        <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
+                            <option value="discovery">Discovery</option>
+                            <option value="concepts">Concepts</option>
+                            <option value="awaiting_approval">Awaiting Approval</option>
+                            <option value="quote">Quote</option>
+                            <option value="paid">Paid</option>
+                            <option value="on_boarding">On-Boarding</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <!-- Design Stage Pipeline -->
+                    <div class="glass rounded-2xl p-4">
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Stage</span>
+                        <div class="design-stage-row" id="jr-design-stage-pills"></div>
+                    </div>
                 </div>
             </div>
 
