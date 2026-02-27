@@ -497,6 +497,111 @@
         .feed-item { padding:12px 14px; border-radius:12px; background:#f8fafc; border:1px solid #e2e8f0; transition:all 0.15s; }
         .feed-item:hover { border-color:#cbd5e1; }
 
+        /* =============================================
+           DESIGN STUDIO V2
+           ============================================= */
+
+        /* Design Studio header area */
+        .ds-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:0; position:sticky; top:56px; z-index:30; }
+
+        /* 3-view tabs: Pending / Delivered / Completed */
+        .ds-view-tabs { display:flex; gap:0; border-top:1px solid #e2e8f0; }
+        .ds-view-tab { position:relative; display:flex; align-items:center; gap:8px; padding:12px 24px; font-size:13px; font-weight:600; color:#64748b; background:transparent; border:none; cursor:pointer; transition:all 0.2s; }
+        .ds-view-tab:hover { color:#be185d; background:rgba(236,72,153,0.04); }
+        .ds-view-tab.active { color:#be185d; background:rgba(236,72,153,0.06); border-bottom:2px solid #ec4899; }
+        .ds-view-tab .tab-badge { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 6px; border-radius:10px; font-size:11px; font-weight:700; background:#f1f5f9; color:#64748b; transition:all 0.2s; }
+        .ds-view-tab.active .tab-badge { background:rgba(236,72,153,0.15); color:#be185d; }
+
+        /* Design view panels */
+        .ds-view { min-height:calc(100vh - 180px); }
+
+        /* Design task kanban board */
+        .ds-kanban { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; align-items:start; }
+        @media(max-width:1280px) { .ds-kanban { grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:768px)  { .ds-kanban { grid-template-columns:1fr; } }
+
+        .ds-kanban-col { background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:16px; min-height:480px; }
+        .ds-kanban-col-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #e2e8f0; }
+        .ds-kanban-col-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#475569; }
+        .ds-kanban-count { font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:#e2e8f0; color:#64748b; }
+
+        /* Design task kanban card */
+        .dt-kanban-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:14px; margin-bottom:10px; cursor:pointer; transition:all 0.2s; position:relative; }
+        .dt-kanban-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.08); transform:translateY(-1px); }
+        .dt-kanban-card.urgency-soon { border-color:rgba(249,115,22,0.5); background:rgba(249,115,22,0.03); }
+        .dt-kanban-card.urgency-overdue { border-color:rgba(239,68,68,0.5); background:rgba(239,68,68,0.04); }
+
+        /* Card urgency bar (top) */
+        .dt-kanban-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:12px 12px 0 0; background:transparent; }
+        .dt-kanban-card.urgency-soon::before { background:linear-gradient(90deg,#f97316,#fb923c); }
+        .dt-kanban-card.urgency-overdue::before { background:linear-gradient(90deg,#ef4444,#f87171); }
+
+        .dt-card-title { font-size:13px; font-weight:700; color:#0f172a; margin-bottom:4px; line-height:1.3; }
+        .dt-card-club { font-size:12px; color:#64748b; margin-bottom:8px; }
+        .dt-card-desc { font-size:12px; color:#94a3b8; margin-bottom:10px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; line-height:1.4; }
+        .dt-card-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .dt-card-due { font-size:11px; font-weight:600; padding:3px 8px; border-radius:6px; background:#f1f5f9; color:#475569; }
+        .dt-card-due.soon { background:rgba(249,115,22,0.12); color:#ea580c; }
+        .dt-card-due.overdue { background:rgba(239,68,68,0.12); color:#dc2626; }
+
+        /* Eye preview icon */
+        .dt-card-eye { width:26px; height:26px; border-radius:6px; display:flex; align-items:center; justify-content:center; background:#f1f5f9; border:1px solid #e2e8f0; cursor:pointer; transition:all 0.15s; flex-shrink:0; color:#64748b; }
+        .dt-card-eye:hover { background:#ede9fe; border-color:#c4b5fd; color:#7c3aed; }
+
+        /* Design task designer badge */
+        .dt-card-designer { font-size:11px; font-weight:600; padding:2px 7px; border-radius:6px; background:rgba(236,72,153,0.1); color:#be185d; }
+
+        /* Design task type chip */
+        .dt-type-chip { font-size:10px; font-weight:700; padding:2px 7px; border-radius:6px; background:rgba(59,130,246,0.1); color:#2563eb; text-transform:uppercase; letter-spacing:0.3px; }
+
+        /* Delivered / Completed grid cards */
+        .ds-grid-card { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:16px; cursor:pointer; transition:all 0.2s; }
+        .ds-grid-card:hover { border-color:rgba(236,72,153,0.3); box-shadow:0 4px 16px rgba(0,0,0,0.06); }
+        .ds-grid-card.delivered-card { border-left:3px solid #3b82f6; }
+        .ds-grid-card.completed-card { border-left:3px solid #22c55e; }
+
+        /* Design Task Record page */
+        .dt-top-nav { background:#fff; border-bottom:1px solid #e2e8f0; position:sticky; top:56px; z-index:30; }
+        .dt-record-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:16px 24px 0; }
+        .dt-countdown { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:4px 10px; border-radius:8px; background:#f1f5f9; color:#475569; }
+        .dt-countdown.soon { background:rgba(249,115,22,0.12); color:#ea580c; }
+        .dt-countdown.overdue { background:rgba(239,68,68,0.12); color:#dc2626; }
+        .dt-countdown.ok { background:rgba(34,197,94,0.1); color:#16a34a; }
+
+        /* Job type selector */
+        .dt-job-type-btn { padding:8px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; transition:all 0.15s; text-align:center; }
+        .dt-job-type-btn:hover { border-color:#c4b5fd; color:#7c3aed; background:rgba(124,58,237,0.05); }
+        .dt-job-type-btn.active { border-color:#7c3aed; color:#7c3aed; background:rgba(124,58,237,0.08); box-shadow:0 0 0 1.5px #7c3aed; }
+
+        /* Design type multi-select chips */
+        .dt-design-type-chip { display:inline-flex; align-items:center; gap:5px; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; transition:all 0.15s; }
+        .dt-design-type-chip:hover { border-color:#c4b5fd; color:#7c3aed; }
+        .dt-design-type-chip.active { border-color:#7c3aed; color:#7c3aed; background:rgba(124,58,237,0.08); }
+        .dt-design-type-chip svg { width:12px; height:12px; }
+
+        /* Status action buttons in Design Task */
+        .dt-status-btn { width:100%; padding:10px 14px; border-radius:10px; font-size:12px; font-weight:700; text-align:left; cursor:pointer; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; transition:all 0.15s; display:flex; align-items:center; gap:8px; }
+        .dt-status-btn:hover { border-color:#94a3b8; background:#fff; }
+        .dt-status-btn.active { box-shadow:0 0 0 2px currentColor; }
+        .dt-status-new               { color:#4b5563; }
+        .dt-status-in_progress       { color:#2563eb; }
+        .dt-status-revisions         { color:#b45309; }
+        .dt-status-in_review         { color:#7c3aed; }
+        .dt-status-awaiting_approval { color:#ea580c; }
+
+        /* Asset / delivery file cards */
+        .dt-file-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:14px 16px; display:flex; align-items:center; gap:14px; transition:all 0.15s; }
+        .dt-file-card:hover { border-color:#cbd5e1; }
+        .dt-file-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; background:#f1f5f9; flex-shrink:0; }
+
+        /* Design task record: status badges (extending existing design-status-* classes) */
+        .design-status-delivered  { background:rgba(59,130,246,0.1);  color:#2563eb; }
+        .design-status-completed  { background:rgba(34,197,94,0.1);   color:#16a34a; }
+
+        /* Quick preview modal */
+        #dt-preview-modal { }
+        .dt-preview-content { background:#fff; border-radius:20px; padding:28px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; }
+
         /* Annotation overlay */
         #ann-img-container { position:relative; display:inline-block; max-width:100%; }
         #ann-img-container img { display:block; max-width:100%; border-radius:10px; user-select:none; }
@@ -1287,82 +1392,324 @@
         </div>
 
         <!-- TOOL: Club Mock-Ups -->
-        <!-- TOOL: Design Studio Pipeline Launchpad -->
-        <div id="tool-design-studio" class="hide w-full p-6 md:p-8 lg:px-12">
-            <!-- Page nav row -->
-            <div class="page-nav-row">
-                <button onclick="showLaunchpad()" class="nav-home-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
-                    Design Studio
-                </span>
-                <div class="flex gap-2 items-center ml-auto">
-                    <span class="text-xs text-gray-500">Filter:</span>
-                    <button id="ds-filter-mine" onclick="setDesignFilter('mine')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:rgba(236,72,153,0.1);color:#be185d;border:1px solid rgba(236,72,153,0.3)">My Jobs</button>
-                    <button id="ds-filter-all" onclick="setDesignFilter('all')" class="text-xs px-3 py-1.5 rounded-lg font-medium" style="background:#f8fafc;color:#64748b;border:1px solid #e2e8f0">All Jobs</button>
+        <!-- TOOL: Design Studio V2 -->
+        <div id="tool-design-studio" class="hide w-full">
+
+            <!-- Sticky header: nav + view tabs -->
+            <div class="ds-header">
+                <div class="page-nav-row" style="padding:12px 24px">
+                    <button onclick="showLaunchpad()" class="nav-home-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        Launchpad
+                    </button>
+                    <span class="nav-page-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+                        Design Studio
+                    </span>
+                    <div class="ml-auto flex items-center gap-3">
+                        <button onclick="openCreateDesignTaskModal()" class="btn-primary text-sm flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            New Design Task
+                        </button>
+                    </div>
+                </div>
+                <!-- 3-view tab bar -->
+                <div class="ds-view-tabs">
+                    <button id="ds-tab-pending" onclick="switchDSView('pending')" class="ds-view-tab active">
+                        <span class="tab-badge" id="ds-badge-pending">0</span>
+                        Pending
+                    </button>
+                    <button id="ds-tab-delivered" onclick="switchDSView('delivered')" class="ds-view-tab">
+                        <span class="tab-badge" id="ds-badge-delivered">0</span>
+                        Delivered
+                    </button>
+                    <button id="ds-tab-completed" onclick="switchDSView('completed')" class="ds-view-tab">
+                        <span class="tab-badge" id="ds-badge-completed">0</span>
+                        Completed
+                    </button>
                 </div>
             </div>
 
-            <!-- Stage Pipeline — single-line filter chips -->
-            <div id="ds-stage-nav">
-                <div onclick="filterDesignByStage('all')" id="ds-stage-all" class="ds-filter-chip active">
-                    <span class="chip-count text-white" id="ds-count-all">0</span>
-                    <span class="chip-label">All</span>
+            <!-- VIEW: Pending — Kanban board (NEW / IN PROGRESS / REVISIONS / IN REVIEW) -->
+            <div id="ds-view-pending" class="ds-view p-6">
+                <div class="ds-kanban" id="ds-kanban-board">
+                    <div class="ds-kanban-col">
+                        <div class="ds-kanban-col-header">
+                            <span class="ds-kanban-col-title">New</span>
+                            <span class="ds-kanban-count" id="dsk-count-new">0</span>
+                        </div>
+                        <div id="dsk-body-new"></div>
+                        <div id="dsk-empty-new" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
+                    </div>
+                    <div class="ds-kanban-col">
+                        <div class="ds-kanban-col-header">
+                            <span class="ds-kanban-col-title" style="color:#2563eb">In Progress</span>
+                            <span class="ds-kanban-count" id="dsk-count-in_progress">0</span>
+                        </div>
+                        <div id="dsk-body-in_progress"></div>
+                        <div id="dsk-empty-in_progress" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
+                    </div>
+                    <div class="ds-kanban-col">
+                        <div class="ds-kanban-col-header">
+                            <span class="ds-kanban-col-title" style="color:#b45309">Revisions</span>
+                            <span class="ds-kanban-count" id="dsk-count-revisions">0</span>
+                        </div>
+                        <div id="dsk-body-revisions"></div>
+                        <div id="dsk-empty-revisions" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
+                    </div>
+                    <div class="ds-kanban-col">
+                        <div class="ds-kanban-col-header">
+                            <span class="ds-kanban-col-title" style="color:#7c3aed">In Review</span>
+                            <span class="ds-kanban-count" id="dsk-count-in_review">0</span>
+                        </div>
+                        <div id="dsk-body-in_review"></div>
+                        <div id="dsk-empty-in_review" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
+                    </div>
                 </div>
-                <div onclick="filterDesignByStage('new')" id="ds-stage-new" class="ds-filter-chip">
-                    <span class="chip-count text-brand-400" id="ds-count-new">0</span>
-                    <span class="chip-label">New</span>
-                </div>
-                <div onclick="filterDesignByStage('in_progress')" id="ds-stage-in_progress" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#d97706" id="ds-count-in_progress">0</span>
-                    <span class="chip-label">Working</span>
-                </div>
-                <div onclick="filterDesignByStage('in_review')" id="ds-stage-in_review" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#2563eb" id="ds-count-in_review">0</span>
-                    <span class="chip-label">In Review</span>
-                </div>
-                <div onclick="filterDesignByStage('revisions')" id="ds-stage-revisions" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#dc2626" id="ds-count-revisions">0</span>
-                    <span class="chip-label">Revisions</span>
-                </div>
-                <div onclick="filterDesignByStage('awaiting_approval')" id="ds-stage-awaiting_approval" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#7c3aed" id="ds-count-awaiting_approval">0</span>
-                    <span class="chip-label">Awaiting Approval</span>
-                </div>
-                <div onclick="filterDesignByStage('complete')" id="ds-stage-complete" class="ds-filter-chip">
-                    <span class="chip-count" style="color:#16a34a" id="ds-count-complete">0</span>
-                    <span class="chip-label">Approved</span>
+                <div id="ds-kanban-empty" class="hide text-center py-20">
+                    <div style="font-size:52px;margin-bottom:14px">🎨</div>
+                    <p style="color:#475569;font-size:16px;font-weight:600">No pending design tasks</p>
+                    <p style="color:#94a3b8;font-size:13px;margin-top:6px">Click "New Design Task" to create your first task</p>
                 </div>
             </div>
 
-            <!-- Design Jobs + Activity Feed side-by-side -->
-            <div class="flex gap-6 items-start">
-                <!-- Briefs list (left, wider) -->
-                <div class="flex-1 min-w-0">
-                    <div id="ds-jobs-list" class="space-y-3">
-                        <!-- Populated by JS -->
-                    </div>
-                    <div id="ds-jobs-empty" class="hide text-center py-16">
-                        <div class="empty-icon text-5xl mb-3">🎨</div>
-                        <p class="text-gray-400 font-medium">No design briefs found</p>
-                        <p class="text-gray-600 text-sm mt-1">Design briefs are created from within job records</p>
+            <!-- VIEW: Delivered grid -->
+            <div id="ds-view-delivered" class="ds-view hide p-6">
+                <div id="ds-delivered-grid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+                <div id="ds-delivered-empty" class="hide text-center py-20">
+                    <div style="font-size:52px;margin-bottom:14px">📦</div>
+                    <p style="color:#475569;font-size:16px;font-weight:600">No delivered tasks yet</p>
+                    <p style="color:#94a3b8;font-size:13px;margin-top:6px">Tasks move here once final artwork is uploaded</p>
+                </div>
+            </div>
+
+            <!-- VIEW: Completed grid -->
+            <div id="ds-view-completed" class="ds-view hide p-6">
+                <div id="ds-completed-grid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+                <div id="ds-completed-empty" class="hide text-center py-20">
+                    <div style="font-size:52px;margin-bottom:14px">✅</div>
+                    <p style="color:#475569;font-size:16px;font-weight:600">No completed tasks yet</p>
+                    <p style="color:#94a3b8;font-size:13px;margin-top:6px">Tasks move here once the client has approved</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOL: Design Task Record -->
+        <div id="tool-design-task" class="hide w-full">
+            <!-- Sticky header -->
+            <div class="dt-top-nav">
+                <div class="page-nav-row" style="padding:12px 24px">
+                    <button onclick="showLaunchpad()" class="nav-home-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        Launchpad
+                    </button>
+                    <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none">
+                        Design Studio
+                    </button>
+                    <span class="nav-page-btn font-semibold" style="color:#0f172a">Design Task</span>
+                    <div class="ml-auto flex items-center gap-3">
+                        <span id="dt-ref-display" class="text-xs font-mono font-semibold text-gray-500"></span>
+                        <span id="dt-status-badge" class="badge design-status-new text-xs">New</span>
                     </div>
                 </div>
-
-                <!-- Activity Feed (right, fixed width) -->
-                <div class="w-80 flex-shrink-0" style="min-width:280px">
-                    <div class="glass rounded-2xl p-5 sticky top-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="font-semibold text-sm">Activity Feed</h4>
-                            <button onclick="refreshDesignFeed()" class="text-xs text-gray-500 hover:text-brand-400 transition">Refresh</button>
-                        </div>
-                        <div id="ds-feed-list" class="space-y-3 max-h-96 overflow-y-auto">
-                            <p class="text-xs text-gray-600 text-center py-4">Loading feed…</p>
+                <!-- Record summary bar -->
+                <div class="dt-record-header px-6 py-3 border-t" style="border-color:#f1f5f9">
+                    <div class="min-w-0">
+                        <h1 id="dt-task-name-display" class="text-xl font-bold truncate">Untitled Task</h1>
+                        <div class="flex flex-wrap items-center gap-3 mt-1">
+                            <span id="dt-club-display" class="text-sm text-gray-500"></span>
+                            <span id="dt-designer-display" class="text-sm" style="color:#be185d"></span>
+                            <div id="dt-countdown" class="dt-countdown hide"></div>
                         </div>
                     </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <button onclick="markDesignDelivered()" id="btn-dt-deliver" class="btn-secondary text-sm hide">Mark as Delivered</button>
+                        <button onclick="markDesignCompleted()" id="btn-dt-complete" class="btn-primary text-sm hide">Mark Complete</button>
+                    </div>
+                </div>
+                <!-- Tab nav -->
+                <div class="tab-nav" style="padding:0 24px;margin-bottom:0">
+                    <button onclick="switchDesignTaskTab('overview')" id="dtt-overview" class="active">Overview</button>
+                    <button onclick="switchDesignTaskTab('assets')" id="dtt-assets">Assets</button>
+                    <button onclick="switchDesignTaskTab('versions')" id="dtt-versions">Versions</button>
+                    <button onclick="switchDesignTaskTab('delivery')" id="dtt-delivery">Delivery</button>
+                </div>
+            </div>
+
+            <!-- TAB: Overview -->
+            <div id="dtt-content-overview" class="p-6 md:p-8 lg:px-12">
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <!-- LEFT 2/3: Main form -->
+                    <div class="lg:col-span-2 space-y-5">
+                        <!-- Core details -->
+                        <div class="glass rounded-2xl p-6">
+                            <p class="section-title">Task Details</p>
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="text-xs text-gray-500 mb-1 block">Task Name *</label>
+                                    <input type="text" id="dt-task-name" placeholder="e.g. Riverside FC Full Kit Range 2025" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Reference</label>
+                                    <input type="text" id="dt-task-ref" class="w-full px-3 py-2.5 rounded-lg text-sm" readonly style="background:#f8fafc;color:#64748b;font-family:monospace">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Due Date</label>
+                                    <input type="date" id="dt-due-date" class="w-full px-3 py-2.5 rounded-lg text-sm" onchange="dtUpdateCountdown()">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Linked Club</label>
+                                    <select id="dt-club-id" class="w-full px-3 py-2.5 rounded-lg text-sm" onchange="dtClubChanged()">
+                                        <option value="">— Select Club —</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Linked Job <span class="text-gray-400">(optional)</span></label>
+                                    <select id="dt-job-id" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                                        <option value="">— None —</option>
+                                    </select>
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="text-xs text-gray-500 mb-1 block">Assigned Designer</label>
+                                    <select id="dt-designer-id" class="w-full px-3 py-2.5 rounded-lg text-sm" onchange="dtDesignerChanged()">
+                                        <option value="">— Unassigned —</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Type -->
+                        <div class="glass rounded-2xl p-6">
+                            <p class="section-title">Job Type</p>
+                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="dt-job-type-grid">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Design Type (multi-select) -->
+                        <div class="glass rounded-2xl p-6">
+                            <p class="section-title">Design Type <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8">(select all that apply)</span></p>
+                            <div class="flex flex-wrap gap-2" id="dt-design-types-grid">
+                                <!-- Rendered by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Design Brief -->
+                        <div class="glass rounded-2xl p-6">
+                            <p class="section-title">Design Brief</p>
+                            <textarea id="dt-design-brief" rows="7" placeholder="Describe the design requirements in full — colours, style preferences, key elements, inspirations, what NOT to do, and anything else the designer needs to know..." class="w-full px-3 py-2.5 rounded-lg text-sm resize-y"></textarea>
+                        </div>
+
+                        <!-- Products Required -->
+                        <div class="glass rounded-2xl p-6">
+                            <p class="section-title">Products Required</p>
+                            <div id="dt-products-list">
+                                <p class="text-sm text-gray-400">Select a linked club above to see available club products.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT 1/3: Status + meta -->
+                    <div class="space-y-4">
+                        <!-- Status -->
+                        <div class="glass rounded-2xl p-5">
+                            <p class="section-title">Task Status</p>
+                            <div class="space-y-2" id="dt-status-buttons"><!-- Rendered by JS --></div>
+                        </div>
+                        <!-- Due countdown -->
+                        <div class="glass rounded-2xl p-5" id="dt-due-panel">
+                            <p class="section-title">Deadline</p>
+                            <div id="dt-due-display" class="text-center py-2">
+                                <p class="text-sm text-gray-400">No due date set</p>
+                            </div>
+                        </div>
+                        <!-- Record meta -->
+                        <div class="glass rounded-2xl p-5">
+                            <p class="section-title">Record Info</p>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between gap-2"><span class="text-gray-500">Reference</span><span id="dt-meta-ref" class="font-mono font-semibold text-gray-700 text-right">—</span></div>
+                                <div class="flex justify-between gap-2"><span class="text-gray-500">Created</span><span id="dt-meta-created" class="text-right text-gray-700">—</span></div>
+                                <div class="flex justify-between gap-2"><span class="text-gray-500">Updated</span><span id="dt-meta-updated" class="text-right text-gray-700">—</span></div>
+                            </div>
+                        </div>
+                        <!-- Save -->
+                        <button onclick="saveDesignTaskOverview()" class="w-full btn-primary py-3 text-sm">Save Overview</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Assets -->
+            <div id="dtt-content-assets" class="hide p-6 md:p-8 lg:px-12">
+                <div class="glass rounded-2xl p-6 mb-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="font-semibold text-sm">Reference Files &amp; Brief Assets</h3>
+                            <p class="text-xs text-gray-500 mt-1">Upload client references, existing logos, branding guidelines, or brief documents</p>
+                        </div>
+                        <button onclick="document.getElementById('dt-asset-input').click()" class="btn-primary text-sm flex items-center gap-2 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Upload Files
+                        </button>
+                        <input type="file" id="dt-asset-input" class="hide" multiple accept="image/*,.pdf,.ai,.eps,.svg,.zip" onchange="uploadDesignTaskAssets(event)">
+                    </div>
+                    <div class="dropzone p-8 text-center cursor-pointer" id="dt-asset-dropzone" onclick="document.getElementById('dt-asset-input').click()">
+                        <svg class="w-10 h-10 mx-auto mb-3" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-sm text-gray-500">Drag &amp; drop files here, or click to browse</p>
+                        <p class="text-xs text-gray-400 mt-1">Images, PDFs, AI, EPS, SVG, ZIP supported</p>
+                    </div>
+                </div>
+                <div id="dt-assets-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+                <div id="dt-assets-empty" class="hide text-center py-16">
+                    <div style="font-size:48px;margin-bottom:12px">📁</div>
+                    <p style="color:#64748b;font-weight:500">No reference files uploaded yet</p>
+                    <p style="color:#94a3b8;font-size:13px;margin-top:4px">Upload client briefs, logos, and reference imagery</p>
+                </div>
+            </div>
+
+            <!-- TAB: Versions -->
+            <div id="dtt-content-versions" class="hide p-6 md:p-8 lg:px-12">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="font-semibold">Design Versions</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Upload each design iteration. Annotate, approve or decline each version.</p>
+                    </div>
+                    <button onclick="addDesignVersion()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Upload Version
+                    </button>
+                </div>
+                <div id="dt-versions-list" class="space-y-4"></div>
+                <div id="dt-versions-empty" class="hide text-center py-16">
+                    <div style="font-size:48px;margin-bottom:12px">🖼</div>
+                    <p style="color:#64748b;font-weight:500">No design versions uploaded yet</p>
+                    <p style="color:#94a3b8;font-size:13px;margin-top:4px">Upload your first design version when you're ready for review</p>
+                </div>
+            </div>
+
+            <!-- TAB: Delivery -->
+            <div id="dtt-content-delivery" class="hide p-6 md:p-8 lg:px-12">
+                <div class="glass rounded-2xl p-6 mb-5">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="font-semibold text-sm">Final Artwork Delivery</h3>
+                            <p class="text-xs text-gray-500 mt-1">Upload final approved artwork files. Once uploaded, you can mark this task as Delivered.</p>
+                        </div>
+                        <button onclick="document.getElementById('dt-delivery-input').click()" class="btn-primary text-sm flex items-center gap-2 flex-shrink-0">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Upload Final Files
+                        </button>
+                        <input type="file" id="dt-delivery-input" class="hide" multiple accept="image/*,.pdf,.ai,.eps,.svg,.zip" onchange="uploadDeliveryFiles(event)">
+                    </div>
+                    <div class="dropzone p-8 text-center cursor-pointer" onclick="document.getElementById('dt-delivery-input').click()">
+                        <svg class="w-10 h-10 mx-auto mb-3" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p class="text-sm text-gray-500">Upload final approved artwork — AI, EPS, PDF, PNG, ZIP</p>
+                    </div>
+                </div>
+                <div id="dt-delivery-list" class="space-y-3"></div>
+                <div id="dt-delivery-empty" class="hide text-center py-16">
+                    <div style="font-size:48px;margin-bottom:12px">📤</div>
+                    <p style="color:#64748b;font-weight:500">No delivery files uploaded yet</p>
+                    <p style="color:#94a3b8;font-size:13px;margin-top:4px">Upload final artwork then mark as Delivered</p>
                 </div>
             </div>
         </div>
@@ -1860,6 +2207,20 @@
                     </div>
                 </div>
                 <button onclick="updateBrandInfo()" class="mt-4 bg-brand-500 hover:bg-brand-600 px-6 py-3 rounded-lg font-semibold">Save Changes</button>
+            </div>
+
+            <!-- Design Studio Settings -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-1">Design Studio Settings</h3>
+                <p class="text-gray-500 text-sm mb-4">Configure how design task references are generated for this brand.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Design Task Reference Prefix</label>
+                        <input type="text" id="design-ref-prefix" placeholder="e.g. ROKDES" maxlength="10" class="w-full px-3 py-2 rounded-lg text-sm" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+                        <p class="text-xs text-gray-600 mt-1">References will be generated as: <strong id="design-ref-example" class="text-gray-400">ROKDES-001</strong></p>
+                    </div>
+                </div>
+                <button onclick="saveDesignSettings()" class="mt-4 btn-primary text-sm">Save Design Settings</button>
             </div>
 
             <!-- Shopify API Configuration -->
@@ -2644,8 +3005,21 @@
 
             <!-- TAB: Design Studio -->
             <div id="jt-content-design" class="hide">
-                <div id="jr-design-content">
-                    <!-- Populated by JS - shows design task or create button -->
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="font-semibold">Design Tasks</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Design tasks linked to this job</p>
+                    </div>
+                    <button onclick="openCreateDesignTaskModal(currentJobId)" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        New Design Task
+                    </button>
+                </div>
+                <div id="jr-design-tasks-list" class="space-y-3"></div>
+                <div id="jr-design-tasks-empty" class="hide text-center py-12">
+                    <div style="font-size:40px;margin-bottom:10px">🎨</div>
+                    <p style="color:#64748b;font-weight:500;font-size:14px">No design tasks linked to this job</p>
+                    <p style="color:#94a3b8;font-size:12px;margin-top:4px">Create a design task to track design work for this job</p>
                 </div>
             </div>
 
@@ -3911,6 +4285,115 @@
         </div>
 
         <!-- ============================================================
+             MODAL: Create Design Task
+             ============================================================ -->
+        <div id="create-design-task-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-lg mx-4">
+                <div class="flex justify-between items-center mb-5">
+                    <h3 class="text-lg font-bold">New Design Task</h3>
+                    <button onclick="hideCreateDesignTaskModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs text-gray-500 mb-1 block">Task Name *</label>
+                        <input type="text" id="cdt-name" placeholder="e.g. Riverside FC Full Kit Range 2025" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Linked Club</label>
+                            <select id="cdt-club-id" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                                <option value="">— Select Club —</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Due Date</label>
+                            <input type="date" id="cdt-due-date" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Assigned Designer</label>
+                            <select id="cdt-designer-id" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                                <option value="">— Unassigned —</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Job Type</label>
+                            <select id="cdt-job-type" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                                <option value="">— Select Type —</option>
+                                <option value="new_club_full_range">New Club Full Range</option>
+                                <option value="sales_order_new_design">Sales Order New Design</option>
+                                <option value="team_sponsor_change">Team Sponsor Change</option>
+                                <option value="one_off">One Off</option>
+                                <option value="special_edition">Special Edition</option>
+                                <option value="internal_task">Internal Task</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="cdt-linked-job-row" class="hide">
+                        <label class="text-xs text-gray-500 mb-1 block">Linked Job</label>
+                        <input type="text" id="cdt-linked-job-display" class="w-full px-3 py-2.5 rounded-lg text-sm bg-gray-50" readonly>
+                        <input type="hidden" id="cdt-linked-job-id">
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="hideCreateDesignTaskModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="saveNewDesignTask()" id="cdt-save-btn" class="flex-1 btn-primary py-3">Create Task</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             MODAL: Design Task Quick Preview (eye icon)
+             ============================================================ -->
+        <div id="dt-preview-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="dt-preview-content mx-4">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span id="dtp-ref" class="text-xs font-mono font-semibold text-gray-500"></span>
+                            <span id="dtp-status" class="badge design-status-new text-xs">New</span>
+                        </div>
+                        <h3 id="dtp-name" class="text-lg font-bold text-gray-900"></h3>
+                    </div>
+                    <button onclick="closeDtPreviewModal()" class="text-gray-400 hover:text-gray-600 text-2xl ml-3 leading-none flex-shrink-0">&times;</button>
+                </div>
+                <div class="space-y-3 text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="rounded-xl p-3" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <p class="text-xs text-gray-500 mb-0.5">Club</p>
+                            <p id="dtp-club" class="font-semibold text-gray-800">—</p>
+                        </div>
+                        <div class="rounded-xl p-3" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <p class="text-xs text-gray-500 mb-0.5">Due Date</p>
+                            <p id="dtp-due" class="font-semibold text-gray-800">—</p>
+                        </div>
+                        <div class="rounded-xl p-3" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <p class="text-xs text-gray-500 mb-0.5">Designer</p>
+                            <p id="dtp-designer" class="font-semibold text-gray-800">—</p>
+                        </div>
+                        <div class="rounded-xl p-3" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <p class="text-xs text-gray-500 mb-0.5">Job Type</p>
+                            <p id="dtp-job-type" class="font-semibold text-gray-800">—</p>
+                        </div>
+                    </div>
+                    <div id="dtp-brief-section" class="hide rounded-xl p-3" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <p class="text-xs text-gray-500 mb-1">Design Brief</p>
+                        <p id="dtp-brief" class="text-gray-700" style="font-size:12px;line-height:1.5;max-height:80px;overflow:hidden"></p>
+                    </div>
+                    <div id="dtp-types-section" class="hide">
+                        <p class="text-xs text-gray-500 mb-1">Design Types</p>
+                        <div id="dtp-types" class="flex flex-wrap gap-1.5"></div>
+                    </div>
+                </div>
+                <div class="mt-5 flex gap-3">
+                    <button onclick="closeDtPreviewModal()" class="flex-1 btn-secondary py-2.5 text-sm">Close</button>
+                    <button id="dtp-open-btn" onclick="" class="flex-1 btn-primary py-2.5 text-sm">Open Full Record</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
              MODAL: Upload Design Version
              ============================================================ -->
         <div id="upload-version-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
@@ -4808,6 +5291,8 @@
             renderSalespeopleList();
             loadShopifyConfigUI();
             renderFeatureToggles();
+            // Load design studio settings (prefix input)
+            if (typeof loadDesignSettings === 'function') loadDesignSettings();
         }
 
         function renderSalespeopleList() {
@@ -11380,15 +11865,18 @@
 
         async function declineVersion(versionId) {
             await supabase.from('design_versions').update({ status: 'rejected' }).eq('id', versionId);
-            if (currentBrand && currentJobId) {
-                const v = currentDesignVersions.find(x => x.id === versionId);
+            const v = currentDesignVersions.find(x => x.id === versionId);
+            if (v) v.status = 'rejected';
+            if (currentBrand && (currentJobId || currentDesignTaskRecord?.job_id)) {
                 await supabase.from('design_feed').insert({
-                    brand_id: currentBrand.id, job_id: currentJobId, version_id: versionId,
+                    brand_id: currentBrand.id, job_id: currentJobId || currentDesignTaskRecord?.job_id, version_id: versionId,
                     activity_type: 'declined', message: `${v?.version_label||'Version'} declined`,
                     created_by: currentUser?.id
-                });
+                }).catch(() => {});
             }
-            await loadJobDesign();
+            // Refresh appropriate view
+            if (currentDesignTaskRecord?.id) { renderDtVersionsList(); }
+            else { await loadJobDesign(); }
             showToast('Version declined');
         }
 
@@ -11542,6 +12030,13 @@
             currentDesignVersions.push(data);
             const vList = document.getElementById('design-versions-list');
             if (vList) vList.innerHTML = renderDesignVersions();
+            // Also refresh design task record versions tab if open
+            const dtVersionsList = document.getElementById('dt-versions-list');
+            if (dtVersionsList) {
+                dtVersionsList.innerHTML = renderDesignVersions();
+                const dtEmpty = document.getElementById('dt-versions-empty');
+                if (dtEmpty) dtEmpty.classList.toggle('hide', currentDesignVersions.length > 0);
+            }
             hideUploadVersionModal();
 
             // Log to design feed
@@ -11730,29 +12225,37 @@
         }
 
         async function approveDesignVersion(versionId) {
-            const oldStatus = currentDesignTask.status;
+            const task = currentDesignTaskRecord || currentDesignTask;
+            if (!task?.id) return;
+            const oldStatus = task.status;
             // Un-approve all others first
-            await supabase.from('design_versions').update({ status: 'pending' }).eq('design_task_id', currentDesignTask.id);
+            await supabase.from('design_versions').update({ status: 'pending' }).eq('design_task_id', task.id);
             const { error } = await supabase.from('design_versions').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', versionId);
             if (error) { showToast('Error approving version', 'error'); return; }
-            // Also update design task to complete
-            await supabase.from('design_tasks').update({ status: 'complete' }).eq('id', currentDesignTask.id);
+            // Update design task status to awaiting_approval
+            await supabase.from('design_tasks').update({ status: 'awaiting_approval' }).eq('id', task.id);
+            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'awaiting_approval';
+            if (currentDesignTask) currentDesignTask.status = 'awaiting_approval';
             // Log
             const userName = currentUserProfile?.email?.split('@')[0] || 'Unknown';
             await supabase.from('design_brief_log').insert({
-                design_task_id: currentDesignTask.id,
-                user_id: currentUser?.id,
-                user_name: userName,
-                old_status: oldStatus,
-                new_status: 'complete'
-            });
-            await loadJobDesign();
-            showToast('Version approved — Design marked complete');
+                design_task_id: task.id, user_id: currentUser?.id, user_name: userName,
+                old_status: oldStatus, new_status: 'awaiting_approval'
+            }).catch(() => {});
+            // Update versions in memory
+            currentDesignVersions.forEach(v => { v.status = v.id === versionId ? 'approved' : (v.status === 'approved' ? 'pending' : v.status); });
+            // Refresh appropriate view
+            if (currentDesignTaskRecord?.id) { renderDtVersionsList(); renderDtStatusButtons('awaiting_approval'); const b = document.getElementById('dt-status-badge'); if (b) { b.textContent = 'Awaiting Approval'; b.className = 'badge design-status-awaiting_approval text-xs'; } }
+            else { const vList = document.getElementById('design-versions-list'); if (vList) vList.innerHTML = renderDesignVersions(); }
+            showToast('Version approved — awaiting client approval');
         }
 
         async function unapproveDesignVersion(versionId) {
             await supabase.from('design_versions').update({ status: 'pending', approved_at: null }).eq('id', versionId);
-            await loadJobDesign();
+            const v = currentDesignVersions.find(x => x.id === versionId);
+            if (v) v.status = 'pending';
+            if (currentDesignTaskRecord?.id) { renderDtVersionsList(); }
+            else { const vList = document.getElementById('design-versions-list'); if (vList) vList.innerHTML = renderDesignVersions(); await loadJobDesign(); }
         }
 
         async function editVersionNotes(versionId) {
@@ -13522,6 +14025,982 @@
         document.getElementById('link-club-modal').addEventListener('click', function(e) {
             if (e.target === this) this.classList.add('hide');
         });
+
+        // =============================================
+        // DESIGN STUDIO V2
+        // =============================================
+        let currentDSView = 'pending';
+        let currentDesignTaskRecord = null;   // the task open in the record page
+        let currentDesignTaskAssets = [];
+        let currentDesignTaskDelivery = [];
+
+        const DS_JOB_TYPES = [
+            { key: 'new_club_full_range',    label: 'New Club Full Range' },
+            { key: 'sales_order_new_design', label: 'Sales Order New Design' },
+            { key: 'team_sponsor_change',    label: 'Team Sponsor Change' },
+            { key: 'one_off',                label: 'One Off' },
+            { key: 'special_edition',        label: 'Special Edition' },
+            { key: 'internal_task',          label: 'Internal Task' }
+        ];
+        const DS_DESIGN_TYPES = [
+            'Full Range', 'New Concept', 'Revision / Update', 'Replica / Copy',
+            'Rush Design', 'Match Kit', 'Training Wear', 'Casual Wear',
+            'Logo Design New', 'Logo Re-Draw'
+        ];
+        const DS_STATUS_LABELS = {
+            new:'New', in_progress:'In Progress', revisions:'Revisions',
+            in_review:'In Review', awaiting_approval:'Awaiting Approval',
+            delivered:'Delivered', completed:'Completed'
+        };
+
+        // ── Load & Render Design Studio ──────────────────────────────────────
+        async function loadDesignStudio() {
+            if (!currentBrand) return;
+            // Ensure a view is selected and shown
+            if (!currentDSView) currentDSView = 'pending';
+            switchDSView(currentDSView);
+            // Load tasks for this brand (brand_id or via job brand_id for legacy tasks)
+            const { data: brandTasks } = await supabase
+                .from('design_tasks')
+                .select('*, clubs(id, name, logo_url), jobs(id, job_name, job_number, brand_id)')
+                .eq('brand_id', currentBrand.id)
+                .order('updated_at', { ascending: false });
+            // Also load legacy tasks that have job_id but no brand_id
+            const { data: legacyTasks } = await supabase
+                .from('design_tasks')
+                .select('*, clubs(id, name, logo_url), jobs(id, job_name, job_number, brand_id)')
+                .is('brand_id', null)
+                .not('job_id', 'is', null)
+                .order('updated_at', { ascending: false });
+            const legacy = (legacyTasks || []).filter(t => t.jobs?.brand_id === currentBrand.id);
+            allDesignTasks = [...(brandTasks || []), ...legacy];
+            renderDesignStudio();
+        }
+
+        function renderDesignStudio() {
+            const pending   = allDesignTasks.filter(t => ['new','in_progress','revisions','in_review','awaiting_approval'].includes(t.status));
+            const delivered = allDesignTasks.filter(t => t.status === 'delivered');
+            const completed = allDesignTasks.filter(t => t.status === 'completed');
+
+            // Badge counts
+            const bp = document.getElementById('ds-badge-pending');
+            const bd = document.getElementById('ds-badge-delivered');
+            const bc = document.getElementById('ds-badge-completed');
+            if (bp) bp.textContent = pending.length;
+            if (bd) bd.textContent = delivered.length;
+            if (bc) bc.textContent = completed.length;
+
+            // Launchpad card stats
+            const elA = document.getElementById('stat-design-active');
+            const elR = document.getElementById('stat-design-review');
+            if (elA) elA.textContent = `${pending.length} active`;
+            if (elR) elR.textContent = `${delivered.length} delivered`;
+
+            if (currentDSView === 'pending')   renderDSKanban(pending);
+            else if (currentDSView === 'delivered') renderDSGrid('delivered', delivered);
+            else if (currentDSView === 'completed') renderDSGrid('completed', completed);
+        }
+
+        function switchDSView(view) {
+            currentDSView = view;
+            ['pending','delivered','completed'].forEach(v => {
+                const tab  = document.getElementById(`ds-tab-${v}`);
+                const panel = document.getElementById(`ds-view-${v}`);
+                if (tab)  tab.classList.toggle('active', v === view);
+                if (panel) panel.classList.toggle('hide', v !== view);
+            });
+            renderDesignStudio();
+        }
+
+        // ── Kanban (Pending tasks) ────────────────────────────────────────────
+        function renderDSKanban(tasks) {
+            const cols = ['new','in_progress','revisions','in_review'];
+            let hasAny = false;
+            cols.forEach(col => {
+                const colTasks = tasks.filter(t => t.status === col);
+                const count = document.getElementById(`dsk-count-${col}`);
+                const body  = document.getElementById(`dsk-body-${col}`);
+                const empty = document.getElementById(`dsk-empty-${col}`);
+                if (count) count.textContent = colTasks.length;
+                if (!body) return;
+                if (colTasks.length === 0) {
+                    body.innerHTML = '';
+                    if (empty) empty.classList.remove('hide');
+                } else {
+                    hasAny = true;
+                    if (empty) empty.classList.add('hide');
+                    body.innerHTML = colTasks.map(t => renderDSKanbanCard(t)).join('');
+                }
+            });
+            // Also count awaiting_approval tasks in in_review column
+            const aaCount = tasks.filter(t => t.status === 'awaiting_approval').length;
+            const countEl = document.getElementById('dsk-count-in_review');
+            if (countEl) {
+                const inR = tasks.filter(t => t.status === 'in_review').length;
+                countEl.textContent = inR + aaCount;
+                const body = document.getElementById('dsk-body-in_review');
+                if (body) {
+                    const aaTasks = tasks.filter(t => t.status === 'awaiting_approval');
+                    if (aaTasks.length) {
+                        hasAny = true;
+                        body.innerHTML += aaTasks.map(t => renderDSKanbanCard(t)).join('');
+                    }
+                }
+            }
+
+            const emptyState = document.getElementById('ds-kanban-empty');
+            const board      = document.getElementById('ds-kanban-board');
+            if (emptyState && board) {
+                const totalInCols = tasks.length;
+                emptyState.classList.toggle('hide', totalInCols > 0);
+                board.style.display = totalInCols > 0 ? '' : 'none';
+            }
+        }
+
+        function renderDSKanbanCard(task) {
+            const due    = task.due_date ? new Date(task.due_date) : null;
+            const dueInfo = due ? getDueInfo(due) : null;
+            const urgClass = dueInfo ? (dueInfo.urgency === 'overdue' ? 'urgency-overdue' : dueInfo.urgency === 'soon' ? 'urgency-soon' : '') : '';
+            const clubName = task.clubs?.name || '';
+            const descTrunc = (task.design_brief || task.task_name || '').substring(0, 80);
+            const dueLabel  = due ? due.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : '';
+            const dueClass  = dueInfo ? (dueInfo.urgency === 'overdue' ? 'overdue' : dueInfo.urgency === 'soon' ? 'soon' : '') : '';
+            const designerBadge = task.assigned_designer_name
+                ? `<span class="dt-card-designer">${escHtml(task.assigned_designer_name.split(' ')[0])}</span>` : '';
+            const statusBadge = task.status === 'awaiting_approval'
+                ? `<span class="dt-type-chip" style="background:rgba(234,179,8,0.1);color:#b45309">Awaiting</span>` : '';
+            return `<div class="dt-kanban-card ${urgClass}" onclick="showDesignTask('${task.id}')">
+                <div class="flex items-start justify-between gap-2 mb-1">
+                    <div class="dt-card-title flex-1">${escHtml(task.task_name || 'Untitled Task')}</div>
+                    <button class="dt-card-eye flex-shrink-0" onclick="openDtPreview(event,'${task.id}')" title="Quick preview">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </button>
+                </div>
+                ${clubName ? `<div class="dt-card-club">🏟 ${escHtml(clubName)}</div>` : ''}
+                ${descTrunc ? `<div class="dt-card-desc">${escHtml(descTrunc)}${descTrunc.length === 80 ? '…' : ''}</div>` : ''}
+                <div class="dt-card-footer">
+                    ${dueLabel ? `<span class="dt-card-due ${dueClass}">📅 ${dueLabel}${dueInfo?.text ? ' · ' + dueInfo.text : ''}</span>` : '<span></span>'}
+                    <div class="flex items-center gap-1">${statusBadge}${designerBadge}</div>
+                </div>
+            </div>`;
+        }
+
+        // ── Delivered / Completed grid ────────────────────────────────────────
+        function renderDSGrid(type, tasks) {
+            const grid  = document.getElementById(`ds-${type}-grid`);
+            const empty = document.getElementById(`ds-${type}-empty`);
+            if (!grid) return;
+            if (!tasks.length) {
+                grid.innerHTML = '';
+                if (empty) empty.classList.remove('hide');
+                return;
+            }
+            if (empty) empty.classList.add('hide');
+            grid.innerHTML = tasks.map(t => {
+                const due   = t.due_date ? new Date(t.due_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+                const ts    = type === 'delivered' ? t.delivered_at : t.completed_at;
+                const tsStr = ts ? new Date(ts).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '';
+                const label = type === 'delivered' ? 'Delivered' : 'Completed';
+                const tsLabel = type === 'delivered' ? 'Delivered' : 'Approved';
+                return `<div class="ds-grid-card ${type}-card" onclick="showDesignTask('${t.id}')">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-mono text-gray-400">${escHtml(t.task_ref||'')}</span>
+                        <span class="badge design-status-${t.status} text-xs">${DS_STATUS_LABELS[t.status]||label}</span>
+                    </div>
+                    <p class="font-semibold text-sm mb-1">${escHtml(t.task_name||'Untitled')}</p>
+                    ${t.clubs?.name ? `<p class="text-xs text-gray-500 mb-2">🏟 ${escHtml(t.clubs.name)}</p>` : ''}
+                    ${t.assigned_designer_name ? `<p class="text-xs text-gray-500 mb-2">👤 ${escHtml(t.assigned_designer_name)}</p>` : ''}
+                    ${tsStr ? `<p class="text-xs text-gray-400">${tsLabel}: ${tsStr}</p>` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // ── Create Design Task (modal) ────────────────────────────────────────
+        function openCreateDesignTaskModal(linkedJobId) {
+            const modal = document.getElementById('create-design-task-modal');
+            if (!modal) return;
+            // Reset form
+            document.getElementById('cdt-name').value = '';
+            document.getElementById('cdt-due-date').value = '';
+            document.getElementById('cdt-job-type').value = '';
+
+            // Populate club dropdown
+            const clubSel = document.getElementById('cdt-club-id');
+            if (clubSel) {
+                clubSel.innerHTML = '<option value="">— Select Club —</option>' +
+                    clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+            }
+
+            // Populate designer dropdown
+            const dsnSel = document.getElementById('cdt-designer-id');
+            if (dsnSel) {
+                dsnSel.innerHTML = '<option value="">— Unassigned —</option>';
+                if (brandUsers && brandUsers.length) {
+                    brandUsers.forEach(u => {
+                        const name = u.full_name || (u.email ? u.email.split('@')[0] : 'User');
+                        dsnSel.innerHTML += `<option value="${u.id}" data-name="${escHtml(name)}">${escHtml(name)}</option>`;
+                    });
+                }
+            }
+
+            // Pre-fill linked job if provided
+            const linkedJobRow = document.getElementById('cdt-linked-job-row');
+            const linkedJobDisplay = document.getElementById('cdt-linked-job-display');
+            const linkedJobIdInput = document.getElementById('cdt-linked-job-id');
+            if (linkedJobId) {
+                const job = jobs.find(j => j.id === linkedJobId);
+                if (linkedJobRow) linkedJobRow.classList.remove('hide');
+                if (linkedJobDisplay) linkedJobDisplay.value = job ? `${job.job_number||''} ${job.job_name||''}`.trim() : linkedJobId;
+                if (linkedJobIdInput) linkedJobIdInput.value = linkedJobId;
+                // Pre-fill club from job
+                if (job?.club_id && clubSel) clubSel.value = job.club_id;
+            } else {
+                if (linkedJobRow) linkedJobRow.classList.add('hide');
+                if (linkedJobIdInput) linkedJobIdInput.value = '';
+            }
+
+            modal.classList.remove('hide');
+            setTimeout(() => document.getElementById('cdt-name')?.focus(), 100);
+        }
+
+        function hideCreateDesignTaskModal() {
+            document.getElementById('create-design-task-modal')?.classList.add('hide');
+        }
+
+        async function saveNewDesignTask() {
+            const name = document.getElementById('cdt-name')?.value?.trim();
+            if (!name) { showToast('Please enter a task name', 'warning'); return; }
+            if (!currentBrand) { showToast('No brand selected', 'error'); return; }
+
+            const btn = document.getElementById('cdt-save-btn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+
+            // Generate reference
+            const ref = await generateDesignRef();
+
+            const clubId    = document.getElementById('cdt-club-id')?.value || null;
+            const dueDate   = document.getElementById('cdt-due-date')?.value || null;
+            const jobType   = document.getElementById('cdt-job-type')?.value || null;
+            const linkedJobId = document.getElementById('cdt-linked-job-id')?.value || null;
+            const dsnSel    = document.getElementById('cdt-designer-id');
+            const designerId   = dsnSel?.value || null;
+            const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+
+            const payload = {
+                brand_id: currentBrand.id,
+                task_name: name,
+                task_ref:  ref,
+                club_id:   clubId || null,
+                due_date:  dueDate || null,
+                job_type:  jobType || null,
+                job_id:    linkedJobId || null,
+                assigned_designer_id:   designerId || null,
+                assigned_designer_name: designerName || null,
+                status: 'new',
+                design_types: []
+            };
+
+            const { data, error } = await supabase.from('design_tasks').insert(payload).select().single();
+            if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
+            if (error) { showToast('Error creating task', 'error'); console.error(error); return; }
+
+            hideCreateDesignTaskModal();
+            showToast(`Design task created: ${ref}`);
+            allDesignTasks.unshift(data);
+            renderDesignStudio();
+
+            // Navigate to the new task record
+            setTimeout(() => showDesignTask(data.id), 300);
+        }
+
+        // ── Generate Reference Number ─────────────────────────────────────────
+        async function generateDesignRef() {
+            if (!currentBrand?.id) return 'DES-001';
+            const prefix = currentBrand.design_ref_prefix || 'DES';
+            // Try atomic RPC first, fall back to count
+            try {
+                const { data: counter, error } = await supabase.rpc('increment_design_task_counter', { brand_id_input: currentBrand.id });
+                if (!error && counter) {
+                    if (currentBrand) currentBrand.design_task_counter = counter;
+                    return `${prefix}-${String(counter).padStart(3,'0')}`;
+                }
+            } catch(e) { /* fall through */ }
+            // Fallback: count existing tasks
+            const { count } = await supabase.from('design_tasks')
+                .select('id', { count: 'exact', head: true })
+                .eq('brand_id', currentBrand.id);
+            return `${prefix}-${String((count || 0) + 1).padStart(3,'0')}`;
+        }
+
+        // ── Navigate to Design Task Record ────────────────────────────────────
+        async function showDesignTask(taskId) {
+            showToolRaw('design-task');
+            await loadDesignTaskRecord(taskId);
+        }
+
+        function showToolRaw(toolId) {
+            document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
+            document.getElementById('launchpad')?.classList.add('hide');
+            const el = document.getElementById(`tool-${toolId}`);
+            if (el) el.classList.remove('hide');
+        }
+
+        // ── Load Design Task Record ───────────────────────────────────────────
+        async function loadDesignTaskRecord(taskId) {
+            // Load task with related data
+            const { data: task } = await supabase
+                .from('design_tasks')
+                .select('*, clubs(id, name, logo_url), jobs(id, job_name, job_number)')
+                .eq('id', taskId)
+                .single();
+            if (!task) { showToast('Task not found', 'error'); return; }
+            currentDesignTaskRecord = task;
+
+            // Also load versions for the versions tab
+            const { data: versions } = await supabase
+                .from('design_versions')
+                .select('*')
+                .eq('design_task_id', taskId)
+                .order('version_number');
+            currentDesignVersions = versions || [];
+            // Set currentDesignTask for compatibility with annotation system
+            currentDesignTask = task;
+            currentJobId = task.job_id;
+
+            renderDesignTaskRecord();
+        }
+
+        function renderDesignTaskRecord() {
+            const task = currentDesignTaskRecord;
+            if (!task) return;
+
+            // Header
+            const nameDisp = document.getElementById('dt-task-name-display');
+            if (nameDisp) nameDisp.textContent = task.task_name || 'Untitled Task';
+            const refDisp = document.getElementById('dt-ref-display');
+            if (refDisp) refDisp.textContent = task.task_ref || '';
+            const statusBadge = document.getElementById('dt-status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = DS_STATUS_LABELS[task.status] || task.status;
+                statusBadge.className = `badge design-status-${task.status} text-xs`;
+            }
+            const clubDisp = document.getElementById('dt-club-display');
+            if (clubDisp) clubDisp.textContent = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
+            const designerDisp = document.getElementById('dt-designer-display');
+            if (designerDisp) designerDisp.textContent = task.assigned_designer_name ? `👤 ${task.assigned_designer_name}` : '';
+
+            // Deliver/Complete buttons
+            const btnDeliver  = document.getElementById('btn-dt-deliver');
+            const btnComplete = document.getElementById('btn-dt-complete');
+            if (btnDeliver)  btnDeliver.classList.toggle('hide', ['delivered','completed'].includes(task.status));
+            if (btnComplete) btnComplete.classList.toggle('hide', task.status !== 'delivered');
+
+            // Form fields
+            dtFillOverviewForm(task);
+            renderDtJobTypeGrid(task.job_type);
+            renderDtDesignTypesGrid(task.design_types || []);
+            renderDtStatusButtons(task.status);
+            dtUpdateCountdown();
+            renderDtProductsList(task);
+
+            // Meta
+            const metaRef = document.getElementById('dt-meta-ref');
+            const metaCreated = document.getElementById('dt-meta-created');
+            const metaUpdated = document.getElementById('dt-meta-updated');
+            if (metaRef) metaRef.textContent = task.task_ref || '—';
+            if (metaCreated) metaCreated.textContent = task.created_at ? new Date(task.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+            if (metaUpdated) metaUpdated.textContent = task.updated_at ? new Date(task.updated_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+
+            // Active tab content
+            const activeTab = document.querySelector('#dtt-overview.active, #dtt-assets.active, #dtt-versions.active, #dtt-delivery.active');
+            const tabId = activeTab?.id?.replace('dtt-', '') || 'overview';
+            switchDesignTaskTab(tabId);
+        }
+
+        function dtFillOverviewForm(task) {
+            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            setVal('dt-task-name', task.task_name);
+            setVal('dt-task-ref', task.task_ref);
+            setVal('dt-due-date', task.due_date || '');
+            setVal('dt-design-brief', task.design_brief);
+
+            // Populate club dropdown
+            const clubSel = document.getElementById('dt-club-id');
+            if (clubSel) {
+                clubSel.innerHTML = '<option value="">— Select Club —</option>' +
+                    clubs.map(c => `<option value="${c.id}" ${c.id === task.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
+            }
+
+            // Populate job dropdown
+            const jobSel = document.getElementById('dt-job-id');
+            if (jobSel) {
+                const brandJobs = jobs.filter(j => j.stage !== 'completed').slice(0, 50);
+                jobSel.innerHTML = '<option value="">— None —</option>' +
+                    brandJobs.map(j => `<option value="${j.id}" ${j.id === task.job_id ? 'selected' : ''}>${escHtml((j.job_number ? j.job_number + ' · ' : '') + (j.job_name||''))}</option>`).join('');
+            }
+
+            // Populate designer dropdown
+            const dsnSel = document.getElementById('dt-designer-id');
+            if (dsnSel) {
+                dsnSel.innerHTML = '<option value="">— Unassigned —</option>';
+                if (brandUsers && brandUsers.length) {
+                    brandUsers.forEach(u => {
+                        const name = u.full_name || (u.email ? u.email.split('@')[0] : 'User');
+                        const sel  = u.id === task.assigned_designer_id ? 'selected' : '';
+                        dsnSel.innerHTML += `<option value="${u.id}" data-name="${escHtml(name)}" ${sel}>${escHtml(name)}</option>`;
+                    });
+                }
+            }
+        }
+
+        function renderDtJobTypeGrid(currentJobType) {
+            const grid = document.getElementById('dt-job-type-grid');
+            if (!grid) return;
+            grid.innerHTML = DS_JOB_TYPES.map(t => `
+                <button class="dt-job-type-btn ${t.key === currentJobType ? 'active' : ''}" onclick="selectDtJobType('${t.key}')">
+                    ${escHtml(t.label)}
+                </button>`).join('');
+        }
+
+        function selectDtJobType(key) {
+            if (currentDesignTaskRecord) currentDesignTaskRecord.job_type = key;
+            document.querySelectorAll('.dt-job-type-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function renderDtDesignTypesGrid(selectedTypes) {
+            const grid = document.getElementById('dt-design-types-grid');
+            if (!grid) return;
+            grid.innerHTML = DS_DESIGN_TYPES.map(t => {
+                const isActive = selectedTypes.includes(t);
+                return `<button class="dt-design-type-chip ${isActive ? 'active' : ''}" onclick="toggleDtDesignType('${escHtml(t)}', this)">
+                    ${isActive ? '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>' : ''}
+                    ${escHtml(t)}
+                </button>`;
+            }).join('');
+        }
+
+        function toggleDtDesignType(typeLabel, btn) {
+            if (!currentDesignTaskRecord) return;
+            const types = currentDesignTaskRecord.design_types || [];
+            const idx = types.indexOf(typeLabel);
+            if (idx >= 0) {
+                types.splice(idx, 1);
+                btn.classList.remove('active');
+                btn.innerHTML = escHtml(typeLabel);
+            } else {
+                types.push(typeLabel);
+                btn.classList.add('active');
+                btn.innerHTML = `<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>${escHtml(typeLabel)}`;
+            }
+            currentDesignTaskRecord.design_types = types;
+        }
+
+        function renderDtStatusButtons(currentStatus) {
+            const container = document.getElementById('dt-status-buttons');
+            if (!container) return;
+            const statuses = [
+                { key:'new',               label:'New',               color:'#4b5563', icon:'○' },
+                { key:'in_progress',       label:'In Progress',       color:'#2563eb', icon:'✏' },
+                { key:'revisions',         label:'Revisions',         color:'#b45309', icon:'↺' },
+                { key:'in_review',         label:'In Review',         color:'#7c3aed', icon:'👁' },
+                { key:'awaiting_approval', label:'Awaiting Approval', color:'#ea580c', icon:'⏳' }
+            ];
+            container.innerHTML = statuses.map(s => `
+                <button class="dt-status-btn dt-status-${s.key} ${s.key === currentStatus ? 'active' : ''}"
+                    style="color:${s.color}" onclick="setDesignTaskStatus('${s.key}')">
+                    <span style="font-size:14px">${s.icon}</span>
+                    <span>${s.label}</span>
+                    ${s.key === currentStatus ? '<svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>' : ''}
+                </button>`).join('');
+        }
+
+        async function setDesignTaskStatus(newStatus) {
+            if (!currentDesignTaskRecord?.id) return;
+            const { error } = await supabase.from('design_tasks').update({ status: newStatus }).eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error updating status', 'error'); return; }
+            currentDesignTaskRecord.status = newStatus;
+            renderDtStatusButtons(newStatus);
+            const badge = document.getElementById('dt-status-badge');
+            if (badge) { badge.textContent = DS_STATUS_LABELS[newStatus]; badge.className = `badge design-status-${newStatus} text-xs`; }
+            const btnDeliver  = document.getElementById('btn-dt-deliver');
+            const btnComplete = document.getElementById('btn-dt-complete');
+            if (btnDeliver)  btnDeliver.classList.toggle('hide', ['delivered','completed'].includes(newStatus));
+            if (btnComplete) btnComplete.classList.toggle('hide', newStatus !== 'delivered');
+            showToast(`Status → ${DS_STATUS_LABELS[newStatus]}`);
+            // Refresh kanban if studio is open
+            allDesignTasks = allDesignTasks.map(t => t.id === currentDesignTaskRecord.id ? { ...t, status: newStatus } : t);
+        }
+
+        // ── Due Date / Countdown ──────────────────────────────────────────────
+        function getDueInfo(dueDate) {
+            const now   = new Date();
+            now.setHours(0,0,0,0);
+            const due   = new Date(dueDate);
+            due.setHours(0,0,0,0);
+            const diffMs = due - now;
+            const diffDays = Math.ceil(diffMs / 86400000);
+            if (diffDays < 0) return { urgency: 'overdue', text: `${Math.abs(diffDays)}d overdue`, days: diffDays };
+            if (diffDays === 0) return { urgency: 'soon', text: 'Due today', days: 0 };
+            if (diffDays === 1) return { urgency: 'soon', text: 'Due tomorrow', days: 1 };
+            if (diffDays <= 3) return { urgency: 'soon', text: `${diffDays}d left`, days: diffDays };
+            return { urgency: 'ok', text: `${diffDays}d left`, days: diffDays };
+        }
+
+        function dtUpdateCountdown() {
+            const dueDateVal = document.getElementById('dt-due-date')?.value;
+            const countdownEl = document.getElementById('dt-countdown');
+            const duePanel = document.getElementById('dt-due-display');
+
+            if (!dueDateVal) {
+                if (countdownEl) countdownEl.classList.add('hide');
+                if (duePanel) duePanel.innerHTML = '<p class="text-sm text-gray-400">No due date set</p>';
+                return;
+            }
+
+            const due = new Date(dueDateVal);
+            const info = getDueInfo(due);
+            const dateStr = due.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'long', year:'numeric' });
+
+            if (countdownEl) {
+                countdownEl.classList.remove('hide', 'soon', 'overdue', 'ok');
+                countdownEl.classList.add(info.urgency);
+                countdownEl.textContent = info.text;
+            }
+            if (duePanel) {
+                const colour = info.urgency === 'overdue' ? '#dc2626' : info.urgency === 'soon' ? '#ea580c' : '#16a34a';
+                duePanel.innerHTML = `
+                    <p class="text-sm font-semibold" style="color:${colour}">${info.text}</p>
+                    <p class="text-xs text-gray-500 mt-1">${dateStr}</p>`;
+            }
+        }
+
+        // ── Tab switching in Design Task Record ───────────────────────────────
+        function switchDesignTaskTab(tabName) {
+            const tabs = ['overview','assets','versions','delivery'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`dtt-${t}`);
+                const panel = document.getElementById(`dtt-content-${t}`);
+                if (btn) btn.classList.toggle('active', t === tabName);
+                if (panel) panel.classList.toggle('hide', t !== tabName);
+            });
+            if (tabName === 'assets') loadDesignTaskAssets();
+            else if (tabName === 'versions') loadDesignVersionsForDTRecord();
+            else if (tabName === 'delivery') loadDesignTaskDelivery();
+        }
+
+        // ── Save Overview ─────────────────────────────────────────────────────
+        async function saveDesignTaskOverview() {
+            if (!currentDesignTaskRecord?.id) return;
+            const dsnSel = document.getElementById('dt-designer-id');
+            const designerId   = dsnSel?.value || null;
+            const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+
+            const payload = {
+                task_name:   document.getElementById('dt-task-name')?.value?.trim() || '',
+                club_id:     document.getElementById('dt-club-id')?.value || null,
+                job_id:      document.getElementById('dt-job-id')?.value || null,
+                due_date:    document.getElementById('dt-due-date')?.value || null,
+                design_brief: document.getElementById('dt-design-brief')?.value || '',
+                job_type:    currentDesignTaskRecord.job_type || null,
+                design_types: currentDesignTaskRecord.design_types || [],
+                products_required: currentDesignTaskRecord.products_required || [],
+                assigned_designer_id:   designerId,
+                assigned_designer_name: designerName
+            };
+
+            if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
+
+            const { data, error } = await supabase.from('design_tasks').update(payload).eq('id', currentDesignTaskRecord.id).select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number)').single();
+            if (error) { showToast('Error saving task', 'error'); return; }
+            currentDesignTaskRecord = data;
+            currentDesignTask = data;
+            allDesignTasks = allDesignTasks.map(t => t.id === data.id ? data : t);
+            renderDesignTaskRecord();
+            showToast('Design task saved ✓');
+        }
+
+        // ── Club changed → load club products ────────────────────────────────
+        async function dtClubChanged() {
+            const clubId = document.getElementById('dt-club-id')?.value;
+            if (currentDesignTaskRecord) currentDesignTaskRecord.club_id = clubId || null;
+            dtUpdateCountdown();
+            renderDtProductsList(currentDesignTaskRecord);
+        }
+
+        function dtDesignerChanged() {
+            const dsnSel = document.getElementById('dt-designer-id');
+            if (!dsnSel || !currentDesignTaskRecord) return;
+            currentDesignTaskRecord.assigned_designer_id = dsnSel.value || null;
+            currentDesignTaskRecord.assigned_designer_name = dsnSel.options[dsnSel.selectedIndex]?.dataset?.name || null;
+        }
+
+        async function renderDtProductsList(task) {
+            const container = document.getElementById('dt-products-list');
+            if (!container) return;
+            const clubId = task?.club_id || document.getElementById('dt-club-id')?.value;
+            if (!clubId) {
+                container.innerHTML = '<p class="text-sm text-gray-400">Select a linked club above to see available club products.</p>';
+                return;
+            }
+            container.innerHTML = '<p class="text-sm text-gray-400">Loading products…</p>';
+            const { data: clubProds } = await supabase.from('club_products').select('id, product_name, sku').eq('club_id', clubId).order('product_name');
+            const selected = task?.products_required || [];
+            if (!clubProds?.length) {
+                container.innerHTML = '<p class="text-sm text-gray-400">No products found for this club.</p>';
+                return;
+            }
+            container.innerHTML = clubProds.map(p => {
+                const isChecked = selected.includes(p.id);
+                return `<label class="flex items-center gap-3 p-2.5 rounded-lg cursor-pointer hover:bg-blue-50 transition" style="border:1px solid #e2e8f0">
+                    <input type="checkbox" value="${p.id}" ${isChecked ? 'checked' : ''} onchange="toggleDtProduct('${p.id}', this.checked)" class="accent-blue-600 w-4 h-4 flex-shrink-0">
+                    <div>
+                        <p class="text-sm font-medium text-gray-800">${escHtml(p.product_name || '')}</p>
+                        ${p.sku ? `<p class="text-xs text-gray-400">${escHtml(p.sku)}</p>` : ''}
+                    </div>
+                </label>`;
+            }).join('');
+        }
+
+        function toggleDtProduct(productId, checked) {
+            if (!currentDesignTaskRecord) return;
+            const arr = currentDesignTaskRecord.products_required || [];
+            const idx = arr.indexOf(productId);
+            if (checked && idx < 0)  arr.push(productId);
+            if (!checked && idx >= 0) arr.splice(idx, 1);
+            currentDesignTaskRecord.products_required = arr;
+        }
+
+        // ── Mark Delivered / Completed ────────────────────────────────────────
+        async function markDesignDelivered() {
+            if (!currentDesignTaskRecord?.id) return;
+            const { error } = await supabase.from('design_tasks').update({
+                status: 'delivered', delivered_at: new Date().toISOString()
+            }).eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error', 'error'); return; }
+            currentDesignTaskRecord.status = 'delivered';
+            currentDesignTaskRecord.delivered_at = new Date().toISOString();
+            allDesignTasks = allDesignTasks.map(t => t.id === currentDesignTaskRecord.id ? currentDesignTaskRecord : t);
+            renderDesignTaskRecord();
+            showToast('Task marked as Delivered 📦');
+        }
+
+        async function markDesignCompleted() {
+            if (!currentDesignTaskRecord?.id) return;
+            const { error } = await supabase.from('design_tasks').update({
+                status: 'completed', completed_at: new Date().toISOString()
+            }).eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error', 'error'); return; }
+            currentDesignTaskRecord.status = 'completed';
+            currentDesignTaskRecord.completed_at = new Date().toISOString();
+            allDesignTasks = allDesignTasks.map(t => t.id === currentDesignTaskRecord.id ? currentDesignTaskRecord : t);
+            renderDesignTaskRecord();
+            showToast('Task marked as Completed ✅');
+        }
+
+        // ── Assets Tab ────────────────────────────────────────────────────────
+        async function loadDesignTaskAssets() {
+            if (!currentDesignTaskRecord?.id) return;
+            const { data } = await supabase.from('design_task_assets')
+                .select('*').eq('design_task_id', currentDesignTaskRecord.id).order('created_at');
+            currentDesignTaskAssets = data || [];
+            renderDesignTaskAssets();
+        }
+
+        function renderDesignTaskAssets() {
+            const grid  = document.getElementById('dt-assets-grid');
+            const empty = document.getElementById('dt-assets-empty');
+            if (!grid) return;
+            if (!currentDesignTaskAssets.length) {
+                grid.innerHTML = '';
+                if (empty) empty.classList.remove('hide');
+                return;
+            }
+            if (empty) empty.classList.add('hide');
+            grid.innerHTML = currentDesignTaskAssets.map(a => {
+                const isImg = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(a.file_name);
+                const icon  = isImg ? '🖼' : a.file_name.endsWith('.pdf') ? '📄' : '📦';
+                const preview = isImg ? `<img src="${escHtml(a.file_url)}" class="w-full h-32 object-cover rounded-xl mb-2">` : `<div class="w-full h-32 rounded-xl flex items-center justify-center text-3xl mb-2" style="background:#f8fafc;border:1px solid #e2e8f0">${icon}</div>`;
+                return `<div class="glass rounded-xl p-3">
+                    ${preview}
+                    <p class="text-xs font-medium text-gray-700 truncate">${escHtml(a.file_name)}</p>
+                    <p class="text-xs text-gray-400 mt-0.5">${a.uploaded_by_name||'Unknown'}</p>
+                    <div class="flex gap-2 mt-2">
+                        <a href="${escHtml(a.file_url)}" target="_blank" class="text-xs btn-secondary px-2 py-1 flex-1 text-center">View</a>
+                        <button onclick="deleteDesignTaskAsset('${a.id}')" class="text-xs px-2 py-1 rounded-lg" style="background:rgba(239,68,68,0.08);color:#dc2626;border:1px solid rgba(239,68,68,0.2)">✕</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function uploadDesignTaskAssets(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length || !currentDesignTaskRecord?.id) return;
+            const bucket = 'club-images';
+            for (const file of files) {
+                showToast(`Uploading ${file.name}…`);
+                const ext = file.name.substring(file.name.lastIndexOf('.'));
+                const path = `${currentBrand?.slug||'brand'}/design-tasks/${currentDesignTaskRecord.id}/assets/${Date.now()}${ext}`;
+                const { error: upErr } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+                if (upErr) { showToast(`Failed: ${file.name}`, 'error'); continue; }
+                const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
+                await supabase.from('design_task_assets').insert({
+                    design_task_id: currentDesignTaskRecord.id,
+                    brand_id: currentBrand?.id,
+                    file_name: file.name,
+                    file_url: urlData.publicUrl,
+                    file_type: file.type,
+                    file_size: file.size,
+                    uploaded_by: currentUser?.id,
+                    uploaded_by_name: currentUser?.user_metadata?.full_name || currentUser?.email || 'Unknown'
+                });
+            }
+            event.target.value = '';
+            await loadDesignTaskAssets();
+            showToast(`${files.length} file(s) uploaded`);
+        }
+
+        async function deleteDesignTaskAsset(assetId) {
+            if (!confirm('Delete this file?')) return;
+            await supabase.from('design_task_assets').delete().eq('id', assetId);
+            currentDesignTaskAssets = currentDesignTaskAssets.filter(a => a.id !== assetId);
+            renderDesignTaskAssets();
+            showToast('File deleted');
+        }
+
+        // ── Versions Tab (Design Task Record) ────────────────────────────────
+        async function loadDesignVersionsForDTRecord() {
+            if (!currentDesignTaskRecord?.id) return;
+            const { data } = await supabase.from('design_versions').select('*')
+                .eq('design_task_id', currentDesignTaskRecord.id).order('version_number');
+            currentDesignVersions = data || [];
+            currentDesignTask = currentDesignTaskRecord;
+            renderDtVersionsList();
+        }
+
+        function renderDtVersionsList() {
+            const list  = document.getElementById('dt-versions-list');
+            const empty = document.getElementById('dt-versions-empty');
+            if (!list) return;
+            if (!currentDesignVersions.length) {
+                list.innerHTML = '';
+                if (empty) empty.classList.remove('hide');
+                return;
+            }
+            if (empty) empty.classList.add('hide');
+            list.innerHTML = renderDesignVersions();
+        }
+
+        // Override addDesignVersion to work with design task record context
+        function addDesignVersion() {
+            if (!currentDesignTask?.id && !currentDesignTaskRecord?.id) {
+                showToast('No design task selected', 'error'); return;
+            }
+            if (currentDesignTaskRecord) currentDesignTask = currentDesignTaskRecord;
+            document.getElementById('version-notes').value = '';
+            document.getElementById('version-file-label').textContent = 'Click to select image (PNG, JPG, PDF)';
+            document.getElementById('version-file-preview').classList.add('hide');
+            document.getElementById('upload-version-modal').classList.remove('hide');
+        }
+
+        // ── Delivery Tab ──────────────────────────────────────────────────────
+        async function loadDesignTaskDelivery() {
+            if (!currentDesignTaskRecord?.id) return;
+            const { data } = await supabase.from('design_task_delivery')
+                .select('*').eq('design_task_id', currentDesignTaskRecord.id).order('created_at');
+            currentDesignTaskDelivery = data || [];
+            renderDesignTaskDelivery();
+        }
+
+        function renderDesignTaskDelivery() {
+            const list  = document.getElementById('dt-delivery-list');
+            const empty = document.getElementById('dt-delivery-empty');
+            if (!list) return;
+            if (!currentDesignTaskDelivery.length) {
+                list.innerHTML = '';
+                if (empty) empty.classList.remove('hide');
+                return;
+            }
+            if (empty) empty.classList.add('hide');
+            list.innerHTML = currentDesignTaskDelivery.map(f => {
+                const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(f.file_name);
+                const icon  = isImg ? '🖼' : f.file_name.endsWith('.pdf') ? '📄' : '📦';
+                const ts    = new Date(f.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+                return `<div class="dt-file-card">
+                    <div class="dt-file-icon">${icon}</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800 truncate">${escHtml(f.file_name)}</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Uploaded by ${escHtml(f.uploaded_by_name||'Unknown')} · ${ts}</p>
+                        ${f.notes ? `<p class="text-xs text-gray-500 mt-1">${escHtml(f.notes)}</p>` : ''}
+                    </div>
+                    <div class="flex gap-2 flex-shrink-0">
+                        <a href="${escHtml(f.file_url)}" target="_blank" class="btn-secondary text-xs px-3 py-1.5">Download</a>
+                        <button onclick="deleteDeliveryFile('${f.id}')" class="text-xs px-2 py-1.5 rounded-lg" style="background:rgba(239,68,68,0.08);color:#dc2626;border:1px solid rgba(239,68,68,0.2)">✕</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function uploadDeliveryFiles(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length || !currentDesignTaskRecord?.id) return;
+            const bucket = 'club-images';
+            for (const file of files) {
+                showToast(`Uploading ${file.name}…`);
+                const ext  = file.name.substring(file.name.lastIndexOf('.'));
+                const path = `${currentBrand?.slug||'brand'}/design-tasks/${currentDesignTaskRecord.id}/delivery/${Date.now()}${ext}`;
+                const { error: upErr } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+                if (upErr) { showToast(`Failed: ${file.name}`, 'error'); continue; }
+                const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
+                await supabase.from('design_task_delivery').insert({
+                    design_task_id: currentDesignTaskRecord.id,
+                    brand_id: currentBrand?.id,
+                    file_name: file.name,
+                    file_url: urlData.publicUrl,
+                    file_type: file.type,
+                    file_size: file.size,
+                    uploaded_by: currentUser?.id,
+                    uploaded_by_name: currentUser?.user_metadata?.full_name || currentUser?.email || 'Unknown'
+                });
+            }
+            event.target.value = '';
+            await loadDesignTaskDelivery();
+            showToast(`${files.length} file(s) uploaded`);
+        }
+
+        async function deleteDeliveryFile(fileId) {
+            if (!confirm('Delete this delivery file?')) return;
+            await supabase.from('design_task_delivery').delete().eq('id', fileId);
+            currentDesignTaskDelivery = currentDesignTaskDelivery.filter(f => f.id !== fileId);
+            renderDesignTaskDelivery();
+            showToast('File deleted');
+        }
+
+        // ── Quick Preview (eye icon) ──────────────────────────────────────────
+        function openDtPreview(event, taskId) {
+            event.stopPropagation();
+            const task = allDesignTasks.find(t => t.id === taskId);
+            if (!task) return;
+            const JOB_TYPE_MAP = Object.fromEntries(DS_JOB_TYPES.map(t => [t.key, t.label]));
+            const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+            setTxt('dtp-ref', task.task_ref);
+            setTxt('dtp-name', task.task_name || 'Untitled Task');
+            const statusEl = document.getElementById('dtp-status');
+            if (statusEl) { statusEl.textContent = DS_STATUS_LABELS[task.status] || task.status; statusEl.className = `badge design-status-${task.status} text-xs`; }
+            setTxt('dtp-club', task.clubs?.name);
+            if (task.due_date) {
+                const info = getDueInfo(new Date(task.due_date));
+                const dateStr = new Date(task.due_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+                setTxt('dtp-due', `${dateStr} (${info.text})`);
+            } else { setTxt('dtp-due', 'No due date'); }
+            setTxt('dtp-designer', task.assigned_designer_name);
+            setTxt('dtp-job-type', JOB_TYPE_MAP[task.job_type] || '—');
+            const briefSec = document.getElementById('dtp-brief-section');
+            const briefEl  = document.getElementById('dtp-brief');
+            if (task.design_brief) {
+                if (briefSec) briefSec.classList.remove('hide');
+                if (briefEl) briefEl.textContent = task.design_brief;
+            } else {
+                if (briefSec) briefSec.classList.add('hide');
+            }
+            const typesSec = document.getElementById('dtp-types-section');
+            const typesEl  = document.getElementById('dtp-types');
+            if (task.design_types?.length) {
+                if (typesSec) typesSec.classList.remove('hide');
+                if (typesEl) typesEl.innerHTML = task.design_types.map(t => `<span class="dt-type-chip">${escHtml(t)}</span>`).join('');
+            } else {
+                if (typesSec) typesSec.classList.add('hide');
+            }
+            const openBtn = document.getElementById('dtp-open-btn');
+            if (openBtn) openBtn.setAttribute('onclick', `closeDtPreviewModal(); showDesignTask('${taskId}')`);
+            document.getElementById('dt-preview-modal')?.classList.remove('hide');
+        }
+
+        function closeDtPreviewModal() {
+            document.getElementById('dt-preview-modal')?.classList.add('hide');
+        }
+
+        // ── Job Record: Design Tab ────────────────────────────────────────────
+        async function loadJobDesign() {
+            if (!currentJobId) return;
+            // Load all design tasks for this job
+            const { data: tasks } = await supabase
+                .from('design_tasks')
+                .select('*, clubs(name)')
+                .eq('job_id', currentJobId)
+                .order('created_at', { ascending: false });
+            // Also set currentDesignTask for backward compat (first task)
+            currentDesignTask = (tasks && tasks.length) ? tasks[0] : null;
+            if (currentDesignTask) {
+                const { data: versions } = await supabase.from('design_versions')
+                    .select('*').eq('design_task_id', currentDesignTask.id).order('version_number');
+                currentDesignVersions = versions || [];
+            } else {
+                currentDesignVersions = [];
+            }
+            renderJobDesignTasks(tasks || []);
+        }
+
+        function renderJobDesignTasks(tasks) {
+            const list  = document.getElementById('jr-design-tasks-list');
+            const empty = document.getElementById('jr-design-tasks-empty');
+            if (!list) return;
+            if (!tasks.length) {
+                list.innerHTML = '';
+                if (empty) empty.classList.remove('hide');
+                return;
+            }
+            if (empty) empty.classList.add('hide');
+            list.innerHTML = tasks.map(t => {
+                const due   = t.due_date ? new Date(t.due_date) : null;
+                const info  = due ? getDueInfo(due) : null;
+                const dueBadge = due ? `<span class="dt-card-due ${info?.urgency === 'overdue' ? 'overdue' : info?.urgency === 'soon' ? 'soon' : ''}">📅 ${due.toLocaleDateString('en-GB', { day:'2-digit', month:'short' })}</span>` : '';
+                const JOB_TYPE_MAP = Object.fromEntries(DS_JOB_TYPES.map(jt => [jt.key, jt.label]));
+                return `<div class="glass rounded-xl p-4 flex items-center gap-4 cursor-pointer hover:border-pink-200 transition" style="border:1px solid #e2e8f0" onclick="showDesignTask('${t.id}')">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-xs font-mono text-gray-400">${escHtml(t.task_ref||'')}</span>
+                            <span class="badge design-status-${t.status} text-xs">${DS_STATUS_LABELS[t.status]||t.status}</span>
+                        </div>
+                        <p class="font-semibold text-sm">${escHtml(t.task_name||'Untitled Task')}</p>
+                        ${t.job_type ? `<p class="text-xs text-gray-400 mt-0.5">${escHtml(JOB_TYPE_MAP[t.job_type]||t.job_type)}</p>` : ''}
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        ${t.assigned_designer_name ? `<p class="text-xs text-gray-500 mb-1">👤 ${escHtml(t.assigned_designer_name)}</p>` : ''}
+                        ${dueBadge}
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </div>`;
+            }).join('');
+        }
+
+        // Backward compat: old renderDesignTab still renders if called
+        function renderDesignTab() { loadJobDesign(); }
+
+        // ── Design Settings (Brand Settings page) ────────────────────────────
+        function loadDesignSettings() {
+            if (!currentBrand) return;
+            const prefixInput = document.getElementById('design-ref-prefix');
+            if (prefixInput) prefixInput.value = currentBrand.design_ref_prefix || 'DES';
+            updateDesignRefExample();
+        }
+
+        function updateDesignRefExample() {
+            const prefix = document.getElementById('design-ref-prefix')?.value || 'DES';
+            const ex = document.getElementById('design-ref-example');
+            if (ex) ex.textContent = `${prefix}-001`;
+        }
+
+        document.getElementById('design-ref-prefix')?.addEventListener('input', updateDesignRefExample);
+
+        async function saveDesignSettings() {
+            if (!currentBrand?.id) return;
+            const prefix = document.getElementById('design-ref-prefix')?.value?.trim().toUpperCase() || 'DES';
+            const { error } = await supabase.from('brands').update({ design_ref_prefix: prefix }).eq('id', currentBrand.id);
+            if (error) { showToast('Error saving settings', 'error'); return; }
+            currentBrand.design_ref_prefix = prefix;
+            showToast('Design settings saved ✓');
+        }
 
         init();
     </script>
