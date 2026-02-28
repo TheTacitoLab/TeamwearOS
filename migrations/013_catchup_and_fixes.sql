@@ -9,6 +9,10 @@
 --            (standalone tasks with job_id IS NULL were invisible)
 --   FIX 3 — design_versions RLS updated to match
 --   FIX 4 — design_feed gets design_task_id for standalone tasks
+--   FIX 5 — Enable RLS on design_annotations and design_feed
+--            (both flagged CRITICAL by Supabase security linter)
+--   FIX 6 — Add SET search_path to all SECURITY DEFINER functions
+--            (mutable search path flagged by Supabase security linter)
 --
 -- Safe to run even if 010 / 011 were partially applied.
 -- TeamwearOS
@@ -553,3 +557,187 @@ ALTER TABLE design_feed
     ADD COLUMN IF NOT EXISTS design_task_id UUID REFERENCES design_tasks(id) ON DELETE CASCADE;
 
 CREATE INDEX IF NOT EXISTS idx_design_feed_task ON design_feed(design_task_id);
+
+
+-- ══════════════════════════════════════════════════════════════
+-- SECTION 5: FIX 5 + 6 — Supabase Security Linter Fixes
+-- ══════════════════════════════════════════════════════════════
+
+-- ──────────────────────────────────────────
+-- FIX 5a: Enable RLS on design_annotations
+-- (table created in 006 without RLS — flagged CRITICAL)
+-- Access is determined via: annotation → version → design_task → brand_id
+-- ──────────────────────────────────────────
+ALTER TABLE design_annotations ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE tablename = 'design_annotations' AND policyname = 'brand_access_design_annotations'
+    ) THEN
+        CREATE POLICY "brand_access_design_annotations" ON design_annotations
+            USING (version_id IN (
+                SELECT id FROM design_versions
+                WHERE design_task_id IN (
+                    SELECT id FROM design_tasks
+                    WHERE brand_id IN (
+                        SELECT brand_id FROM user_profiles WHERE id = auth.uid()
+                        UNION
+                        SELECT id FROM brands WHERE EXISTS (
+                            SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin'
+                        )
+                    )
+                    OR job_id IN (
+                        SELECT id FROM jobs WHERE brand_id IN (
+                            SELECT brand_id FROM user_profiles WHERE id = auth.uid()
+                            UNION
+                            SELECT id FROM brands WHERE EXISTS (
+                                SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin'
+                            )
+                        )
+                    )
+                )
+            ));
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE tablename = 'design_annotations' AND policyname = 'brand_write_design_annotations'
+    ) THEN
+        CREATE POLICY "brand_write_design_annotations" ON design_annotations
+            FOR ALL USING (version_id IN (
+                SELECT id FROM design_versions
+                WHERE design_task_id IN (
+                    SELECT id FROM design_tasks
+                    WHERE brand_id IN (
+                        SELECT brand_id FROM user_profiles WHERE id = auth.uid()
+                        UNION
+                        SELECT id FROM brands WHERE EXISTS (
+                            SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin'
+                        )
+                    )
+                    OR job_id IN (
+                        SELECT id FROM jobs WHERE brand_id IN (
+                            SELECT brand_id FROM user_profiles WHERE id = auth.uid()
+                            UNION
+                            SELECT id FROM brands WHERE EXISTS (
+                                SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin'
+                            )
+                        )
+                    )
+                )
+            ));
+    END IF;
+END $$;
+
+-- ──────────────────────────────────────────
+-- FIX 5b: Enable RLS on design_feed
+-- (table created in 006 without RLS — flagged CRITICAL)
+-- After section 4, design_feed now has brand_id via job or design_task
+-- ──────────────────────────────────────────
+ALTER TABLE design_feed ENABLE ROW LEVEL SECURITY;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE tablename = 'design_feed' AND policyname = 'brand_access_design_feed'
+    ) THEN
+        CREATE POLICY "brand_access_design_feed" ON design_feed
+            USING (brand_id IN (
+                SELECT brand_id FROM user_profiles WHERE id = auth.uid()
+                UNION
+                SELECT id FROM brands WHERE EXISTS (
+                    SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin'
+                )
+            ));
+    END IF;
+END $$;
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE tablename = 'design_feed' AND policyname = 'brand_write_design_feed'
+    ) THEN
+        CREATE POLICY "brand_write_design_feed" ON design_feed
+            FOR ALL USING (brand_id IN (
+                SELECT brand_id FROM user_profiles WHERE id = auth.uid()
+                UNION
+                SELECT id FROM brands WHERE EXISTS (
+                    SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'super_admin'
+                )
+            ));
+    END IF;
+END $$;
+
+-- ──────────────────────────────────────────
+-- FIX 6: Add SET search_path to all SECURITY DEFINER functions
+-- Supabase flags functions without a fixed search_path as a
+-- security risk (search_path injection). Fix: recreate each
+-- function with SET search_path = '' and fully-qualified names.
+-- ──────────────────────────────────────────
+
+-- handle_new_user (009)
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    INSERT INTO public.user_profiles (id, email, role)
+    VALUES (NEW.id, NEW.email, 'user')
+    ON CONFLICT (id) DO NOTHING;
+    RETURN NEW;
+END;
+$$;
+
+-- get_next_job_number (004)
+CREATE OR REPLACE FUNCTION public.get_next_job_number(p_brand_id UUID)
+RETURNS TEXT
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+    job_count INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO job_count FROM public.jobs WHERE brand_id = p_brand_id;
+    RETURN 'JOB-' || LPAD((job_count + 1)::TEXT, 4, '0');
+END;
+$$;
+
+-- update_updated_at_column (003/005)
+CREATE OR REPLACE FUNCTION public.update_updated_at_column()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
+$$;
+
+-- increment_design_task_counter (011/013)
+CREATE OR REPLACE FUNCTION public.increment_design_task_counter(brand_id_input UUID)
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+DECLARE
+    new_counter INTEGER;
+BEGIN
+    UPDATE public.brands
+    SET design_task_counter = COALESCE(design_task_counter, 0) + 1
+    WHERE id = brand_id_input
+    RETURNING design_task_counter INTO new_counter;
+    RETURN new_counter;
+END;
+$$;

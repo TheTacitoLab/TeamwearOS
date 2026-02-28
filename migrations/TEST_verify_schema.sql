@@ -113,6 +113,8 @@ FROM (VALUES
     ('job_activity'),
     ('design_tasks'),
     ('design_versions'),
+    ('design_annotations'),
+    ('design_feed'),
     ('design_task_assets'),
     ('design_task_delivery'),
     ('leads'),
@@ -127,6 +129,30 @@ LEFT JOIN pg_tables pt
     ON pt.tablename = e.table_name
     AND pt.schemaname = 'public'
 ORDER BY result, e.table_name;
+
+
+-- ──────────────────────────────────────────
+-- 3b. SECURITY DEFINER functions must have fixed search_path
+-- ──────────────────────────────────────────
+SELECT
+    p.proname AS function_name,
+    CASE
+        WHEN p.proconfig IS NOT NULL AND EXISTS (
+            SELECT 1 FROM unnest(p.proconfig) AS cfg
+            WHERE cfg LIKE 'search_path=%'
+        ) THEN 'PASS'
+        ELSE 'FAIL — mutable search_path (security risk)'
+    END AS result
+FROM pg_proc p
+JOIN pg_namespace n ON n.oid = p.pronamespace
+WHERE n.nspname = 'public'
+  AND p.prosecdef = TRUE   -- SECURITY DEFINER only
+  AND p.proname IN (
+      'handle_new_user',
+      'get_next_job_number',
+      'increment_design_task_counter'
+  )
+ORDER BY result, p.proname;
 
 
 -- ──────────────────────────────────────────
