@@ -741,3 +741,21 @@ BEGIN
     RETURN new_counter;
 END;
 $$;
+
+-- generate_po_number, get_user_brand_id, is_super_admin were created
+-- manually in Supabase (not tracked in any migration file).
+-- Use OID-based ALTER to fix search_path without needing their signatures.
+DO $$
+DECLARE
+    func RECORD;
+BEGIN
+    FOR func IN
+        SELECT p.oid::regprocedure AS sig
+        FROM pg_proc p
+        JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = 'public'
+          AND p.proname IN ('generate_po_number', 'get_user_brand_id', 'is_super_admin')
+    LOOP
+        EXECUTE format('ALTER FUNCTION %s SET search_path = ''''', func.sig);
+    END LOOP;
+END $$;
