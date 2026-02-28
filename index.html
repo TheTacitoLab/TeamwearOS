@@ -849,6 +849,7 @@
             </div>
 
             <div id="signup-form" class="hide">
+                <input type="text" id="signup-username" placeholder="Username (e.g. johndoe)" class="w-full px-4 py-3 rounded-lg mb-3">
                 <input type="email" id="signup-email" placeholder="Email" class="w-full px-4 py-3 rounded-lg mb-3">
                 <input type="password" id="signup-password" placeholder="Password" class="w-full px-4 py-3 rounded-lg mb-3">
                 <input type="password" id="signup-confirm" placeholder="Confirm Password" class="w-full px-4 py-3 rounded-lg mb-4">
@@ -906,6 +907,13 @@
                 <div class="mb-5 pb-4 border-b" style="border-color:#e2e8f0">
                     <p class="text-xs text-gray-500 mb-1">Signed in as</p>
                     <p id="profile-email-display" class="font-semibold text-sm" style="color:#0f172a"></p>
+                    <div class="mt-3">
+                        <label class="text-xs text-gray-500 mb-1 block">Username <span class="text-gray-400">(shown in assignments &amp; activity)</span></label>
+                        <div class="flex gap-2">
+                            <input type="text" id="profile-username-input" placeholder="Choose a username..." class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0;color:#0f172a">
+                            <button onclick="saveProfileUsername()" class="btn-primary text-xs px-3 py-2">Save</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="rounded-xl p-4 mb-4" style="background:#f8fafc;border:1px solid #e2e8f0">
                     <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wider">Record Visibility</p>
@@ -2386,81 +2394,97 @@
                 </span>
             </div>
 
-            <!-- Prospecting Sub-Launchpad (home view) -->
-            <div id="prospect-home">
-                <!-- Inline metrics + quick actions bar -->
-                <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <div class="prospect-metric-mini" style="border-left-color:#2563eb">
-                            <span id="pm-not-contacted" class="prospect-mini-count" style="color:#1d4ed8">0</span>
-                            <span class="prospect-mini-label">Not Contacted</span>
-                        </div>
-                        <div class="prospect-metric-mini" style="border-left-color:#6d28d9">
-                            <span id="pm-in-discussion" class="prospect-mini-count" style="color:#6d28d9">0</span>
-                            <span class="prospect-mini-label">In Discussion</span>
-                        </div>
-                        <div class="prospect-metric-mini" style="border-left-color:#16a34a">
-                            <span id="pm-converted" class="prospect-mini-count" style="color:#16a34a">0</span>
-                            <span class="prospect-mini-label">Converted</span>
-                        </div>
+            <!-- Top actions row -->
+            <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <div class="prospect-metric-mini" style="border-left-color:#2563eb">
+                        <span id="pm-not-contacted" class="prospect-mini-count" style="color:#1d4ed8">0</span>
+                        <span class="prospect-mini-label">Not Contacted</span>
                     </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Add Lead
-                        </button>
-                        <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
-                        <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
+                    <div class="prospect-metric-mini" style="border-left-color:#6d28d9">
+                        <span id="pm-in-discussion" class="prospect-mini-count" style="color:#6d28d9">0</span>
+                        <span class="prospect-mini-label">In Discussion</span>
+                    </div>
+                    <div class="prospect-metric-mini" style="border-left-color:#16a34a">
+                        <span id="pm-converted" class="prospect-mini-count" style="color:#16a34a">0</span>
+                        <span class="prospect-mini-label">Converted</span>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Lead
+                    </button>
+                    <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
+                    <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
+                </div>
+            </div>
+
+            <!-- 3-column pipeline cards (always visible, click to expand inline panel) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+                <!-- Not Contacted -->
+                <div id="prospect-card-nc" onclick="showProspectView('not-contacted')"
+                    class="prospect-card transition-all"
+                    style="cursor:pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
+                            <svg class="w-5 h-5" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-sm">Not Contacted</h3>
+                                <span id="nc-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-0.5">New leads waiting to be contacted.</p>
+                        </div>
+                        <svg id="prospect-card-nc-arrow" class="w-4 h-4 flex-shrink-0 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                 </div>
 
-                <!-- Slim prospect-cards -->
-                <div class="grid md:grid-cols-2 gap-3">
-                    <!-- Not Contacted -->
-                    <div onclick="showProspectView('not-contacted')" class="prospect-card">
-                        <div class="flex items-center gap-4">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
-                                <svg class="w-5 h-5" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-sm">Not Contacted</h3>
-                                    <span id="nc-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
-                                </div>
-                                <p class="text-gray-500 text-xs mt-0.5">New leads waiting to be contacted. Filter by sport and county.</p>
-                            </div>
-                            <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <!-- In Discussion -->
+                <div id="prospect-card-id" onclick="showProspectView('in-discussion')"
+                    class="prospect-card transition-all"
+                    style="cursor:pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#ede9fe">
+                            <svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
                         </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-sm">In Discussion</h3>
+                                <span id="id-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-0.5">Active conversations on a visual Kanban board.</p>
+                        </div>
+                        <svg id="prospect-card-id-arrow" class="w-4 h-4 flex-shrink-0 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </div>
+                </div>
 
-                    <!-- In Discussion -->
-                    <div onclick="showProspectView('in-discussion')" class="prospect-card">
-                        <div class="flex items-center gap-4">
-                            <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#ede9fe">
-                                <svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <h3 class="font-bold text-sm">In Discussion</h3>
-                                    <span id="id-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
-                                </div>
-                                <p class="text-gray-500 text-xs mt-0.5">Active conversations on a visual Kanban board with customisable stages.</p>
-                            </div>
-                            <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <!-- Converted -->
+                <div id="prospect-card-cv" onclick="showProspectView('converted')"
+                    class="prospect-card transition-all"
+                    style="cursor:pointer">
+                    <div class="flex items-center gap-4">
+                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dcfce7">
+                            <svg class="w-5 h-5" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-sm">Converted</h3>
+                                <span id="cv-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#dcfce7;color:#16a34a">0</span>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-0.5">Leads successfully converted to Sales Jobs.</p>
+                        </div>
+                        <svg id="prospect-card-cv-arrow" class="w-4 h-4 flex-shrink-0 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                 </div>
             </div>
 
-            <!-- Not Contacted List View -->
+            <!-- INLINE PANEL: Not Contacted List -->
             <div id="prospect-not-contacted" class="hide">
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
-                        <button onclick="showProspectView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                            Back
-                        </button>
-                        <h3 class="text-xl font-bold">Not Contacted</h3>
+                        <h3 class="text-base font-bold">Not Contacted</h3>
                         <span id="nc-list-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
                     </div>
                     <button onclick="openLeadModal(null, 'not_contacted')" class="btn-primary text-sm flex items-center gap-2">
@@ -2468,9 +2492,7 @@
                         Add Lead
                     </button>
                 </div>
-
-                <!-- Filters -->
-                <div class="filter-bar">
+                <div class="filter-bar mb-4">
                     <input type="text" id="nc-search" placeholder="Search leads..." oninput="renderNotContacted()" style="min-width:200px">
                     <select id="nc-filter-sport" onchange="renderNotContacted()">
                         <option value="">All Sports</option>
@@ -2484,24 +2506,19 @@
                     </select>
                     <button onclick="exportLeadsCSV('not_contacted')" class="btn-secondary text-sm">Export CSV</button>
                 </div>
-
                 <div id="nc-list" class="space-y-2 xl:grid xl:grid-cols-2 xl:gap-3 xl:space-y-0 2xl:grid-cols-3">
                     <!-- Populated by JS -->
                 </div>
             </div>
 
-            <!-- In Discussion Kanban View -->
+            <!-- INLINE PANEL: In Discussion Kanban -->
             <div id="prospect-in-discussion" class="hide">
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-3">
-                        <button onclick="showProspectView('home')" class="text-gray-500 hover:text-white flex items-center gap-1 text-sm transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                            Back
-                        </button>
-                        <h3 class="text-xl font-bold">In Discussion</h3>
+                        <h3 class="text-base font-bold">In Discussion</h3>
                         <span id="id-board-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
                     </div>
-                    <div class="flex gap-3">
+                    <div class="flex gap-2">
                         <button onclick="openStageConfig()" class="btn-secondary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             Configure Stages
@@ -2512,8 +2529,24 @@
                         </button>
                     </div>
                 </div>
-
                 <div id="kanban-board" class="kanban-board">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- INLINE PANEL: Converted Leads -->
+            <div id="prospect-converted" class="hide">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <h3 class="text-base font-bold">Converted Leads</h3>
+                        <span id="cv-list-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#dcfce7;color:#16a34a">0</span>
+                    </div>
+                    <button onclick="exportLeadsCSV('converted')" class="btn-secondary text-sm">Export CSV</button>
+                </div>
+                <div class="filter-bar mb-4">
+                    <input type="text" id="cv-search" placeholder="Search converted leads..." oninput="renderConverted()" style="min-width:200px">
+                </div>
+                <div id="cv-list" class="space-y-2">
                     <!-- Populated by JS -->
                 </div>
             </div>
@@ -2588,7 +2621,7 @@
                     <!-- Status & Stage -->
                     <div class="modal-section">
                         <p class="modal-section-title">Status & Pipeline</p>
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4 mb-3">
                             <div>
                                 <label class="text-xs text-gray-500 mb-1 block">Status</label>
                                 <select id="lead-status" class="w-full px-3 py-2 rounded-lg text-sm" onchange="toggleKanbanStageField()">
@@ -2602,6 +2635,12 @@
                                     <option value="">Select stage...</option>
                                 </select>
                             </div>
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Assigned To</label>
+                            <select id="lead-assigned-to" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">Unassigned</option>
+                            </select>
                         </div>
                     </div>
 
@@ -4816,12 +4855,18 @@
         }
 
         async function handleSignup() {
+            const username = document.getElementById('signup-username').value.trim();
             const email = document.getElementById('signup-email').value;
             const password = document.getElementById('signup-password').value;
             const confirm = document.getElementById('signup-confirm').value;
 
-            if (!email || !password) {
+            if (!username || !email || !password) {
                 showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_.-]{2,30}$/.test(username)) {
+                showToast('Username must be 2–30 characters (letters, numbers, _ . - only)', 'error');
                 return;
             }
 
@@ -4835,6 +4880,17 @@
             if (error) {
                 showToast(error.message, 'error');
                 return;
+            }
+
+            // If user is immediately available (no email confirmation), save username to profile
+            if (data?.user?.id) {
+                // Upsert profile with username — trigger may have already created the row
+                await supabase.from('user_profiles').upsert({
+                    id: data.user.id,
+                    email: email,
+                    username: username,
+                    role: 'user'
+                }, { onConflict: 'id' });
             }
 
             showToast('Account created! Please sign in.');
@@ -4861,6 +4917,7 @@
             _appInitialising = true;
 
             currentUser = user;
+            // Show email initially; will be replaced by username once profile loads
             document.getElementById('user-email').textContent = user.email;
 
             // Get user profile
@@ -4883,6 +4940,10 @@
 
             currentUserProfile = profile;
             isSuperAdmin = profile?.role === 'super_admin';
+            // Update header to show username if available
+            if (profile?.username) {
+                document.getElementById('user-email').textContent = profile.username;
+            }
 
             // Show super admin badge if applicable
             if (isSuperAdmin) {
@@ -5121,11 +5182,13 @@
             // Prospecting home badges
             const ncBadge = document.getElementById('nc-count-badge');
             const idBadge = document.getElementById('id-count-badge');
+            const convertedLeads = leads.filter(l => l.status === 'converted' || l.converted_to_job_id).length;
+            const cvBadge = document.getElementById('cv-count-badge');
             if (ncBadge) ncBadge.textContent = ncLeads;
             if (idBadge) idBadge.textContent = idLeads;
+            if (cvBadge) cvBadge.textContent = convertedLeads;
 
             // Prospecting 3 key metrics
-            const convertedLeads = leads.filter(l => l.status === 'converted' || l.converted_to_job_id).length;
             const pmNc = document.getElementById('pm-not-contacted');
             const pmId = document.getElementById('pm-in-discussion');
             const pmConv = document.getElementById('pm-converted');
@@ -5270,7 +5333,18 @@
                     loadPoTracker();
                     break;
                 case 'prospecting':
-                    showProspectView('home');
+                    // Reset to collapsed (no panel open) when navigating to Prospecting
+                    currentProspectView = null;
+                    ['nc','id','cv'].forEach(k => {
+                        const card = document.getElementById(`prospect-card-${k}`);
+                        const arrow = document.getElementById(`prospect-card-${k}-arrow`);
+                        if (card) card.style.borderColor = '';
+                        if (arrow) arrow.style.transform = '';
+                    });
+                    ['prospect-not-contacted','prospect-in-discussion','prospect-converted'].forEach(id => {
+                        document.getElementById(id)?.classList.add('hide');
+                    });
+                    updateStats();
                     break;
                 case 'sales':
                     showSalesView('home');
@@ -11196,6 +11270,9 @@
                     }).eq('id', convertLeadId);
                     await loadLeads();
                     updateStats();
+                    // If prospecting panel is open refresh it
+                    if (currentProspectView === 'not-contacted') renderNotContacted();
+                    else if (currentProspectView === 'in-discussion') renderKanban();
                     showToast('Lead successfully converted to Job!', 'success');
                 }
                 await loadJobs();
@@ -12744,6 +12821,8 @@
         // =============================================
         function showProfileSettings() {
             document.getElementById('profile-email-display').textContent = currentUser?.email || '';
+            const usernameInput = document.getElementById('profile-username-input');
+            if (usernameInput) usernameInput.value = currentUserProfile?.username || '';
             document.getElementById('scope-all').checked = viewScope !== 'mine';
             document.getElementById('scope-mine').checked = viewScope === 'mine';
             // Show admin tools for super admins
@@ -12759,6 +12838,29 @@
             document.getElementById('profile-settings-modal').classList.add('hide');
         }
 
+        async function saveProfileUsername() {
+            const input = document.getElementById('profile-username-input');
+            const username = input?.value?.trim() || '';
+            if (!username) { showToast('Please enter a username', 'error'); return; }
+            if (!/^[a-zA-Z0-9_.-]{2,30}$/.test(username)) {
+                showToast('Username must be 2–30 characters (letters, numbers, _ . - only)', 'error');
+                return;
+            }
+            const { error } = await supabase.from('user_profiles')
+                .update({ username })
+                .eq('id', currentUser.id);
+            if (error) {
+                showToast(error.message?.includes('duplicate') ? 'Username already taken in this brand' : 'Error saving username', 'error');
+                return;
+            }
+            if (currentUserProfile) currentUserProfile.username = username;
+            document.getElementById('user-email').textContent = username;
+            // Update brandUsers cache
+            const bu = brandUsers.find(u => u.id === currentUser.id);
+            if (bu) bu.username = username;
+            showToast('Username saved');
+        }
+
         function updateViewScope(scope) {
             viewScope = scope;
             localStorage.setItem('teamwear_view_scope', scope);
@@ -12770,11 +12872,11 @@
         function getUserDisplayName(userId) {
             if (!userId) return '—';
             if (userId === currentUser?.id) {
-                const name = currentUser.email?.split('@')[0] || 'me';
+                const name = currentUserProfile?.username || currentUser.email?.split('@')[0] || 'me';
                 return name + ' (you)';
             }
             const u = brandUsers.find(u => u.id === userId);
-            return u ? u.email.split('@')[0] : '—';
+            return u ? userDisplayName(u) : '—';
         }
 
         // =============================================
@@ -12784,15 +12886,20 @@
 
         async function loadBrandUsers() {
             if (!currentBrand) return;
-            const { data } = await supabase.from('user_profiles').select('id, email').eq('brand_id', currentBrand.id).order('email');
+            const { data } = await supabase.from('user_profiles').select('id, email, username').eq('brand_id', currentBrand.id).order('email');
             brandUsers = data || [];
+        }
+
+        function userDisplayName(u) {
+            if (!u) return 'Unknown';
+            return u.username || u.email?.split('@')[0] || 'User';
         }
 
         function populateUserAssignDropdown(selectId, currentAssignedId) {
             const el = document.getElementById(selectId);
             if (!el) return;
             el.innerHTML = '<option value="">Unassigned</option>' +
-                brandUsers.map(u => `<option value="${u.id}" ${u.id === currentAssignedId ? 'selected' : ''}>${escHtml(u.email.split('@')[0])}</option>`).join('');
+                brandUsers.map(u => `<option value="${u.id}" ${u.id === currentAssignedId ? 'selected' : ''}>${escHtml(userDisplayName(u))}</option>`).join('');
         }
 
         async function saveJobAssignment(userId) {
@@ -13058,22 +13165,52 @@
         // =============================================
         // PROSPECTING — NAVIGATION
         // =============================================
+        // PROSPECTING — ONE-PAGE VIEW CONTROLLER
+        // =============================================
+        let currentProspectView = null;
+
         function showProspectView(view) {
-            document.getElementById('prospect-home').classList.add('hide');
+            // Toggle: clicking the same card again collapses the panel
+            if (currentProspectView === view) {
+                view = null;
+            }
+            currentProspectView = view;
+
+            // Hide all inline panels
             document.getElementById('prospect-not-contacted').classList.add('hide');
             document.getElementById('prospect-in-discussion').classList.add('hide');
+            document.getElementById('prospect-converted').classList.add('hide');
 
-            if (view === 'home') {
-                document.getElementById('prospect-home').classList.remove('hide');
-                updateStats();
-            } else if (view === 'not-contacted') {
+            // Reset all card active states
+            ['nc','id','cv'].forEach(k => {
+                const card = document.getElementById(`prospect-card-${k}`);
+                const arrow = document.getElementById(`prospect-card-${k}-arrow`);
+                if (card) card.style.borderColor = '';
+                if (arrow) arrow.style.transform = '';
+            });
+
+            if (view === 'not-contacted') {
                 document.getElementById('prospect-not-contacted').classList.remove('hide');
                 renderNotContacted();
                 populateCountyFilter();
+                _setProspectCardActive('nc');
             } else if (view === 'in-discussion') {
                 document.getElementById('prospect-in-discussion').classList.remove('hide');
                 renderKanban();
+                _setProspectCardActive('id');
+            } else if (view === 'converted') {
+                document.getElementById('prospect-converted').classList.remove('hide');
+                renderConverted();
+                _setProspectCardActive('cv');
             }
+        }
+
+        function _setProspectCardActive(key) {
+            const card = document.getElementById(`prospect-card-${key}`);
+            const arrow = document.getElementById(`prospect-card-${key}-arrow`);
+            const colors = { nc: '#2563eb', id: '#6d28d9', cv: '#16a34a' };
+            if (card) card.style.borderColor = colors[key] || '';
+            if (arrow) arrow.style.transform = 'rotate(180deg)';
         }
 
         // =============================================
@@ -13149,14 +13286,65 @@
                 counties.map(c => `<option value="${escHtml(c)}" ${c === current ? 'selected' : ''}>${escHtml(c)}</option>`).join('');
         }
 
+        // =============================================
+        // PROSPECTING — CONVERTED LEADS LIST
+        // =============================================
+        function renderConverted() {
+            const search = (document.getElementById('cv-search')?.value || '').toLowerCase();
+            let filtered = leads.filter(l => l.status === 'converted' || l.converted_to_job_id);
+            if (search) filtered = filtered.filter(l =>
+                l.lead_name?.toLowerCase().includes(search) ||
+                l.club_name?.toLowerCase().includes(search) ||
+                l.county?.toLowerCase().includes(search)
+            );
+
+            const countEl = document.getElementById('cv-list-count');
+            if (countEl) countEl.textContent = filtered.length;
+            const badgeEl = document.getElementById('cv-count-badge');
+            if (badgeEl) badgeEl.textContent = filtered.length;
+
+            const container = document.getElementById('cv-list');
+            if (!container) return;
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="empty-icon">✅</div><p>No converted leads yet. Leads moved to jobs will appear here.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(lead => {
+                const jobId = lead.converted_to_job_id;
+                const job = jobs.find(j => j.id === jobId);
+                return `
+                <div class="lead-row" onclick="openLeadModal('${lead.id}')">
+                    <div class="flex-1 min-w-0">
+                        <p class="font-semibold text-sm truncate">${escHtml(lead.lead_name)}</p>
+                        <p class="text-xs text-gray-500 truncate">${escHtml(lead.club_name)}${lead.location ? ' · ' + escHtml(lead.location) : ''}</p>
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        ${lead.sport ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>` : ''}
+                        ${lead.county ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
+                    </div>
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        ${job ? `<button onclick="event.stopPropagation();openJobRecord('${job.id}')"
+                            class="text-xs px-3 py-1.5 rounded-lg font-semibold transition"
+                            style="background:#dcfce7;color:#16a34a;border:1px solid rgba(22,163,74,0.2)">
+                            View Job →
+                        </button>` : `<span class="text-xs text-gray-400 px-2">Job not found</span>`}
+                        <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background:#dcfce7;color:#16a34a">Converted</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
         async function moveLeadToDiscussion(leadId) {
             const defaultStage = kanbanStages[0];
             const updates = { status: 'in_discussion', kanban_stage_id: defaultStage?.id || null };
             const { error } = await supabase.from('leads').update(updates).eq('id', leadId);
             if (error) { showToast('Error moving lead: ' + error.message, 'error'); return; }
             await loadLeads();
-            renderNotContacted();
             updateStats();
+            if (currentProspectView === 'not-contacted') renderNotContacted();
+            else if (currentProspectView === 'in-discussion') renderKanban();
             showToast('Lead moved to In Discussion');
         }
 
@@ -13167,8 +13355,9 @@
                 .eq('id', leadId);
             if (error) { showToast('Error archiving lead: ' + error.message, 'error'); return; }
             await loadLeads();
-            renderNotContacted();
             updateStats();
+            if (currentProspectView === 'not-contacted') renderNotContacted();
+            else if (currentProspectView === 'in-discussion') renderKanban();
             showToast('Lead archived');
         }
 
@@ -13377,6 +13566,7 @@
                 document.getElementById('lead-notes').value = lead.notes || '';
                 document.getElementById('lead-status').value = lead.status || 'not_contacted';
                 document.getElementById('lead-stage').value = lead.kanban_stage_id || '';
+                populateUserAssignDropdown('lead-assigned-to', lead.assigned_to);
                 dangerActions.style.removeProperty('display');
                 // Show convert banner only if not already converted
                 const convertBanner = document.getElementById('lead-convert-banner');
@@ -13412,6 +13602,7 @@
                 document.getElementById('lead-notes').value = '';
                 document.getElementById('lead-status').value = defaultStatus;
                 document.getElementById('lead-stage').value = defaultStatus === 'in_discussion' ? (kanbanStages[0]?.id || '') : '';
+                populateUserAssignDropdown('lead-assigned-to', null);
                 dangerActions.style.display = 'none';
                 const convertBanner = document.getElementById('lead-convert-banner');
                 if (convertBanner) convertBanner.classList.add('hide');
@@ -13499,6 +13690,7 @@
 
             const status = document.getElementById('lead-status').value;
             const stageId = document.getElementById('lead-stage').value || null;
+            const assignedTo = document.getElementById('lead-assigned-to')?.value || null;
             const payload = {
                 brand_id: currentBrand.id,
                 lead_name: leadName,
@@ -13510,7 +13702,8 @@
                 amount_of_teams: parseInt(document.getElementById('lead-teams').value) || null,
                 notes: document.getElementById('lead-notes').value.trim() || null,
                 status,
-                kanban_stage_id: status === 'in_discussion' ? stageId : null
+                kanban_stage_id: status === 'in_discussion' ? stageId : null,
+                assigned_to: assignedTo || null
             };
 
             let leadId = currentLeadId;
@@ -13534,11 +13727,10 @@
             updateStats();
             closeLeadModal();
 
-            // Refresh current view
-            const ncVisible = !document.getElementById('prospect-not-contacted').classList.contains('hide');
-            const idVisible = !document.getElementById('prospect-in-discussion').classList.contains('hide');
-            if (ncVisible) renderNotContacted();
-            if (idVisible) renderKanban();
+            // Refresh whichever inline panel is currently open
+            if (currentProspectView === 'not-contacted') renderNotContacted();
+            else if (currentProspectView === 'in-discussion') renderKanban();
+            else if (currentProspectView === 'converted') renderConverted();
 
             showToast(currentLeadId ? 'Lead updated' : 'Lead created');
         }
@@ -13553,7 +13745,9 @@
             await loadLeads();
             updateStats();
             closeLeadModal();
-            renderNotContacted();
+            if (currentProspectView === 'not-contacted') renderNotContacted();
+            else if (currentProspectView === 'in-discussion') renderKanban();
+            else if (currentProspectView === 'converted') renderConverted();
             showToast('Lead archived');
         }
 
@@ -13566,8 +13760,9 @@
             await loadLeads();
             updateStats();
             closeLeadModal();
-            renderNotContacted();
-            renderKanban();
+            if (currentProspectView === 'not-contacted') renderNotContacted();
+            else if (currentProspectView === 'in-discussion') renderKanban();
+            else if (currentProspectView === 'converted') renderConverted();
             showToast('Lead deleted');
         }
 
@@ -13631,7 +13826,8 @@
                     setTimeout(() => {
                         document.getElementById('leads-csv-import-modal').classList.add('hide');
                         statusEl.classList.add('hide');
-                        renderNotContacted();
+                        // Auto-open the Not Contacted panel after import
+                        showProspectView('not-contacted');
                     }, 2000);
                 }
             });
@@ -13655,6 +13851,19 @@
             document.getElementById('job-description').value = lead.notes || '';
             if (document.getElementById('job-type')) document.getElementById('job-type').value = 'new_club';
 
+            // Populate club dropdown and try to match by club name
+            const clubSel = document.getElementById('job-club-id');
+            if (clubSel) {
+                clubSel.innerHTML = '<option value="">— Not Assigned —</option>' +
+                    clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+                // Auto-select if there's a club name match
+                if (lead.club_name) {
+                    const normalise = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+                    const matchedClub = clubs.find(c => normalise(c.name) === normalise(lead.club_name));
+                    if (matchedClub) clubSel.value = matchedClub.id;
+                }
+            }
+
             // Store the lead ID for post-save conversion marking
             document.getElementById('job-modal')._convertingFromLeadId = leadId;
 
@@ -13674,7 +13883,7 @@
                 }
             }
             if (noticeEl) {
-                noticeEl.innerHTML = `<p class="text-sm font-bold" style="color:#15803d">Converting from Lead: ${escHtml(lead.lead_name)}</p><p class="text-xs text-gray-500 mt-0.5">Pre-filled from lead data. Complete the remaining job details below.</p>`;
+                noticeEl.innerHTML = `<p class="text-sm font-bold" style="color:#15803d">Converting from Lead: ${escHtml(lead.lead_name)}</p><p class="text-xs text-gray-500 mt-0.5">Select the club this job belongs to (or leave as "Not Assigned") then complete the remaining details below.</p>`;
                 noticeEl.style.display = 'block';
             }
         }
@@ -13937,7 +14146,7 @@
             const assigned = currentAssignedIds || [];
             container.innerHTML = brandUsers.map(u => {
                 const isChecked = assigned.includes(u.id);
-                const displayName = u.email.split('@')[0];
+                const displayName = userDisplayName(u);
                 return `<label class="user-assign-item">
                     <input type="checkbox" value="${u.id}" ${isChecked ? 'checked' : ''}
                         onchange="onUserAssignChange('${containerId}','${chipsId}')">
@@ -13973,7 +14182,7 @@
             }
             chipsEl.innerHTML = selected.map(uid => {
                 const u = brandUsers.find(u => u.id === uid);
-                const name = u ? u.email.split('@')[0] : 'Unknown';
+                const name = u ? userDisplayName(u) : 'Unknown';
                 return `<span class="user-chip">${escHtml(name)}</span>`;
             }).join('');
         }
@@ -14237,7 +14446,7 @@
                 dsnSel.innerHTML = '<option value="">— Unassigned —</option>';
                 if (brandUsers && brandUsers.length) {
                     brandUsers.forEach(u => {
-                        const name = u.full_name || (u.email ? u.email.split('@')[0] : 'User');
+                        const name = u.username || u.full_name || (u.email ? u.email.split('@')[0] : 'User');
                         dsnSel.innerHTML += `<option value="${u.id}" data-name="${escHtml(name)}">${escHtml(name)}</option>`;
                     });
                 }
@@ -14275,42 +14484,54 @@
             const btn = document.getElementById('cdt-save-btn');
             if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
 
-            // Generate reference
-            const ref = await generateDesignRef();
+            try {
+                // Generate reference
+                const ref = await generateDesignRef();
 
-            const clubId    = document.getElementById('cdt-club-id')?.value || null;
-            const dueDate   = document.getElementById('cdt-due-date')?.value || null;
-            const jobType   = document.getElementById('cdt-job-type')?.value || null;
-            const linkedJobId = document.getElementById('cdt-linked-job-id')?.value || null;
-            const dsnSel    = document.getElementById('cdt-designer-id');
-            const designerId   = dsnSel?.value || null;
-            const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+                const clubId    = document.getElementById('cdt-club-id')?.value || null;
+                const dueDate   = document.getElementById('cdt-due-date')?.value || null;
+                const jobType   = document.getElementById('cdt-job-type')?.value || null;
+                const linkedJobId = document.getElementById('cdt-linked-job-id')?.value || null;
+                const dsnSel    = document.getElementById('cdt-designer-id');
+                const designerId   = dsnSel?.value || null;
+                const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
 
-            const payload = {
-                brand_id: currentBrand.id,
-                task_name: name,
-                task_ref:  ref,
-                club_id:   clubId || null,
-                due_date:  dueDate || null,
-                job_type:  jobType || null,
-                job_id:    linkedJobId || null,
-                assigned_designer_id:   designerId || null,
-                assigned_designer_name: designerName || null,
-                status: 'new',
-                design_types: []
-            };
+                const payload = {
+                    brand_id: currentBrand.id,
+                    task_name: name,
+                    task_ref:  ref,
+                    club_id:   clubId || null,
+                    due_date:  dueDate || null,
+                    job_type:  jobType || null,
+                    job_id:    linkedJobId || null,
+                    assigned_designer_id:   designerId || null,
+                    assigned_designer_name: designerName || null,
+                    status: 'new',
+                    design_types: []
+                };
 
-            const { data, error } = await supabase.from('design_tasks').insert(payload).select().single();
-            if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
-            if (error) { showToast('Error creating task', 'error'); console.error(error); return; }
+                const { data, error } = await supabase.from('design_tasks').insert(payload).select().single();
+                if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
 
-            hideCreateDesignTaskModal();
-            showToast(`Design task created: ${ref}`);
-            allDesignTasks.unshift(data);
-            renderDesignStudio();
+                if (error) {
+                    console.error('Design task insert error:', error);
+                    showToast('Error creating task: ' + (error.message || 'Unknown error'), 'error');
+                    return;
+                }
 
-            // Navigate to the new task record
-            setTimeout(() => showDesignTask(data.id), 300);
+                hideCreateDesignTaskModal();
+                showToast(`Design task created: ${ref}`);
+                allDesignTasks.unshift(data);
+                renderDesignStudio();
+
+                // Navigate to the new task record
+                setTimeout(() => showDesignTask(data.id), 300);
+
+            } catch (err) {
+                console.error('Unexpected error creating design task:', err);
+                if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
+                showToast('Unexpected error — please try again', 'error');
+            }
         }
 
         // ── Generate Reference Number ─────────────────────────────────────────
