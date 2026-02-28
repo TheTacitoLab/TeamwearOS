@@ -746,20 +746,57 @@ BEGIN
 END;
 $$;
 
--- generate_po_number, get_user_brand_id, is_super_admin were created
--- manually in Supabase (not tracked in any migration file).
--- Use OID-based ALTER to fix search_path without needing their signatures.
-DO $$
-DECLARE
-    func RECORD;
+-- is_super_admin, get_user_brand_id, generate_po_number were created
+-- manually in Supabase. Recreated here with SET search_path = '' AND
+-- fully-qualified table names (public.*) so they are both secure and correct.
+-- NOTE: setting search_path = '' on functions that use unqualified names
+-- breaks them silently — always pair the setting with qualified names.
+
+CREATE OR REPLACE FUNCTION public.is_super_admin()
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
 BEGIN
-    FOR func IN
-        SELECT p.oid::regprocedure AS sig
-        FROM pg_proc p
-        JOIN pg_namespace n ON n.oid = p.pronamespace
-        WHERE n.nspname = 'public'
-          AND p.proname IN ('generate_po_number', 'get_user_brand_id', 'is_super_admin')
-    LOOP
-        EXECUTE format('ALTER FUNCTION %s SET search_path = ''''', func.sig);
-    END LOOP;
-END $$;
+    RETURN (
+        SELECT role = 'super_admin'
+        FROM public.user_profiles
+        WHERE id = auth.uid()
+    );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.get_user_brand_id()
+RETURNS uuid
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+    RETURN (
+        SELECT brand_id
+        FROM public.user_profiles
+        WHERE id = auth.uid()
+    );
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.generate_po_number(
+    p_brand_id uuid,
+    p_prefix   text DEFAULT 'APX'::text
+)
+RETURNS text
+LANGUAGE plpgsql
+SET search_path = ''
+AS $$
+DECLARE
+    next_seq INTEGER;
+BEGIN
+    SELECT COALESCE(MAX(po_sequence), 0) + 1 INTO next_seq
+    FROM public.purchase_orders
+    WHERE brand_id = p_brand_id;
+
+    RETURN p_prefix || '/PO-' || LPAD(next_seq::TEXT, 3, '0');
+END;
+$$;
