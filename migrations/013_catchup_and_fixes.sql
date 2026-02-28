@@ -259,18 +259,22 @@ ALTER TABLE design_tasks
     ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
 
 -- ──────────────────────────────────────────
--- FIX 1: Backfill 'complete' → 'completed' BEFORE dropping the
--- constraint. Without this, ADD CONSTRAINT fails if any rows
--- still carry the old 'complete' value from migration 004.
+-- FIX 1: Drop constraint FIRST, then backfill, then re-add.
+-- The old constraint (from 004) only allows 'complete', so updating
+-- to 'completed' while the constraint is still active causes a
+-- check violation. Order must be: DROP → UPDATE → ADD CONSTRAINT.
 -- ──────────────────────────────────────────
+
+-- Step 1: Drop old constraint so the UPDATE below is not blocked
+ALTER TABLE design_tasks
+    DROP CONSTRAINT IF EXISTS design_tasks_status_check;
+
+-- Step 2: Migrate old 'complete' rows to 'completed'
 UPDATE design_tasks
     SET status = 'completed'
     WHERE status = 'complete';
 
--- Drop old constraint, add updated one with 'delivered' + 'completed'
-ALTER TABLE design_tasks
-    DROP CONSTRAINT IF EXISTS design_tasks_status_check;
-
+-- Step 3: Add updated constraint with 'delivered' + 'completed'
 ALTER TABLE design_tasks
     ADD CONSTRAINT design_tasks_status_check
     CHECK (status IN (
