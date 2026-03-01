@@ -6693,6 +6693,8 @@
         }
 
         async function saveProduct() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
+            try {
             const productId = document.getElementById('edit-product-id').value;
             const isSinglePrice = document.getElementById('prod-single-price').checked;
 
@@ -6795,6 +6797,10 @@
             renderProductsTable();
             updateStats();
             showToast(productId ? 'Product updated' : 'Product added');
+            } catch (err) {
+                console.error('saveProduct error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
+            }
         }
 
         function showDeleteProductModal(productId) {
@@ -9136,6 +9142,8 @@
         }
 
         async function saveClubEnhanced() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
+            try {
             const clubId = document.getElementById('edit-club-id').value;
             const name = document.getElementById('club-name').value.trim();
             const suffix = document.getElementById('club-suffix').value.trim().toUpperCase();
@@ -9238,6 +9246,10 @@
                     return;
                 }
                 openClubDashboard(result.data.id);
+            }
+            } catch (err) {
+                console.error('saveClubEnhanced error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
             }
         }
 
@@ -9795,21 +9807,29 @@
                 showToast('Please set a Partnership Level in Club Info before adding products', 'error');
                 return;
             }
-            document.getElementById('club-product-modal-title').textContent = 'Add Club Product';
             document.getElementById('edit-club-product-id').value = '';
             document.getElementById('cp-custom-name').value = '';
             document.getElementById('cp-sizes-info').classList.add('hide');
             document.getElementById('cp-pricing-info')?.classList.add('hide');
-            // Show which tier is being used
             const tierKey = currentClub.club_status;
             const activeTier = brandPricingTiers.find(t => t.tier_key === tierKey);
             const modalTitle = document.getElementById('club-product-modal-title');
-            if (modalTitle && activeTier) modalTitle.textContent = `Add Club Product — ${activeTier.tier_name} pricing`;
-            const assignedIds = currentClubProducts.map(cp => cp.product_id);
-            const available = products.filter(p => !assignedIds.includes(p.id));
+            if (modalTitle) modalTitle.textContent = `Add Product — ${activeTier?.tier_name || tierKey} pricing`;
+            const assignedIds = new Set(currentClubProducts.map(cp => cp.product_id));
             const select = document.getElementById('cp-master-product');
-            select.innerHTML = '<option value="">Select from master catalogue...</option>' +
-                available.map(p => `<option value="${p.id}">${escHtml(p.product_code)} – ${escHtml(p.item_name)} (${escHtml(p.range_name)})</option>`).join('');
+            if (window._jobProductMode) {
+                // Job context: show ALL master catalogue products; mark those already in the club
+                select.innerHTML = '<option value="">Select from master catalogue...</option>' +
+                    products.map(p => {
+                        const inCatalogue = assignedIds.has(p.id);
+                        return `<option value="${p.id}">${escHtml(p.product_code)} – ${escHtml(p.item_name)} (${escHtml(p.range_name)})${inCatalogue ? ' ✓ already in club' : ''}</option>`;
+                    }).join('');
+            } else {
+                // Club context: only show products not yet assigned to this club
+                const available = products.filter(p => !assignedIds.has(p.id));
+                select.innerHTML = '<option value="">Select from master catalogue...</option>' +
+                    available.map(p => `<option value="${p.id}">${escHtml(p.product_code)} – ${escHtml(p.item_name)} (${escHtml(p.range_name)})</option>`).join('');
+            }
             select.disabled = false;
             document.getElementById('club-product-modal').classList.remove('hide');
         }
@@ -10067,6 +10087,22 @@
             const customName = document.getElementById('cp-custom-name').value.trim();
             if (!productId) { showToast('Please select a master product', 'error'); return; }
             if (!customName) { showToast('Club product name is required', 'error'); return; }
+            // If from job context AND this product is already a club product, skip insert
+            if (window._addProductFromJob && !cpId) {
+                const alreadyExists = currentClubProducts.find(cp => cp.product_id === productId);
+                if (alreadyExists) {
+                    const { prevClub, prevClubProducts } = window._addProductFromJob;
+                    window._addProductFromJob = null;
+                    window._jobProductMode = false;
+                    currentClub = prevClub;
+                    currentClubProducts = prevClubProducts;
+                    hideClubProductModal();
+                    showToast('Already in club catalogue — shown in the products list');
+                    await renderJobProducts();
+                    return;
+                }
+            }
+            window._jobProductMode = false;
             // Resolve tier pricing from master product based on club's partnership level
             const prod = products.find(p => p.id === productId);
             const tierKey = currentClub?.club_status;
@@ -10092,6 +10128,7 @@
             if (window._addProductFromJob) {
                 const { prevClub, prevClubProducts } = window._addProductFromJob;
                 window._addProductFromJob = null;
+                window._jobProductMode = false;
                 currentClub = prevClub;
                 currentClubProducts = prevClubProducts;
                 hideClubProductModal();
@@ -11745,17 +11782,22 @@
                 return;
             }
             emptyEl.classList.add('hide');
+            const jobClub = (currentJob.clubs) || clubs.find(c => c.id === currentJob.club_id);
+            const tierKey = jobClub?.club_status || 'retail';
+            const tierObj = brandPricingTiers.find(t => t.tier_key === tierKey);
+            const tierName = tierObj?.tier_name || tierKey;
             container.innerHTML = clubProds.map(cp => {
-                const shopPrice = (cp.web_price || cp.partner_price || 0).toFixed(2);
+                const tp = (cp.products?.tier_prices || {})[tierKey] || {};
+                const adultPrice = tp.adult != null ? `£${Number(tp.adult).toFixed(2)}` : '—';
+                const youthPrice = tp.youth != null ? `£${Number(tp.youth).toFixed(2)}` : null;
                 return `<div class="glass rounded-xl p-4 flex items-center justify-between gap-4">
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-sm">${escHtml(cp.custom_name)}</p>
                         <p class="text-xs text-gray-500">${escHtml(cp.products?.product_code || '')} · ${escHtml(cp.products?.item_name || '')}</p>
                     </div>
                     <div class="flex gap-6 text-right flex-shrink-0">
-                        <div><p class="text-xs text-gray-600">Shop</p><p class="text-sm font-bold text-brand-400">£${shopPrice}</p></div>
-                        <div><p class="text-xs text-gray-600">Partner</p><p class="text-sm font-bold">£${(cp.partner_price||0).toFixed(2)}</p></div>
-                        <div><p class="text-xs text-gray-600">Direct</p><p class="text-sm font-bold">£${(cp.non_partner_price||0).toFixed(2)}</p></div>
+                        <div><p class="text-xs text-gray-500">${escHtml(tierName)} — Adult</p><p class="text-sm font-bold text-brand-400">${adultPrice}</p></div>
+                        ${youthPrice ? `<div><p class="text-xs text-gray-500">${escHtml(tierName)} — Youth</p><p class="text-sm font-bold">${youthPrice}</p></div>` : ''}
                     </div>
                     ${cp.shopify_product_id ? '<span class="text-xs text-purple-400 flex-shrink-0">Shopify ✓</span>' : ''}
                 </div>`;
@@ -11767,7 +11809,7 @@
             const club = clubs.find(c => c.id === currentJob.club_id);
             if (!club) return;
             if (!club.club_status) { showToast('Set a Partnership Level on this club first', 'error'); return; }
-            // Load existing club_products so the shared modal can filter already-assigned ones
+            // Load existing club_products so the modal can mark already-assigned ones
             const { data: existing } = await supabase
                 .from('club_products').select('product_id').eq('club_id', club.id).eq('is_active', true);
             // Save previous context and set job's club as the active context for the shared modal
@@ -11778,6 +11820,7 @@
             };
             currentClub = club;
             currentClubProducts = existing || [];
+            window._jobProductMode = true; // show ALL master catalogue products
             showAddClubProductModal();
         }
 
@@ -13912,6 +13955,8 @@
         }
 
         async function saveLead() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
+            try {
             const leadName = document.getElementById('lead-name').value.trim();
             const clubName = document.getElementById('lead-club-name').value.trim();
             if (!leadName) { showToast('Lead name is required', 'error'); return; }
@@ -13962,6 +14007,10 @@
             else if (currentProspectView === 'converted') renderConverted();
 
             showToast(currentLeadId ? 'Lead updated' : 'Lead created');
+            } catch (err) {
+                console.error('saveLead error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
+            }
         }
 
         async function archiveLead(reason) {
