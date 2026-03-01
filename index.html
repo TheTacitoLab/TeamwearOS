@@ -1509,6 +1509,10 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         Launchpad
                     </button>
+                    <button id="dt-back-btn" onclick="goBack()" class="nav-back-btn hide">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        <span id="dt-back-label">Back</span>
+                    </button>
                     <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none">
                         Design Studio
                     </button>
@@ -8566,6 +8570,7 @@
                     break;
                 case 'job': openJobRecord(item.jobId); break;
                 case 'club-detail': openClubDashboard(item.clubId); break;
+                case 'design-task': showDesignTask(item.taskId); break;
             }
             renderBreadcrumb();
         }
@@ -8595,6 +8600,8 @@
                     openJobRecord(prev.jobId); break;
                 case 'club-detail':
                     openClubDashboard(prev.clubId); break;
+                case 'design-task':
+                    showDesignTask(prev.taskId); break;
                 default:
                     navTrail = []; showLaunchpad();
             }
@@ -9196,6 +9203,15 @@
                     currentClub = clubs.find(c => c.id === clubId);
                     updateClubDetailHeader();
                     renderClubOverviewInfo();
+                }
+                // If we opened edit from within a job record, refresh the job's club tab
+                if (window._editClubFromJob) {
+                    const jid = window._editClubFromJob;
+                    window._editClubFromJob = null;
+                    const { data: updatedJob } = await supabase.from('jobs').select('*, clubs(*)').eq('id', jid).single();
+                    if (updatedJob) { currentJob = updatedJob; }
+                    renderJobHeader();
+                    renderJobClubTab();
                 }
             } else {
                 clubs.push(result.data);
@@ -10051,8 +10067,15 @@
             const customName = document.getElementById('cp-custom-name').value.trim();
             if (!productId) { showToast('Please select a master product', 'error'); return; }
             if (!customName) { showToast('Club product name is required', 'error'); return; }
+            // Resolve tier pricing from master product based on club's partnership level
+            const prod = products.find(p => p.id === productId);
+            const tierKey = currentClub?.club_status;
+            const tierPrices = (prod?.tier_prices || {})[tierKey] || {};
             const cpData = {
-                club_id: currentClub.id, product_id: productId, custom_name: customName, is_active: true
+                club_id: currentClub.id, product_id: productId, custom_name: customName, is_active: true,
+                web_price:         tierPrices.adult       || tierPrices.web         || null,
+                partner_price:     tierPrices.youth       || tierPrices.partner     || null,
+                non_partner_price: tierPrices.non_partner || null
             };
             let result;
             if (cpId) {
@@ -10065,6 +10088,17 @@
                     .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs)').single();
             }
             if (result.error) { showToast(result.error.message, 'error'); return; }
+            // If we opened this modal from within a job record, restore context and refresh job products
+            if (window._addProductFromJob) {
+                const { prevClub, prevClubProducts } = window._addProductFromJob;
+                window._addProductFromJob = null;
+                currentClub = prevClub;
+                currentClubProducts = prevClubProducts;
+                hideClubProductModal();
+                showToast('Product added to club');
+                await renderJobProducts();
+                return;
+            }
             if (cpId) {
                 const idx = currentClubProducts.findIndex(p => p.id === cpId);
                 if (idx !== -1) currentClubProducts[idx] = result.data;
@@ -11174,6 +11208,7 @@
         let currentDesignTask = null;
         let currentDesignVersions = [];
         let salesViewStageFilter = null;
+        let currentJobTab = 'overview';
 
         const JOB_STAGES = [
             { key: 'discovery',         label: 'Discovery',         colorClass: 'stage-discovery',  color: '#64748b', bg: 'rgba(100,116,139,0.12)' },
@@ -11451,6 +11486,7 @@
             if (currentJobId) {
                 currentJob = jobs.find(j => j.id === currentJobId);
                 renderJobHeader();
+                showJobTab(currentJobTab);
             } else {
                 showSalesView('home');
             }
@@ -11460,6 +11496,7 @@
         // SALES — JOB RECORD
         // =============================================
         async function openJobRecord(jobId) {
+            try {
             currentJobId = jobId;
             // Push current view to navStack if not already navigating
             if (!navStack.length || navStack[navStack.length-1].type !== 'job') {
@@ -11513,11 +11550,24 @@
             jobInputType = 'comment';
             setActivityTab('all');
             setInputType('comment');
+            } catch (err) {
+                console.error('openJobRecord error:', err);
+                showToast('Error loading job — please try again', 'error');
+                if (navStack.length) goBack();
+            }
         }
 
         // Helper to open job record from design studio (sets right tab)
         function showJobRecord(job) {
             openJobRecord(job.id);
+        }
+
+        function openEditClubFromJob(clubId) {
+            const club = clubs.find(c => c.id === clubId);
+            if (!club) return;
+            currentClub = club;
+            window._editClubFromJob = currentJobId;
+            showEditClubModal();
         }
 
         function closeJobRecord() {
@@ -11628,6 +11678,7 @@
         // SALES — JOB TABS
         // =============================================
         function showJobTab(tab) {
+            currentJobTab = tab;
             ['overview','products','club','team','design','orderform','production'].forEach(t => {
                 document.getElementById(`jt-content-${t}`)?.classList.add('hide');
                 document.getElementById(`jt-${t}`)?.classList.remove('active');
@@ -11711,11 +11762,23 @@
             }).join('');
         }
 
-        function showJobAddClubProductModal() {
+        async function showJobAddClubProductModal() {
             if (!currentJob?.club_id) { showToast('Link a club to this job first', 'error'); return; }
-            // Temporarily set current club to job's club then open modal
             const club = clubs.find(c => c.id === currentJob.club_id);
-            if (club) { showAddClubProductModal(club); }
+            if (!club) return;
+            if (!club.club_status) { showToast('Set a Partnership Level on this club first', 'error'); return; }
+            // Load existing club_products so the shared modal can filter already-assigned ones
+            const { data: existing } = await supabase
+                .from('club_products').select('product_id').eq('club_id', club.id).eq('is_active', true);
+            // Save previous context and set job's club as the active context for the shared modal
+            window._addProductFromJob = {
+                jobId: currentJobId,
+                prevClub: currentClub,
+                prevClubProducts: currentClubProducts
+            };
+            currentClub = club;
+            currentClubProducts = existing || [];
+            showAddClubProductModal();
         }
 
         async function toggleRangeApproved(checked) {
@@ -11755,7 +11818,8 @@
                             <span class="badge ${clubBadgeClass} text-xs">${escHtml(clubTierName)}</span>
                         </div>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="openEditClubFromJob('${club.id}')" class="btn-secondary text-sm">Edit Club Details</button>
                         <button onclick="openClubFromJob('${club.id}')" class="btn-secondary text-sm">Open Club Record</button>
                         <button onclick="showLinkClubModal()" class="btn-secondary text-sm">Change Club</button>
                     </div>
@@ -14730,8 +14794,31 @@
 
         // ── Navigate to Design Task Record ────────────────────────────────────
         async function showDesignTask(taskId) {
+            // Push the originating view to navStack so goBack() can return to it
+            const inJob = !document.getElementById('tool-job-record').classList.contains('hide');
+            const inStudio = !document.getElementById('tool-design-studio').classList.contains('hide');
+            if (inJob && currentJobId) {
+                navStack.push({ type: 'job', jobId: currentJobId, label: currentJob?.job_name || 'Job Record' });
+            } else if (inStudio) {
+                navStack.push({ type: 'tool', tool: 'design-studio', label: 'Design Studio' });
+            }
             showToolRaw('design-task');
             await loadDesignTaskRecord(taskId);
+            // Update breadcrumb trail
+            if (!Array.isArray(navTrail) || navTrail.length === 0) navTrail = [{ label: 'Home', type: 'launchpad' }];
+            if (navTrail[navTrail.length - 1]?.type !== 'design-task') {
+                navTrail.push({ label: currentDesignTaskRecord?.task_name || 'Design Task', type: 'design-task', taskId });
+            }
+            renderBreadcrumb();
+            // Update back button
+            const backBtn = document.getElementById('dt-back-btn');
+            const backLabel = document.getElementById('dt-back-label');
+            if (navStack.length > 0) {
+                if (backBtn) backBtn.classList.remove('hide');
+                if (backLabel) backLabel.textContent = navStack[navStack.length - 1]?.label || 'Back';
+            } else {
+                if (backBtn) backBtn.classList.add('hide');
+            }
         }
 
         function showToolRaw(toolId) {
