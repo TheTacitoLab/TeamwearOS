@@ -3060,22 +3060,22 @@
             <div id="jt-content-products" class="hide">
                 <div class="flex items-center justify-between mb-5">
                     <div>
-                        <h4 class="font-semibold">Club Products</h4>
-                        <p class="text-gray-500 text-sm mt-0.5">Products created for this job's club. Pricing from the club's partnership level.</p>
+                        <h4 class="font-semibold">Job Products</h4>
+                        <p class="text-gray-500 text-sm mt-0.5">Products selected for this job from the club's catalogue. Products not in the club catalogue must be added via the Club Record first.</p>
                     </div>
                     <div class="flex gap-3">
                         <div id="jr-range-approved-wrap" class="flex items-center gap-2 px-4 py-2 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <input type="checkbox" id="jr-range-approved" onchange="toggleRangeApproved(this.checked)" class="w-4 h-4">
                             <label for="jr-range-approved" class="text-sm font-semibold text-gray-300 cursor-pointer">Range Approved</label>
                         </div>
-                        <button onclick="showJobAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
+                        <button onclick="showJobProductPicker()" class="btn-primary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             Add Product
                         </button>
                     </div>
                 </div>
                 <div id="jr-products-list" class="space-y-3"></div>
-                <div id="jr-products-empty" class="empty-state hide"><div class="empty-icon">📦</div><p>No products added yet. Link a club first, then add products.</p></div>
+                <div id="jr-products-empty" class="empty-state hide"><div class="empty-icon">📦</div><p>No products selected yet. Add products from the club's catalogue.</p></div>
             </div>
 
             <!-- TAB: Club Record -->
@@ -3094,8 +3094,7 @@
 
             <!-- TAB: Team -->
             <div id="jt-content-team" class="hide">
-                <!-- Section 1: Club Team (from club_teams linked to the club) -->
-                <div class="glass rounded-2xl p-5 mb-5">
+                <div class="glass rounded-2xl p-5">
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h4 class="font-semibold">Club Team</h4>
@@ -3105,22 +3104,6 @@
                     <div id="jr-club-team-section">
                         <p class="text-gray-600 text-sm">Link a club to this job first to select a team.</p>
                     </div>
-                </div>
-
-                <!-- Section 2: Project Team (internal staff on this job) -->
-                <div class="glass rounded-2xl p-5">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h4 class="font-semibold">Project Team</h4>
-                            <p class="text-gray-500 text-sm mt-0.5">Internal staff members working on this job</p>
-                        </div>
-                        <button onclick="openTeamModal(null)" class="btn-primary text-sm flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Add Member
-                        </button>
-                    </div>
-                    <div id="jr-teams-list" class="space-y-3"></div>
-                    <div id="jr-teams-empty" class="empty-state hide"><div class="empty-icon">👤</div><p>No project team members added yet.</p></div>
                 </div>
             </div>
 
@@ -3318,6 +3301,27 @@
                     <div class="flex gap-3 mt-2">
                         <button onclick="saveTeam()" class="btn-primary">Save Team</button>
                         <button onclick="closeTeamModal()" class="btn-secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: Job Product Picker (select from club catalogue only) -->
+        <div id="job-product-picker-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)">
+            <div class="glass rounded-2xl w-full max-w-lg">
+                <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold">Add Products to Job</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Choose from this club's product catalogue only</p>
+                    </div>
+                    <button onclick="closeJobProductPicker()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg">✕</button>
+                </div>
+                <div class="p-5">
+                    <div id="job-product-picker-list" class="space-y-2 max-h-72 overflow-y-auto mb-4"></div>
+                    <p id="job-product-picker-empty" class="text-gray-500 text-sm text-center py-6 hide">All club products are already on this job, or the club has no products yet.<br><span class="text-xs mt-1 block">Add products to the club via the Club Record first.</span></p>
+                    <div class="flex gap-3">
+                        <button onclick="closeJobProductPicker()" class="flex-1 btn-secondary py-2.5">Cancel</button>
+                        <button onclick="addSelectedJobProducts()" class="flex-1 btn-primary py-2.5">Add Selected</button>
                     </div>
                 </div>
             </div>
@@ -4860,6 +4864,7 @@
         let currentBrand = null;
         let currentUserProfile = null;
         let _appInitialising = false; // guard against double-init from handleLogin + onAuthStateChange
+        let _appInitialised = false;  // stays true once app is running; prevents token-refresh from re-running initApp
         let viewScope = localStorage.getItem('teamwear_view_scope') || 'all'; // 'all' | 'mine'
         let allBrands = [];
         let isSuperAdmin = false;
@@ -5023,6 +5028,7 @@
             currentBrand = null;
             isSuperAdmin = false;
             allBrands = [];
+            _appInitialised = false;
             _appInitialising = false;
             document.getElementById('main-app').classList.add('hide');
             document.getElementById('auth-screen').classList.remove('hide');
@@ -5115,6 +5121,7 @@
             // Apply any feature access restrictions for this user
             await applyUserFeaturePermissions();
             showLaunchpad();
+            _appInitialised = true;
             _appInitialising = false;
         }
 
@@ -8523,7 +8530,9 @@
             // Listen for auth changes
             supabase.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'SIGNED_IN' && session?.user) {
-                    _appInitialising = false; // reset before each auth-state-driven init
+                    // Skip if the app is already running (e.g. Supabase silently refreshing the JWT)
+                    if (_appInitialised) return;
+                    _appInitialising = false;
                     await initApp(session.user);
                 } else if (event === 'SIGNED_OUT') {
                     _appInitialising = false;
@@ -11753,7 +11762,7 @@
                 case 'overview':   renderJobOverview(); break;
                 case 'products':   renderJobProducts(); break;
                 case 'club':       renderJobClubTab(); break;
-                case 'team':       loadJobTeams(); renderJobClubTeamSection(); break;
+                case 'team':       renderJobClubTeamSection(); break;
                 case 'design':     loadJobDesign(); break;
                 case 'orderform':  renderJobOrderForm(); break;
                 case 'production': renderJobProduction(); break;
@@ -11787,24 +11796,26 @@
             const rangeApproved = document.getElementById('jr-range-approved');
             if (rangeApproved) rangeApproved.checked = currentJob.range_approved || false;
 
+            const container = document.getElementById('jr-products-list');
+            const emptyEl = document.getElementById('jr-products-empty');
+
             if (!currentJob.club_id) {
-                document.getElementById('jr-products-list').innerHTML = '';
-                document.getElementById('jr-products-empty').classList.remove('hide');
-                document.getElementById('jr-products-empty').querySelector('p').textContent = 'Link a club to this job first to manage products.';
+                container.innerHTML = '';
+                emptyEl.classList.remove('hide');
+                emptyEl.querySelector('p').textContent = 'Link a club to this job first to manage products.';
                 return;
             }
 
-            const { data: clubProds } = await supabase
-                .from('club_products')
-                .select('*, products(*)')
-                .eq('club_id', currentJob.club_id)
-                .eq('is_active', true);
+            // Fetch job-specific products via job_products → club_products → products
+            const { data: jobProds } = await supabase
+                .from('job_products')
+                .select('*, club_products(*, products(*))')
+                .eq('job_id', currentJobId);
 
-            const container = document.getElementById('jr-products-list');
-            const emptyEl = document.getElementById('jr-products-empty');
-            if (!clubProds || clubProds.length === 0) {
+            if (!jobProds || jobProds.length === 0) {
                 container.innerHTML = '';
                 emptyEl.classList.remove('hide');
+                emptyEl.querySelector('p').textContent = 'No products selected for this job yet. Add products from the club\'s catalogue.';
                 return;
             }
             emptyEl.classList.add('hide');
@@ -11812,7 +11823,9 @@
             const tierKey = jobClub?.club_status || 'retail';
             const tierObj = brandPricingTiers.find(t => t.tier_key === tierKey);
             const tierName = tierObj?.tier_name || tierKey;
-            container.innerHTML = clubProds.map(cp => {
+            container.innerHTML = jobProds.map(jp => {
+                const cp = jp.club_products;
+                if (!cp) return '';
                 const tp = (cp.products?.tier_prices || {})[tierKey] || {};
                 const adultPrice = tp.adult != null ? `£${Number(tp.adult).toFixed(2)}` : '—';
                 const youthPrice = tp.youth != null ? `£${Number(tp.youth).toFixed(2)}` : null;
@@ -11826,28 +11839,74 @@
                         ${youthPrice ? `<div><p class="text-xs text-gray-500">${escHtml(tierName)} — Youth</p><p class="text-sm font-bold">${youthPrice}</p></div>` : ''}
                     </div>
                     ${cp.shopify_product_id ? '<span class="text-xs text-purple-400 flex-shrink-0">Shopify ✓</span>' : ''}
+                    <button onclick="removeJobProduct('${jp.id}')" class="text-red-400 hover:text-red-300 flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg" style="background:rgba(239,68,68,0.08)" title="Remove from job">✕</button>
                 </div>`;
             }).join('');
         }
 
-        async function showJobAddClubProductModal() {
+        let _jobProductSelections = new Set();
+
+        async function showJobProductPicker() {
             if (!currentJob?.club_id) { showToast('Link a club to this job first', 'error'); return; }
-            const club = clubs.find(c => c.id === currentJob.club_id);
-            if (!club) return;
-            if (!club.club_status) { showToast('Set a Partnership Level on this club first', 'error'); return; }
-            // Load existing club_products so the modal can mark already-assigned ones
+            // Fetch club's product catalogue
+            const { data: clubProds } = await supabase
+                .from('club_products')
+                .select('*, products(*)')
+                .eq('club_id', currentJob.club_id)
+                .eq('is_active', true);
+            // Fetch products already on this job
             const { data: existing } = await supabase
-                .from('club_products').select('product_id').eq('club_id', club.id).eq('is_active', true);
-            // Save previous context and set job's club as the active context for the shared modal
-            window._addProductFromJob = {
-                jobId: currentJobId,
-                prevClub: currentClub,
-                prevClubProducts: currentClubProducts
-            };
-            currentClub = club;
-            currentClubProducts = existing || [];
-            window._jobProductMode = true; // show ALL master catalogue products
-            showAddClubProductModal();
+                .from('job_products')
+                .select('club_product_id')
+                .eq('job_id', currentJobId);
+            const existingIds = new Set((existing || []).map(jp => jp.club_product_id));
+            const available = (clubProds || []).filter(cp => !existingIds.has(cp.id));
+            _jobProductSelections = new Set();
+            const listEl = document.getElementById('job-product-picker-list');
+            const emptyEl = document.getElementById('job-product-picker-empty');
+            if (!available.length) {
+                listEl.innerHTML = '';
+                emptyEl.classList.remove('hide');
+            } else {
+                emptyEl.classList.add('hide');
+                listEl.innerHTML = available.map(cp => `
+                    <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition hover:bg-white/5" style="border:1px solid rgba(255,255,255,0.07)">
+                        <input type="checkbox" value="${cp.id}" onchange="toggleJobProductSelection('${cp.id}', this.checked)" class="w-4 h-4 flex-shrink-0">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold leading-tight">${escHtml(cp.custom_name)}</p>
+                            <p class="text-xs text-gray-500">${escHtml(cp.products?.product_code || '')} · ${escHtml(cp.products?.item_name || '')}</p>
+                        </div>
+                    </label>`).join('');
+            }
+            document.getElementById('job-product-picker-modal').classList.remove('hide');
+        }
+
+        function toggleJobProductSelection(cpId, checked) {
+            if (checked) _jobProductSelections.add(cpId);
+            else _jobProductSelections.delete(cpId);
+        }
+
+        function closeJobProductPicker() {
+            document.getElementById('job-product-picker-modal').classList.add('hide');
+            _jobProductSelections = new Set();
+        }
+
+        async function addSelectedJobProducts() {
+            if (_jobProductSelections.size === 0) { showToast('Select at least one product', 'error'); return; }
+            const inserts = [..._jobProductSelections].map(cpId => ({ job_id: currentJobId, club_product_id: cpId }));
+            const { error } = await supabase.from('job_products').insert(inserts);
+            if (error) { showToast('Error adding products: ' + error.message, 'error'); return; }
+            closeJobProductPicker();
+            await renderJobProducts();
+            showToast(`${inserts.length} product${inserts.length !== 1 ? 's' : ''} added to job`);
+        }
+
+        async function removeJobProduct(jpId) {
+            if (!confirm('Remove this product from the job?')) return;
+            const { error } = await supabase.from('job_products').delete().eq('id', jpId);
+            if (error) { showToast('Error removing product', 'error'); return; }
+            await renderJobProducts();
+            showToast('Product removed from job');
         }
 
         async function toggleRangeApproved(checked) {
@@ -11907,10 +11966,6 @@
                     ${club.pantone_secondary ? `<span class="pantone-swatch" style="background:${club.pantone_secondary}"></span>` : ''}
                     ${club.pantone_accent ? `<span class="pantone-swatch" style="background:${club.pantone_accent}"></span>` : ''}
                 </div>` : ''}
-                <div class="mt-5 flex gap-3">
-                    <button onclick="syncClubCollectionForJob('${club.id}')" class="btn-primary text-sm">Create Shopify Collection (API)</button>
-                    <button onclick="generateShopifyCSVForClub('${club.id}')" class="btn-secondary text-sm">Download Shopify CSV</button>
-                </div>
             </div>`;
         }
 
@@ -12994,7 +13049,12 @@
             }
             if (result.error) { showToast(result.error.message, 'error'); return; }
             closeClubTeamModal();
-            renderClubTeams();
+            if (window._teamFromJob) {
+                window._teamFromJob = false;
+                await renderJobClubTeamSection();
+            } else {
+                renderClubTeams();
+            }
             showToast(teamId ? 'Team updated' : 'Team added');
             } catch (err) {
                 console.error('saveClubTeam error:', err);
@@ -13015,13 +13075,25 @@
         // =============================================
         async function renderJobClubTeamSection() {
             const container = document.getElementById('jr-club-team-section');
-            if (!container || !currentJob?.club_id) return;
-            const { data: teams } = await supabase.from('club_teams').select('*').eq('club_id', currentJob.club_id).order('team_name');
-            if (!teams?.length) {
-                container.innerHTML = '<p class="text-gray-600 text-sm">No teams set up for this club yet. Add teams in the club record.</p>';
+            if (!container) return;
+            if (!currentJob?.club_id) {
+                container.innerHTML = '<p class="text-gray-600 text-sm">Link a club to this job first to select a team.</p>';
                 return;
             }
+            const { data: teams } = await supabase.from('club_teams').select('*').eq('club_id', currentJob.club_id).order('team_name');
             const current = currentJob.club_team_id;
+            const actionButtons = `
+                <div class="flex gap-2 mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.07)">
+                    <button onclick="openNewTeamForJobClub()" class="btn-primary text-xs flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Create New Team
+                    </button>
+                    <button onclick="openClubFromJobTeams('${currentJob.club_id}')" class="btn-secondary text-xs">View All Teams in Club Record</button>
+                </div>`;
+            if (!teams?.length) {
+                container.innerHTML = `<p class="text-gray-600 text-sm mb-3">No teams set up for this club yet.</p>${actionButtons}`;
+                return;
+            }
             container.innerHTML = `
                 <p class="text-xs text-gray-500 mb-2">Select which team this job is for:</p>
                 <div class="flex flex-wrap gap-2 mb-3">
@@ -13030,12 +13102,29 @@
                 ${current ? (() => {
                     const t = teams.find(x => x.id === current);
                     if (!t) return '';
-                    return `<div class="p-3 rounded-xl" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2)">
+                    return `<div class="p-3 rounded-xl mb-3" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2)">
                         <p class="text-xs text-brand-400 font-semibold mb-1">Selected: ${escHtml(t.team_name)}</p>
                         ${t.coach_name ? `<p class="text-xs text-gray-400">Coach: ${escHtml(t.coach_name)}${t.coach_email ? ` · ${escHtml(t.coach_email)}` : ''}</p>` : ''}
                     </div>`;
                 })() : ''}
+                ${actionButtons}
             `;
+        }
+
+        async function openNewTeamForJobClub() {
+            if (!currentJob?.club_id) return;
+            const club = clubs.find(c => c.id === currentJob.club_id);
+            if (!club) return;
+            currentClub = club;
+            window._teamFromJob = true;
+            openClubTeamModal(null);
+        }
+
+        async function openClubFromJobTeams(clubId) {
+            pushNav({ type: 'job', jobId: currentJobId, label: currentJob?.job_name || 'Job' });
+            setClubDetailBackLabel('Back to Job');
+            await openClubDashboard(clubId);
+            showClubTab('teams');
         }
 
         async function setJobClubTeam(teamId) {
