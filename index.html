@@ -2374,6 +2374,16 @@
                     <button onclick="hideAddUserModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
                 <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">First Name</label>
+                            <input type="text" id="new-user-first-name" placeholder="Jane" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Last Name</label>
+                            <input type="text" id="new-user-last-name" placeholder="Smith" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                    </div>
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">Email Address *</label>
                         <input type="email" id="new-user-email" placeholder="user@example.com" class="w-full px-3 py-2 rounded-lg">
@@ -2397,6 +2407,51 @@
                 <div class="flex gap-3 mt-6">
                     <button onclick="hideAddUserModal()" class="flex-1 btn-secondary py-3">Cancel</button>
                     <button onclick="inviteNewUser()" class="flex-1 btn-primary py-3">Send Invite</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit User Modal -->
+        <div id="edit-user-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-md mx-4">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-bold">Edit User</h3>
+                    <button onclick="hideEditUserModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                <input type="hidden" id="edit-user-id">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">First Name</label>
+                            <input type="text" id="edit-user-first-name" placeholder="Jane" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Last Name</label>
+                            <input type="text" id="edit-user-last-name" placeholder="Smith" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Username</label>
+                        <input type="text" id="edit-user-username" placeholder="jsmith" class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Assign to Brand</label>
+                        <select id="edit-user-brand" class="w-full px-3 py-2 rounded-lg">
+                            <option value="">No brand</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Role</label>
+                        <select id="edit-user-role" class="w-full px-3 py-2 rounded-lg">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                            <option value="super_admin">Super Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="hideEditUserModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="saveEditUser()" class="flex-1 btn-primary py-3">Save Changes</button>
                 </div>
             </div>
         </div>
@@ -5615,18 +5670,23 @@
                     </label>`;
                 }).join('');
                 const brandName = user.brands?.name || '—';
+                const fullName = [user.first_name, user.last_name].filter(Boolean).join(' ');
+                const avatarLetter = (user.first_name || user.email || '?')[0].toUpperCase();
+                const userDataAttr = escHtml(JSON.stringify({id:user.id,first_name:user.first_name||'',last_name:user.last_name||'',username:user.username||'',brand_id:user.brand_id||'',role:user.role||'user'}));
                 return `
                 <div class="glass rounded-xl p-4">
                     <div class="flex items-center justify-between mb-3 flex-wrap gap-3">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold text-brand-400">${(user.email||'?')[0].toUpperCase()}</div>
+                            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-xs font-bold text-brand-400">${avatarLetter}</div>
                             <div>
-                                <span class="font-medium text-sm">${escHtml(user.email)}</span>
+                                ${fullName ? `<span class="font-medium text-sm">${escHtml(fullName)}</span>` : ''}
+                                <span class="font-medium text-sm ${fullName ? 'text-gray-400 ml-1' : ''}">${escHtml(user.email)}</span>
                                 ${user.role === 'super_admin' ? '<span class="text-purple-400 text-xs ml-2 px-2 py-0.5 rounded" style="background:rgba(167,139,250,0.1)">SUPER ADMIN</span>' : ''}
                                 <p class="text-gray-600 text-xs mt-0.5">${escHtml(brandName)}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
+                            <button onclick='showEditUserModal(${userDataAttr})' class="bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded text-sm">Edit</button>
                             <select onchange="assignUserToBrand('${user.id}', this.value)" class="bg-gray-700 border border-gray-600 px-3 py-1 rounded text-sm" ${user.role === 'super_admin' ? 'disabled' : ''}>
                                 <option value="">No brand</option>
                                 ${allBrands.map(b => `<option value="${b.id}" ${user.brand_id === b.id ? 'selected' : ''}>${escHtml(b.name)}</option>`).join('')}
@@ -5652,6 +5712,8 @@
         }
 
         function showAddUserModal() {
+            document.getElementById('new-user-first-name').value = '';
+            document.getElementById('new-user-last-name').value = '';
             document.getElementById('new-user-email').value = '';
             document.getElementById('new-user-role').value = 'user';
             // Populate brand select
@@ -5663,6 +5725,41 @@
 
         function hideAddUserModal() {
             document.getElementById('add-user-modal').classList.add('hide');
+        }
+
+        function showEditUserModal(user) {
+            document.getElementById('edit-user-id').value = user.id;
+            document.getElementById('edit-user-first-name').value = user.first_name || '';
+            document.getElementById('edit-user-last-name').value = user.last_name || '';
+            document.getElementById('edit-user-username').value = user.username || '';
+            document.getElementById('edit-user-role').value = user.role || 'user';
+            const brandSel = document.getElementById('edit-user-brand');
+            if (brandSel) {
+                brandSel.innerHTML = '<option value="">No brand</option>' +
+                    allBrands.map(b => `<option value="${b.id}" ${b.id === user.brand_id ? 'selected' : ''}>${escHtml(b.name)}</option>`).join('');
+            }
+            document.getElementById('edit-user-modal').classList.remove('hide');
+        }
+
+        function hideEditUserModal() {
+            document.getElementById('edit-user-modal').classList.add('hide');
+        }
+
+        async function saveEditUser() {
+            const id        = document.getElementById('edit-user-id').value;
+            const firstName = document.getElementById('edit-user-first-name').value.trim();
+            const lastName  = document.getElementById('edit-user-last-name').value.trim();
+            const username  = document.getElementById('edit-user-username').value.trim() || null;
+            const brandId   = document.getElementById('edit-user-brand').value || null;
+            const role      = document.getElementById('edit-user-role').value;
+            const { error } = await supabase.from('user_profiles')
+                .update({ first_name: firstName || null, last_name: lastName || null,
+                          username: username, brand_id: brandId, role })
+                .eq('id', id);
+            if (error) { showToast(error.message, 'error'); return; }
+            showToast('User updated');
+            hideEditUserModal();
+            loadAllUsers();
         }
 
         async function inviteNewUser() {
@@ -12953,13 +13050,14 @@
 
         async function loadBrandUsers() {
             if (!currentBrand) return;
-            const { data } = await supabase.from('user_profiles').select('id, email, username').eq('brand_id', currentBrand.id).order('email');
+            const { data } = await supabase.from('user_profiles').select('id, email, username, first_name, last_name').eq('brand_id', currentBrand.id).order('email');
             brandUsers = data || [];
         }
 
         function userDisplayName(u) {
             if (!u) return 'Unknown';
-            return u.username || u.email?.split('@')[0] || 'User';
+            const full = [u.first_name, u.last_name].filter(Boolean).join(' ');
+            return full || u.username || u.email?.split('@')[0] || 'User';
         }
 
         function populateUserAssignDropdown(selectId, currentAssignedId) {
@@ -14492,9 +14590,11 @@
         }
 
         // ── Create Design Task (modal) ────────────────────────────────────────
-        function openCreateDesignTaskModal(linkedJobId) {
+        async function openCreateDesignTaskModal(linkedJobId) {
             const modal = document.getElementById('create-design-task-modal');
             if (!modal) return;
+            // Ensure brand users are fresh for the designer dropdown
+            await loadBrandUsers();
             // Reset form
             document.getElementById('cdt-name').value = '';
             document.getElementById('cdt-due-date').value = '';
@@ -14513,7 +14613,7 @@
                 dsnSel.innerHTML = '<option value="">— Unassigned —</option>';
                 if (brandUsers && brandUsers.length) {
                     brandUsers.forEach(u => {
-                        const name = u.username || u.full_name || (u.email ? u.email.split('@')[0] : 'User');
+                        const name = userDisplayName(u);
                         dsnSel.innerHTML += `<option value="${u.id}" data-name="${escHtml(name)}">${escHtml(name)}</option>`;
                     });
                 }
@@ -14551,6 +14651,12 @@
             const btn = document.getElementById('cdt-save-btn');
             if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
 
+            // Safety: always re-enable the button after 30s in case the async chain hangs
+            const safetyTimer = setTimeout(() => {
+                if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
+                showToast('Request timed out — please try again', 'error');
+            }, 30000);
+
             try {
                 // Generate reference
                 const ref = await generateDesignRef();
@@ -14578,6 +14684,7 @@
                 };
 
                 const { data, error } = await supabase.from('design_tasks').insert(payload).select().single();
+                clearTimeout(safetyTimer);
                 if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
 
                 if (error) {
@@ -14595,6 +14702,7 @@
                 setTimeout(() => showDesignTask(data.id), 300);
 
             } catch (err) {
+                clearTimeout(safetyTimer);
                 console.error('Unexpected error creating design task:', err);
                 if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
                 showToast('Unexpected error — please try again', 'error');
@@ -14733,7 +14841,7 @@
                 dsnSel.innerHTML = '<option value="">— Unassigned —</option>';
                 if (brandUsers && brandUsers.length) {
                     brandUsers.forEach(u => {
-                        const name = u.full_name || (u.email ? u.email.split('@')[0] : 'User');
+                        const name = userDisplayName(u);
                         const sel  = u.id === task.assigned_designer_id ? 'selected' : '';
                         dsnSel.innerHTML += `<option value="${u.id}" data-name="${escHtml(name)}" ${sel}>${escHtml(name)}</option>`;
                     });
