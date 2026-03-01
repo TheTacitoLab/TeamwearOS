@@ -4852,6 +4852,18 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // =============================================
+        // GLOBAL ASYNC ERROR HANDLER
+        // Catches any unhandled promise rejection that slips through try-catch
+        // so the user always sees feedback instead of a silent failure.
+        // =============================================
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled async error:', event.reason);
+            if (typeof showToast === 'function') {
+                showToast('An unexpected error occurred — please check console', 'error');
+            }
+        });
+
+        // =============================================
         // APP STATE
         // =============================================
         let currentUser = null;
@@ -13808,6 +13820,7 @@
         }
 
         async function saveNewStage() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
             const name = document.getElementById('new-stage-name').value.trim();
             const color = document.getElementById('new-stage-color').value;
             if (!name) { showToast('Stage name is required', 'error'); return; }
@@ -14748,52 +14761,58 @@
 
         // ── Create Design Task (modal) ────────────────────────────────────────
         async function openCreateDesignTaskModal(linkedJobId) {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
             const modal = document.getElementById('create-design-task-modal');
             if (!modal) return;
-            // Ensure brand users are fresh for the designer dropdown
-            await loadBrandUsers();
-            // Reset form
-            document.getElementById('cdt-name').value = '';
-            document.getElementById('cdt-due-date').value = '';
-            document.getElementById('cdt-job-type').value = '';
+            try {
+                // Ensure brand users are fresh for the designer dropdown
+                await loadBrandUsers();
+                // Reset form
+                document.getElementById('cdt-name').value = '';
+                document.getElementById('cdt-due-date').value = '';
+                document.getElementById('cdt-job-type').value = '';
 
-            // Populate club dropdown
-            const clubSel = document.getElementById('cdt-club-id');
-            if (clubSel) {
-                clubSel.innerHTML = '<option value="">— Select Club —</option>' +
-                    clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
-            }
-
-            // Populate designer dropdown
-            const dsnSel = document.getElementById('cdt-designer-id');
-            if (dsnSel) {
-                dsnSel.innerHTML = '<option value="">— Unassigned —</option>';
-                if (brandUsers && brandUsers.length) {
-                    brandUsers.forEach(u => {
-                        const name = userDisplayName(u);
-                        dsnSel.innerHTML += `<option value="${u.id}" data-name="${escHtml(name)}">${escHtml(name)}</option>`;
-                    });
+                // Populate club dropdown
+                const clubSel = document.getElementById('cdt-club-id');
+                if (clubSel) {
+                    clubSel.innerHTML = '<option value="">— Select Club —</option>' +
+                        clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
                 }
-            }
 
-            // Pre-fill linked job if provided
-            const linkedJobRow = document.getElementById('cdt-linked-job-row');
-            const linkedJobDisplay = document.getElementById('cdt-linked-job-display');
-            const linkedJobIdInput = document.getElementById('cdt-linked-job-id');
-            if (linkedJobId) {
-                const job = jobs.find(j => j.id === linkedJobId);
-                if (linkedJobRow) linkedJobRow.classList.remove('hide');
-                if (linkedJobDisplay) linkedJobDisplay.value = job ? `${job.job_number||''} ${job.job_name||''}`.trim() : linkedJobId;
-                if (linkedJobIdInput) linkedJobIdInput.value = linkedJobId;
-                // Pre-fill club from job
-                if (job?.club_id && clubSel) clubSel.value = job.club_id;
-            } else {
-                if (linkedJobRow) linkedJobRow.classList.add('hide');
-                if (linkedJobIdInput) linkedJobIdInput.value = '';
-            }
+                // Populate designer dropdown
+                const dsnSel = document.getElementById('cdt-designer-id');
+                if (dsnSel) {
+                    dsnSel.innerHTML = '<option value="">— Unassigned —</option>';
+                    if (brandUsers && brandUsers.length) {
+                        brandUsers.forEach(u => {
+                            const name = userDisplayName(u);
+                            dsnSel.innerHTML += `<option value="${u.id}" data-name="${escHtml(name)}">${escHtml(name)}</option>`;
+                        });
+                    }
+                }
 
-            modal.classList.remove('hide');
-            setTimeout(() => document.getElementById('cdt-name')?.focus(), 100);
+                // Pre-fill linked job if provided
+                const linkedJobRow = document.getElementById('cdt-linked-job-row');
+                const linkedJobDisplay = document.getElementById('cdt-linked-job-display');
+                const linkedJobIdInput = document.getElementById('cdt-linked-job-id');
+                if (linkedJobId) {
+                    const job = jobs.find(j => j.id === linkedJobId);
+                    if (linkedJobRow) linkedJobRow.classList.remove('hide');
+                    if (linkedJobDisplay) linkedJobDisplay.value = job ? `${job.job_number||''} ${job.job_name||''}`.trim() : linkedJobId;
+                    if (linkedJobIdInput) linkedJobIdInput.value = linkedJobId;
+                    // Pre-fill club from job
+                    if (job?.club_id && clubSel) clubSel.value = job.club_id;
+                } else {
+                    if (linkedJobRow) linkedJobRow.classList.add('hide');
+                    if (linkedJobIdInput) linkedJobIdInput.value = '';
+                }
+
+                modal.classList.remove('hide');
+                setTimeout(() => document.getElementById('cdt-name')?.focus(), 100);
+            } catch (err) {
+                console.error('openCreateDesignTaskModal error:', err);
+                showToast('Could not open design task form — please try again', 'error');
+            }
         }
 
         function hideCreateDesignTaskModal() {
@@ -15168,32 +15187,37 @@
         // ── Save Overview ─────────────────────────────────────────────────────
         async function saveDesignTaskOverview() {
             if (!currentDesignTaskRecord?.id) return;
-            const dsnSel = document.getElementById('dt-designer-id');
-            const designerId   = dsnSel?.value || null;
-            const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+            try {
+                const dsnSel = document.getElementById('dt-designer-id');
+                const designerId   = dsnSel?.value || null;
+                const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
 
-            const payload = {
-                task_name:   document.getElementById('dt-task-name')?.value?.trim() || '',
-                club_id:     document.getElementById('dt-club-id')?.value || null,
-                job_id:      document.getElementById('dt-job-id')?.value || null,
-                due_date:    document.getElementById('dt-due-date')?.value || null,
-                design_brief: document.getElementById('dt-design-brief')?.value || '',
-                job_type:    currentDesignTaskRecord.job_type || null,
-                design_types: currentDesignTaskRecord.design_types || [],
-                products_required: currentDesignTaskRecord.products_required || [],
-                assigned_designer_id:   designerId,
-                assigned_designer_name: designerName
-            };
+                const payload = {
+                    task_name:   document.getElementById('dt-task-name')?.value?.trim() || '',
+                    club_id:     document.getElementById('dt-club-id')?.value || null,
+                    job_id:      document.getElementById('dt-job-id')?.value || null,
+                    due_date:    document.getElementById('dt-due-date')?.value || null,
+                    design_brief: document.getElementById('dt-design-brief')?.value || '',
+                    job_type:    currentDesignTaskRecord.job_type || null,
+                    design_types: currentDesignTaskRecord.design_types || [],
+                    products_required: currentDesignTaskRecord.products_required || [],
+                    assigned_designer_id:   designerId,
+                    assigned_designer_name: designerName
+                };
 
-            if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
+                if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
 
-            const { data, error } = await supabase.from('design_tasks').update(payload).eq('id', currentDesignTaskRecord.id).select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number)').single();
-            if (error) { showToast('Error saving task', 'error'); return; }
-            currentDesignTaskRecord = data;
-            currentDesignTask = data;
-            allDesignTasks = allDesignTasks.map(t => t.id === data.id ? data : t);
-            renderDesignTaskRecord();
-            showToast('Design task saved ✓');
+                const { data, error } = await supabase.from('design_tasks').update(payload).eq('id', currentDesignTaskRecord.id).select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number)').single();
+                if (error) { showToast('Error saving task: ' + error.message, 'error'); return; }
+                currentDesignTaskRecord = data;
+                currentDesignTask = data;
+                allDesignTasks = allDesignTasks.map(t => t.id === data.id ? data : t);
+                renderDesignTaskRecord();
+                showToast('Design task saved ✓');
+            } catch (err) {
+                console.error('saveDesignTaskOverview error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
+            }
         }
 
         // ── Club changed → load club products ────────────────────────────────
