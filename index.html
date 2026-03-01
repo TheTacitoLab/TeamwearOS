@@ -3858,11 +3858,16 @@
                         <h3 class="font-semibold text-lg">Club Jobs</h3>
                         <p class="text-gray-500 text-sm mt-1">All sales jobs linked to this club</p>
                     </div>
+                    <button onclick="openNewJobForClub()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Create Job
+                    </button>
                 </div>
                 <div id="club-jobs-list" class="space-y-3"></div>
                 <div id="club-jobs-empty" class="hide text-center py-12">
                     <div class="empty-icon">💼</div>
                     <p class="text-gray-500">No jobs linked to this club yet.</p>
+                    <button onclick="openNewJobForClub()" class="btn-primary text-sm mt-4">Create First Job</button>
                 </div>
             </div>
 
@@ -10082,6 +10087,8 @@
         }
 
         async function saveClubProduct() {
+            if (!currentClub) { showToast('No club selected', 'error'); return; }
+            try {
             const cpId = document.getElementById('edit-club-product-id').value;
             const productId = document.getElementById('cp-master-product').value;
             const customName = document.getElementById('cp-custom-name').value.trim();
@@ -10146,6 +10153,10 @@
             renderClubProducts();
             updateOverviewStats();
             showToast(cpId ? 'Product updated' : 'Product added to club');
+            } catch (err) {
+                console.error('saveClubProduct error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
+            }
         }
 
         async function removeClubProduct(cpId) {
@@ -10648,8 +10659,12 @@
             }).join('');
         }
 
-        function showCreateOrderFormModal() {
+        async function showCreateOrderFormModal() {
             if (!currentClub) return;
+            // Ensure club products are loaded (user may not have visited Products tab yet)
+            if (!currentClubProducts.length) {
+                await loadCurrentClubProducts();
+            }
             if (!currentClubProducts.length) {
                 showToast('Add club products first before creating an order form', 'error');
                 return;
@@ -10671,6 +10686,9 @@
         }
 
         async function createOrderForm() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
+            if (!currentClub) { showToast('No club selected', 'error'); return; }
+            try {
             const title = document.getElementById('of-title').value.trim();
             if (!title) { showToast('Form title is required', 'error'); return; }
             const formData = {
@@ -10678,7 +10696,7 @@
                 token: generateToken(),
                 season: document.getElementById('of-season').value.trim() || null,
                 description: document.getElementById('of-description').value.trim() || null,
-                is_active: true, created_by: currentUser.id
+                is_active: true, created_by: currentUser?.id || null
             };
             const { data, error } = await supabase.from('order_forms').insert(formData).select().single();
             if (error) { showToast(error.message, 'error'); return; }
@@ -10687,6 +10705,10 @@
             renderClubOrderForms();
             updateOverviewStats();
             showToast('Order form created! Share the link with the club.');
+            } catch (err) {
+                console.error('createOrderForm error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
+            }
         }
 
         function copyFormLink(url) {
@@ -11444,6 +11466,15 @@
             document.getElementById('job-modal').classList.remove('hide');
         }
 
+        function openNewJobForClub() {
+            openNewJobModal();
+            if (!currentClub) return;
+            const sel = document.getElementById('job-club-id');
+            if (sel) sel.value = currentClub.id;
+            const nameEl = document.getElementById('job-name');
+            if (nameEl && !nameEl.value) nameEl.value = currentClub.name;
+        }
+
         function openEditJobModal() {
             if (!currentJob) return;
             document.getElementById('job-modal-title').textContent = 'Edit Job';
@@ -11465,6 +11496,8 @@
         }
 
         async function saveJob() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
+            try {
             const jobName = document.getElementById('job-name').value.trim();
             if (!jobName) { showToast('Job name is required', 'error'); return; }
             const jobId = document.getElementById('job-id').value;
@@ -11526,6 +11559,10 @@
                 showJobTab(currentJobTab);
             } else {
                 showSalesView('home');
+            }
+            } catch (err) {
+                console.error('saveJob error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
             }
         }
 
@@ -12941,6 +12978,9 @@
         }
 
         async function saveClubTeam() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
+            if (!currentClub) { showToast('No club selected', 'error'); return; }
+            try {
             const teamId = document.getElementById('edit-club-team-id').value;
             const name = document.getElementById('ct-name').value.trim();
             if (!name) { showToast('Team name is required', 'error'); return; }
@@ -12967,6 +13007,10 @@
             closeClubTeamModal();
             renderClubTeams();
             showToast(teamId ? 'Team updated' : 'Team added');
+            } catch (err) {
+                console.error('saveClubTeam error:', err);
+                showToast('An unexpected error occurred — please try again', 'error');
+            }
         }
 
         async function deleteClubTeam(teamId) {
