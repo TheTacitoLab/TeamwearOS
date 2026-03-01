@@ -10689,19 +10689,27 @@
             try {
             const title = document.getElementById('of-title').value.trim();
             if (!title) { showToast('Form title is required', 'error'); return; }
+            const jobId = window._orderFormJobId || null;
             const formData = {
                 club_id: currentClub.id, brand_id: currentBrand.id, title,
                 token: generateToken(),
                 season: document.getElementById('of-season').value.trim() || null,
                 description: document.getElementById('of-description').value.trim() || null,
-                is_active: true, created_by: currentUser?.id || null
+                is_active: true, created_by: currentUser?.id || null,
+                job_id: jobId
             };
             const { data, error } = await supabase.from('order_forms').insert(formData).select().single();
             if (error) { showToast(error.message, 'error'); return; }
+            const createdFromJob = !!jobId;
+            window._orderFormJobId = null;
             currentOrderForms.unshift(data);
             hideOrderFormModal();
-            renderClubOrderForms();
-            updateOverviewStats();
+            if (createdFromJob) {
+                await renderJobOrderForm();
+            } else {
+                renderClubOrderForms();
+                updateOverviewStats();
+            }
             showToast('Order form created! Share the link with the club.');
             } catch (err) {
                 console.error('createOrderForm error:', err);
@@ -10950,10 +10958,24 @@
                     .eq('token', token).eq('is_active', true).single();
                 if (!form) { loadingEl.classList.add('hide'); errorEl.classList.remove('hide'); return; }
                 publicFormData = form;
-                const { data: clubProds } = await supabase.from('club_products')
-                    .select('*, products(fit_type, sizes)')
-                    .eq('club_id', form.clubs.id).eq('is_active', true);
-                publicFormProducts = clubProds || [];
+
+                // If the form was created from a job, show only that job's selected products.
+                // Otherwise fall back to all active club products (backward-compatible).
+                if (form.job_id) {
+                    const { data: jobProds } = await supabase
+                        .from('job_products')
+                        .select('*, club_products(*, products(fit_type, sizes))')
+                        .eq('job_id', form.job_id);
+                    publicFormProducts = (jobProds || [])
+                        .map(jp => jp.club_products)
+                        .filter(Boolean);
+                } else {
+                    const { data: clubProds } = await supabase.from('club_products')
+                        .select('*, products(fit_type, sizes)')
+                        .eq('club_id', form.clubs.id).eq('is_active', true);
+                    publicFormProducts = clubProds || [];
+                }
+
                 if (!publicFormProducts.length) { loadingEl.classList.add('hide'); errorEl.classList.remove('hide'); return; }
                 document.getElementById('pf-club-name').textContent = form.clubs.name;
                 document.getElementById('pf-brand-logo').textContent = form.clubs.brands?.name || 'TeamwearOS';
@@ -13405,49 +13427,91 @@
         // =============================================
         async function renderJobOrderForm() {
             const container = document.getElementById('jr-orderform-content');
-            if (!container || !currentJob?.club_id) {
-                container.innerHTML = `<div class="glass rounded-2xl p-6 text-center"><div class="empty-icon text-5xl mb-3">📝</div><p class="text-gray-500">Link a club to this job to create order forms.</p></div>`;
+            if (!container) return;
+            if (!currentJob?.club_id) {
+                container.innerHTML = `<div class="glass rounded-2xl p-6 text-center">
+                    <div class="empty-icon text-4xl mb-3">📝</div>
+                    <p class="text-gray-500">Link a club to this job to create order forms.</p>
+                </div>`;
                 return;
             }
-            // Load order forms for the linked club
-            const { data: forms } = await supabase.from('order_forms').select('*').eq('club_id', currentJob.club_id).order('created_at', { ascending: false });
+            // Load order forms linked to this specific job (not all club forms)
+            const { data: forms } = await supabase
+                .from('order_forms').select('*')
+                .eq('job_id', currentJobId)
+                .order('created_at', { ascending: false });
             if (!forms || forms.length === 0) {
-                container.innerHTML = `<div class="glass rounded-2xl p-6 text-center">
-                    <div class="empty-icon text-5xl mb-3">📝</div>
-                    <p class="text-gray-500 mb-4">No order forms yet for this club.</p>
+                container.innerHTML = `<div class="glass rounded-2xl p-8 text-center">
+                    <div class="empty-icon text-4xl mb-3">📝</div>
+                    <p class="text-gray-500 mb-1">No order forms for this job yet.</p>
+                    <p class="text-xs text-gray-600 mb-5">Forms created here are linked to this job and only include the products selected on the Products tab.</p>
                     <button onclick="createOrderFormForJob()" class="btn-primary text-sm">Create Order Form</button>
                 </div>`;
                 return;
             }
             const baseUrl = window.location.origin + window.location.pathname;
-            container.innerHTML = `<div class="flex items-center justify-between mb-4">
-                <h4 class="font-semibold">Order Forms for ${escHtml(currentJob.clubs?.name || '')}</h4>
-                <button onclick="createOrderFormForJob()" class="btn-primary text-sm">New Form</button>
-            </div>` +
-            forms.map(f => `<div class="glass rounded-xl p-4 mb-3">
-                <div class="flex items-start justify-between gap-3">
+            container.innerHTML = `
+                <div class="flex items-center justify-between mb-4">
                     <div>
-                        <p class="font-semibold">${escHtml(f.title)}</p>
-                        <p class="text-xs text-gray-500 mt-0.5">${f.season || ''} ${f.is_active ? '<span style="color:#16a34a">● Active</span>' : '<span style="color:#94a3b8">● Closed</span>'}</p>
+                        <h4 class="font-semibold">Order Forms</h4>
+                        <p class="text-xs text-gray-500 mt-0.5">Forms linked to this job — public link shows only this job's products</p>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="copyFormLink('${baseUrl}?form=${f.token}')" class="text-xs btn-secondary py-1 px-3">Copy Link</button>
-                        <a href="${baseUrl}?form=${f.token}" target="_blank" class="text-xs btn-secondary py-1 px-3">Preview</a>
-                        <button onclick="viewFormSubmissions('${f.id}')" class="text-xs btn-primary py-1 px-3">Submissions</button>
-                    </div>
+                    <button onclick="createOrderFormForJob()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        New Form
+                    </button>
                 </div>
-            </div>`).join('');
+                ${forms.map(f => {
+                    const formUrl = `${baseUrl}?form=${f.token}`;
+                    return `<div class="glass rounded-xl p-5 mb-3">
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span class="font-semibold">${escHtml(f.title)}</span>
+                                    <span class="badge ${f.is_active ? 'badge-success' : 'badge-danger'} text-xs">${f.is_active ? 'Active' : 'Closed'}</span>
+                                </div>
+                                ${f.season ? `<p class="text-xs text-gray-500 mb-1">Season: ${escHtml(f.season)}</p>` : ''}
+                                ${f.description ? `<p class="text-xs text-gray-400 mb-2">${escHtml(f.description)}</p>` : ''}
+                                <div class="flex items-center gap-2 rounded-lg px-3 py-2 mt-2" style="background:rgba(0,0,0,0.25)">
+                                    <span class="text-gray-600 text-xs flex-1 font-mono truncate">${formUrl}</span>
+                                    <button onclick="copyFormLink('${formUrl}')" class="text-brand-400 hover:text-brand-300 text-xs whitespace-nowrap">Copy</button>
+                                    <a href="${formUrl}" target="_blank" class="text-gray-500 hover:text-white text-xs whitespace-nowrap">Preview →</a>
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2 flex-shrink-0">
+                                <button onclick="viewFormSubmissions('${f.id}')" class="btn-primary text-xs py-1.5 px-3 whitespace-nowrap">Submissions</button>
+                                <button onclick="toggleFormStatus('${f.id}', ${!f.is_active})" class="btn-secondary text-xs py-1.5 px-3">
+                                    ${f.is_active ? 'Close Form' : 'Reopen'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('')}`;
         }
 
         async function createOrderFormForJob() {
             if (!currentJob?.club_id) { showToast('Link a club first', 'error'); return; }
-            // Open the existing order form modal but with job's club pre-set
             const clubObj = clubs.find(c => c.id === currentJob.club_id);
-            if (clubObj) {
-                // Set up the club context and open modal
-                window._currentClub = clubObj;
-                showCreateOrderFormModal();
+            if (!clubObj) { showToast('Club not found — please refresh', 'error'); return; }
+
+            // Require at least one product selected on the job
+            const { data: jobProds } = await supabase
+                .from('job_products').select('id').eq('job_id', currentJobId).limit(1);
+            if (!jobProds?.length) {
+                showToast('Add products to this job first before creating an order form', 'error');
+                return;
             }
+
+            // Set club context so createOrderForm() can read currentClub
+            currentClub = clubObj;
+            // Flag that this form is being created from a job
+            window._orderFormJobId = currentJobId;
+
+            // Pre-fill modal with job name
+            document.getElementById('of-title').value = currentJob.job_name || `${clubObj.name} Kit Order`;
+            document.getElementById('of-season').value = '';
+            document.getElementById('of-description').value = '';
+            document.getElementById('order-form-modal').classList.remove('hide');
         }
 
         // =============================================
