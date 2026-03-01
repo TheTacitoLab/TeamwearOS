@@ -4099,16 +4099,6 @@
                     </div>
                 </div>
 
-                <!-- External Links -->
-                <div class="modal-section">
-                    <p class="modal-section-title">External Links</p>
-                    <div>
-                        <label class="text-gray-400 text-xs mb-1 block">Google Drive Folder URL</label>
-                        <input type="url" id="club-google-drive-url" placeholder="https://drive.google.com/drive/folders/..." class="w-full px-3 py-2 rounded-lg text-sm">
-                        <p class="text-gray-600 text-xs mt-1">Paste the club's Google Drive folder link — a shortcut button will appear on the club overview.</p>
-                    </div>
-                </div>
-
                 <!-- Hidden legacy partner checkbox for JS compatibility -->
                 <input type="hidden" id="club-is-partner" value="false">
 
@@ -8980,8 +8970,7 @@
             document.getElementById('club-modal-title').textContent = 'Create New Club';
             document.getElementById('edit-club-id').value = '';
             ['club-name','club-suffix','club-slug','club-league','club-addr1','club-addr2',
-             'club-town','club-county','club-postcode','club-contact-name','club-contact-email','club-contact-phone',
-             'club-google-drive-url'].forEach(id => {
+             'club-town','club-county','club-postcode','club-contact-name','club-contact-email','club-contact-phone'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
@@ -9039,8 +9028,6 @@
             document.getElementById('club-contact-name').value = currentClub.contact_name || '';
             document.getElementById('club-contact-email').value = currentClub.contact_email || '';
             document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
-            const driveUrlEl = document.getElementById('club-google-drive-url');
-            if (driveUrlEl) driveUrlEl.value = currentClub.google_drive_url || '';
             const suffixStatus = document.getElementById('suffix-status');
             if (suffixStatus) { suffixStatus.textContent = '✓ Saved'; suffixStatus.className = 'absolute right-2 top-1/2 -translate-y-1/2 text-xs text-green-400'; }
             // Logo preview
@@ -9211,7 +9198,6 @@
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
-                google_drive_url: document.getElementById('club-google-drive-url')?.value.trim() || null,
                 logo_url: logoUrl
             };
             let result;
@@ -9631,16 +9617,7 @@
             ];
             el.innerHTML = rows.map(([label, value]) =>
                 `<div class="info-row"><span class="info-label">${escHtml(label)}</span><span class="info-value">${escHtml(value)}</span></div>`
-            ).join('') + (currentClub.google_drive_url ? `
-                <div class="mt-4 pt-4" style="border-top:1px solid #e2e8f0">
-                    <a href="${escHtml(currentClub.google_drive_url)}" target="_blank" rel="noopener noreferrer"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-md"
-                        style="background:#e8f0fe;color:#1558d6;border:1px solid #c5d3f8">
-                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z"/><path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2 2m-2-2v4"/></svg>
-                        Google Drive Folder
-                        <svg class="w-3 h-3 opacity-60 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    </a>
-                </div>` : '');
+            ).join('');
 
             // Update branding panel — prefer logo_url, fall back to club_crest_url
             const crestEl = document.getElementById('club-crest-display');
