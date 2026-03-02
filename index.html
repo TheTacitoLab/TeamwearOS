@@ -6581,9 +6581,10 @@
             if (brandPricingTiers.find(t => t.tier_key === key)) { showToast('Tier key already exists', 'error'); return; }
 
             const newTier = { brand_id: currentBrand.id, tier_key: key, tier_name: name, sort_order: brandPricingTiers.length };
-            const { data, error } = await supabase.from('brand_pricing_tiers').insert(newTier).select().single();
+            const { data, error } = await supabase.from('brand_pricing_tiers').upsert(newTier, { onConflict: 'brand_id,tier_key' }).select().single();
             if (error) { showToast(error.message, 'error'); return; }
-            brandPricingTiers.push(data);
+            const existingIdx = brandPricingTiers.findIndex(t => t.tier_key === data.tier_key);
+            if (existingIdx >= 0) { brandPricingTiers[existingIdx] = data; } else { brandPricingTiers.push(data); }
             keyEl.value = ''; nameEl.value = '';
             renderPricingTiersList();
             showToast(`Tier "${name}" added`);
@@ -6715,9 +6716,10 @@
             if (!key || !name) { showToast('Enter both a key and display name', 'error'); return; }
             if (brandPricingTiers.find(t => t.tier_key === key)) { showToast('That key already exists', 'error'); return; }
             const newTier = { brand_id: currentBrand.id, tier_key: key, tier_name: name, sort_order: brandPricingTiers.length };
-            const { data, error } = await supabase.from('brand_pricing_tiers').insert(newTier).select().single();
+            const { data, error } = await supabase.from('brand_pricing_tiers').upsert(newTier, { onConflict: 'brand_id,tier_key' }).select().single();
             if (error) { showToast(error.message, 'error'); return; }
-            brandPricingTiers.push(data);
+            const existingIdx = brandPricingTiers.findIndex(t => t.tier_key === data.tier_key);
+            if (existingIdx >= 0) { brandPricingTiers[existingIdx] = data; } else { brandPricingTiers.push(data); }
             keyEl.value = ''; nameEl.value = '';
             renderCsTiersList();
             showToast(`Price list "${name}" added`);
