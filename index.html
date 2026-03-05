@@ -1148,6 +1148,11 @@
                 <button onclick="toggleSkuInfoPopover(event)" id="sku-info-btn" class="bg-gray-700 hover:bg-gray-600 w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" title="Master Product SKU — how SKUs work">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
                 </button>
+                <!-- VAT status pill — always visible, click to toggle -->
+                <button id="vat-toggle-btn" onclick="csToggleVatFromToolbar()" title="VAT status — click to toggle on/off. Controls 'Charge Tax' in Shopify CSV, order totals and PDFs." class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors border">
+                    <span id="vat-status-dot" class="w-2 h-2 rounded-full flex-shrink-0"></span>
+                    <span id="vat-status-text"></span>
+                </button>
                 <div class="flex-1"></div>
                 <button onclick="showBulkDeleteModal()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 border border-red-500/50">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/></svg>
@@ -5361,6 +5366,7 @@
 
             // Load catalogue settings from localStorage
             loadCatalogueSettings();
+            renderVatStatus();   // sync toolbar pill + order row with loaded vatEnabled state
             if (!catalogueActivePriceKeys.length && brandPricingTiers.length) {
                 catalogueActivePriceKeys = [brandPricingTiers[0].tier_key];
             }
@@ -6865,22 +6871,50 @@
             renderCsRangesList();
             // Render fit types
             renderCsFitTypesList();
-            // Populate VAT toggle
-            const vatToggle = document.getElementById('cs-vat-enabled');
-            if (vatToggle) vatToggle.checked = vatEnabled;
+            // Sync VAT toggle (renderVatStatus handles both toolbar pill and settings checkbox)
+            renderVatStatus();
             // Reset bulk tag UI
             const bulkScope = document.getElementById('cs-bulk-tag-scope');
             if (bulkScope) { bulkScope.value = 'all'; csBulkTagScopeChange(); }
             document.getElementById('catalogue-settings-modal').classList.remove('hide');
         }
 
+        // Renders the toolbar VAT pill and keeps the settings checkbox + order row in sync.
+        // Call this whenever vatEnabled changes or on brand load.
+        function renderVatStatus() {
+            const btn  = document.getElementById('vat-toggle-btn');
+            const dot  = document.getElementById('vat-status-dot');
+            const text = document.getElementById('vat-status-text');
+            if (btn) {
+                if (vatEnabled) {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors border bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30';
+                    if (dot)  dot.className  = 'w-2 h-2 rounded-full flex-shrink-0 bg-green-400';
+                    if (text) text.textContent = 'VAT ON';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors border bg-gray-800 text-gray-500 border-gray-700 hover:bg-gray-700 hover:text-gray-400';
+                    if (dot)  dot.className  = 'w-2 h-2 rounded-full flex-shrink-0 bg-gray-600';
+                    if (text) text.textContent = 'VAT OFF';
+                }
+            }
+            // Keep the settings modal checkbox in sync
+            const toggle = document.getElementById('cs-vat-enabled');
+            if (toggle) toggle.checked = vatEnabled;
+            // Show/hide the VAT row in the order summary
+            const vatRow = document.getElementById('order-vat-row');
+            if (vatRow) vatRow.style.display = vatEnabled ? '' : 'none';
+        }
+
+        // Called from the toolbar pill — flips the current state
+        function csToggleVatFromToolbar() {
+            csToggleVat(!vatEnabled);
+        }
+
         function csToggleVat(enabled) {
             vatEnabled = enabled;
             saveCatalogueSettings();
-            // Reflect in order summary VAT row
-            const vatRow = document.getElementById('order-vat-row');
-            if (vatRow) vatRow.style.display = enabled ? '' : 'none';
-            updateOrderTotals();
+            renderVatStatus();
+            // Refresh order totals (function is defined in the order-builder section)
+            if (typeof recalculateOrder === 'function') recalculateOrder();
         }
 
         function hideCatalogueSettings() {
