@@ -1123,21 +1123,6 @@
                 </span>
             </div>
 
-            <!-- Uniform Structure Guide -->
-            <div class="glass rounded-2xl p-4 mb-6 border" style="border-color:rgba(59,130,246,0.2)">
-                <div class="flex items-start gap-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
-                    <div class="flex-1">
-                        <p class="text-sm font-semibold text-brand-400 mb-1">Master Product SKU</p>
-                        <p class="text-xs text-gray-400 mb-2">Enter your brand's master product SKU in whatever format your brand uses — e.g. <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">APX-ATL-001</code> or <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">NK/RANGE/001</code>. The club suffix and size will be appended automatically according to your brand's SKU Format setting.</p>
-                        <div class="grid grid-cols-2 gap-3 text-xs text-gray-500">
-                            <div><span class="text-gray-300 font-medium">Master SKU</span> — the base code you define for each product</div>
-                            <div><span class="text-gray-300 font-medium">Club SKU</span> — club suffix &amp; size appended automatically via SKU Format</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Action Bar -->
             <div class="flex flex-wrap gap-4 mb-6">
                 <button onclick="showAddProductModal()" class="bg-brand-500 hover:bg-brand-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
@@ -1159,6 +1144,9 @@
                 <button onclick="showCatalogueSettings()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Catalogue Settings
+                </button>
+                <button onclick="toggleSkuInfoPopover(event)" id="sku-info-btn" class="bg-gray-700 hover:bg-gray-600 w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" title="Master Product SKU — how SKUs work">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
                 </button>
                 <div class="flex-1"></div>
                 <button onclick="showBulkDeleteModal()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 border border-red-500/50">
@@ -2058,8 +2046,8 @@
                     <span class="text-gray-400">Subtotal</span>
                     <span id="order-subtotal" class="text-xl font-semibold">£0.00</span>
                 </div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-400">VAT (20% on adult items)</span>
+                <div id="order-vat-row" class="flex justify-between items-center mb-4">
+                    <span class="text-gray-400">VAT (20%)</span>
                     <span id="order-vat" class="text-xl font-semibold">£0.00</span>
                 </div>
                 <div class="flex justify-between items-center mb-6 pt-4 border-t border-gray-800">
@@ -4181,6 +4169,31 @@
         <!-- ============================================================
              MODAL: Catalogue Settings
              ============================================================ -->
+        <!-- ── Tag Editor Popover ──────────────────────────────────────────── -->
+        <div id="tag-editor-popover" class="hide fixed z-[200] w-72 glass rounded-2xl p-4 shadow-2xl border border-white/10">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Edit Tags</p>
+            <div id="tag-editor-chips" class="flex flex-wrap gap-1 min-h-6 mb-3"></div>
+            <div class="flex gap-2">
+                <input type="text" id="tag-editor-input" placeholder="Add tag…" class="flex-1 px-2.5 py-1.5 rounded-lg text-xs bg-gray-800 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-brand-500" onkeydown="if(event.key==='Enter'){event.preventDefault();addTagFromEditor();}">
+                <button onclick="addTagFromEditor()" class="btn-primary text-xs px-3 py-1.5 rounded-lg">Add</button>
+            </div>
+        </div>
+
+        <!-- ── SKU Info Popover ───────────────────────────────────────────── -->
+        <div id="sku-info-popover" class="hide fixed z-[200] w-80 glass rounded-2xl p-5 shadow-2xl border" style="border-color:rgba(59,130,246,0.25)">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-brand-400 mb-1">Master Product SKU</p>
+                    <p class="text-xs text-gray-400 mb-3">Enter your brand's master product SKU in whatever format your brand uses — e.g. <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">APX-ATL-001</code> or <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">NK/RANGE/001</code>. The club suffix and size will be appended automatically according to your brand's SKU Format setting.</p>
+                    <div class="grid grid-cols-2 gap-3 text-xs text-gray-500">
+                        <div><span class="text-gray-300 font-medium">Master SKU</span><br>The base code you define for each product</div>
+                        <div><span class="text-gray-300 font-medium">Club SKU</span><br>Club suffix &amp; size appended automatically via SKU Format</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="catalogue-settings-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
             <div class="glass rounded-2xl w-full max-w-2xl mx-4 my-auto">
                 <div class="flex justify-between items-center p-6 border-b border-white/5">
@@ -4192,8 +4205,25 @@
                 </div>
                 <div class="p-6 space-y-6">
 
-                    <!-- Pricing Tiers -->
+                    <!-- VAT Settings -->
                     <div>
+                        <h4 class="font-semibold text-brand-400 mb-1">VAT Settings</h4>
+                        <p class="text-gray-500 text-xs mb-3">Controls whether VAT is included on adult, women's and accessory products. Youth is always zero-rated. Disable if your business is not VAT registered.</p>
+                        <label class="flex items-center justify-between cursor-pointer select-none bg-gray-900/50 rounded-xl px-4 py-3">
+                            <div>
+                                <span class="text-sm font-medium">Charge VAT on Adult, Women's &amp; Accessories</span>
+                                <p class="text-xs text-gray-500 mt-0.5">Affects order totals, Purchase Order PDFs and Shopify CSV "Charge Tax" column</p>
+                            </div>
+                            <div class="relative ml-4 flex-shrink-0">
+                                <input type="checkbox" id="cs-vat-enabled" class="sr-only peer" onchange="csToggleVat(this.checked)">
+                                <div class="w-11 h-6 bg-gray-700 peer-checked:bg-brand-500 rounded-full transition-colors duration-200"></div>
+                                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Pricing Tiers -->
+                    <div class="pt-4 border-t border-white/5">
                         <div class="flex items-center justify-between mb-3">
                             <div>
                                 <h4 class="font-semibold text-brand-400">Price Lists</h4>
@@ -4248,6 +4278,27 @@
                         <div class="flex gap-2">
                             <input type="text" id="cs-new-fittype" placeholder="e.g. Ladies Fit, Junior" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <button onclick="csAddFitType()" class="btn-primary text-sm px-4">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Tags -->
+                    <div class="pt-4 border-t border-white/5">
+                        <h4 class="font-semibold text-brand-400 mb-1">Bulk Tags</h4>
+                        <p class="text-gray-500 text-xs mb-3">Add or remove a Shopify tag across multiple products at once. You can also edit tags product-by-product directly in the catalogue table.</p>
+                        <div class="space-y-2">
+                            <input type="text" id="cs-bulk-tag-input" placeholder="Tag e.g. teamwear" class="w-full px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <div class="flex gap-2 items-center">
+                                <select id="cs-bulk-tag-scope" onchange="csBulkTagScopeChange()" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
+                                    <option value="all">All Products</option>
+                                    <option value="range">By Range</option>
+                                    <option value="category">By Category</option>
+                                </select>
+                                <select id="cs-bulk-tag-scope-value" class="flex-1 px-3 py-2 rounded-lg text-sm hide" style="background:#f8fafc;border:1px solid #e2e8f0"></select>
+                            </div>
+                            <div class="flex gap-2 pt-1">
+                                <button onclick="csBulkApplyTag()" class="flex-1 btn-primary text-sm py-2">+ Add Tag to Products</button>
+                                <button onclick="csBulkRemoveTag()" class="flex-1 text-sm py-2 rounded-lg font-semibold bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 transition-colors">− Remove Tag</button>
+                            </div>
                         </div>
                     </div>
 
@@ -4945,6 +4996,7 @@
         let catalogueRangePrefixes = {};      // {rangeName: skuPrefix} — covers DB ranges AND custom ranges
         let catalogueCustomFitTypes = [];     // persisted in localStorage per brand
         let catalogueActivePriceKeys = [];    // which tier keys to show in the catalogue table (array)
+        let vatEnabled = true;                // master VAT toggle — false for non-VAT-registered brands
         let clubImages = [];
         let orderLines = [];
         let poSequence = 1;
@@ -6049,7 +6101,10 @@
                     <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.category || '-')}</td>
                     <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.range_name || '-')}</td>
                     ${priceCells}
-                    <td class="py-3 pr-3">${renderProductTagChips(p.shopify_tags)}</td>
+                    <td id="product-tags-${p.id}" class="py-3 pr-3 cursor-pointer group" onclick="openTagEditor(event, '${p.id}')">
+                        ${renderProductTagChips(p.shopify_tags)}
+                        <svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </td>
                     <td class="py-3 text-center whitespace-nowrap">
                         <button onclick="editProduct('${p.id}')" class="text-brand-400 hover:text-brand-300 text-sm mr-2">Edit</button>
                         <button onclick="showDeleteProductModal('${p.id}')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
@@ -6095,6 +6150,159 @@
             if (!arr.length) return '<span class="text-gray-700 text-xs">—</span>';
             return arr.slice(0, 3).map(t => `<span class="inline-block px-1.5 py-0.5 rounded text-xs bg-gray-800 text-gray-400 mr-1">${escHtml(t)}</span>`).join('') + (arr.length > 3 ? `<span class="text-gray-600 text-xs">+${arr.length - 3}</span>` : '');
         }
+
+        // ── Inline Tag Editor ─────────────────────────────────────────────────
+        let _tagEditorProductId = null;
+        let _tagEditorTags = [];
+
+        function openTagEditor(event, productId) {
+            event.stopPropagation();
+            _tagEditorProductId = productId;
+            const p = products.find(x => x.id === productId);
+            _tagEditorTags = p ? (Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : [])) : [];
+            renderTagEditorChips();
+            const popover = document.getElementById('tag-editor-popover');
+            popover.classList.remove('hide');
+            // Position below the clicked cell, clamped to viewport
+            const rect = event.currentTarget.getBoundingClientRect();
+            const scrollY = window.scrollY;
+            const pw = 288; // w-72
+            let left = rect.left;
+            if (left + pw > window.innerWidth - 12) left = window.innerWidth - pw - 12;
+            if (left < 8) left = 8;
+            popover.style.top = (rect.bottom + scrollY + 6) + 'px';
+            popover.style.left = left + 'px';
+            const inp = document.getElementById('tag-editor-input');
+            inp.value = '';
+            inp.focus();
+        }
+
+        function closeTagEditor() {
+            document.getElementById('tag-editor-popover').classList.add('hide');
+            _tagEditorProductId = null;
+        }
+
+        function renderTagEditorChips() {
+            document.getElementById('tag-editor-chips').innerHTML = _tagEditorTags.length
+                ? _tagEditorTags.map(t => `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-700 text-gray-200">${escHtml(t)}<button type="button" onclick="removeTagFromEditor('${escHtml(t)}')" class="text-gray-400 hover:text-red-400 leading-none">&times;</button></span>`).join('')
+                : '<span class="text-gray-600 text-xs">No tags yet</span>';
+        }
+
+        async function addTagFromEditor() {
+            const inp = document.getElementById('tag-editor-input');
+            const tag = inp.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag || _tagEditorTags.includes(tag)) { inp.value = ''; return; }
+            _tagEditorTags.push(tag);
+            inp.value = '';
+            renderTagEditorChips();
+            await saveTagEditorTags();
+        }
+
+        async function removeTagFromEditor(tag) {
+            _tagEditorTags = _tagEditorTags.filter(t => t !== tag);
+            renderTagEditorChips();
+            await saveTagEditorTags();
+        }
+
+        async function saveTagEditorTags() {
+            if (!_tagEditorProductId) return;
+            const newTags = _tagEditorTags.length ? _tagEditorTags : null;
+            const { error } = await supabase
+                .from('products')
+                .update({ shopify_tags: newTags })
+                .eq('id', _tagEditorProductId);
+            if (!error) {
+                const p = products.find(x => x.id === _tagEditorProductId);
+                if (p) p.shopify_tags = newTags;
+                // Refresh just this row's tag cell
+                const cell = document.getElementById(`product-tags-${_tagEditorProductId}`);
+                if (cell) {
+                    cell.innerHTML = renderProductTagChips(newTags) +
+                        `<svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>`;
+                }
+            }
+        }
+
+        // ── Bulk Tag Operations (from Catalogue Settings) ──────────────────────
+        function csBulkTagScopeChange() {
+            const scope = document.getElementById('cs-bulk-tag-scope').value;
+            const valSel = document.getElementById('cs-bulk-tag-scope-value');
+            if (scope === 'all') { valSel.classList.add('hide'); return; }
+            valSel.classList.remove('hide');
+            const items = scope === 'range'
+                ? [...new Set(products.map(p => p.range_name).filter(Boolean))]
+                : [...new Set(products.map(p => p.category).filter(Boolean))];
+            valSel.innerHTML = items.map(v => `<option value="${escHtml(v)}">${escHtml(v)}</option>`).join('');
+        }
+
+        async function csBulkApplyTag() {
+            const tag = document.getElementById('cs-bulk-tag-input').value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { showToast('Enter a tag first', 'error'); return; }
+            const scope = document.getElementById('cs-bulk-tag-scope').value;
+            const scopeVal = document.getElementById('cs-bulk-tag-scope-value').value;
+            let targets = products;
+            if (scope === 'range') targets = products.filter(p => p.range_name === scopeVal);
+            else if (scope === 'category') targets = products.filter(p => p.category === scopeVal);
+            let updated = 0;
+            for (const p of targets) {
+                const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                if (tags.includes(tag)) continue;
+                tags.push(tag);
+                const { error } = await supabase.from('products').update({ shopify_tags: tags }).eq('id', p.id);
+                if (!error) { p.shopify_tags = tags; updated++; }
+            }
+            renderProductsTable();
+            showToast(`Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        async function csBulkRemoveTag() {
+            const tag = document.getElementById('cs-bulk-tag-input').value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { showToast('Enter a tag first', 'error'); return; }
+            const scope = document.getElementById('cs-bulk-tag-scope').value;
+            const scopeVal = document.getElementById('cs-bulk-tag-scope-value').value;
+            let targets = products;
+            if (scope === 'range') targets = products.filter(p => p.range_name === scopeVal);
+            else if (scope === 'category') targets = products.filter(p => p.category === scopeVal);
+            let updated = 0;
+            for (const p of targets) {
+                const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                const newTags = tags.filter(t => t !== tag);
+                if (newTags.length === tags.length) continue;
+                const newVal = newTags.length ? newTags : null;
+                const { error } = await supabase.from('products').update({ shopify_tags: newVal }).eq('id', p.id);
+                if (!error) { p.shopify_tags = newVal; updated++; }
+            }
+            renderProductsTable();
+            showToast(`Removed "${tag}" from ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        // ── SKU Info Popover ──────────────────────────────────────────────────
+        function toggleSkuInfoPopover(event) {
+            event.stopPropagation();
+            const popover = document.getElementById('sku-info-popover');
+            if (!popover.classList.contains('hide')) { popover.classList.add('hide'); return; }
+            const btn = document.getElementById('sku-info-btn');
+            const rect = btn.getBoundingClientRect();
+            const scrollY = window.scrollY;
+            const pw = 320; // w-80
+            let left = rect.right - pw;
+            if (left < 8) left = 8;
+            if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+            popover.style.top = (rect.bottom + scrollY + 8) + 'px';
+            popover.style.left = left + 'px';
+            popover.classList.remove('hide');
+        }
+
+        // Close popovers on outside click
+        document.addEventListener('click', function(e) {
+            const tagPopover = document.getElementById('tag-editor-popover');
+            if (tagPopover && !tagPopover.classList.contains('hide') && !tagPopover.contains(e.target)) closeTagEditor();
+            const skuPopover = document.getElementById('sku-info-popover');
+            if (skuPopover && !skuPopover.classList.contains('hide') &&
+                !skuPopover.contains(e.target) && !document.getElementById('sku-info-btn')?.contains(e.target)) {
+                skuPopover.classList.add('hide');
+            }
+        });
 
         function populateFilterDropdowns() {
             // Get unique categories and ranges (from products + custom catalogue settings)
@@ -6615,6 +6823,7 @@
                     });
                     catalogueCustomFitTypes = s.fitTypes || [];
                     catalogueActivePriceKeys = s.activePriceKeys || (s.activePriceKey ? [s.activePriceKey] : []);
+                    vatEnabled = s.vatEnabled !== false; // default true
                 }
             } catch (e) { /* ignore */ }
         }
@@ -6626,7 +6835,8 @@
                     ranges: catalogueCustomRanges,
                     rangePrefixes: catalogueRangePrefixes,
                     fitTypes: catalogueCustomFitTypes,
-                    activePriceKeys: catalogueActivePriceKeys
+                    activePriceKeys: catalogueActivePriceKeys,
+                    vatEnabled: vatEnabled
                 }));
             } catch (e) { /* ignore */ }
         }
@@ -6655,7 +6865,22 @@
             renderCsRangesList();
             // Render fit types
             renderCsFitTypesList();
+            // Populate VAT toggle
+            const vatToggle = document.getElementById('cs-vat-enabled');
+            if (vatToggle) vatToggle.checked = vatEnabled;
+            // Reset bulk tag UI
+            const bulkScope = document.getElementById('cs-bulk-tag-scope');
+            if (bulkScope) { bulkScope.value = 'all'; csBulkTagScopeChange(); }
             document.getElementById('catalogue-settings-modal').classList.remove('hide');
+        }
+
+        function csToggleVat(enabled) {
+            vatEnabled = enabled;
+            saveCatalogueSettings();
+            // Reflect in order summary VAT row
+            const vatRow = document.getElementById('order-vat-row');
+            if (vatRow) vatRow.style.display = enabled ? '' : 'none';
+            updateOrderTotals();
         }
 
         function hideCatalogueSettings() {
@@ -8690,8 +8915,8 @@
                 const lineTotal = (price || 0) * line.quantity;
                 subtotal += lineTotal;
 
-                // VAT only on adult
-                if (line.fit === 'Adult' && !product.is_single_price) {
+                // VAT on adult, women and accessories when vatEnabled; youth always zero-rated
+                if (vatEnabled && !line.fit?.toLowerCase().includes('youth')) {
                     vatAmount += lineTotal * 0.2;
                 }
 
@@ -8816,7 +9041,7 @@
                 const lineTotal = (price || 0) * line.quantity;
                 subtotal += lineTotal;
                 
-                if (line.fit === 'Adult' && !product.is_single_price) {
+                if (vatEnabled && !line.fit?.toLowerCase().includes('youth')) {
                     vatAmount += lineTotal * 0.2;
                 }
             }
@@ -9202,6 +9427,7 @@
             // ── Tax per fit (UK VAT rules) ───────────────────────────────
             // Adult = TRUE, Women's = TRUE, Youth = FALSE (zero-rated), One Size = TRUE by default
             function taxForFit(fit) {
+                if (!vatEnabled) return 'FALSE';
                 return fit.toLowerCase().includes('youth') ? 'FALSE' : 'TRUE';
             }
 
