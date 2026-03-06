@@ -655,63 +655,89 @@
 
         /* ── Design Task View V2 ───────────────────────── */
 
-        /* Brief header panel */
-        .dt-brief-panel { background:#fff; border-bottom:1px solid #e2e8f0; transition:all 0.3s; }
-        .dt-brief-panel-header { display:flex; align-items:center; justify-content:space-between; padding:10px 24px; cursor:pointer; }
-        .dt-brief-panel-header:hover { background:#f8fafc; }
-        .dt-brief-panel-body { padding:0 24px 16px; }
-        .dt-brief-field { margin-bottom:0; }
-        .dt-brief-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:2px; }
+        /* Slim task title bar (below nav row) */
+        .dt-title-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:10px 24px; border-top:1px solid #f1f5f9; border-bottom:1px solid #e2e8f0; background:#fff; }
+        .dt-title-bar-left h1 { font-size:17px; font-weight:800; color:#0f172a; margin:0 0 2px; }
+        .dt-title-bar-left .dt-title-meta { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+        .dt-title-bar-left .dt-title-meta span { font-size:12px; color:#64748b; }
+        .dt-title-bar-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+        /* Brief field styles (used inside stage panel) */
+        .dt-brief-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:3px; }
         .dt-brief-value { font-size:13px; color:#0f172a; line-height:1.5; }
-        .dt-brief-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px 20px; }
+        .dt-brief-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px 20px; }
+        .dt-brief-field { }
 
         /* Stage progress bar */
         .dt-stage-progress-wrap { height:4px; background:#e2e8f0; position:relative; }
         .dt-stage-progress-fill { height:100%; background:linear-gradient(90deg,#00e5cc,#22c55e); transition:width 0.4s ease; position:absolute; top:0; left:0; }
 
-        /* Stage tabs */
-        .dt-stage-tabs { display:flex; background:#fff; border-bottom:1px solid #e2e8f0; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-behavior:smooth; }
-        .dt-stage-tab { flex:0 0 auto; display:flex; align-items:center; gap:8px; padding:12px 20px; font-size:13px; font-weight:600; color:#64748b; background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
-        .dt-stage-tab:disabled { opacity:0.45; cursor:not-allowed; }
+        /* Stage tabs — full width, 4 equal columns */
+        .dt-stage-tabs { display:grid; grid-template-columns:repeat(4,1fr); background:#fff; border-bottom:1px solid #e2e8f0; }
+        .dt-stage-tab { display:flex; align-items:center; justify-content:center; gap:8px; padding:13px 12px; font-size:12px; font-weight:700; color:#64748b; background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer; transition:all 0.2s; white-space:nowrap; border-right:1px solid #f1f5f9; text-align:center; }
+        .dt-stage-tab:last-child { border-right:none; }
+        .dt-stage-tab:disabled { opacity:0.4; cursor:not-allowed; }
         .dt-stage-tab.st-not_started  { }
-        .dt-stage-tab.st-in_progress  { color:#1d4ed8; border-bottom-color:#1d4ed8; }
-        .dt-stage-tab.st-in_review    { color:#b45309; border-bottom-color:#f59e0b; }
-        .dt-stage-tab.st-revisions_required { color:#dc2626; border-bottom-color:#ef4444; }
-        .dt-stage-tab.st-approved     { color:#16a34a; border-bottom-color:#22c55e; }
-        .dt-stage-tab.st-declined     { color:#dc2626; border-bottom-color:#ef4444; }
-        .dt-stage-tab.st-skipped      { color:#16a34a; border-bottom-color:#86efac; border-bottom-style:dashed; }
-        .dt-stage-tab.active          { font-weight:700; background:rgba(0,229,204,0.05); }
-
-        /* Stage icon check */
-        .dt-stage-tab .stage-icon { width:20px; height:20px; border-radius:50%; border:2px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; }
+        .dt-stage-tab.st-in_progress  { color:#1d4ed8; border-bottom-color:#1d4ed8; background:rgba(37,99,235,0.03); }
+        .dt-stage-tab.st-in_review    { color:#b45309; border-bottom-color:#f59e0b; background:rgba(245,158,11,0.04); }
+        .dt-stage-tab.st-revisions_required { color:#dc2626; border-bottom-color:#ef4444; background:rgba(239,68,68,0.03); }
+        .dt-stage-tab.st-approved     { color:#16a34a; border-bottom-color:#22c55e; background:rgba(34,197,94,0.04); }
+        .dt-stage-tab.st-declined     { color:#dc2626; border-bottom-color:#ef4444; background:rgba(239,68,68,0.03); }
+        .dt-stage-tab.st-skipped      { color:#16a34a; border-bottom-color:#86efac; border-bottom-style:dashed; background:rgba(34,197,94,0.02); }
+        .dt-stage-tab.active          { background:rgba(0,229,204,0.07) !important; }
+        .dt-stage-tab .stage-icon { width:22px; height:22px; border-radius:50%; border:2px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; }
         .dt-stage-tab.st-approved .stage-icon { background:#22c55e; border-color:#22c55e; color:#fff; }
         .dt-stage-tab.st-skipped .stage-icon { background:#86efac; border-color:#86efac; color:#166534; }
         .dt-stage-tab.st-declined .stage-icon { background:#ef4444; border-color:#ef4444; color:#fff; }
 
-        /* Stage panel */
-        .dt-stage-panel { padding:24px; max-width:960px; margin:0 auto; }
-        @media(max-width:768px) { .dt-stage-panel { padding:16px; } }
+        /* Two-column stage layout */
+        .dt-stage-layout { display:grid; grid-template-columns:1fr 300px; min-height:calc(100vh - 220px); align-items:start; }
+        @media(max-width:1024px) { .dt-stage-layout { grid-template-columns:1fr 260px; } }
+        @media(max-width:768px)  { .dt-stage-layout { grid-template-columns:1fr; } }
+        .dt-stage-content { padding:24px; border-right:1px solid #e2e8f0; }
+        @media(max-width:768px) { .dt-stage-content { border-right:none; } }
 
-        /* Stage status selector */
-        .ds-status-selector { display:flex; flex-direction:column; gap:8px; }
-        .ds-status-option { padding:10px 14px; border-radius:10px; border:1.5px solid #e2e8f0; background:#f8fafc; cursor:pointer; font-size:13px; font-weight:600; transition:all 0.15s; display:flex; align-items:center; gap:10px; }
-        .ds-status-option:hover { border-color:#94a3b8; background:#fff; }
-        .ds-status-option.selected { box-shadow:0 0 0 2px currentColor; }
-        .ds-status-option.opt-not_started  { color:#64748b; }
-        .ds-status-option.opt-in_progress  { color:#1d4ed8; }
-        .ds-status-option.opt-in_review    { color:#b45309; }
-        .ds-status-option.opt-revisions_required { color:#dc2626; }
-        .ds-status-option.opt-approved     { color:#16a34a; }
-        .ds-status-option.opt-declined     { color:#dc2626; }
-        .ds-status-option.opt-skipped      { color:#16a34a; }
-        .ds-status-dot { width:8px; height:8px; border-radius:50%; background:currentColor; flex-shrink:0; }
+        /* Sticky right sidebar */
+        .dt-stage-sidebar { padding:20px; background:#f8fafc; position:sticky; top:0; max-height:100vh; overflow-y:auto; }
+
+        /* Brief field grid in Stage 1 */
+        .ds-brief-field { padding:10px 16px; border-bottom:1px solid #e2e8f0; display:flex; flex-direction:column; gap:3px; }
+        .ds-brief-field:last-child { border-bottom:none; }
+        .ds-brief-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; }
+        .ds-brief-value { font-size:13px; font-weight:500; color:#0f172a; line-height:1.4; }
+        .dt-sidebar-section { margin-bottom:20px; }
+        .dt-sidebar-section:last-child { margin-bottom:0; }
+        .dt-sidebar-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#94a3b8; margin-bottom:10px; }
+
+        /* Stage action buttons in sidebar */
+        .ds-action-btn-primary { width:100%; padding:11px 16px; background:linear-gradient(135deg,#0f172a,#1e293b); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; text-align:left; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .ds-action-btn-primary:hover { opacity:0.88; }
+        .ds-action-btn-primary:disabled { opacity:0.35; cursor:not-allowed; }
+        .ds-action-btn-success { width:100%; padding:11px 16px; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; text-align:left; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .ds-action-btn-success:hover { opacity:0.88; }
+        .ds-action-btn-danger { width:100%; padding:11px 16px; background:rgba(239,68,68,0.08); border:1.5px solid #fca5a5; color:#dc2626; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; text-align:left; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .ds-action-btn-danger:hover { background:rgba(239,68,68,0.15); }
+        .ds-action-btn-warning { width:100%; padding:11px 16px; background:rgba(245,158,11,0.08); border:1.5px solid #fde68a; color:#b45309; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; text-align:left; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .ds-action-btn-warning:hover { background:rgba(245,158,11,0.15); }
+        .ds-action-btn-ghost { width:100%; padding:9px 16px; background:transparent; border:1.5px dashed #cbd5e1; color:#94a3b8; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; text-align:left; display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+        .ds-action-btn-ghost:hover { border-color:#94a3b8; color:#64748b; }
+
+        /* Stage 1 action trio */
+        .ds-s1-action-trio { display:flex; flex-direction:column; gap:0; }
+
+        /* Status badge in sidebar */
+        .dt-sidebar-status-badge { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:6px 12px; border-radius:8px; width:100%; }
 
         /* Stage comment log */
-        .ds-comment-row { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid #f1f5f9; }
+        .ds-comment-row { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid #e2e8f0; }
         .ds-comment-row:last-child { border-bottom:none; }
-        .ds-actor-pill { width:30px; height:30px; border-radius:50%; background:#e0f2fe; color:#0369a1; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-        .ds-comment-text { font-size:13px; color:#374151; flex:1; }
+        .ds-actor-pill { width:28px; height:28px; border-radius:50%; background:#dbeafe; color:#1d4ed8; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ds-comment-text { font-size:12px; color:#374151; flex:1; line-height:1.4; }
         .ds-comment-time { font-size:10px; color:#94a3b8; margin-top:2px; }
+
+        /* Content section headings */
+        .dt-section-heading { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#64748b; margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid #e2e8f0; }
+        .dt-section-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 20px; margin-bottom:16px; }
 
         /* Version upload cards */
         .ds-version-grid { display:grid; gap:16px; }
@@ -1674,10 +1700,11 @@
 
         <!-- TOOL: Design Task Record -->
         <div id="tool-design-task" class="hide w-full">
-            <!-- Sticky composite header -->
+            <!-- Sticky header: nav + title bar + progress + stage tabs -->
             <div class="dt-top-nav" style="position:sticky;top:56px;z-index:30;background:#fff;">
-                <!-- Nav row -->
-                <div class="page-nav-row" style="padding:12px 24px">
+
+                <!-- Nav breadcrumb row -->
+                <div class="page-nav-row" style="padding:10px 24px">
                     <button onclick="showLaunchpad()" class="nav-home-btn">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         Launchpad
@@ -1687,105 +1714,24 @@
                         <span id="dt-back-label">Back</span>
                     </button>
                     <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none">Design Studio</button>
-                    <span class="nav-page-btn font-semibold" style="color:#0f172a">Design Task</span>
+                    <span class="nav-page-btn font-semibold" style="color:#0f172a" id="dt-task-name-display">Design Task</span>
                     <div class="ml-auto flex items-center gap-3">
                         <span id="dt-ref-display" class="text-xs font-mono font-semibold text-gray-500"></span>
                         <span id="dt-status-badge" class="badge design-status-new text-xs">New</span>
                     </div>
                 </div>
 
-                <!-- Brief header panel (collapsible) -->
-                <div class="dt-brief-panel" id="dt-brief-panel">
-                    <div class="dt-brief-panel-header" onclick="toggleDTBriefPanel()">
-                        <div style="display:flex;align-items:center;gap:10px">
-                            <h1 id="dt-task-name-display" style="font-size:16px;font-weight:700;color:#0f172a;margin:0">Untitled Task</h1>
-                            <span id="dt-club-display" class="text-sm text-gray-500"></span>
-                            <span id="dt-designer-display" class="text-sm" style="color:#be185d"></span>
+                <!-- Task title bar: key meta at a glance -->
+                <div class="dt-title-bar">
+                    <div class="dt-title-bar-left">
+                        <div class="dt-title-meta">
+                            <span id="dt-club-display"></span>
+                            <span id="dt-designer-display" style="color:#be185d"></span>
                             <div id="dt-countdown" class="dt-countdown hide"></div>
                         </div>
-                        <div style="display:flex;align-items:center;gap:8px">
-                            <button onclick="event.stopPropagation();saveDesignTaskOverview()" class="btn-secondary text-xs" style="padding:5px 12px">Save</button>
-                            <svg id="dt-brief-chevron" class="w-4 h-4" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="transition:transform 0.2s;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
                     </div>
-                    <!-- Expanded brief body -->
-                    <div class="dt-brief-panel-body" id="dt-brief-body">
-                        <div class="dt-brief-grid">
-                            <!-- Core fields -->
-                            <div class="dt-brief-field md:col-span-2">
-                                <div class="dt-brief-label">Task Name</div>
-                                <input type="text" id="dt-task-name" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Riverside FC Full Kit Range 2025">
-                            </div>
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Reference</div>
-                                <input type="text" id="dt-task-ref" class="w-full px-2 py-1.5 rounded-lg text-sm" readonly style="background:#f8fafc;color:#64748b;font-family:monospace;border:1px solid #e2e8f0">
-                            </div>
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Due Date</div>
-                                <input type="date" id="dt-due-date" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" onchange="dtUpdateCountdown()">
-                            </div>
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Linked Club</div>
-                                <select id="dt-club-id" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" onchange="dtClubChanged()">
-                                    <option value="">— Select Club —</option>
-                                </select>
-                            </div>
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Linked Job</div>
-                                <select id="dt-job-id" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200">
-                                    <option value="">— None —</option>
-                                </select>
-                            </div>
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Assigned Designer</div>
-                                <select id="dt-designer-id" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" onchange="dtDesignerChanged()">
-                                    <option value="">— Unassigned —</option>
-                                </select>
-                            </div>
-                            <!-- Brief fields -->
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Sport</div>
-                                <input type="text" id="dt-sport" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Football">
-                            </div>
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Product Type</div>
-                                <input type="text" id="dt-product-type" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Full Kit">
-                            </div>
-                            <div class="dt-brief-field">
-                                <div class="dt-brief-label">Colour Palette</div>
-                                <input type="text" id="dt-colour-palette" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Blue, White, Gold">
-                            </div>
-                            <div class="dt-brief-field" style="grid-column:1/-1">
-                                <div class="dt-brief-label">Kit Details / Design Brief</div>
-                                <textarea id="dt-design-brief" rows="3" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200 resize-y" placeholder="Describe the design requirements — style, key elements, inspirations, what NOT to do..."></textarea>
-                            </div>
-                            <div class="dt-brief-field" style="grid-column:1/-1">
-                                <div class="dt-brief-label">Key Notes</div>
-                                <textarea id="dt-key-notes" rows="2" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200 resize-y" placeholder="Any additional notes for the designer..."></textarea>
-                            </div>
-                        </div>
-                        <!-- Job Type + Design Types (compact row) -->
-                        <div style="margin-top:12px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
-                            <div style="flex:0 0 auto">
-                                <div class="dt-brief-label" style="margin-bottom:6px">Job Type</div>
-                                <div class="flex flex-wrap gap-2" id="dt-job-type-grid"></div>
-                            </div>
-                            <div style="flex:1;min-width:200px">
-                                <div class="dt-brief-label" style="margin-bottom:6px">Design Types</div>
-                                <div class="flex flex-wrap gap-2" id="dt-design-types-grid"></div>
-                            </div>
-                        </div>
-                        <!-- Products list (compact) -->
-                        <div style="margin-top:12px" id="dt-products-list-wrap">
-                            <div class="dt-brief-label" style="margin-bottom:6px">Products Required</div>
-                            <div id="dt-products-list"><p class="text-xs text-gray-400">Select a linked club above to see available products.</p></div>
-                        </div>
-                        <!-- Record meta -->
-                        <div style="margin-top:12px;display:flex;gap:20px;flex-wrap:wrap">
-                            <div class="dt-brief-field"><div class="dt-brief-label">Created</div><div class="dt-brief-value" id="dt-meta-created">—</div></div>
-                            <div class="dt-brief-field"><div class="dt-brief-label">Updated</div><div class="dt-brief-value" id="dt-meta-updated">—</div></div>
-                            <div class="dt-brief-field"><div class="dt-brief-label">Status</div><div id="dt-status-buttons" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>
-                        </div>
+                    <div class="dt-title-bar-right">
+                        <span id="dt-meta-created" style="font-size:11px;color:#94a3b8"></span>
                     </div>
                 </div>
 
@@ -1794,25 +1740,41 @@
                     <div class="dt-stage-progress-fill" id="dt-progress-fill" style="width:0%"></div>
                 </div>
 
-                <!-- Stage tabs -->
+                <!-- Stage tabs — full width, 4 equal columns -->
                 <div class="dt-stage-tabs" id="dt-stage-tabs">
                     <!-- Rendered by JS -->
                 </div>
             </div>
 
-            <!-- Stage panel: rendered dynamically -->
-            <div id="dt-stage-panel" class="dt-stage-panel"></div>
+            <!-- Stage panel: two-column layout rendered by JS -->
+            <div id="dt-stage-panel"></div>
 
-            <!-- Keep legacy hidden elements for backward compatibility -->
+            <!-- Hidden form fields & legacy compat elements -->
             <div class="hide">
-                <div id="dtt-content-overview"></div>
-                <div id="dtt-content-assets"><div id="dt-assets-grid"></div><div id="dt-assets-empty"></div><div id="dt-asset-dropzone"></div><input type="file" id="dt-asset-input" onchange="uploadDesignTaskAssets(event)"></div>
-                <div id="dtt-content-versions"><div id="dt-versions-list"></div><div id="dt-versions-empty"></div></div>
-                <div id="dtt-content-delivery"><div id="dt-delivery-list"></div><div id="dt-delivery-empty"></div><input type="file" id="dt-delivery-input" onchange="uploadDeliveryFiles(event)"></div>
+                <input type="text" id="dt-task-name">
+                <input type="text" id="dt-task-ref">
+                <input type="date" id="dt-due-date" onchange="dtUpdateCountdown()">
+                <select id="dt-club-id" onchange="dtClubChanged()"><option value=""></option></select>
+                <select id="dt-job-id"><option value=""></option></select>
+                <select id="dt-designer-id" onchange="dtDesignerChanged()"><option value=""></option></select>
+                <input type="text" id="dt-sport">
+                <input type="text" id="dt-product-type">
+                <input type="text" id="dt-colour-palette">
+                <textarea id="dt-design-brief"></textarea>
+                <textarea id="dt-key-notes"></textarea>
+                <div id="dt-job-type-grid"></div>
+                <div id="dt-design-types-grid"></div>
+                <div id="dt-products-list"></div>
+                <div id="dt-status-buttons"></div>
+                <span id="dt-meta-updated"></span>
                 <span id="dt-meta-ref"></span>
                 <div id="dt-due-panel"><div id="dt-due-display"></div></div>
                 <button id="btn-dt-deliver" onclick="markDesignDelivered()"></button>
                 <button id="btn-dt-complete" onclick="markDesignCompleted()"></button>
+                <div id="dtt-content-overview"></div>
+                <div id="dtt-content-assets"><div id="dt-assets-grid"></div><div id="dt-assets-empty"></div><div id="dt-asset-dropzone"></div><input type="file" id="dt-asset-input" onchange="uploadDesignTaskAssets(event)"></div>
+                <div id="dtt-content-versions"><div id="dt-versions-list"></div><div id="dt-versions-empty"></div></div>
+                <div id="dtt-content-delivery"><div id="dt-delivery-list"></div><div id="dt-delivery-empty"></div><input type="file" id="dt-delivery-input" onchange="uploadDeliveryFiles(event)"></div>
                 <button id="dtt-overview"></button><button id="dtt-assets"></button><button id="dtt-versions"></button><button id="dtt-delivery"></button>
             </div>
         </div>
@@ -16235,46 +16197,104 @@
             const { data: log } = await supabase.from('stage_status_log')
                 .select('*').eq('stage_id', stage.id).order('created_at');
             const logHtml = buildCommentLog(log || []);
+            const task = currentDesignTaskRecord || {};
             const isApproved = stage.status === 'approved';
             const isDeclined = stage.status === 'declined';
+            const isNeedsInfo = stage.status === 'in_review';
 
-            return `<div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-                    <div>
-                        <h3 style="font-size:16px;font-weight:700;margin:0 0 4px">Stage 1: Brief Review</h3>
-                        <p style="font-size:13px;color:#64748b;margin:0">Review the brief above and accept, decline, or request more information.</p>
+            // Brief field helpers
+            const field = (label, val) => val ? `<div class="ds-brief-field">
+                <div class="ds-brief-label">${label}</div>
+                <div class="ds-brief-value">${escHtml(String(val))}</div>
+            </div>` : '';
+
+            const chips = (items) => (items||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${(items).map(i => `<span style="padding:3px 10px;background:#e2e8f0;border-radius:20px;font-size:12px;color:#0f172a">${escHtml(i)}</span>`).join('')}</div>` : '<span style="color:#94a3b8;font-size:13px">—</span>';
+
+            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : null;
+            const now = new Date();
+            const due = task.due_date ? new Date(task.due_date) : null;
+            const daysLeft = due ? Math.ceil((due - now) / 86400000) : null;
+            const dueBadge = daysLeft !== null ? (daysLeft < 0 ? `<span style="margin-left:8px;padding:2px 8px;background:#fef2f2;color:#dc2626;border-radius:10px;font-size:11px;font-weight:700">${Math.abs(daysLeft)}d overdue</span>` : daysLeft <= 7 ? `<span style="margin-left:8px;padding:2px 8px;background:#fff7ed;color:#c2410c;border-radius:10px;font-size:11px;font-weight:700">${daysLeft}d left</span>` : '') : '';
+
+            return `<div class="dt-stage-layout">
+                <div class="dt-stage-content">
+                    <div style="margin-bottom:24px">
+                        <h3 style="font-size:18px;font-weight:800;margin:0 0 4px;color:#0f172a">${escHtml(task.task_name || 'Untitled Task')}</h3>
+                        ${task.task_ref ? `<div style="font-size:12px;color:#94a3b8;font-weight:600;letter-spacing:0.4px">Ref: ${escHtml(task.task_ref)}</div>` : ''}
                     </div>
-                    <span class="ds-stage-badge ${stage.status}">${dsStageStatusLabel(stage.status)}</span>
+
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px">
+                        ${field('Club / Client', task.clubs?.name)}
+                        ${field('Designer', task.assigned_designer_name)}
+                        <div class="ds-brief-field" style="grid-column:1/-1">
+                            <div class="ds-brief-label">Due Date</div>
+                            <div class="ds-brief-value">${dueDate || '—'}${dueBadge}</div>
+                        </div>
+                        ${field('Sport', task.sport)}
+                        ${field('Product Type', task.product_type)}
+                        ${field('Colour Palette', task.colour_palette)}
+                        ${field('Kit Details', task.kit_details)}
+                    </div>
+
+                    ${task.design_brief ? `<div style="margin-bottom:20px">
+                        <div class="ds-brief-label" style="margin-bottom:6px">Design Brief</div>
+                        <div style="padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;color:#0f172a;line-height:1.6;white-space:pre-wrap">${escHtml(task.design_brief)}</div>
+                    </div>` : ''}
+
+                    ${task.key_notes ? `<div style="margin-bottom:20px">
+                        <div class="ds-brief-label" style="margin-bottom:6px">Key Notes</div>
+                        <div style="padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:13px;color:#92400e;line-height:1.6;white-space:pre-wrap">${escHtml(task.key_notes)}</div>
+                    </div>` : ''}
+
+                    ${(task.job_type || (task.design_types||[]).length || (task.products_required||[]).length) ? `<div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
+                        ${task.job_type ? `<div class="ds-brief-field">
+                            <div class="ds-brief-label">Job Type</div>
+                            <div class="ds-brief-value"><span style="padding:3px 10px;background:#e0f2fe;color:#0369a1;border-radius:20px;font-size:12px;font-weight:600">${escHtml(task.job_type)}</span></div>
+                        </div>` : ''}
+                        ${(task.design_types||[]).length ? `<div class="ds-brief-field">
+                            <div class="ds-brief-label">Design Types</div>
+                            <div class="ds-brief-value">${chips(task.design_types)}</div>
+                        </div>` : ''}
+                        ${(task.products_required||[]).length ? `<div class="ds-brief-field">
+                            <div class="ds-brief-label">Products Required</div>
+                            <div class="ds-brief-value">${chips(task.products_required)}</div>
+                        </div>` : ''}
+                    </div>` : ''}
+
+                    ${isApproved ? `<div style="margin-top:20px;background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:12px;padding:14px;color:#16a34a;font-size:13px;font-weight:600">
+                        ✓ Brief accepted — Stage 2 (Concepts) is now unlocked.
+                    </div>` : ''}
+                    ${isDeclined ? `<div style="margin-top:20px;background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:12px;padding:14px;color:#dc2626;font-size:13px;font-weight:600">
+                        ✕ Brief declined. Update the brief and re-accept when ready.
+                    </div>` : ''}
+                    ${isNeedsInfo ? `<div style="margin-top:20px;background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:12px;padding:14px;color:#b45309;font-size:13px;font-weight:600">
+                        ? More information requested — awaiting client response.
+                    </div>` : ''}
                 </div>
 
-                ${isApproved ? `<div style="background:rgba(34,197,94,0.08);border:1.5px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
-                    ✓ Brief accepted — Stage 2 (Concepts) is now unlocked.
-                </div>` : ''}
-                ${isDeclined ? `<div style="background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:12px;padding:16px;margin-bottom:20px;color:#dc2626;font-size:13px;font-weight:600">
-                    ✕ Brief declined. Update the brief details above and re-accept when ready.
-                </div>` : ''}
+                <div class="dt-stage-sidebar">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:12px">Stage Status</div>
+                    <div style="margin-bottom:20px">
+                        <span class="ds-stage-badge ${stage.status}" style="font-size:12px;padding:5px 12px">${dsStageStatusLabel(stage.status)}</span>
+                    </div>
 
-                ${!isApproved ? `<div class="ds-s1-actions">
-                    <button class="ds-s1-btn accept" onclick="stage1Action('accept')">
-                        <span style="font-size:24px">✓</span>
-                        Accept Job
-                        <span style="font-size:11px;font-weight:400;opacity:0.8">Brief looks good</span>
-                    </button>
-                    <button class="ds-s1-btn needs-info" onclick="stage1Action('needs_info')">
-                        <span style="font-size:24px">?</span>
-                        Needs More Info
-                        <span style="font-size:11px;font-weight:400;opacity:0.8">Request clarification</span>
-                    </button>
-                    <button class="ds-s1-btn decline" onclick="stage1Action('decline')">
-                        <span style="font-size:24px">✕</span>
-                        Decline Job
-                        <span style="font-size:11px;font-weight:400;opacity:0.8">Cannot proceed</span>
-                    </button>
-                </div>` : ''}
+                    ${!isApproved ? `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Actions</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+                        <button class="ds-action-btn-success" onclick="stage1Action('accept')">
+                            <span style="font-size:15px">✓</span> Accept Job
+                        </button>
+                        <button class="ds-action-btn-warning" onclick="stage1Action('needs_info')">
+                            <span style="font-size:15px">?</span> Needs More Info
+                        </button>
+                        <button class="ds-action-btn-danger" onclick="stage1Action('decline')">
+                            <span style="font-size:15px">✕</span> Decline Job
+                        </button>
+                    </div>` : ''}
 
-                <div style="margin-top:20px">
-                    <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Activity Log</div>
-                    ${logHtml || '<p style="font-size:13px;color:#94a3b8">No activity yet</p>'}
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Activity</div>
+                    <div style="font-size:13px">
+                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No activity yet</p>'}
+                    </div>
                 </div>
             </div>`;
         }
@@ -16317,53 +16337,61 @@
 
             const uploadsHtml = buildVersionCards(stage, uploads || []);
             const logHtml = buildCommentLog(log || []);
-            const isLocked = stage.status === 'not_started';
             const isInReview = stage.status === 'in_review';
             const isApproved = stage.status === 'approved';
+            const isRevisionsRequired = stage.status === 'revisions_required';
             const hasApprovedVersion = (uploads||[]).some(u => u.status === 'approved');
+            const nextStageNum = stage.stage_number + 1;
 
-            return `<div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
-                    <div>
-                        <h3 style="font-size:16px;font-weight:700;margin:0 0 4px">Stage ${stage.stage_number}: ${escHtml(stage.stage_name)}</h3>
+            return `<div class="dt-stage-layout">
+                <div class="dt-stage-content">
+                    <div style="margin-bottom:20px">
+                        <h3 style="font-size:16px;font-weight:800;margin:0 0 4px;color:#0f172a">Stage ${stage.stage_number}: ${escHtml(stage.stage_name)}</h3>
                         <p style="font-size:13px;color:#64748b;margin:0">Upload design versions for review. Each version can be previewed, annotated, approved or declined.</p>
                     </div>
-                    <span class="ds-stage-badge ${stage.status}">${dsStageStatusLabel(stage.status)}</span>
+
+                    ${isApproved ? `<div style="background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:12px;padding:14px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
+                        ✓ Stage ${stage.stage_number} approved — ${stage.stage_number < 4 ? `Stage ${nextStageNum} unlocked` : 'All stages complete'}.
+                    </div>` : ''}
+                    ${isRevisionsRequired ? `<div style="background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:12px;padding:14px;margin-bottom:20px;color:#b45309;font-size:13px;font-weight:600">
+                        ↩ Revisions requested — upload a new version to address the feedback.
+                    </div>` : ''}
+
+                    <div class="ds-version-grid" id="ds-version-cards-${stage.id}">
+                        ${uploadsHtml}
+                    </div>
+                    ${!isApproved ? `<button id="ds-add-version-btn-${stage.id}" onclick="addVersionCard('${stage.id}', ${(uploads||[]).length + 1})" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px dashed #cbd5e1;background:transparent;border-radius:10px;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;transition:all 0.15s" onmouseover="this.style.borderColor='#00e5cc';this.style.color='#0f766e'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b'">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Version V${(uploads||[]).length + 1}
+                    </button>` : ''}
                 </div>
 
-                ${isApproved ? `<div style="background:rgba(34,197,94,0.08);border:1.5px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
-                    ✓ Stage ${stage.stage_number} approved — ${stage.stage_number < 4 ? `Stage ${stage.stage_number+1} unlocked` : 'All stages complete'}.
-                </div>` : ''}
+                <div class="dt-stage-sidebar">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:12px">Stage Status</div>
+                    <div style="margin-bottom:20px">
+                        <span class="ds-stage-badge ${stage.status}" style="font-size:12px;padding:5px 12px">${dsStageStatusLabel(stage.status)}</span>
+                    </div>
 
-                <!-- Version upload cards -->
-                <div class="ds-version-grid" id="ds-version-cards-${stage.id}">
-                    ${uploadsHtml}
-                </div>
-                ${!isApproved ? `<button onclick="addVersionCard('${stage.id}', ${(uploads||[]).length + 1})" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px dashed #cbd5e1;background:transparent;border-radius:10px;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;transition:all 0.15s" onmouseover="this.style.borderColor='#00e5cc';this.style.color='#0f766e'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b'">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    Add Version V${(uploads||[]).length + 1}
-                </button>` : ''}
-
-                <!-- Stage footer actions -->
-                <div class="ds-stage-footer">
-                    <div style="display:flex;gap:8px;flex-wrap:wrap">
-                        ${!isApproved && !isInReview ? `<button class="ds-submit-review-btn" ${!hasApprovedVersion ? 'disabled title="Approve at least one version first"' : ''} onclick="submitStageForReview('${stage.id}', ${stage.stage_number})">
+                    ${!isApproved ? `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Actions</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+                        ${!isInReview ? `<button class="ds-action-btn-primary" ${!hasApprovedVersion ? 'disabled style="opacity:0.4;cursor:not-allowed" title="Approve at least one version first"' : ''} onclick="submitStageForReview('${stage.id}', ${stage.stage_number})">
                             Submit for Review
                         </button>` : ''}
-                        ${isInReview ? `<button class="ds-approve-stage-btn" onclick="approveStage('${stage.id}', ${stage.stage_number})">
-                            Approve Stage ${stage.stage_number}
+                        ${isInReview ? `<button class="ds-action-btn-success" onclick="approveStage('${stage.id}', ${stage.stage_number})">
+                            ✓ Approve Stage ${stage.stage_number}
                         </button>
-                        <button class="ds-req-revisions-btn" onclick="requestRevisions('${stage.id}', ${stage.stage_number})">
-                            Request Revisions
+                        <button class="ds-action-btn-warning" onclick="requestRevisions('${stage.id}', ${stage.stage_number})">
+                            ↩ Request Revisions
                         </button>` : ''}
-                        ${!isApproved ? `<button class="ds-skip-stage-btn" onclick="skipStage('${stage.id}', ${stage.stage_number})">Skip Stage</button>` : ''}
-                    </div>
-                </div>
+                        <button class="ds-action-btn-ghost" onclick="skipStage('${stage.id}', ${stage.stage_number})">
+                            Skip Stage
+                        </button>
+                    </div>` : ''}
 
-                <!-- Comment log -->
-                <div style="margin-top:24px">
-                    <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Stage Activity</div>
-                    ${logHtml || '<p style="font-size:13px;color:#94a3b8">No activity yet</p>'}
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Activity</div>
+                    <div style="font-size:13px">
+                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No activity yet</p>'}
+                    </div>
                 </div>
             </div>`;
         }
@@ -16608,6 +16636,7 @@
             const logHtml = buildCommentLog(log || []);
             const isApproved = stage.status === 'approved';
             const isInReview = stage.status === 'in_review';
+            const isRevisionsRequired = stage.status === 'revisions_required';
 
             const sectionsHtml = DS_S4_SECTIONS.map(sec => {
                 const secUploads = (uploads||[]).filter(u => u.section_label === sec.key);
@@ -16615,40 +16644,59 @@
             }).join('');
 
             const allSectionsUploaded = DS_S4_SECTIONS.every(sec => (uploads||[]).some(u => u.section_label === sec.key));
+            const uploadedCount = DS_S4_SECTIONS.filter(sec => (uploads||[]).some(u => u.section_label === sec.key)).length;
 
-            return `<div>
-                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
-                    <div>
-                        <h3 style="font-size:16px;font-weight:700;margin:0 0 4px">Stage 4: Final Artwork</h3>
+            return `<div class="dt-stage-layout">
+                <div class="dt-stage-content">
+                    <div style="margin-bottom:20px">
+                        <h3 style="font-size:16px;font-weight:800;margin:0 0 4px;color:#0f172a">Stage 4: Final Artwork</h3>
                         <p style="font-size:13px;color:#64748b;margin:0">Upload the four required final artwork deliverables. All sections must be uploaded before submitting for review.</p>
                     </div>
-                    <span class="ds-stage-badge ${stage.status}">${dsStageStatusLabel(stage.status)}</span>
+
+                    ${isApproved ? `<div style="background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:12px;padding:14px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
+                        ✓ All final artwork approved — task is complete!
+                    </div>` : ''}
+                    ${isRevisionsRequired ? `<div style="background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:12px;padding:14px;margin-bottom:20px;color:#b45309;font-size:13px;font-weight:600">
+                        ↩ Revisions requested — replace any sections as needed and resubmit.
+                    </div>` : ''}
+
+                    ${sectionsHtml}
                 </div>
 
-                ${isApproved ? `<div style="background:rgba(34,197,94,0.08);border:1.5px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
-                    ✓ All final artwork approved — task is complete!
-                </div>` : ''}
+                <div class="dt-stage-sidebar">
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:12px">Stage Status</div>
+                    <div style="margin-bottom:20px">
+                        <span class="ds-stage-badge ${stage.status}" style="font-size:12px;padding:5px 12px">${dsStageStatusLabel(stage.status)}</span>
+                    </div>
 
-                ${sectionsHtml}
+                    <div style="margin-bottom:20px;padding:12px;background:#fff;border:1px solid #e2e8f0;border-radius:10px">
+                        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Sections Uploaded</div>
+                        <div style="font-size:24px;font-weight:800;color:#0f172a;margin-bottom:4px">${uploadedCount} / 4</div>
+                        <div style="height:4px;background:#e2e8f0;border-radius:2px;overflow:hidden">
+                            <div style="height:4px;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:2px;width:${(uploadedCount/4)*100}%;transition:width 0.4s ease"></div>
+                        </div>
+                    </div>
 
-                <div class="ds-stage-footer">
-                    <div style="display:flex;gap:8px;flex-wrap:wrap">
-                        ${!isApproved && !isInReview ? `<button class="ds-submit-review-btn" ${!allSectionsUploaded ? 'disabled title="Upload all 4 sections first"' : ''} onclick="submitStageForReview('${stage.id}', 4)">
+                    ${!isApproved ? `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Actions</div>
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
+                        ${!isInReview ? `<button class="ds-action-btn-primary" ${!allSectionsUploaded ? 'disabled style="opacity:0.4;cursor:not-allowed" title="Upload all 4 sections first"' : ''} onclick="submitStageForReview('${stage.id}', 4)">
                             Submit for Final Review
                         </button>` : ''}
-                        ${isInReview ? `<button class="ds-approve-stage-btn" onclick="approveStage('${stage.id}', 4)">
-                            Approve & Complete Task
+                        ${isInReview ? `<button class="ds-action-btn-success" onclick="approveStage('${stage.id}', 4)">
+                            ✓ Approve & Complete Task
                         </button>
-                        <button class="ds-req-revisions-btn" onclick="requestRevisions('${stage.id}', 4)">
-                            Request Revisions
+                        <button class="ds-action-btn-warning" onclick="requestRevisions('${stage.id}', 4)">
+                            ↩ Request Revisions
                         </button>` : ''}
-                        ${!isApproved ? `<button class="ds-skip-stage-btn" onclick="skipStage('${stage.id}', 4)">Skip Stage</button>` : ''}
-                    </div>
-                </div>
+                        <button class="ds-action-btn-ghost" onclick="skipStage('${stage.id}', 4)">
+                            Skip Stage
+                        </button>
+                    </div>` : ''}
 
-                <div style="margin-top:24px">
-                    <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Stage Activity</div>
-                    ${logHtml || '<p style="font-size:13px;color:#94a3b8">No activity yet</p>'}
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Activity</div>
+                    <div style="font-size:13px">
+                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No activity yet</p>'}
+                    </div>
                 </div>
             </div>`;
         }
