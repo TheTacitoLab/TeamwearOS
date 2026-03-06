@@ -607,6 +607,213 @@
         #ann-img-container img { display:block; max-width:100%; border-radius:10px; user-select:none; }
         #ann-overlay { position:absolute; inset:0; cursor:crosshair; border-radius:10px; }
 
+        /* =============================================
+           DESIGN STUDIO REDESIGN — Stage-based workflow
+           ============================================= */
+
+        /* DS Home: two-column grid */
+        .ds-home-grid { display:grid; grid-template-columns:1fr 340px; gap:20px; padding:20px 24px; align-items:start; }
+        @media(max-width:1100px) { .ds-home-grid { grid-template-columns:1fr; } }
+        @media(max-width:768px)  { .ds-home-grid { padding:12px; gap:12px; } }
+
+        /* DS Task cards (new design) */
+        .ds-task-card-v2 { background:#fff; border:1px solid #e2e8f0; border-radius:14px; padding:16px; cursor:pointer; transition:all 0.2s; margin-bottom:12px; }
+        .ds-task-card-v2:hover { border-color:#94a3b8; box-shadow:0 4px 16px rgba(0,0,0,0.07); transform:translateY(-1px); }
+        .ds-task-card-v2 .tc-ref { font-size:11px; font-family:monospace; color:#94a3b8; }
+        .ds-task-card-v2 .tc-title { font-size:14px; font-weight:700; color:#0f172a; margin:4px 0 2px; line-height:1.3; }
+        .ds-task-card-v2 .tc-sub { font-size:12px; color:#64748b; margin-bottom:8px; }
+        .ds-task-card-v2 .tc-progress-bar { height:5px; border-radius:3px; background:#e2e8f0; overflow:hidden; margin-bottom:10px; }
+        .ds-task-card-v2 .tc-progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#00e5cc,#22c55e); transition:width 0.4s ease; }
+        .ds-task-card-v2 .tc-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+
+        /* Stage badge on task card */
+        .ds-stage-badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+        .ds-stage-badge.not_started    { background:#f1f5f9; color:#64748b; }
+        .ds-stage-badge.in_progress    { background:rgba(37,99,235,0.1); color:#1d4ed8; }
+        .ds-stage-badge.in_review      { background:rgba(245,158,11,0.12); color:#b45309; }
+        .ds-stage-badge.revisions_required { background:rgba(239,68,68,0.1); color:#dc2626; }
+        .ds-stage-badge.approved       { background:rgba(34,197,94,0.1); color:#16a34a; }
+        .ds-stage-badge.declined       { background:rgba(239,68,68,0.1); color:#dc2626; }
+        .ds-stage-badge.skipped        { background:rgba(34,197,94,0.08); color:#16a34a; border:1px dashed #86efac; }
+
+        /* Activity feed panel */
+        .ds-feed-panel { background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:0; overflow:hidden; position:sticky; top:140px; }
+        .ds-feed-header { padding:14px 16px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; background:#fff; }
+        .ds-feed-header h3 { font-size:13px; font-weight:700; color:#0f172a; margin:0; }
+        .ds-feed-list { max-height:calc(100vh - 250px); overflow-y:auto; }
+        .ds-feed-item { padding:12px 16px; border-bottom:1px solid #e2e8f0; transition:background 0.15s; cursor:pointer; }
+        .ds-feed-item:hover { background:#fff; }
+        .ds-feed-item:last-child { border-bottom:none; }
+        .ds-feed-item.unread { background:#fffbeb; }
+        .ds-feed-actor { width:28px; height:28px; border-radius:50%; background:#00e5cc; color:#0f172a; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ds-feed-text { font-size:12px; color:#374151; line-height:1.4; }
+        .ds-feed-text strong { color:#0f172a; }
+        .ds-feed-time { font-size:10px; color:#94a3b8; margin-top:2px; }
+
+        /* Unread notification badge */
+        .ds-notif-badge { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; padding:0 4px; border-radius:8px; font-size:10px; font-weight:700; background:#ef4444; color:#fff; margin-left:4px; }
+
+        /* ── Design Task View V2 ───────────────────────── */
+
+        /* Brief header panel */
+        .dt-brief-panel { background:#fff; border-bottom:1px solid #e2e8f0; transition:all 0.3s; }
+        .dt-brief-panel-header { display:flex; align-items:center; justify-content:space-between; padding:10px 24px; cursor:pointer; }
+        .dt-brief-panel-header:hover { background:#f8fafc; }
+        .dt-brief-panel-body { padding:0 24px 16px; }
+        .dt-brief-field { margin-bottom:0; }
+        .dt-brief-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:2px; }
+        .dt-brief-value { font-size:13px; color:#0f172a; line-height:1.5; }
+        .dt-brief-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px 20px; }
+
+        /* Stage progress bar */
+        .dt-stage-progress-wrap { height:4px; background:#e2e8f0; position:relative; }
+        .dt-stage-progress-fill { height:100%; background:linear-gradient(90deg,#00e5cc,#22c55e); transition:width 0.4s ease; position:absolute; top:0; left:0; }
+
+        /* Stage tabs */
+        .dt-stage-tabs { display:flex; background:#fff; border-bottom:1px solid #e2e8f0; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-behavior:smooth; }
+        .dt-stage-tab { flex:0 0 auto; display:flex; align-items:center; gap:8px; padding:12px 20px; font-size:13px; font-weight:600; color:#64748b; background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+        .dt-stage-tab:disabled { opacity:0.45; cursor:not-allowed; }
+        .dt-stage-tab.st-not_started  { }
+        .dt-stage-tab.st-in_progress  { color:#1d4ed8; border-bottom-color:#1d4ed8; }
+        .dt-stage-tab.st-in_review    { color:#b45309; border-bottom-color:#f59e0b; }
+        .dt-stage-tab.st-revisions_required { color:#dc2626; border-bottom-color:#ef4444; }
+        .dt-stage-tab.st-approved     { color:#16a34a; border-bottom-color:#22c55e; }
+        .dt-stage-tab.st-declined     { color:#dc2626; border-bottom-color:#ef4444; }
+        .dt-stage-tab.st-skipped      { color:#16a34a; border-bottom-color:#86efac; border-bottom-style:dashed; }
+        .dt-stage-tab.active          { font-weight:700; background:rgba(0,229,204,0.05); }
+
+        /* Stage icon check */
+        .dt-stage-tab .stage-icon { width:20px; height:20px; border-radius:50%; border:2px solid currentColor; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; flex-shrink:0; }
+        .dt-stage-tab.st-approved .stage-icon { background:#22c55e; border-color:#22c55e; color:#fff; }
+        .dt-stage-tab.st-skipped .stage-icon { background:#86efac; border-color:#86efac; color:#166534; }
+        .dt-stage-tab.st-declined .stage-icon { background:#ef4444; border-color:#ef4444; color:#fff; }
+
+        /* Stage panel */
+        .dt-stage-panel { padding:24px; max-width:960px; margin:0 auto; }
+        @media(max-width:768px) { .dt-stage-panel { padding:16px; } }
+
+        /* Stage status selector */
+        .ds-status-selector { display:flex; flex-direction:column; gap:8px; }
+        .ds-status-option { padding:10px 14px; border-radius:10px; border:1.5px solid #e2e8f0; background:#f8fafc; cursor:pointer; font-size:13px; font-weight:600; transition:all 0.15s; display:flex; align-items:center; gap:10px; }
+        .ds-status-option:hover { border-color:#94a3b8; background:#fff; }
+        .ds-status-option.selected { box-shadow:0 0 0 2px currentColor; }
+        .ds-status-option.opt-not_started  { color:#64748b; }
+        .ds-status-option.opt-in_progress  { color:#1d4ed8; }
+        .ds-status-option.opt-in_review    { color:#b45309; }
+        .ds-status-option.opt-revisions_required { color:#dc2626; }
+        .ds-status-option.opt-approved     { color:#16a34a; }
+        .ds-status-option.opt-declined     { color:#dc2626; }
+        .ds-status-option.opt-skipped      { color:#16a34a; }
+        .ds-status-dot { width:8px; height:8px; border-radius:50%; background:currentColor; flex-shrink:0; }
+
+        /* Stage comment log */
+        .ds-comment-row { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid #f1f5f9; }
+        .ds-comment-row:last-child { border-bottom:none; }
+        .ds-actor-pill { width:30px; height:30px; border-radius:50%; background:#e0f2fe; color:#0369a1; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ds-comment-text { font-size:13px; color:#374151; flex:1; }
+        .ds-comment-time { font-size:10px; color:#94a3b8; margin-top:2px; }
+
+        /* Version upload cards */
+        .ds-version-grid { display:grid; gap:16px; }
+        .ds-version-card { background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; overflow:hidden; transition:border-color 0.2s; }
+        .ds-version-card.vc-approved { border-color:#86efac; background:rgba(34,197,94,0.02); }
+        .ds-version-card.vc-declined { border-color:#fca5a5; background:rgba(239,68,68,0.02); }
+        .ds-version-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
+        .ds-version-label { font-size:13px; font-weight:700; color:#0f172a; }
+        .ds-version-status { font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+        .ds-version-status.vs-pending  { background:#f1f5f9; color:#64748b; }
+        .ds-version-status.vs-approved { background:rgba(34,197,94,0.12); color:#16a34a; }
+        .ds-version-status.vs-declined { background:rgba(239,68,68,0.1); color:#dc2626; }
+        .ds-version-body { padding:16px; }
+        .ds-version-dropzone { border:2px dashed #cbd5e1; border-radius:10px; padding:32px 16px; text-align:center; cursor:pointer; transition:all 0.2s; background:#f8fafc; }
+        .ds-version-dropzone:hover, .ds-version-dropzone.drag-over { border-color:#00e5cc; background:rgba(0,229,204,0.04); }
+        .ds-version-file-info { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0; }
+        .ds-version-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+        .ds-version-actions .btn-preview { background:#f1f5f9; border:1px solid #e2e8f0; color:#374151; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+        .ds-version-actions .btn-preview:hover { background:#e2e8f0; }
+        .ds-version-actions .btn-approve { background:rgba(34,197,94,0.1); border:1px solid #86efac; color:#16a34a; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+        .ds-version-actions .btn-approve:hover { background:rgba(34,197,94,0.18); }
+        .ds-version-actions .btn-decline { background:rgba(239,68,68,0.08); border:1px solid #fca5a5; color:#dc2626; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+        .ds-version-actions .btn-decline:hover { background:rgba(239,68,68,0.15); }
+        .ds-version-actions .btn-annotate { background:rgba(0,229,204,0.1); border:1px solid rgba(0,229,204,0.4); color:#0f766e; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+        .ds-version-actions .btn-annotate:hover { background:rgba(0,229,204,0.2); }
+
+        /* Stage 4 sections */
+        .ds-s4-section { border:1.5px solid #e2e8f0; border-radius:14px; overflow:hidden; margin-bottom:16px; }
+        .ds-s4-section-header { padding:12px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; }
+        .ds-s4-section-title { font-size:13px; font-weight:700; color:#0f172a; }
+        .ds-s4-section-body { padding:16px; }
+
+        /* Full-screen preview modal */
+        #ds-preview-modal { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); display:flex; align-items:stretch; }
+        #ds-preview-modal.hide { display:none; }
+        #ds-preview-main { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
+        #ds-preview-sidebar { width:300px; background:#1a1a1a; border-left:1px solid #333; display:flex; flex-direction:column; overflow:hidden; }
+        @media(max-width:768px) { #ds-preview-sidebar { display:none; } }
+        #ds-preview-close { position:absolute; top:16px; right:16px; z-index:10; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+        #ds-preview-close:hover { background:rgba(255,255,255,0.22); }
+        #ds-preview-img-wrap { position:relative; max-width:100%; max-height:100%; }
+        #ds-preview-img { max-width:calc(100vw - 320px); max-height:90vh; border-radius:8px; display:block; }
+        @media(max-width:768px) { #ds-preview-img { max-width:95vw; } }
+        #ds-preview-iframe { width:calc(100vw - 320px); height:90vh; border:none; border-radius:8px; background:#fff; }
+        @media(max-width:768px) { #ds-preview-iframe { width:95vw; } }
+        #ann-overlay-v2 { position:absolute; inset:0; cursor:crosshair; border-radius:8px; }
+        .ann-pin { position:absolute; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; transform:translate(-50%,-50%); cursor:pointer; border:2px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.4); z-index:5; transition:transform 0.15s; }
+        .ann-pin:hover { transform:translate(-50%,-50%) scale(1.2); }
+        .ann-pin.designer { background:#00e5cc; color:#0f172a; }
+        .ann-pin.manager  { background:#f59e0b; color:#0f172a; }
+        #ds-preview-sidebar-header { padding:14px 16px; border-bottom:1px solid #333; color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:space-between; }
+        #ds-preview-sidebar-header button { background:rgba(0,229,204,0.15); border:1px solid rgba(0,229,204,0.3); color:#00e5cc; font-size:11px; font-weight:700; padding:4px 10px; border-radius:6px; cursor:pointer; transition:background 0.15s; }
+        #ds-preview-sidebar-header button:hover { background:rgba(0,229,204,0.3); }
+        #ds-preview-sidebar-header button.active { background:#00e5cc; color:#0f172a; }
+        #ds-ann-list { flex:1; overflow-y:auto; padding:10px; }
+        .ds-ann-item { background:#222; border-radius:10px; padding:10px 12px; margin-bottom:8px; cursor:pointer; transition:background 0.15s; }
+        .ds-ann-item:hover { background:#2a2a2a; }
+        .ds-ann-item.highlight { background:#1a2a2a; border:1px solid rgba(0,229,204,0.3); }
+        .ds-ann-item-header { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+        .ds-ann-item-text { font-size:12px; color:#d1d5db; line-height:1.4; }
+        .ds-ann-item-time { font-size:10px; color:#6b7280; margin-top:3px; }
+        #ds-ann-new-form { padding:12px 16px; border-top:1px solid #333; }
+        #ds-ann-new-form textarea { width:100%; background:#222; border:1px solid #444; color:#e5e7eb; border-radius:8px; padding:8px 10px; font-size:12px; resize:none; outline:none; transition:border-color 0.15s; }
+        #ds-ann-new-form textarea:focus { border-color:#00e5cc; }
+        #ds-ann-new-form .btn-save-ann { width:100%; background:#00e5cc; color:#0f172a; font-weight:700; font-size:12px; padding:7px; border-radius:8px; border:none; cursor:pointer; margin-top:8px; transition:opacity 0.15s; }
+        #ds-ann-new-form .btn-save-ann:hover { opacity:0.85; }
+        #ds-ann-new-form .btn-cancel-ann { width:100%; background:transparent; color:#6b7280; font-size:12px; padding:5px; border-radius:8px; border:none; cursor:pointer; margin-top:4px; }
+        #ds-ann-new-form .btn-cancel-ann:hover { color:#9ca3af; }
+
+        /* Stage 1 action buttons */
+        .ds-s1-actions { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:20px; }
+        @media(max-width:600px) { .ds-s1-actions { grid-template-columns:1fr; } }
+        .ds-s1-btn { padding:14px 16px; border-radius:12px; border:2px solid; font-size:13px; font-weight:700; cursor:pointer; text-align:center; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:6px; }
+        .ds-s1-btn.accept { border-color:#86efac; background:rgba(34,197,94,0.08); color:#16a34a; }
+        .ds-s1-btn.accept:hover { background:rgba(34,197,94,0.15); }
+        .ds-s1-btn.decline { border-color:#fca5a5; background:rgba(239,68,68,0.07); color:#dc2626; }
+        .ds-s1-btn.decline:hover { background:rgba(239,68,68,0.14); }
+        .ds-s1-btn.needs-info { border-color:#fde68a; background:rgba(245,158,11,0.08); color:#b45309; }
+        .ds-s1-btn.needs-info:hover { background:rgba(245,158,11,0.15); }
+
+        /* Stage action footer */
+        .ds-stage-footer { margin-top:24px; padding-top:20px; border-top:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .ds-submit-review-btn { padding:10px 24px; background:linear-gradient(135deg,#1d4ed8,#2563eb); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; }
+        .ds-submit-review-btn:hover { opacity:0.88; }
+        .ds-submit-review-btn:disabled { opacity:0.4; cursor:not-allowed; }
+        .ds-approve-stage-btn { padding:10px 24px; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; }
+        .ds-approve-stage-btn:hover { opacity:0.88; }
+        .ds-req-revisions-btn { padding:10px 20px; background:rgba(239,68,68,0.1); border:1.5px solid #fca5a5; color:#dc2626; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+        .ds-req-revisions-btn:hover { background:rgba(239,68,68,0.17); }
+        .ds-skip-stage-btn { padding:8px 16px; background:transparent; border:1.5px dashed #cbd5e1; color:#94a3b8; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
+        .ds-skip-stage-btn:hover { border-color:#94a3b8; color:#64748b; }
+
+        /* Section empty state */
+        .ds-empty-state { text-align:center; padding:40px 20px; }
+        .ds-empty-state .es-icon { font-size:40px; margin-bottom:10px; }
+        .ds-empty-state p { color:#64748b; font-size:14px; font-weight:500; margin:0 0 4px; }
+        .ds-empty-state span { color:#94a3b8; font-size:12px; }
+
+        /* Filter chips for activity feed */
+        .ds-filter-chip { padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1.5px solid #e2e8f0; color:#64748b; background:#fff; transition:all 0.15s; }
+        .ds-filter-chip.active { border-color:#00e5cc; color:#0f766e; background:rgba(0,229,204,0.08); }
+
         /* Club status badges */
         .status-retail       { background:rgba(107,114,128,0.1);  color:#4b5563; }
         .status-partner      { background:rgba(59,130,246,0.1);   color:#2563eb; }
@@ -1401,7 +1608,7 @@
         <!-- TOOL: Design Studio V2 -->
         <div id="tool-design-studio" class="hide w-full">
 
-            <!-- Sticky header: nav + view tabs -->
+            <!-- Sticky header -->
             <div class="ds-header">
                 <div class="page-nav-row" style="padding:12px 24px">
                     <button onclick="showLaunchpad()" class="nav-home-btn">
@@ -1419,91 +1626,57 @@
                         </button>
                     </div>
                 </div>
-                <!-- 3-view tab bar -->
-                <div class="ds-view-tabs">
-                    <button id="ds-tab-pending" onclick="switchDSView('pending')" class="ds-view-tab active">
-                        <span class="tab-badge" id="ds-badge-pending">0</span>
-                        Pending
-                    </button>
-                    <button id="ds-tab-delivered" onclick="switchDSView('delivered')" class="ds-view-tab">
-                        <span class="tab-badge" id="ds-badge-delivered">0</span>
-                        Delivered
-                    </button>
-                    <button id="ds-tab-completed" onclick="switchDSView('completed')" class="ds-view-tab">
-                        <span class="tab-badge" id="ds-badge-completed">0</span>
-                        Completed
-                    </button>
+                <!-- filter chips row -->
+                <div style="padding:0 24px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <span style="font-size:12px;font-weight:600;color:#64748b;margin-right:4px">Filter:</span>
+                    <button class="ds-filter-chip active" id="ds-filter-all" onclick="setDSFilter('all')">All Active</button>
+                    <button class="ds-filter-chip" id="ds-filter-in_progress" onclick="setDSFilter('in_progress')">In Progress</button>
+                    <button class="ds-filter-chip" id="ds-filter-in_review" onclick="setDSFilter('in_review')">In Review</button>
+                    <button class="ds-filter-chip" id="ds-filter-completed" onclick="setDSFilter('completed')">Completed</button>
                 </div>
             </div>
 
-            <!-- VIEW: Pending — Kanban board (NEW / IN PROGRESS / REVISIONS / IN REVIEW) -->
-            <div id="ds-view-pending" class="ds-view p-6">
-                <div class="ds-kanban" id="ds-kanban-board">
-                    <div class="ds-kanban-col">
-                        <div class="ds-kanban-col-header">
-                            <span class="ds-kanban-col-title">New</span>
-                            <span class="ds-kanban-count" id="dsk-count-new">0</span>
-                        </div>
-                        <div id="dsk-body-new"></div>
-                        <div id="dsk-empty-new" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
-                    </div>
-                    <div class="ds-kanban-col">
-                        <div class="ds-kanban-col-header">
-                            <span class="ds-kanban-col-title" style="color:#2563eb">In Progress</span>
-                            <span class="ds-kanban-count" id="dsk-count-in_progress">0</span>
-                        </div>
-                        <div id="dsk-body-in_progress"></div>
-                        <div id="dsk-empty-in_progress" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
-                    </div>
-                    <div class="ds-kanban-col">
-                        <div class="ds-kanban-col-header">
-                            <span class="ds-kanban-col-title" style="color:#b45309">Revisions</span>
-                            <span class="ds-kanban-count" id="dsk-count-revisions">0</span>
-                        </div>
-                        <div id="dsk-body-revisions"></div>
-                        <div id="dsk-empty-revisions" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
-                    </div>
-                    <div class="ds-kanban-col">
-                        <div class="ds-kanban-col-header">
-                            <span class="ds-kanban-col-title" style="color:#7c3aed">In Review</span>
-                            <span class="ds-kanban-count" id="dsk-count-in_review">0</span>
-                        </div>
-                        <div id="dsk-body-in_review"></div>
-                        <div id="dsk-empty-in_review" class="hide" style="padding:24px 0;text-align:center;color:#cbd5e1;font-size:12px">No tasks</div>
+            <!-- Two-column layout: task list + activity feed -->
+            <div class="ds-home-grid">
+                <!-- Task list (left) -->
+                <div>
+                    <div id="ds-task-list"></div>
+                    <div id="ds-task-list-empty" class="hide ds-empty-state" style="margin-top:40px">
+                        <div class="es-icon">🎨</div>
+                        <p>No design tasks yet</p>
+                        <span>Click "New Design Task" to get started</span>
                     </div>
                 </div>
-                <div id="ds-kanban-empty" class="hide text-center py-20">
-                    <div style="font-size:52px;margin-bottom:14px">🎨</div>
-                    <p style="color:#475569;font-size:16px;font-weight:600">No pending design tasks</p>
-                    <p style="color:#94a3b8;font-size:13px;margin-top:6px">Click "New Design Task" to create your first task</p>
+                <!-- Activity feed (right) -->
+                <div class="ds-feed-panel">
+                    <div class="ds-feed-header">
+                        <h3>Activity Feed <span id="ds-unread-badge" class="ds-notif-badge hide">0</span></h3>
+                        <button onclick="markAllFeedRead()" style="font-size:11px;color:#64748b;background:transparent;border:none;cursor:pointer;padding:0">Mark all read</button>
+                    </div>
+                    <div class="ds-feed-list" id="ds-feed-list">
+                        <div class="ds-empty-state" style="padding:30px 16px">
+                            <div class="es-icon">💬</div>
+                            <p>No activity yet</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- VIEW: Delivered grid -->
-            <div id="ds-view-delivered" class="ds-view hide p-6">
-                <div id="ds-delivered-grid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"></div>
-                <div id="ds-delivered-empty" class="hide text-center py-20">
-                    <div style="font-size:52px;margin-bottom:14px">📦</div>
-                    <p style="color:#475569;font-size:16px;font-weight:600">No delivered tasks yet</p>
-                    <p style="color:#94a3b8;font-size:13px;margin-top:6px">Tasks move here once final artwork is uploaded</p>
-                </div>
-            </div>
-
-            <!-- VIEW: Completed grid -->
-            <div id="ds-view-completed" class="ds-view hide p-6">
-                <div id="ds-completed-grid" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"></div>
-                <div id="ds-completed-empty" class="hide text-center py-20">
-                    <div style="font-size:52px;margin-bottom:14px">✅</div>
-                    <p style="color:#475569;font-size:16px;font-weight:600">No completed tasks yet</p>
-                    <p style="color:#94a3b8;font-size:13px;margin-top:6px">Tasks move here once the client has approved</p>
-                </div>
+            <!-- Keep legacy hidden elements so existing Kanban render functions don't crash -->
+            <div class="hide">
+                <div id="ds-view-pending"><div id="ds-kanban-board"><div id="dsk-body-new"></div><div id="dsk-body-in_progress"></div><div id="dsk-body-revisions"></div><div id="dsk-body-in_review"></div><span id="dsk-count-new"></span><span id="dsk-count-in_progress"></span><span id="dsk-count-revisions"></span><span id="dsk-count-in_review"></span><div id="dsk-empty-new"></div><div id="dsk-empty-in_progress"></div><div id="dsk-empty-revisions"></div><div id="dsk-empty-in_review"></div><div id="ds-kanban-empty"></div></div></div>
+                <div id="ds-view-delivered"><div id="ds-delivered-grid"></div><div id="ds-delivered-empty"></div></div>
+                <div id="ds-view-completed"><div id="ds-completed-grid"></div><div id="ds-completed-empty"></div></div>
+                <span id="ds-badge-pending"></span><span id="ds-badge-delivered"></span><span id="ds-badge-completed"></span>
+                <button id="ds-tab-pending"></button><button id="ds-tab-delivered"></button><button id="ds-tab-completed"></button>
             </div>
         </div>
 
         <!-- TOOL: Design Task Record -->
         <div id="tool-design-task" class="hide w-full">
-            <!-- Sticky header -->
-            <div class="dt-top-nav">
+            <!-- Sticky composite header -->
+            <div class="dt-top-nav" style="position:sticky;top:56px;z-index:30;background:#fff;">
+                <!-- Nav row -->
                 <div class="page-nav-row" style="padding:12px 24px">
                     <button onclick="showLaunchpad()" class="nav-home-btn">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -1513,213 +1686,158 @@
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span id="dt-back-label">Back</span>
                     </button>
-                    <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none">
-                        Design Studio
-                    </button>
+                    <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none">Design Studio</button>
                     <span class="nav-page-btn font-semibold" style="color:#0f172a">Design Task</span>
                     <div class="ml-auto flex items-center gap-3">
                         <span id="dt-ref-display" class="text-xs font-mono font-semibold text-gray-500"></span>
                         <span id="dt-status-badge" class="badge design-status-new text-xs">New</span>
                     </div>
                 </div>
-                <!-- Record summary bar -->
-                <div class="dt-record-header px-6 py-3 border-t" style="border-color:#f1f5f9">
-                    <div class="min-w-0">
-                        <h1 id="dt-task-name-display" class="text-xl font-bold truncate">Untitled Task</h1>
-                        <div class="flex flex-wrap items-center gap-3 mt-1">
+
+                <!-- Brief header panel (collapsible) -->
+                <div class="dt-brief-panel" id="dt-brief-panel">
+                    <div class="dt-brief-panel-header" onclick="toggleDTBriefPanel()">
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <h1 id="dt-task-name-display" style="font-size:16px;font-weight:700;color:#0f172a;margin:0">Untitled Task</h1>
                             <span id="dt-club-display" class="text-sm text-gray-500"></span>
                             <span id="dt-designer-display" class="text-sm" style="color:#be185d"></span>
                             <div id="dt-countdown" class="dt-countdown hide"></div>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <button onclick="markDesignDelivered()" id="btn-dt-deliver" class="btn-secondary text-sm hide">Mark as Delivered</button>
-                        <button onclick="markDesignCompleted()" id="btn-dt-complete" class="btn-primary text-sm hide">Mark Complete</button>
-                    </div>
-                </div>
-                <!-- Tab nav -->
-                <div class="tab-nav" style="padding:0 24px;margin-bottom:0">
-                    <button onclick="switchDesignTaskTab('overview')" id="dtt-overview" class="active">Overview</button>
-                    <button onclick="switchDesignTaskTab('assets')" id="dtt-assets">Assets</button>
-                    <button onclick="switchDesignTaskTab('versions')" id="dtt-versions">Versions</button>
-                    <button onclick="switchDesignTaskTab('delivery')" id="dtt-delivery">Delivery</button>
-                </div>
-            </div>
-
-            <!-- TAB: Overview -->
-            <div id="dtt-content-overview" class="p-6 md:p-8 lg:px-12">
-                <div class="grid lg:grid-cols-3 gap-6">
-                    <!-- LEFT 2/3: Main form -->
-                    <div class="lg:col-span-2 space-y-5">
-                        <!-- Core details -->
-                        <div class="glass rounded-2xl p-6">
-                            <p class="section-title">Task Details</p>
-                            <div class="grid md:grid-cols-2 gap-4">
-                                <div class="md:col-span-2">
-                                    <label class="text-xs text-gray-500 mb-1 block">Task Name *</label>
-                                    <input type="text" id="dt-task-name" placeholder="e.g. Riverside FC Full Kit Range 2025" class="w-full px-3 py-2.5 rounded-lg text-sm">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-500 mb-1 block">Reference</label>
-                                    <input type="text" id="dt-task-ref" class="w-full px-3 py-2.5 rounded-lg text-sm" readonly style="background:#f8fafc;color:#64748b;font-family:monospace">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-500 mb-1 block">Due Date</label>
-                                    <input type="date" id="dt-due-date" class="w-full px-3 py-2.5 rounded-lg text-sm" onchange="dtUpdateCountdown()">
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-500 mb-1 block">Linked Club</label>
-                                    <select id="dt-club-id" class="w-full px-3 py-2.5 rounded-lg text-sm" onchange="dtClubChanged()">
-                                        <option value="">— Select Club —</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-xs text-gray-500 mb-1 block">Linked Job <span class="text-gray-400">(optional)</span></label>
-                                    <select id="dt-job-id" class="w-full px-3 py-2.5 rounded-lg text-sm">
-                                        <option value="">— None —</option>
-                                    </select>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <label class="text-xs text-gray-500 mb-1 block">Assigned Designer</label>
-                                    <select id="dt-designer-id" class="w-full px-3 py-2.5 rounded-lg text-sm" onchange="dtDesignerChanged()">
-                                        <option value="">— Unassigned —</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Job Type -->
-                        <div class="glass rounded-2xl p-6">
-                            <p class="section-title">Job Type</p>
-                            <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="dt-job-type-grid">
-                                <!-- Rendered by JS -->
-                            </div>
-                        </div>
-
-                        <!-- Design Type (multi-select) -->
-                        <div class="glass rounded-2xl p-6">
-                            <p class="section-title">Design Type <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8">(select all that apply)</span></p>
-                            <div class="flex flex-wrap gap-2" id="dt-design-types-grid">
-                                <!-- Rendered by JS -->
-                            </div>
-                        </div>
-
-                        <!-- Design Brief -->
-                        <div class="glass rounded-2xl p-6">
-                            <p class="section-title">Design Brief</p>
-                            <textarea id="dt-design-brief" rows="7" placeholder="Describe the design requirements in full — colours, style preferences, key elements, inspirations, what NOT to do, and anything else the designer needs to know..." class="w-full px-3 py-2.5 rounded-lg text-sm resize-y"></textarea>
-                        </div>
-
-                        <!-- Products Required -->
-                        <div class="glass rounded-2xl p-6">
-                            <p class="section-title">Products Required</p>
-                            <div id="dt-products-list">
-                                <p class="text-sm text-gray-400">Select a linked club above to see available club products.</p>
-                            </div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <button onclick="event.stopPropagation();saveDesignTaskOverview()" class="btn-secondary text-xs" style="padding:5px 12px">Save</button>
+                            <svg id="dt-brief-chevron" class="w-4 h-4" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="transition:transform 0.2s;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                         </div>
                     </div>
-
-                    <!-- RIGHT 1/3: Status + meta -->
-                    <div class="space-y-4">
-                        <!-- Status -->
-                        <div class="glass rounded-2xl p-5">
-                            <p class="section-title">Task Status</p>
-                            <div class="space-y-2" id="dt-status-buttons"><!-- Rendered by JS --></div>
-                        </div>
-                        <!-- Due countdown -->
-                        <div class="glass rounded-2xl p-5" id="dt-due-panel">
-                            <p class="section-title">Deadline</p>
-                            <div id="dt-due-display" class="text-center py-2">
-                                <p class="text-sm text-gray-400">No due date set</p>
+                    <!-- Expanded brief body -->
+                    <div class="dt-brief-panel-body" id="dt-brief-body">
+                        <div class="dt-brief-grid">
+                            <!-- Core fields -->
+                            <div class="dt-brief-field md:col-span-2">
+                                <div class="dt-brief-label">Task Name</div>
+                                <input type="text" id="dt-task-name" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Riverside FC Full Kit Range 2025">
                             </div>
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Reference</div>
+                                <input type="text" id="dt-task-ref" class="w-full px-2 py-1.5 rounded-lg text-sm" readonly style="background:#f8fafc;color:#64748b;font-family:monospace;border:1px solid #e2e8f0">
+                            </div>
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Due Date</div>
+                                <input type="date" id="dt-due-date" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" onchange="dtUpdateCountdown()">
+                            </div>
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Linked Club</div>
+                                <select id="dt-club-id" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" onchange="dtClubChanged()">
+                                    <option value="">— Select Club —</option>
+                                </select>
+                            </div>
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Linked Job</div>
+                                <select id="dt-job-id" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200">
+                                    <option value="">— None —</option>
+                                </select>
+                            </div>
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Assigned Designer</div>
+                                <select id="dt-designer-id" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" onchange="dtDesignerChanged()">
+                                    <option value="">— Unassigned —</option>
+                                </select>
+                            </div>
+                            <!-- Brief fields -->
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Sport</div>
+                                <input type="text" id="dt-sport" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Football">
+                            </div>
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Product Type</div>
+                                <input type="text" id="dt-product-type" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Full Kit">
+                            </div>
+                            <div class="dt-brief-field">
+                                <div class="dt-brief-label">Colour Palette</div>
+                                <input type="text" id="dt-colour-palette" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200" placeholder="e.g. Blue, White, Gold">
+                            </div>
+                            <div class="dt-brief-field" style="grid-column:1/-1">
+                                <div class="dt-brief-label">Kit Details / Design Brief</div>
+                                <textarea id="dt-design-brief" rows="3" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200 resize-y" placeholder="Describe the design requirements — style, key elements, inspirations, what NOT to do..."></textarea>
+                            </div>
+                            <div class="dt-brief-field" style="grid-column:1/-1">
+                                <div class="dt-brief-label">Key Notes</div>
+                                <textarea id="dt-key-notes" rows="2" class="w-full px-2 py-1.5 rounded-lg text-sm border border-gray-200 resize-y" placeholder="Any additional notes for the designer..."></textarea>
+                            </div>
+                        </div>
+                        <!-- Job Type + Design Types (compact row) -->
+                        <div style="margin-top:12px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+                            <div style="flex:0 0 auto">
+                                <div class="dt-brief-label" style="margin-bottom:6px">Job Type</div>
+                                <div class="flex flex-wrap gap-2" id="dt-job-type-grid"></div>
+                            </div>
+                            <div style="flex:1;min-width:200px">
+                                <div class="dt-brief-label" style="margin-bottom:6px">Design Types</div>
+                                <div class="flex flex-wrap gap-2" id="dt-design-types-grid"></div>
+                            </div>
+                        </div>
+                        <!-- Products list (compact) -->
+                        <div style="margin-top:12px" id="dt-products-list-wrap">
+                            <div class="dt-brief-label" style="margin-bottom:6px">Products Required</div>
+                            <div id="dt-products-list"><p class="text-xs text-gray-400">Select a linked club above to see available products.</p></div>
                         </div>
                         <!-- Record meta -->
-                        <div class="glass rounded-2xl p-5">
-                            <p class="section-title">Record Info</p>
-                            <div class="space-y-2 text-sm">
-                                <div class="flex justify-between gap-2"><span class="text-gray-500">Reference</span><span id="dt-meta-ref" class="font-mono font-semibold text-gray-700 text-right">—</span></div>
-                                <div class="flex justify-between gap-2"><span class="text-gray-500">Created</span><span id="dt-meta-created" class="text-right text-gray-700">—</span></div>
-                                <div class="flex justify-between gap-2"><span class="text-gray-500">Updated</span><span id="dt-meta-updated" class="text-right text-gray-700">—</span></div>
-                            </div>
+                        <div style="margin-top:12px;display:flex;gap:20px;flex-wrap:wrap">
+                            <div class="dt-brief-field"><div class="dt-brief-label">Created</div><div class="dt-brief-value" id="dt-meta-created">—</div></div>
+                            <div class="dt-brief-field"><div class="dt-brief-label">Updated</div><div class="dt-brief-value" id="dt-meta-updated">—</div></div>
+                            <div class="dt-brief-field"><div class="dt-brief-label">Status</div><div id="dt-status-buttons" style="display:flex;flex-wrap:wrap;gap:4px"></div></div>
                         </div>
-                        <!-- Save -->
-                        <button onclick="saveDesignTaskOverview()" class="w-full btn-primary py-3 text-sm">Save Overview</button>
                     </div>
+                </div>
+
+                <!-- Stage progress bar -->
+                <div class="dt-stage-progress-wrap">
+                    <div class="dt-stage-progress-fill" id="dt-progress-fill" style="width:0%"></div>
+                </div>
+
+                <!-- Stage tabs -->
+                <div class="dt-stage-tabs" id="dt-stage-tabs">
+                    <!-- Rendered by JS -->
                 </div>
             </div>
 
-            <!-- TAB: Assets -->
-            <div id="dtt-content-assets" class="hide p-6 md:p-8 lg:px-12">
-                <div class="glass rounded-2xl p-6 mb-5">
-                    <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <h3 class="font-semibold text-sm">Reference Files &amp; Brief Assets</h3>
-                            <p class="text-xs text-gray-500 mt-1">Upload client references, existing logos, branding guidelines, or brief documents</p>
-                        </div>
-                        <button onclick="document.getElementById('dt-asset-input').click()" class="btn-primary text-sm flex items-center gap-2 flex-shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Upload Files
-                        </button>
-                        <input type="file" id="dt-asset-input" class="hide" multiple accept="image/*,.pdf,.ai,.eps,.svg,.zip" onchange="uploadDesignTaskAssets(event)">
-                    </div>
-                    <div class="dropzone p-8 text-center cursor-pointer" id="dt-asset-dropzone" onclick="document.getElementById('dt-asset-input').click()">
-                        <svg class="w-10 h-10 mx-auto mb-3" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                        <p class="text-sm text-gray-500">Drag &amp; drop files here, or click to browse</p>
-                        <p class="text-xs text-gray-400 mt-1">Images, PDFs, AI, EPS, SVG, ZIP supported</p>
-                    </div>
-                </div>
-                <div id="dt-assets-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
-                <div id="dt-assets-empty" class="hide text-center py-16">
-                    <div style="font-size:48px;margin-bottom:12px">📁</div>
-                    <p style="color:#64748b;font-weight:500">No reference files uploaded yet</p>
-                    <p style="color:#94a3b8;font-size:13px;margin-top:4px">Upload client briefs, logos, and reference imagery</p>
+            <!-- Stage panel: rendered dynamically -->
+            <div id="dt-stage-panel" class="dt-stage-panel"></div>
+
+            <!-- Keep legacy hidden elements for backward compatibility -->
+            <div class="hide">
+                <div id="dtt-content-overview"></div>
+                <div id="dtt-content-assets"><div id="dt-assets-grid"></div><div id="dt-assets-empty"></div><div id="dt-asset-dropzone"></div><input type="file" id="dt-asset-input" onchange="uploadDesignTaskAssets(event)"></div>
+                <div id="dtt-content-versions"><div id="dt-versions-list"></div><div id="dt-versions-empty"></div></div>
+                <div id="dtt-content-delivery"><div id="dt-delivery-list"></div><div id="dt-delivery-empty"></div><input type="file" id="dt-delivery-input" onchange="uploadDeliveryFiles(event)"></div>
+                <span id="dt-meta-ref"></span>
+                <div id="dt-due-panel"><div id="dt-due-display"></div></div>
+                <button id="btn-dt-deliver" onclick="markDesignDelivered()"></button>
+                <button id="btn-dt-complete" onclick="markDesignCompleted()"></button>
+                <button id="dtt-overview"></button><button id="dtt-assets"></button><button id="dtt-versions"></button><button id="dtt-delivery"></button>
+            </div>
+        </div>
+
+        <!-- Full-screen Preview Modal -->
+        <div id="ds-preview-modal" class="hide">
+            <div id="ds-preview-main">
+                <button id="ds-preview-close" onclick="closeDSPreview()" title="Close (Esc)">✕</button>
+                <div id="ds-preview-img-wrap">
+                    <img id="ds-preview-img" src="" alt="" class="hide" style="cursor:default">
+                    <iframe id="ds-preview-iframe" src="" class="hide"></iframe>
+                    <div id="ann-overlay-v2" class="hide"></div>
                 </div>
             </div>
-
-            <!-- TAB: Versions -->
-            <div id="dtt-content-versions" class="hide p-6 md:p-8 lg:px-12">
-                <div class="flex items-center justify-between mb-5">
-                    <div>
-                        <h3 class="font-semibold">Design Versions</h3>
-                        <p class="text-xs text-gray-500 mt-0.5">Upload each design iteration. Annotate, approve or decline each version.</p>
-                    </div>
-                    <button onclick="addDesignVersion()" class="btn-primary text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Upload Version
-                    </button>
+            <div id="ds-preview-sidebar">
+                <div id="ds-preview-sidebar-header">
+                    <span>Annotations</span>
+                    <button id="ds-ann-mode-btn" onclick="toggleAnnMode()">+ Annotate</button>
                 </div>
-                <div id="dt-versions-list" class="space-y-4"></div>
-                <div id="dt-versions-empty" class="hide text-center py-16">
-                    <div style="font-size:48px;margin-bottom:12px">🖼</div>
-                    <p style="color:#64748b;font-weight:500">No design versions uploaded yet</p>
-                    <p style="color:#94a3b8;font-size:13px;margin-top:4px">Upload your first design version when you're ready for review</p>
-                </div>
-            </div>
-
-            <!-- TAB: Delivery -->
-            <div id="dtt-content-delivery" class="hide p-6 md:p-8 lg:px-12">
-                <div class="glass rounded-2xl p-6 mb-5">
-                    <div class="flex items-start justify-between mb-4">
-                        <div>
-                            <h3 class="font-semibold text-sm">Final Artwork Delivery</h3>
-                            <p class="text-xs text-gray-500 mt-1">Upload final approved artwork files. Once uploaded, you can mark this task as Delivered.</p>
-                        </div>
-                        <button onclick="document.getElementById('dt-delivery-input').click()" class="btn-primary text-sm flex items-center gap-2 flex-shrink-0">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Upload Final Files
-                        </button>
-                        <input type="file" id="dt-delivery-input" class="hide" multiple accept="image/*,.pdf,.ai,.eps,.svg,.zip" onchange="uploadDeliveryFiles(event)">
-                    </div>
-                    <div class="dropzone p-8 text-center cursor-pointer" onclick="document.getElementById('dt-delivery-input').click()">
-                        <svg class="w-10 h-10 mx-auto mb-3" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                        <p class="text-sm text-gray-500">Upload final approved artwork — AI, EPS, PDF, PNG, ZIP</p>
-                    </div>
-                </div>
-                <div id="dt-delivery-list" class="space-y-3"></div>
-                <div id="dt-delivery-empty" class="hide text-center py-16">
-                    <div style="font-size:48px;margin-bottom:12px">📤</div>
-                    <p style="color:#64748b;font-weight:500">No delivery files uploaded yet</p>
-                    <p style="color:#94a3b8;font-size:13px;margin-top:4px">Upload final artwork then mark as Delivered</p>
+                <div id="ds-ann-list"></div>
+                <div id="ds-ann-new-form" class="hide">
+                    <div style="font-size:11px;color:#9ca3af;margin-bottom:6px">Click position: <span id="ds-ann-pos-label">–</span></div>
+                    <textarea id="ds-ann-comment" rows="3" placeholder="Add your comment..."></textarea>
+                    <button class="btn-save-ann" onclick="saveAnnotation()">Save Pin</button>
+                    <button class="btn-cancel-ann" onclick="cancelAnnotation()">Cancel</button>
                 </div>
             </div>
         </div>
@@ -15706,6 +15824,1252 @@
 
         // Backward compat: old renderDesignTab still renders if called
         function renderDesignTab() { loadJobDesign(); }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        //  DESIGN STUDIO V2 — Stage-based workflow
+        // ═══════════════════════════════════════════════════════════════════════
+
+        // State
+        let dsFilter = 'all';
+        let dsActivityChannel = null;
+        let currentStages = [];
+        let currentActiveStageNum = 1;
+        let annMode = false;
+        let pendingAnnPin = null;
+        let currentPreviewUploadId = null;
+        let currentAnnUploadId = null;
+        let currentAnnotations = [];
+
+        // ── Helpers ────────────────────────────────────────────────────────────
+        function dsRelativeTime(ts) {
+            if (!ts) return '';
+            const diff = Date.now() - new Date(ts).getTime();
+            const m = Math.floor(diff / 60000);
+            if (m < 1) return 'just now';
+            if (m < 60) return `${m}m ago`;
+            const h = Math.floor(m / 60);
+            if (h < 24) return `${h}h ago`;
+            return new Date(ts).toLocaleDateString('en-GB', { day:'2-digit', month:'short' });
+        }
+
+        function dsActorInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+        }
+
+        function dsStageStatusLabel(status) {
+            return { not_started:'Not Started', in_progress:'In Progress', in_review:'In Review',
+                revisions_required:'Revisions', approved:'Approved', declined:'Declined', skipped:'Skipped' }[status] || status;
+        }
+
+        function dsActivityLabel(action_type, detail) {
+            const map = {
+                task_created:              'created this task',
+                stage_accepted:            `accepted Stage ${detail?.stage_name||''}`,
+                stage_declined:            `declined Stage ${detail?.stage_name||''}`,
+                stage_needs_info:          `requested more info on Stage ${detail?.stage_name||''}`,
+                version_uploaded:          `uploaded ${detail?.version_label||'a version'} to Stage ${detail?.stage_name||''}`,
+                version_approved:          `approved ${detail?.version_label||'a version'}`,
+                version_declined:          `declined ${detail?.version_label||'a version'}`,
+                stage_submitted_for_review:`submitted Stage ${detail?.stage_name||''} for review`,
+                stage_approved:            `approved Stage ${detail?.stage_name||''}`,
+                stage_revisions_requested: `requested revisions on Stage ${detail?.stage_name||''}`,
+                stage_skipped:             `skipped Stage ${detail?.stage_name||''}`,
+                task_completed:            'completed the task',
+            };
+            return map[action_type] || action_type.replace(/_/g,' ');
+        }
+
+        async function dsLogActivity(taskId, stageId, actionType, detail = {}) {
+            if (!currentBrand?.id) return;
+            const actor = await supabase.auth.getUser();
+            const actorId = actor?.data?.user?.id || null;
+            const actorName = currentUserProfile ? (currentUserProfile.first_name || '') + ' ' + (currentUserProfile.last_name || '') : '';
+            await supabase.from('design_activity_feed').insert({
+                task_id: taskId, stage_id: stageId || null,
+                brand_id: currentBrand.id,
+                actor_id: actorId, actor_name: actorName.trim() || null,
+                action_type: actionType, action_detail: detail
+            });
+        }
+
+        // ── Design Studio Home ─────────────────────────────────────────────────
+
+        function setDSFilter(filter) {
+            dsFilter = filter;
+            document.querySelectorAll('.ds-filter-chip').forEach(c => {
+                c.classList.toggle('active', c.id === `ds-filter-${filter}`);
+            });
+            renderDSTaskList();
+        }
+
+        function renderDSHome() {
+            renderDSTaskList();
+            loadDSActivityFeed();
+            subscribeToActivityFeed();
+        }
+
+        function renderDSTaskList() {
+            const container = document.getElementById('ds-task-list');
+            const empty = document.getElementById('ds-task-list-empty');
+            if (!container) return;
+
+            let tasks = allDesignTasks || [];
+            if (dsFilter === 'in_progress') tasks = tasks.filter(t => t.status === 'in_progress');
+            else if (dsFilter === 'in_review') tasks = tasks.filter(t => ['in_review','awaiting_approval'].includes(t.status));
+            else if (dsFilter === 'completed') tasks = tasks.filter(t => t.status === 'completed');
+            else tasks = tasks.filter(t => t.status !== 'completed'); // 'all' = all active
+
+            // Update launchpad stats
+            const elA = document.getElementById('stat-design-active');
+            const elR = document.getElementById('stat-design-review');
+            const activeTasks = (allDesignTasks||[]).filter(t => !['completed','delivered'].includes(t.status));
+            const reviewTasks = (allDesignTasks||[]).filter(t => ['in_review','awaiting_approval'].includes(t.status));
+            if (elA) elA.textContent = `${activeTasks.length} active`;
+            if (elR) elR.textContent = `${reviewTasks.length} in review`;
+
+            if (!tasks.length) {
+                container.innerHTML = '';
+                if (empty) empty.classList.remove('hide');
+                return;
+            }
+            if (empty) empty.classList.add('hide');
+            container.innerHTML = tasks.map(t => renderDSTaskCardV2(t)).join('');
+        }
+
+        function renderDSTaskCardV2(task) {
+            const stages = task._stages || [];
+            const approvedCount = stages.filter(s => ['approved','skipped'].includes(s.status)).length;
+            const progressPct = Math.round((approvedCount / 4) * 100);
+            // Determine active stage label
+            const activeStage = stages.find(s => s.status === 'in_progress' || s.status === 'in_review' || s.status === 'revisions_required')
+                || stages.find(s => s.status === 'not_started');
+            const stageBadgeStatus = activeStage?.status || 'not_started';
+            const stageLabel = activeStage ? `Stage ${activeStage.stage_number}: ${activeStage.stage_name}` : (approvedCount === 4 ? 'Complete' : 'Not Started');
+            const due = task.due_date ? new Date(task.due_date) : null;
+            const dueInfo = due ? getDueInfo(due) : null;
+            const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : '';
+            const dueClass = dueInfo ? (dueInfo.urgency === 'overdue' ? 'color:#dc2626' : dueInfo.urgency === 'soon' ? 'color:#ea580c' : 'color:#64748b') : 'color:#64748b';
+
+            return `<div class="ds-task-card-v2" onclick="showDesignTask('${task.id}')">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                    <div style="min-width:0;flex:1">
+                        <div class="tc-ref">${escHtml(task.task_ref||'')}</div>
+                        <div class="tc-title">${escHtml(task.task_name||'Untitled Task')}</div>
+                        <div class="tc-sub">
+                            ${task.clubs?.name ? `🏟 ${escHtml(task.clubs.name)}` : ''}
+                            ${task.assigned_designer_name ? ` · 👤 ${escHtml(task.assigned_designer_name)}` : ''}
+                        </div>
+                    </div>
+                    <span class="ds-stage-badge ${stageBadgeStatus}" style="flex-shrink:0;margin-top:4px">${escHtml(stageLabel)}</span>
+                </div>
+                <div class="tc-progress-bar"><div class="tc-progress-fill" style="width:${progressPct}%"></div></div>
+                <div class="tc-footer">
+                    <span style="font-size:11px;font-weight:600;${dueClass}">
+                        ${dueLabel ? `📅 ${dueLabel}${dueInfo?.text ? ' · ' + dueInfo.text : ''}` : ''}
+                    </span>
+                    <span style="font-size:11px;color:#94a3b8">${approvedCount}/4 stages</span>
+                </div>
+            </div>`;
+        }
+
+        // ── Activity Feed ──────────────────────────────────────────────────────
+
+        async function loadDSActivityFeed() {
+            if (!currentBrand?.id) return;
+            const { data } = await supabase.from('design_activity_feed')
+                .select('*, design_tasks(task_name,task_ref)')
+                .eq('brand_id', currentBrand.id)
+                .order('created_at', { ascending: false })
+                .limit(50);
+            renderDSActivityFeed(data || []);
+            // Update unread badge
+            const unread = (data||[]).filter(f => !f.is_read).length;
+            const badge = document.getElementById('ds-unread-badge');
+            if (badge) {
+                badge.textContent = unread;
+                badge.classList.toggle('hide', unread === 0);
+            }
+        }
+
+        function renderDSActivityFeed(items) {
+            const list = document.getElementById('ds-feed-list');
+            if (!list) return;
+            if (!items.length) {
+                list.innerHTML = '<div class="ds-empty-state" style="padding:30px 16px"><div class="es-icon">💬</div><p>No activity yet</p></div>';
+                return;
+            }
+            list.innerHTML = items.map(item => {
+                const initials = dsActorInitials(item.actor_name || '');
+                const detail = item.action_detail || {};
+                const taskName = item.design_tasks?.task_name || detail.task_name || 'Task';
+                const taskRef  = item.design_tasks?.task_ref || '';
+                const label = dsActivityLabel(item.action_type, detail);
+                return `<div class="ds-feed-item ${!item.is_read ? 'unread' : ''}" onclick="showDesignTask('${item.task_id}')">
+                    <div style="display:flex;gap:8px;align-items:flex-start">
+                        <div class="ds-feed-actor">${initials}</div>
+                        <div style="flex:1;min-width:0">
+                            <div class="ds-feed-text">
+                                <strong>${escHtml(item.actor_name||'Someone')}</strong> ${escHtml(label)}
+                            </div>
+                            <div class="ds-feed-text" style="color:#64748b;margin-top:1px">
+                                ${taskRef ? `<span style="font-family:monospace;font-size:10px">${escHtml(taskRef)}</span> · ` : ''}${escHtml(taskName)}
+                            </div>
+                            <div class="ds-feed-time">${dsRelativeTime(item.created_at)}</div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function markAllFeedRead() {
+            if (!currentBrand?.id) return;
+            await supabase.from('design_activity_feed').update({ is_read: true })
+                .eq('brand_id', currentBrand.id).eq('is_read', false);
+            const badge = document.getElementById('ds-unread-badge');
+            if (badge) badge.classList.add('hide');
+            document.querySelectorAll('.ds-feed-item.unread').forEach(el => el.classList.remove('unread'));
+        }
+
+        function subscribeToActivityFeed() {
+            if (dsActivityChannel) { supabase.removeChannel(dsActivityChannel); dsActivityChannel = null; }
+            if (!currentBrand?.id) return;
+            dsActivityChannel = supabase.channel('ds_activity_' + currentBrand.id)
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'design_activity_feed',
+                    filter: `brand_id=eq.${currentBrand.id}` }, () => {
+                    loadDSActivityFeed();
+                })
+                .subscribe();
+        }
+
+        // ── Override loadDesignStudio to also load stages ─────────────────────
+
+        const _origLoadDesignStudio = loadDesignStudio;
+        async function loadDesignStudioV2() {
+            if (!currentBrand) return;
+            // Load tasks
+            const { data: brandTasks } = await supabase
+                .from('design_tasks')
+                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number,brand_id)')
+                .eq('brand_id', currentBrand.id)
+                .order('updated_at', { ascending: false });
+            const { data: legacyTasks } = await supabase
+                .from('design_tasks')
+                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number,brand_id)')
+                .is('brand_id', null).not('job_id', 'is', null)
+                .order('updated_at', { ascending: false });
+            const legacy = (legacyTasks||[]).filter(t => t.jobs?.brand_id === currentBrand.id);
+            allDesignTasks = [...(brandTasks||[]), ...legacy];
+
+            // Load all stages for this brand's tasks in one query
+            const taskIds = allDesignTasks.map(t => t.id);
+            if (taskIds.length) {
+                const { data: allStages } = await supabase.from('design_stages')
+                    .select('*').in('task_id', taskIds).order('stage_number');
+                const stagesByTask = {};
+                (allStages||[]).forEach(s => {
+                    if (!stagesByTask[s.task_id]) stagesByTask[s.task_id] = [];
+                    stagesByTask[s.task_id].push(s);
+                });
+                allDesignTasks.forEach(t => { t._stages = stagesByTask[t.id] || []; });
+            }
+
+            renderDSHome();
+        }
+
+        // ── Toggle Brief Panel ─────────────────────────────────────────────────
+
+        function toggleDTBriefPanel() {
+            const body = document.getElementById('dt-brief-body');
+            const chevron = document.getElementById('dt-brief-chevron');
+            if (!body) return;
+            const isOpen = !body.classList.contains('hide');
+            body.classList.toggle('hide', isOpen);
+            if (chevron) chevron.style.transform = isOpen ? 'rotate(-90deg)' : '';
+            if (currentDesignTaskRecord?.id) {
+                localStorage.setItem(`ds_brief_open_${currentDesignTaskRecord.id}`, isOpen ? '0' : '1');
+            }
+        }
+
+        // ── Design Task Record V2 ──────────────────────────────────────────────
+
+        async function loadDesignTaskRecordV2(taskId) {
+            const { data: task } = await supabase
+                .from('design_tasks')
+                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number)')
+                .eq('id', taskId).single();
+            if (!task) { showToast('Task not found', 'error'); return; }
+            currentDesignTaskRecord = task;
+            currentDesignTask = task;
+            currentJobId = task.job_id;
+
+            // Load stages
+            const { data: stages } = await supabase.from('design_stages')
+                .select('*').eq('task_id', taskId).order('stage_number');
+            currentStages = stages || [];
+            // Ensure 4 stages exist (fallback if trigger hadn't fired yet)
+            if (!currentStages.length) {
+                await supabase.from('design_stages').insert([
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 1, stage_name: 'Brief', status: 'not_started' },
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 2, stage_name: 'Concepts', status: 'not_started' },
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 3, stage_name: 'Full Range', status: 'not_started' },
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 4, stage_name: 'Final Artwork', status: 'not_started' }
+                ]);
+                const { data: stagesRetry } = await supabase.from('design_stages').select('*').eq('task_id', taskId).order('stage_number');
+                currentStages = stagesRetry || [];
+            }
+
+            renderDesignTaskRecordV2();
+        }
+
+        function renderDesignTaskRecordV2() {
+            const task = currentDesignTaskRecord;
+            if (!task) return;
+
+            // Header fields
+            const nameDisp = document.getElementById('dt-task-name-display');
+            if (nameDisp) nameDisp.textContent = task.task_name || 'Untitled Task';
+            const refDisp = document.getElementById('dt-ref-display');
+            if (refDisp) refDisp.textContent = task.task_ref || '';
+            const statusBadge = document.getElementById('dt-status-badge');
+            if (statusBadge) {
+                statusBadge.textContent = DS_STATUS_LABELS[task.status] || task.status;
+                statusBadge.className = `badge design-status-${task.status} text-xs`;
+            }
+            const clubDisp = document.getElementById('dt-club-display');
+            if (clubDisp) clubDisp.textContent = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
+            const designerDisp = document.getElementById('dt-designer-display');
+            if (designerDisp) designerDisp.textContent = task.assigned_designer_name ? `👤 ${task.assigned_designer_name}` : '';
+
+            // Brief collapse state
+            const body = document.getElementById('dt-brief-body');
+            const chevron = document.getElementById('dt-brief-chevron');
+            const savedOpen = localStorage.getItem(`ds_brief_open_${task.id}`);
+            const isOpen = savedOpen !== '0'; // default open
+            if (body) body.classList.toggle('hide', !isOpen);
+            if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(-90deg)';
+
+            // Fill brief form fields
+            dtFillOverviewForm(task);
+            const setV = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            setV('dt-sport', task.sport);
+            setV('dt-product-type', task.product_type);
+            setV('dt-colour-palette', task.colour_palette);
+            setV('dt-key-notes', task.key_notes);
+            renderDtJobTypeGrid(task.job_type);
+            renderDtDesignTypesGrid(task.design_types || []);
+            dtUpdateCountdown();
+            renderDtProductsList(task);
+
+            // Meta
+            const metaCreated = document.getElementById('dt-meta-created');
+            const metaUpdated = document.getElementById('dt-meta-updated');
+            if (metaCreated) metaCreated.textContent = task.created_at ? new Date(task.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+            if (metaUpdated) metaUpdated.textContent = task.updated_at ? new Date(task.updated_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+            renderDtStatusButtons(task.status);
+
+            // Progress bar
+            const approvedCount = currentStages.filter(s => ['approved','skipped'].includes(s.status)).length;
+            const fill = document.getElementById('dt-progress-fill');
+            if (fill) fill.style.width = `${(approvedCount / 4) * 100}%`;
+
+            // Stage tabs
+            renderStageTabs();
+
+            // Show first unlocked/active stage
+            const firstActive = currentStages.find(s => s.status !== 'not_started' && s.status !== 'approved' && s.status !== 'skipped')
+                || currentStages.find(s => s.status === 'not_started')
+                || currentStages[0];
+            currentActiveStageNum = firstActive?.stage_number || 1;
+            renderStagePanel(currentActiveStageNum);
+        }
+
+        function renderStageTabs() {
+            const container = document.getElementById('dt-stage-tabs');
+            if (!container) return;
+            const approvedCount = currentStages.filter(s => ['approved','skipped'].includes(s.status)).length;
+            container.innerHTML = currentStages.map((stage, idx) => {
+                const isUnlocked = idx === 0 || ['approved','skipped'].includes(currentStages[idx - 1]?.status);
+                const isActive = stage.stage_number === currentActiveStageNum;
+                const icon = stage.status === 'approved' ? '✓' : stage.status === 'skipped' ? '↷' : stage.status === 'declined' ? '✕' : stage.stage_number;
+                return `<button class="dt-stage-tab st-${stage.status} ${isActive ? 'active' : ''}"
+                    ${!isUnlocked ? 'disabled' : ''}
+                    onclick="switchDSStage(${stage.stage_number})">
+                    <span class="stage-icon">${icon}</span>
+                    <span>Stage ${stage.stage_number}: ${escHtml(stage.stage_name)}</span>
+                </button>`;
+            }).join('');
+
+            // Update progress bar
+            const fill = document.getElementById('dt-progress-fill');
+            if (fill) fill.style.width = `${(approvedCount / 4) * 100}%`;
+        }
+
+        function switchDSStage(stageNum) {
+            currentActiveStageNum = stageNum;
+            document.querySelectorAll('.dt-stage-tab').forEach((tab, idx) => {
+                tab.classList.toggle('active', currentStages[idx]?.stage_number === stageNum);
+            });
+            renderStagePanel(stageNum);
+        }
+
+        async function renderStagePanel(stageNum) {
+            const panel = document.getElementById('dt-stage-panel');
+            if (!panel) return;
+            const stage = currentStages.find(s => s.stage_number === stageNum);
+            if (!stage) { panel.innerHTML = '<p class="text-sm text-gray-400 p-6">Stage not found.</p>'; return; }
+
+            panel.innerHTML = '<div style="padding:32px;text-align:center"><div class="spinner"></div></div>';
+
+            if (stageNum === 1) {
+                panel.innerHTML = await buildStage1Panel(stage);
+            } else if (stageNum === 2 || stageNum === 3) {
+                panel.innerHTML = await buildVersionStagePanel(stage);
+            } else if (stageNum === 4) {
+                panel.innerHTML = await buildStage4Panel(stage);
+            }
+        }
+
+        // ── Stage 1: Brief ─────────────────────────────────────────────────────
+
+        async function buildStage1Panel(stage) {
+            const { data: log } = await supabase.from('stage_status_log')
+                .select('*').eq('stage_id', stage.id).order('created_at');
+            const logHtml = buildCommentLog(log || []);
+            const isApproved = stage.status === 'approved';
+            const isDeclined = stage.status === 'declined';
+
+            return `<div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+                    <div>
+                        <h3 style="font-size:16px;font-weight:700;margin:0 0 4px">Stage 1: Brief Review</h3>
+                        <p style="font-size:13px;color:#64748b;margin:0">Review the brief above and accept, decline, or request more information.</p>
+                    </div>
+                    <span class="ds-stage-badge ${stage.status}">${dsStageStatusLabel(stage.status)}</span>
+                </div>
+
+                ${isApproved ? `<div style="background:rgba(34,197,94,0.08);border:1.5px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
+                    ✓ Brief accepted — Stage 2 (Concepts) is now unlocked.
+                </div>` : ''}
+                ${isDeclined ? `<div style="background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:12px;padding:16px;margin-bottom:20px;color:#dc2626;font-size:13px;font-weight:600">
+                    ✕ Brief declined. Update the brief details above and re-accept when ready.
+                </div>` : ''}
+
+                ${!isApproved ? `<div class="ds-s1-actions">
+                    <button class="ds-s1-btn accept" onclick="stage1Action('accept')">
+                        <span style="font-size:24px">✓</span>
+                        Accept Job
+                        <span style="font-size:11px;font-weight:400;opacity:0.8">Brief looks good</span>
+                    </button>
+                    <button class="ds-s1-btn needs-info" onclick="stage1Action('needs_info')">
+                        <span style="font-size:24px">?</span>
+                        Needs More Info
+                        <span style="font-size:11px;font-weight:400;opacity:0.8">Request clarification</span>
+                    </button>
+                    <button class="ds-s1-btn decline" onclick="stage1Action('decline')">
+                        <span style="font-size:24px">✕</span>
+                        Decline Job
+                        <span style="font-size:11px;font-weight:400;opacity:0.8">Cannot proceed</span>
+                    </button>
+                </div>` : ''}
+
+                <div style="margin-top:20px">
+                    <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Activity Log</div>
+                    ${logHtml || '<p style="font-size:13px;color:#94a3b8">No activity yet</p>'}
+                </div>
+            </div>`;
+        }
+
+        async function stage1Action(action) {
+            const stage = currentStages.find(s => s.stage_number === 1);
+            if (!stage) return;
+
+            if (action === 'accept') {
+                const ok = await updateStageStatus(stage, 'approved', 'Brief accepted');
+                if (!ok) return;
+                await dsLogActivity(stage.task_id, stage.id, 'stage_accepted', { stage_name: 'Brief' });
+                renderStageTabs();
+                renderStagePanel(1);
+                showToast('Brief accepted — Stage 2 unlocked ✓');
+            } else {
+                const actionLabel = action === 'decline' ? 'Decline Job' : 'Request More Info';
+                const placeholder = action === 'decline' ? 'Reason for declining...' : 'What information do you need?';
+                const newStatus  = action === 'decline' ? 'declined' : 'in_review';
+                showDSCommentModal(actionLabel, placeholder, async (comment) => {
+                    if (!comment.trim()) { showToast('Please enter a comment', 'warning'); return; }
+                    const ok = await updateStageStatus(stage, newStatus, comment);
+                    if (!ok) return;
+                    const actType = action === 'decline' ? 'stage_declined' : 'stage_needs_info';
+                    await dsLogActivity(stage.task_id, stage.id, actType, { stage_name: 'Brief', comment });
+                    renderStageTabs();
+                    renderStagePanel(1);
+                    showToast(action === 'decline' ? 'Job declined' : 'More info requested');
+                });
+            }
+        }
+
+        // ── Stage 2 & 3: Versioned upload ──────────────────────────────────────
+
+        async function buildVersionStagePanel(stage) {
+            const { data: uploads } = await supabase.from('stage_uploads')
+                .select('*').eq('stage_id', stage.id).order('uploaded_at');
+            const { data: log } = await supabase.from('stage_status_log')
+                .select('*').eq('stage_id', stage.id).order('created_at');
+
+            const uploadsHtml = buildVersionCards(stage, uploads || []);
+            const logHtml = buildCommentLog(log || []);
+            const isLocked = stage.status === 'not_started';
+            const isInReview = stage.status === 'in_review';
+            const isApproved = stage.status === 'approved';
+            const hasApprovedVersion = (uploads||[]).some(u => u.status === 'approved');
+
+            return `<div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+                    <div>
+                        <h3 style="font-size:16px;font-weight:700;margin:0 0 4px">Stage ${stage.stage_number}: ${escHtml(stage.stage_name)}</h3>
+                        <p style="font-size:13px;color:#64748b;margin:0">Upload design versions for review. Each version can be previewed, annotated, approved or declined.</p>
+                    </div>
+                    <span class="ds-stage-badge ${stage.status}">${dsStageStatusLabel(stage.status)}</span>
+                </div>
+
+                ${isApproved ? `<div style="background:rgba(34,197,94,0.08);border:1.5px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
+                    ✓ Stage ${stage.stage_number} approved — ${stage.stage_number < 4 ? `Stage ${stage.stage_number+1} unlocked` : 'All stages complete'}.
+                </div>` : ''}
+
+                <!-- Version upload cards -->
+                <div class="ds-version-grid" id="ds-version-cards-${stage.id}">
+                    ${uploadsHtml}
+                </div>
+                ${!isApproved ? `<button onclick="addVersionCard('${stage.id}', ${(uploads||[]).length + 1})" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px dashed #cbd5e1;background:transparent;border-radius:10px;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;transition:all 0.15s" onmouseover="this.style.borderColor='#00e5cc';this.style.color='#0f766e'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b'">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    Add Version V${(uploads||[]).length + 1}
+                </button>` : ''}
+
+                <!-- Stage footer actions -->
+                <div class="ds-stage-footer">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        ${!isApproved && !isInReview ? `<button class="ds-submit-review-btn" ${!hasApprovedVersion ? 'disabled title="Approve at least one version first"' : ''} onclick="submitStageForReview('${stage.id}', ${stage.stage_number})">
+                            Submit for Review
+                        </button>` : ''}
+                        ${isInReview ? `<button class="ds-approve-stage-btn" onclick="approveStage('${stage.id}', ${stage.stage_number})">
+                            Approve Stage ${stage.stage_number}
+                        </button>
+                        <button class="ds-req-revisions-btn" onclick="requestRevisions('${stage.id}', ${stage.stage_number})">
+                            Request Revisions
+                        </button>` : ''}
+                        ${!isApproved ? `<button class="ds-skip-stage-btn" onclick="skipStage('${stage.id}', ${stage.stage_number})">Skip Stage</button>` : ''}
+                    </div>
+                </div>
+
+                <!-- Comment log -->
+                <div style="margin-top:24px">
+                    <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Stage Activity</div>
+                    ${logHtml || '<p style="font-size:13px;color:#94a3b8">No activity yet</p>'}
+                </div>
+            </div>`;
+        }
+
+        function buildVersionCards(stage, uploads) {
+            if (!uploads.length) {
+                return `<div class="ds-version-card">
+                    <div class="ds-version-header">
+                        <span class="ds-version-label">V1</span>
+                        <span class="ds-version-status vs-pending">Pending</span>
+                    </div>
+                    <div class="ds-version-body">
+                        <div class="ds-version-dropzone" id="dsvz-${stage.id}-1"
+                            onclick="document.getElementById('dsvinput-${stage.id}-1').click()"
+                            ondragover="event.preventDefault();this.classList.add('drag-over')"
+                            ondragleave="this.classList.remove('drag-over')"
+                            ondrop="handleVersionDrop(event,'${stage.id}',1)">
+                            <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            <p style="font-size:13px;color:#64748b">Click or drag to upload V1</p>
+                            <p style="font-size:11px;color:#94a3b8;margin-top:4px">PNG, JPG, PDF, AI, EPS, SVG</p>
+                        </div>
+                        <input type="file" id="dsvinput-${stage.id}-1" class="hide" accept="image/*,.pdf,.ai,.eps,.svg,.zip" onchange="handleVersionFileSelect(event,'${stage.id}',1)">
+                    </div>
+                </div>`;
+            }
+            return uploads.map((upload, idx) => buildVersionCard(stage, upload, idx + 1)).join('');
+        }
+
+        function buildVersionCard(stage, upload, vNum) {
+            const isImg = upload.file_type && upload.file_type.startsWith('image/');
+            const isPdf = upload.file_type === 'application/pdf' || upload.file_name?.toLowerCase().endsWith('.pdf');
+            const canPreview = isImg || isPdf;
+            const sizeStr = upload.file_size ? `${Math.round(upload.file_size / 1024)}KB` : '';
+            return `<div class="ds-version-card vc-${upload.status}" id="dsvc-${upload.id}">
+                <div class="ds-version-header">
+                    <span class="ds-version-label">${escHtml(upload.version_label || 'V' + vNum)}</span>
+                    <span class="ds-version-status vs-${upload.status}">${upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}</span>
+                </div>
+                <div class="ds-version-body">
+                    ${isImg ? `<img src="${escHtml(upload.file_url)}" alt="" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:200px;object-fit:contain;background:#f1f5f9">` : ''}
+                    <div class="ds-version-file-info">
+                        <span style="font-size:20px">${isPdf ? '📄' : isImg ? '🖼' : '📁'}</span>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(upload.file_name||'')}</div>
+                            <div style="font-size:11px;color:#94a3b8">${sizeStr}</div>
+                        </div>
+                    </div>
+                    <div class="ds-version-actions">
+                        ${canPreview ? `<button class="btn-preview" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}')">Preview</button>
+                        <button class="btn-annotate" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}',true)">Annotate</button>` : ''}
+                        ${upload.status !== 'approved' ? `<button class="btn-approve" onclick="approveVersion('${upload.id}','${stage.id}',${stage.stage_number})">✓ Approve</button>` : ''}
+                        ${upload.status !== 'declined' ? `<button class="btn-decline" onclick="declineVersion('${upload.id}','${stage.id}',${stage.stage_number})">✕ Decline</button>` : ''}
+                    </div>
+                    ${upload.review_comment ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;color:#92400e">${escHtml(upload.review_comment)}</div>` : ''}
+                </div>
+            </div>`;
+        }
+
+        function addVersionCard(stageId, vNum) {
+            const grid = document.getElementById(`ds-version-cards-${stageId}`);
+            if (!grid) return;
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const card = document.createElement('div');
+            card.className = 'ds-version-card';
+            card.id = `dsvc-new-${vNum}`;
+            card.innerHTML = `<div class="ds-version-header">
+                <span class="ds-version-label">V${vNum}</span>
+                <span class="ds-version-status vs-pending">Pending</span>
+            </div>
+            <div class="ds-version-body">
+                <div class="ds-version-dropzone" id="dsvz-${stageId}-${vNum}"
+                    onclick="document.getElementById('dsvinput-${stageId}-${vNum}').click()"
+                    ondragover="event.preventDefault();this.classList.add('drag-over')"
+                    ondragleave="this.classList.remove('drag-over')"
+                    ondrop="handleVersionDrop(event,'${stageId}',${vNum})">
+                    <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <p style="font-size:13px;color:#64748b">Click or drag to upload V${vNum}</p>
+                </div>
+                <input type="file" id="dsvinput-${stageId}-${vNum}" class="hide" accept="image/*,.pdf,.ai,.eps,.svg,.zip"
+                    onchange="handleVersionFileSelect(event,'${stageId}',${vNum})">
+            </div>`;
+            grid.appendChild(card);
+            // Hide "Add Version" button if we already added it
+            const addBtn = grid.nextElementSibling;
+            if (addBtn) addBtn.remove();
+            // Add new "Add Version" button
+            const newAddBtn = document.createElement('button');
+            newAddBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Add Version V${vNum + 1}`;
+            newAddBtn.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px dashed #cbd5e1;background:transparent;border-radius:10px;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;transition:all 0.15s';
+            newAddBtn.onclick = () => { if (vNum < 10) addVersionCard(stageId, vNum + 1); else showToast('Maximum 10 versions', 'warning'); };
+            grid.insertAdjacentElement('afterend', newAddBtn);
+        }
+
+        function handleVersionDrop(event, stageId, vNum) {
+            event.preventDefault();
+            const dz = document.getElementById(`dsvz-${stageId}-${vNum}`);
+            if (dz) dz.classList.remove('drag-over');
+            const file = event.dataTransfer?.files?.[0];
+            if (file) uploadVersionFile(stageId, vNum, file);
+        }
+
+        function handleVersionFileSelect(event, stageId, vNum) {
+            const file = event.target.files?.[0];
+            if (file) uploadVersionFile(stageId, vNum, file);
+        }
+
+        async function uploadVersionFile(stageId, vNum, file) {
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage || !currentBrand?.id) return;
+            const dz = document.getElementById(`dsvz-${stageId}-${vNum}`);
+            if (dz) dz.innerHTML = '<div class="spinner" style="margin:0 auto"></div>';
+            try {
+                const ext = file.name.split('.').pop();
+                const path = `${currentBrand.id}/design-stages/${stageId}/V${vNum}-${Date.now()}.${ext}`;
+                const { data: stored, error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
+                if (upErr) throw upErr;
+                const { data: { publicUrl } } = supabase.storage.from('design-uploads').getPublicUrl(path);
+
+                const actor = await supabase.auth.getUser();
+                const actorName = currentUserProfile ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim() : null;
+
+                const { error: dbErr } = await supabase.from('stage_uploads').insert({
+                    stage_id: stageId, task_id: stage.task_id, brand_id: currentBrand.id,
+                    version_label: `V${vNum}`, file_url: publicUrl,
+                    file_name: file.name, file_type: file.type, file_size: file.size,
+                    status: 'pending',
+                    uploaded_by: actor?.data?.user?.id || null,
+                    uploaded_by_name: actorName
+                });
+                if (dbErr) throw dbErr;
+
+                await dsLogActivity(stage.task_id, stageId, 'version_uploaded', { stage_name: stage.stage_name, version_label: `V${vNum}` });
+                showToast(`V${vNum} uploaded ✓`);
+                renderStagePanel(stage.stage_number);
+            } catch(err) {
+                console.error('uploadVersionFile error', err);
+                showToast('Upload failed: ' + (err.message || 'Unknown error'), 'error');
+                if (dz) dz.innerHTML = `<p style="color:#dc2626;font-size:12px">Upload failed — try again</p>`;
+            }
+        }
+
+        async function approveVersion(uploadId, stageId, stageNum) {
+            const { error } = await supabase.from('stage_uploads').update({ status: 'approved' }).eq('id', uploadId);
+            if (error) { showToast('Error approving version', 'error'); return; }
+            const stage = currentStages.find(s => s.id === stageId);
+            if (stage) await dsLogActivity(stage.task_id, stageId, 'version_approved', { stage_name: stage.stage_name });
+            showToast('Version approved ✓');
+            renderStagePanel(stageNum);
+        }
+
+        async function declineVersion(uploadId, stageId, stageNum) {
+            showDSCommentModal('Decline Version', 'Why are you declining this version?', async (comment) => {
+                const { error } = await supabase.from('stage_uploads').update({ status: 'declined', review_comment: comment }).eq('id', uploadId);
+                if (error) { showToast('Error declining version', 'error'); return; }
+                const stage = currentStages.find(s => s.id === stageId);
+                if (stage) await dsLogActivity(stage.task_id, stageId, 'version_declined', { stage_name: stage.stage_name, comment });
+                showToast('Version declined');
+                renderStagePanel(stageNum);
+            });
+        }
+
+        async function submitStageForReview(stageId, stageNum) {
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const ok = await updateStageStatus(stage, 'in_review', 'Submitted for review');
+            if (!ok) return;
+            await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: stage.stage_name });
+            renderStageTabs();
+            renderStagePanel(stageNum);
+            showToast('Stage submitted for review');
+        }
+
+        async function approveStage(stageId, stageNum) {
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const ok = await updateStageStatus(stage, 'approved', 'Stage approved');
+            if (!ok) return;
+            await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: stage.stage_name });
+            // Auto-complete task if all 4 stages done
+            const allApproved = currentStages.every(s => s.id === stageId ? true : ['approved','skipped'].includes(s.status));
+            if (allApproved) {
+                await supabase.from('design_tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', stage.task_id);
+                if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'completed';
+                await dsLogActivity(stage.task_id, null, 'task_completed', {});
+                showToast('All stages complete — task marked Completed 🎉');
+            } else {
+                showToast(`Stage ${stageNum} approved ✓`);
+            }
+            renderStageTabs();
+            renderStagePanel(stageNum);
+        }
+
+        async function requestRevisions(stageId, stageNum) {
+            showDSCommentModal('Request Revisions', 'Describe what needs to be revised...', async (comment) => {
+                if (!comment.trim()) { showToast('Please describe the revisions needed', 'warning'); return; }
+                const stage = currentStages.find(s => s.id === stageId);
+                if (!stage) return;
+                const ok = await updateStageStatus(stage, 'revisions_required', comment);
+                if (!ok) return;
+                await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: stage.stage_name, comment });
+                renderStageTabs();
+                renderStagePanel(stageNum);
+                showToast('Revisions requested');
+            });
+        }
+
+        async function skipStage(stageId, stageNum) {
+            showDSCommentModal('Skip Stage', 'Reason for skipping (optional):', async (comment) => {
+                const stage = currentStages.find(s => s.id === stageId);
+                if (!stage) return;
+                const { error } = await supabase.from('design_stages').update({
+                    status: 'skipped', is_skipped: true, completed_at: new Date().toISOString()
+                }).eq('id', stageId);
+                if (error) { showToast('Error skipping stage', 'error'); return; }
+                stage.status = 'skipped'; stage.is_skipped = true;
+                await supabase.from('stage_status_log').insert({
+                    stage_id: stageId, task_id: stage.task_id, brand_id: currentBrand?.id,
+                    previous_status: stage.status, new_status: 'skipped', comment
+                });
+                await dsLogActivity(stage.task_id, stageId, 'stage_skipped', { stage_name: stage.stage_name });
+                renderStageTabs();
+                renderStagePanel(stageNum);
+                showToast(`Stage ${stageNum} skipped`);
+            }, true); // true = comment optional
+        }
+
+        // ── Stage 4: Final Artwork ─────────────────────────────────────────────
+
+        const DS_S4_SECTIONS = [
+            { key: 'print_files',     label: 'Print Files',       icon: '🖨', desc: 'AI, EPS, or PDF print-ready files' },
+            { key: 'full_range_pdf',  label: 'Full Range PDF',    icon: '📑', desc: 'Complete product range overview' },
+            { key: 'tech_pack',       label: 'Tech Pack',         icon: '📐', desc: 'Technical specification document' },
+            { key: 'website_imagery', label: 'Website Imagery',   icon: '🖼', desc: 'PNG/JPG renders for online use' },
+        ];
+
+        async function buildStage4Panel(stage) {
+            const { data: uploads } = await supabase.from('stage_uploads')
+                .select('*').eq('stage_id', stage.id).order('uploaded_at');
+            const { data: log } = await supabase.from('stage_status_log')
+                .select('*').eq('stage_id', stage.id).order('created_at');
+            const logHtml = buildCommentLog(log || []);
+            const isApproved = stage.status === 'approved';
+            const isInReview = stage.status === 'in_review';
+
+            const sectionsHtml = DS_S4_SECTIONS.map(sec => {
+                const secUploads = (uploads||[]).filter(u => u.section_label === sec.key);
+                return buildS4Section(stage, sec, secUploads, isApproved);
+            }).join('');
+
+            const allSectionsUploaded = DS_S4_SECTIONS.every(sec => (uploads||[]).some(u => u.section_label === sec.key));
+
+            return `<div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+                    <div>
+                        <h3 style="font-size:16px;font-weight:700;margin:0 0 4px">Stage 4: Final Artwork</h3>
+                        <p style="font-size:13px;color:#64748b;margin:0">Upload the four required final artwork deliverables. All sections must be uploaded before submitting for review.</p>
+                    </div>
+                    <span class="ds-stage-badge ${stage.status}">${dsStageStatusLabel(stage.status)}</span>
+                </div>
+
+                ${isApproved ? `<div style="background:rgba(34,197,94,0.08);border:1.5px solid #86efac;border-radius:12px;padding:16px;margin-bottom:20px;color:#16a34a;font-size:13px;font-weight:600">
+                    ✓ All final artwork approved — task is complete!
+                </div>` : ''}
+
+                ${sectionsHtml}
+
+                <div class="ds-stage-footer">
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        ${!isApproved && !isInReview ? `<button class="ds-submit-review-btn" ${!allSectionsUploaded ? 'disabled title="Upload all 4 sections first"' : ''} onclick="submitStageForReview('${stage.id}', 4)">
+                            Submit for Final Review
+                        </button>` : ''}
+                        ${isInReview ? `<button class="ds-approve-stage-btn" onclick="approveStage('${stage.id}', 4)">
+                            Approve & Complete Task
+                        </button>
+                        <button class="ds-req-revisions-btn" onclick="requestRevisions('${stage.id}', 4)">
+                            Request Revisions
+                        </button>` : ''}
+                        ${!isApproved ? `<button class="ds-skip-stage-btn" onclick="skipStage('${stage.id}', 4)">Skip Stage</button>` : ''}
+                    </div>
+                </div>
+
+                <div style="margin-top:24px">
+                    <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Stage Activity</div>
+                    ${logHtml || '<p style="font-size:13px;color:#94a3b8">No activity yet</p>'}
+                </div>
+            </div>`;
+        }
+
+        function buildS4Section(stage, sec, uploads, isApproved) {
+            const hasFile = uploads.length > 0;
+            const lastUpload = uploads[uploads.length - 1];
+            const sectionStatus = !hasFile ? 'pending' : (lastUpload?.status || 'pending');
+
+            return `<div class="ds-s4-section">
+                <div class="ds-s4-section-header">
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <span style="font-size:20px">${sec.icon}</span>
+                        <div>
+                            <div class="ds-s4-section-title">${escHtml(sec.label)}</div>
+                            <div style="font-size:11px;color:#94a3b8">${escHtml(sec.desc)}</div>
+                        </div>
+                    </div>
+                    <span class="ds-version-status vs-${sectionStatus}">${sectionStatus.charAt(0).toUpperCase() + sectionStatus.slice(1)}</span>
+                </div>
+                <div class="ds-s4-section-body">
+                    ${uploads.map(u => {
+                        const isImg = u.file_type?.startsWith('image/');
+                        const isPdf = u.file_type === 'application/pdf' || u.file_name?.toLowerCase().endsWith('.pdf');
+                        const canPreview = isImg || isPdf;
+                        return `<div class="ds-version-file-info" style="margin-bottom:8px">
+                            <span style="font-size:18px">${isPdf ? '📄' : isImg ? '🖼' : '📁'}</span>
+                            <div style="flex:1;min-width:0">
+                                <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(u.file_name||'')}</div>
+                                <div style="font-size:11px;color:#94a3b8">${u.file_size ? Math.round(u.file_size/1024)+'KB' : ''} · ${dsRelativeTime(u.uploaded_at)}</div>
+                            </div>
+                            ${canPreview ? `<button class="btn-preview" style="flex-shrink:0" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${u.file_type||''}')">Preview</button>` : ''}
+                        </div>`;
+                    }).join('')}
+                    ${!isApproved ? `<div class="ds-version-dropzone" style="margin-top:${uploads.length ? '8px' : '0'}"
+                        onclick="document.getElementById('dss4input-${stage.id}-${sec.key}').click()"
+                        ondragover="event.preventDefault();this.classList.add('drag-over')"
+                        ondragleave="this.classList.remove('drag-over')"
+                        ondrop="handleS4Drop(event,'${stage.id}','${sec.key}')">
+                        <svg class="w-6 h-6 mx-auto mb-1" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p style="font-size:12px;color:#64748b">${uploads.length ? 'Replace / add file' : `Upload ${escHtml(sec.label)}`}</p>
+                    </div>
+                    <input type="file" id="dss4input-${stage.id}-${sec.key}" class="hide"
+                        accept="image/*,.pdf,.ai,.eps,.svg,.zip"
+                        onchange="handleS4FileSelect(event,'${stage.id}','${sec.key}')">` : ''}
+                </div>
+            </div>`;
+        }
+
+        function handleS4Drop(event, stageId, sectionKey) {
+            event.preventDefault();
+            const file = event.dataTransfer?.files?.[0];
+            if (file) uploadS4File(stageId, sectionKey, file);
+        }
+
+        function handleS4FileSelect(event, stageId, sectionKey) {
+            const file = event.target.files?.[0];
+            if (file) uploadS4File(stageId, sectionKey, file);
+        }
+
+        async function uploadS4File(stageId, sectionKey, file) {
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage || !currentBrand?.id) return;
+            try {
+                const ext = file.name.split('.').pop();
+                const path = `${currentBrand.id}/design-stages/${stageId}/${sectionKey}-${Date.now()}.${ext}`;
+                const { error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
+                if (upErr) throw upErr;
+                const { data: { publicUrl } } = supabase.storage.from('design-uploads').getPublicUrl(path);
+                const actor = await supabase.auth.getUser();
+                const actorName = currentUserProfile ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim() : null;
+                const secInfo = DS_S4_SECTIONS.find(s => s.key === sectionKey);
+                await supabase.from('stage_uploads').insert({
+                    stage_id: stageId, task_id: stage.task_id, brand_id: currentBrand.id,
+                    section_label: sectionKey, version_label: secInfo?.label || sectionKey,
+                    file_url: publicUrl, file_name: file.name, file_type: file.type, file_size: file.size,
+                    status: 'pending', uploaded_by: actor?.data?.user?.id || null, uploaded_by_name: actorName
+                });
+                await dsLogActivity(stage.task_id, stageId, 'version_uploaded', { stage_name: stage.stage_name, version_label: secInfo?.label });
+                showToast(`${secInfo?.label || 'File'} uploaded ✓`);
+                renderStagePanel(4);
+            } catch(err) {
+                console.error('uploadS4File error', err);
+                showToast('Upload failed: ' + (err.message || 'Unknown error'), 'error');
+            }
+        }
+
+        // ── Shared stage utilities ──────────────────────────────────────────────
+
+        async function updateStageStatus(stage, newStatus, comment) {
+            const actor = await supabase.auth.getUser();
+            const actorId = actor?.data?.user?.id || null;
+            const actorName = currentUserProfile ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim() : null;
+
+            const { error } = await supabase.from('design_stages').update({
+                status: newStatus,
+                updated_at: new Date().toISOString(),
+                ...((['approved','declined','skipped'].includes(newStatus)) ? {
+                    completed_at: new Date().toISOString(), completed_by: actorId
+                } : {})
+            }).eq('id', stage.id);
+            if (error) { showToast('Error updating stage: ' + error.message, 'error'); return false; }
+
+            // Log to stage_status_log
+            await supabase.from('stage_status_log').insert({
+                stage_id: stage.id, task_id: stage.task_id, brand_id: currentBrand?.id,
+                actor_id: actorId, actor_name: actorName,
+                previous_status: stage.status, new_status: newStatus, comment
+            });
+
+            stage.status = newStatus;
+            return true;
+        }
+
+        function buildCommentLog(entries) {
+            if (!entries.length) return '';
+            return `<div style="space-y:0">${entries.map(e => {
+                const initials = dsActorInitials(e.actor_name || '');
+                return `<div class="ds-comment-row">
+                    <div class="ds-actor-pill">${initials}</div>
+                    <div style="flex:1">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+                            <span style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(e.actor_name||'Unknown')}</span>
+                            <span class="ds-stage-badge ${e.new_status}" style="font-size:10px;padding:2px 7px">${dsStageStatusLabel(e.new_status)}</span>
+                        </div>
+                        ${e.comment ? `<div class="ds-comment-text">${escHtml(e.comment)}</div>` : ''}
+                        <div class="ds-comment-time">${dsRelativeTime(e.created_at)}</div>
+                    </div>
+                </div>`;
+            }).join('')}</div>`;
+        }
+
+        // ── Save Design Task (extended for new fields) ─────────────────────────
+
+        const _origSaveDesignTaskOverview = saveDesignTaskOverview;
+        async function saveDesignTaskOverviewV2() {
+            if (!currentDesignTaskRecord?.id) return;
+            try {
+                const dsnSel = document.getElementById('dt-designer-id');
+                const designerId   = dsnSel?.value || null;
+                const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+                const payload = {
+                    task_name:   document.getElementById('dt-task-name')?.value?.trim() || '',
+                    club_id:     document.getElementById('dt-club-id')?.value || null,
+                    job_id:      document.getElementById('dt-job-id')?.value || null,
+                    due_date:    document.getElementById('dt-due-date')?.value || null,
+                    design_brief: document.getElementById('dt-design-brief')?.value || '',
+                    sport:       document.getElementById('dt-sport')?.value || null,
+                    product_type: document.getElementById('dt-product-type')?.value || null,
+                    colour_palette: document.getElementById('dt-colour-palette')?.value || null,
+                    key_notes:   document.getElementById('dt-key-notes')?.value || null,
+                    job_type:    currentDesignTaskRecord.job_type || null,
+                    design_types: currentDesignTaskRecord.design_types || [],
+                    products_required: currentDesignTaskRecord.products_required || [],
+                    assigned_designer_id:   designerId,
+                    assigned_designer_name: designerName
+                };
+                if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
+                const { data, error } = await supabase.from('design_tasks').update(payload)
+                    .eq('id', currentDesignTaskRecord.id)
+                    .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number)').single();
+                if (error) { showToast('Error saving task: ' + error.message, 'error'); return; }
+                currentDesignTaskRecord = data;
+                currentDesignTask = data;
+                allDesignTasks = allDesignTasks.map(t => t.id === data.id ? data : t);
+                renderDesignTaskRecordV2();
+                showToast('Design task saved ✓');
+            } catch(err) {
+                console.error('saveDesignTaskOverviewV2 error:', err);
+                showToast('Unexpected error — please try again', 'error');
+            }
+        }
+
+        // ── DS Comment Modal ────────────────────────────────────────────────────
+
+        function showDSCommentModal(title, placeholder, onConfirm, commentOptional = false) {
+            const existing = document.getElementById('ds-comment-modal');
+            if (existing) existing.remove();
+            const modal = document.createElement('div');
+            modal.id = 'ds-comment-modal';
+            modal.style.cssText = 'position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;padding:16px';
+            modal.innerHTML = `<div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,0.2)">
+                <h3 style="font-size:16px;font-weight:700;margin:0 0 16px">${escHtml(title)}</h3>
+                <textarea id="ds-modal-comment" rows="4" placeholder="${escHtml(placeholder)}"
+                    style="width:100%;border:1.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:13px;resize:none;outline:none;font-family:inherit"
+                    onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                <div style="display:flex;gap:8px;margin-top:14px;justify-content:flex-end">
+                    <button onclick="document.getElementById('ds-comment-modal').remove()"
+                        style="padding:8px 20px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+                    <button id="ds-modal-confirm-btn"
+                        style="padding:8px 20px;border-radius:8px;background:#0f172a;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer">Confirm</button>
+                </div>
+            </div>`;
+            document.body.appendChild(modal);
+            document.getElementById('ds-modal-confirm-btn').onclick = () => {
+                const comment = document.getElementById('ds-modal-comment')?.value?.trim() || '';
+                if (!commentOptional && !comment) { showToast('Please enter a comment', 'warning'); return; }
+                modal.remove();
+                onConfirm(comment);
+            };
+            setTimeout(() => document.getElementById('ds-modal-comment')?.focus(), 100);
+        }
+
+        // ── Preview Modal ───────────────────────────────────────────────────────
+
+        async function openPreviewModal(uploadId, fileUrl, fileType, startAnnotating = false) {
+            currentPreviewUploadId = uploadId;
+            currentAnnUploadId = uploadId;
+            annMode = false;
+            pendingAnnPin = null;
+
+            const modal = document.getElementById('ds-preview-modal');
+            const img   = document.getElementById('ds-preview-img');
+            const iframe = document.getElementById('ds-preview-iframe');
+            const overlay = document.getElementById('ann-overlay-v2');
+            if (!modal) return;
+
+            // Reset
+            img.classList.add('hide'); iframe.classList.add('hide');
+            img.src = ''; iframe.src = '';
+            const modeBtn = document.getElementById('ds-ann-mode-btn');
+            if (modeBtn) { modeBtn.textContent = '+ Annotate'; modeBtn.classList.remove('active'); }
+            if (overlay) overlay.classList.add('hide');
+
+            const isImg = fileType?.startsWith('image/');
+            const isPdf = fileType === 'application/pdf' || fileUrl.toLowerCase().includes('.pdf');
+
+            if (isImg) {
+                img.src = fileUrl;
+                img.classList.remove('hide');
+            } else if (isPdf) {
+                iframe.src = fileUrl;
+                iframe.classList.remove('hide');
+            } else {
+                // Generic: try as image
+                img.src = fileUrl;
+                img.classList.remove('hide');
+            }
+
+            modal.classList.remove('hide');
+            document.addEventListener('keydown', handlePreviewKeydown);
+
+            // Load annotations
+            await loadAnnotations(uploadId);
+
+            if (startAnnotating) {
+                setTimeout(() => toggleAnnMode(), 300);
+            }
+        }
+
+        function closeDSPreview() {
+            const modal = document.getElementById('ds-preview-modal');
+            if (modal) modal.classList.add('hide');
+            document.removeEventListener('keydown', handlePreviewKeydown);
+            annMode = false;
+            pendingAnnPin = null;
+            currentPreviewUploadId = null;
+        }
+
+        function handlePreviewKeydown(e) {
+            if (e.key === 'Escape') closeDSPreview();
+        }
+
+        function toggleAnnMode() {
+            annMode = !annMode;
+            const btn = document.getElementById('ds-ann-mode-btn');
+            const overlay = document.getElementById('ann-overlay-v2');
+            if (btn) { btn.textContent = annMode ? 'Exit Annotate' : '+ Annotate'; btn.classList.toggle('active', annMode); }
+            if (overlay) {
+                overlay.classList.toggle('hide', !annMode);
+                if (annMode) {
+                    overlay.onclick = handleAnnClick;
+                } else {
+                    overlay.onclick = null;
+                    cancelAnnotation();
+                }
+            }
+        }
+
+        function handleAnnClick(event) {
+            if (!annMode) return;
+            const wrap = document.getElementById('ds-preview-img-wrap');
+            if (!wrap) return;
+            const rect = wrap.getBoundingClientRect();
+            const x = ((event.clientX - rect.left) / rect.width) * 100;
+            const y = ((event.clientY - rect.top) / rect.height) * 100;
+            pendingAnnPin = { x, y };
+
+            // Show form
+            const form = document.getElementById('ds-ann-new-form');
+            const posLabel = document.getElementById('ds-ann-pos-label');
+            if (posLabel) posLabel.textContent = `${Math.round(x)}%, ${Math.round(y)}%`;
+            if (form) form.classList.remove('hide');
+
+            const textarea = document.getElementById('ds-ann-comment');
+            if (textarea) { textarea.value = ''; textarea.focus(); }
+        }
+
+        function cancelAnnotation() {
+            pendingAnnPin = null;
+            const form = document.getElementById('ds-ann-new-form');
+            if (form) form.classList.add('hide');
+        }
+
+        async function saveAnnotation() {
+            if (!pendingAnnPin || !currentAnnUploadId) return;
+            const comment = document.getElementById('ds-ann-comment')?.value?.trim();
+            if (!comment) { showToast('Please enter a comment', 'warning'); return; }
+            const actor = await supabase.auth.getUser();
+            const actorId = actor?.data?.user?.id || null;
+            const actorName = currentUserProfile ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim() : null;
+
+            // Count existing pins
+            const pinNum = currentAnnotations.length + 1;
+
+            const { error } = await supabase.from('upload_annotations').insert({
+                upload_id: currentAnnUploadId, brand_id: currentBrand?.id,
+                actor_id: actorId, actor_name: actorName,
+                x_position: pendingAnnPin.x, y_position: pendingAnnPin.y,
+                comment, pin_number: pinNum
+            });
+            if (error) { showToast('Error saving annotation', 'error'); return; }
+
+            pendingAnnPin = null;
+            const form = document.getElementById('ds-ann-new-form');
+            if (form) form.classList.add('hide');
+            showToast('Annotation saved ✓');
+            await loadAnnotations(currentAnnUploadId);
+        }
+
+        async function loadAnnotations(uploadId) {
+            const { data } = await supabase.from('upload_annotations')
+                .select('*').eq('upload_id', uploadId).order('created_at');
+            currentAnnotations = data || [];
+            renderAnnotationPins();
+            renderAnnotationList();
+        }
+
+        function renderAnnotationPins() {
+            const wrap = document.getElementById('ds-preview-img-wrap');
+            if (!wrap) return;
+            // Remove old pins
+            wrap.querySelectorAll('.ann-pin').forEach(p => p.remove());
+            currentAnnotations.forEach((ann, idx) => {
+                const pin = document.createElement('div');
+                pin.className = `ann-pin ${ann.actor_id ? 'designer' : 'manager'}`;
+                pin.style.left = `${ann.x_position}%`;
+                pin.style.top  = `${ann.y_position}%`;
+                pin.textContent = ann.pin_number || (idx + 1);
+                pin.title = ann.comment;
+                pin.onclick = (e) => { e.stopPropagation(); highlightAnnotation(ann.id); };
+                wrap.appendChild(pin);
+            });
+        }
+
+        function renderAnnotationList() {
+            const list = document.getElementById('ds-ann-list');
+            if (!list) return;
+            if (!currentAnnotations.length) {
+                list.innerHTML = '<div style="padding:16px;text-align:center;color:#6b7280;font-size:12px">No annotations yet.<br>Enable annotate mode and click to add pins.</div>';
+                return;
+            }
+            list.innerHTML = currentAnnotations.map((ann, idx) => `
+                <div class="ds-ann-item" id="ann-item-${ann.id}" onclick="highlightAnnotation('${ann.id}')">
+                    <div class="ds-ann-item-header">
+                        <div class="ann-pin designer" style="position:static;transform:none;width:18px;height:18px;font-size:10px">${ann.pin_number || idx+1}</div>
+                        <span style="font-size:11px;font-weight:600;color:#e5e7eb">${escHtml(ann.actor_name||'Unknown')}</span>
+                    </div>
+                    <div class="ds-ann-item-text">${escHtml(ann.comment)}</div>
+                    <div class="ds-ann-item-time">${dsRelativeTime(ann.created_at)}</div>
+                </div>`).join('');
+        }
+
+        function highlightAnnotation(annId) {
+            document.querySelectorAll('.ds-ann-item').forEach(el => el.classList.remove('highlight'));
+            const item = document.getElementById(`ann-item-${annId}`);
+            if (item) { item.classList.add('highlight'); item.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+        }
+
+        // ── Override entry point functions ─────────────────────────────────────
+
+        // Override showDesignTask to use V2 loader
+        const _origShowDesignTask = showDesignTask;
+        async function showDesignTask(taskId) {
+            const inJob    = !document.getElementById('tool-job-record')?.classList.contains('hide');
+            const inStudio = !document.getElementById('tool-design-studio')?.classList.contains('hide');
+            if (inJob && currentJobId) {
+                navStack.push({ type: 'job', jobId: currentJobId, label: currentJob?.job_name || 'Job Record' });
+            } else if (inStudio) {
+                navStack.push({ type: 'tool', tool: 'design-studio', label: 'Design Studio' });
+            }
+            showToolRaw('design-task');
+            await loadDesignTaskRecordV2(taskId);
+            if (!Array.isArray(navTrail) || !navTrail.length) navTrail = [{ label: 'Home', type: 'launchpad' }];
+            if (navTrail[navTrail.length - 1]?.type !== 'design-task') {
+                navTrail.push({ label: currentDesignTaskRecord?.task_name || 'Design Task', type: 'design-task', taskId });
+            }
+            renderBreadcrumb();
+            const backBtn   = document.getElementById('dt-back-btn');
+            const backLabel = document.getElementById('dt-back-label');
+            if (navStack.length > 0) {
+                if (backBtn) backBtn.classList.remove('hide');
+                if (backLabel) backLabel.textContent = navStack[navStack.length - 1]?.label || 'Back';
+            } else { if (backBtn) backBtn.classList.add('hide'); }
+        }
+
+        // Override renderDesignTaskRecord to use V2
+        function renderDesignTaskRecord() { renderDesignTaskRecordV2(); }
+
+        // Override saveDesignTaskOverview to include new fields
+        async function saveDesignTaskOverview() { await saveDesignTaskOverviewV2(); }
+
+        // Override loadDesignStudio to use V2
+        async function loadDesignStudio() { await loadDesignStudioV2(); }
+
+        // Override switchDSView (no longer needed, keep for legacy compat)
+        function switchDSView(view) { /* no-op in V2 */ }
+
+        // Override renderDesignStudio to use V2
+        function renderDesignStudio() { renderDSHome(); }
 
         // ── Design Settings (Brand Settings page) ────────────────────────────
         function loadDesignSettings() {
