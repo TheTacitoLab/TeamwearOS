@@ -15829,7 +15829,7 @@
         //  DESIGN STUDIO V2 — Stage-based workflow
         // ═══════════════════════════════════════════════════════════════════════
 
-        // State
+        // State (currentAnnotations already declared earlier in this file)
         let dsFilter = 'all';
         let dsActivityChannel = null;
         let currentStages = [];
@@ -15838,7 +15838,6 @@
         let pendingAnnPin = null;
         let currentPreviewUploadId = null;
         let currentAnnUploadId = null;
-        let currentAnnotations = [];
 
         // ── Helpers ────────────────────────────────────────────────────────────
         function dsRelativeTime(ts) {
