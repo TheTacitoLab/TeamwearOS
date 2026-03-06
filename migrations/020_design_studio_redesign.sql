@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS design_stages (
 
 ALTER TABLE design_stages ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "brand_read_design_stages" ON design_stages
+DROP POLICY IF EXISTS "brand_read_design_stages" ON design_stages;
+CREATE POLICY "brand_read_design_stages" ON design_stages
     FOR SELECT USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -51,7 +52,8 @@ CREATE POLICY IF NOT EXISTS "brand_read_design_stages" ON design_stages
         )
     ));
 
-CREATE POLICY IF NOT EXISTS "brand_write_design_stages" ON design_stages
+DROP POLICY IF EXISTS "brand_write_design_stages" ON design_stages;
+CREATE POLICY "brand_write_design_stages" ON design_stages
     FOR ALL USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -83,7 +85,8 @@ CREATE TABLE IF NOT EXISTS stage_status_log (
 
 ALTER TABLE stage_status_log ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "brand_read_stage_status_log" ON stage_status_log
+DROP POLICY IF EXISTS "brand_read_stage_status_log" ON stage_status_log;
+CREATE POLICY "brand_read_stage_status_log" ON stage_status_log
     FOR SELECT USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -92,7 +95,8 @@ CREATE POLICY IF NOT EXISTS "brand_read_stage_status_log" ON stage_status_log
         )
     ));
 
-CREATE POLICY IF NOT EXISTS "brand_write_stage_status_log" ON stage_status_log
+DROP POLICY IF EXISTS "brand_write_stage_status_log" ON stage_status_log;
+CREATE POLICY "brand_write_stage_status_log" ON stage_status_log
     FOR ALL USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -130,7 +134,8 @@ CREATE TABLE IF NOT EXISTS stage_uploads (
 
 ALTER TABLE stage_uploads ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "brand_read_stage_uploads" ON stage_uploads
+DROP POLICY IF EXISTS "brand_read_stage_uploads" ON stage_uploads;
+CREATE POLICY "brand_read_stage_uploads" ON stage_uploads
     FOR SELECT USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -139,7 +144,8 @@ CREATE POLICY IF NOT EXISTS "brand_read_stage_uploads" ON stage_uploads
         )
     ));
 
-CREATE POLICY IF NOT EXISTS "brand_write_stage_uploads" ON stage_uploads
+DROP POLICY IF EXISTS "brand_write_stage_uploads" ON stage_uploads;
+CREATE POLICY "brand_write_stage_uploads" ON stage_uploads
     FOR ALL USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -162,8 +168,8 @@ CREATE TABLE IF NOT EXISTS upload_annotations (
     brand_id    uuid REFERENCES brands(id),
     actor_id    uuid REFERENCES auth.users(id),
     actor_name  text,
-    x_position  numeric NOT NULL, -- percentage 0–100 of container width
-    y_position  numeric NOT NULL, -- percentage 0–100 of container height
+    x_position  numeric NOT NULL, -- percentage 0-100 of container width
+    y_position  numeric NOT NULL, -- percentage 0-100 of container height
     page_number int DEFAULT 1,
     comment     text NOT NULL,
     pin_number  int,
@@ -172,7 +178,8 @@ CREATE TABLE IF NOT EXISTS upload_annotations (
 
 ALTER TABLE upload_annotations ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "brand_read_upload_annotations" ON upload_annotations
+DROP POLICY IF EXISTS "brand_read_upload_annotations" ON upload_annotations;
+CREATE POLICY "brand_read_upload_annotations" ON upload_annotations
     FOR SELECT USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -181,7 +188,8 @@ CREATE POLICY IF NOT EXISTS "brand_read_upload_annotations" ON upload_annotation
         )
     ));
 
-CREATE POLICY IF NOT EXISTS "brand_write_upload_annotations" ON upload_annotations
+DROP POLICY IF EXISTS "brand_write_upload_annotations" ON upload_annotations;
+CREATE POLICY "brand_write_upload_annotations" ON upload_annotations
     FOR ALL USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -216,7 +224,8 @@ CREATE TABLE IF NOT EXISTS design_activity_feed (
 
 ALTER TABLE design_activity_feed ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "brand_read_design_activity_feed" ON design_activity_feed
+DROP POLICY IF EXISTS "brand_read_design_activity_feed" ON design_activity_feed;
+CREATE POLICY "brand_read_design_activity_feed" ON design_activity_feed
     FOR SELECT USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -225,7 +234,8 @@ CREATE POLICY IF NOT EXISTS "brand_read_design_activity_feed" ON design_activity
         )
     ));
 
-CREATE POLICY IF NOT EXISTS "brand_write_design_activity_feed" ON design_activity_feed
+DROP POLICY IF EXISTS "brand_write_design_activity_feed" ON design_activity_feed;
+CREATE POLICY "brand_write_design_activity_feed" ON design_activity_feed
     FOR ALL USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
