@@ -16060,6 +16060,16 @@
                 .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number)')
                 .eq('id', taskId).single();
             if (!task) { showToast('Task not found', 'error'); return; }
+
+            // Pre-load product names for products_required (UUID array)
+            if ((task.products_required || []).length) {
+                const { data: prods } = await supabase.from('club_products')
+                    .select('id, product_name').in('id', task.products_required);
+                task._productNames = (prods || []).map(p => p.product_name);
+            } else {
+                task._productNames = [];
+            }
+
             currentDesignTaskRecord = task;
             currentDesignTask = task;
             currentJobId = task.job_id;
@@ -16186,6 +16196,10 @@
                 panel.innerHTML = await buildStage1Panel(stage);
             } else if (stageNum === 2 || stageNum === 3) {
                 panel.innerHTML = await buildVersionStagePanel(stage);
+                // Load per-version comment threads
+                const { data: uploads } = await supabase.from('stage_uploads')
+                    .select('id').eq('stage_id', stage.id);
+                (uploads||[]).forEach(u => loadVersionComments(u.id));
             } else if (stageNum === 4) {
                 panel.innerHTML = await buildStage4Panel(stage);
             }
@@ -16202,73 +16216,93 @@
             const isDeclined = stage.status === 'declined';
             const isNeedsInfo = stage.status === 'in_review';
 
-            // Brief field helpers
-            const field = (label, val) => val ? `<div class="ds-brief-field">
+            // Helpers
+            const field = (label, val, fullWidth) => val ? `<div class="ds-brief-field"${fullWidth ? ' style="grid-column:1/-1"' : ''}>
                 <div class="ds-brief-label">${label}</div>
                 <div class="ds-brief-value">${escHtml(String(val))}</div>
             </div>` : '';
+            const chips = (items) => (items||[]).length
+                ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${items.map(i => `<span style="padding:3px 10px;background:#e2e8f0;border-radius:20px;font-size:12px;color:#0f172a">${escHtml(String(i))}</span>`).join('')}</div>`
+                : '<span style="color:#94a3b8;font-size:13px">—</span>';
 
-            const chips = (items) => (items||[]).length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${(items).map(i => `<span style="padding:3px 10px;background:#e2e8f0;border-radius:20px;font-size:12px;color:#0f172a">${escHtml(i)}</span>`).join('')}</div>` : '<span style="color:#94a3b8;font-size:13px">—</span>';
-
-            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : null;
-            const now = new Date();
+            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
             const due = task.due_date ? new Date(task.due_date) : null;
-            const daysLeft = due ? Math.ceil((due - now) / 86400000) : null;
-            const dueBadge = daysLeft !== null ? (daysLeft < 0 ? `<span style="margin-left:8px;padding:2px 8px;background:#fef2f2;color:#dc2626;border-radius:10px;font-size:11px;font-weight:700">${Math.abs(daysLeft)}d overdue</span>` : daysLeft <= 7 ? `<span style="margin-left:8px;padding:2px 8px;background:#fff7ed;color:#c2410c;border-radius:10px;font-size:11px;font-weight:700">${daysLeft}d left</span>` : '') : '';
+            const daysLeft = due ? Math.ceil((due - new Date()) / 86400000) : null;
+            const dueBadge = daysLeft !== null
+                ? (daysLeft < 0
+                    ? `<span style="margin-left:8px;padding:2px 8px;background:#fef2f2;color:#dc2626;border-radius:10px;font-size:11px;font-weight:700">${Math.abs(daysLeft)}d overdue</span>`
+                    : daysLeft <= 7
+                        ? `<span style="margin-left:8px;padding:2px 8px;background:#fff7ed;color:#c2410c;border-radius:10px;font-size:11px;font-weight:700">${daysLeft}d left</span>`
+                        : '')
+                : '';
+
+            const appetiteLabel = { minimal: 'Minimal', moderate: 'Moderate', bold: 'Bold', bespoke: 'Bespoke' };
+            const linkedJob = task.jobs ? `${task.jobs.job_name || ''}${task.jobs.job_number ? ' · ' + task.jobs.job_number : ''}`.trim() : null;
+            const productNames = (task._productNames || []);
 
             return `<div class="dt-stage-layout">
                 <div class="dt-stage-content">
-                    <div style="margin-bottom:24px">
-                        <h3 style="font-size:18px;font-weight:800;margin:0 0 4px;color:#0f172a">${escHtml(task.task_name || 'Untitled Task')}</h3>
-                        ${task.task_ref ? `<div style="font-size:12px;color:#94a3b8;font-weight:600;letter-spacing:0.4px">Ref: ${escHtml(task.task_ref)}</div>` : ''}
+                    <!-- Task title -->
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px">
+                        <div>
+                            <h3 style="font-size:18px;font-weight:800;margin:0 0 4px;color:#0f172a">${escHtml(task.task_name || 'Untitled Task')}</h3>
+                            ${task.task_ref ? `<div style="font-size:12px;color:#94a3b8;font-weight:600;letter-spacing:0.4px">Ref: ${escHtml(task.task_ref)}</div>` : ''}
+                        </div>
+                        <span class="ds-stage-badge ds-status-${task.status||'new'}" style="flex-shrink:0;margin-top:2px">${DS_STATUS_LABELS[task.status]||task.status||'New'}</span>
                     </div>
 
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:24px">
+                    <!-- Core job info grid -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:20px">
                         ${field('Club / Client', task.clubs?.name)}
-                        ${field('Designer', task.assigned_designer_name)}
+                        ${field('Assigned Designer', task.assigned_designer_name)}
                         <div class="ds-brief-field" style="grid-column:1/-1">
                             <div class="ds-brief-label">Due Date</div>
-                            <div class="ds-brief-value">${dueDate || '—'}${dueBadge}</div>
+                            <div class="ds-brief-value" style="display:flex;align-items:center">${dueDate}${dueBadge}</div>
                         </div>
-                        ${field('Sport', task.sport)}
+                        ${linkedJob ? field('Linked Job', linkedJob) : ''}
+                        ${field('Sport / Discipline', task.sport)}
                         ${field('Product Type', task.product_type)}
                         ${field('Colour Palette', task.colour_palette)}
                         ${field('Kit Details', task.kit_details)}
-                    </div>
-
-                    ${task.design_brief ? `<div style="margin-bottom:20px">
-                        <div class="ds-brief-label" style="margin-bottom:6px">Design Brief</div>
-                        <div style="padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;color:#0f172a;line-height:1.6;white-space:pre-wrap">${escHtml(task.design_brief)}</div>
-                    </div>` : ''}
-
-                    ${task.key_notes ? `<div style="margin-bottom:20px">
-                        <div class="ds-brief-label" style="margin-bottom:6px">Key Notes</div>
-                        <div style="padding:14px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:13px;color:#92400e;line-height:1.6;white-space:pre-wrap">${escHtml(task.key_notes)}</div>
-                    </div>` : ''}
-
-                    ${(task.job_type || (task.design_types||[]).length || (task.products_required||[]).length) ? `<div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden">
+                        ${task.design_appetite ? `<div class="ds-brief-field">
+                            <div class="ds-brief-label">Design Appetite</div>
+                            <div class="ds-brief-value"><span style="padding:3px 10px;background:#ede9fe;color:#6d28d9;border-radius:20px;font-size:12px;font-weight:600">${escHtml(appetiteLabel[task.design_appetite]||task.design_appetite)}</span></div>
+                        </div>` : ''}
                         ${task.job_type ? `<div class="ds-brief-field">
                             <div class="ds-brief-label">Job Type</div>
                             <div class="ds-brief-value"><span style="padding:3px 10px;background:#e0f2fe;color:#0369a1;border-radius:20px;font-size:12px;font-weight:600">${escHtml(task.job_type)}</span></div>
                         </div>` : ''}
-                        ${(task.design_types||[]).length ? `<div class="ds-brief-field">
+                        ${(task.design_types||[]).length ? `<div class="ds-brief-field" style="grid-column:1/-1">
                             <div class="ds-brief-label">Design Types</div>
                             <div class="ds-brief-value">${chips(task.design_types)}</div>
                         </div>` : ''}
-                        ${(task.products_required||[]).length ? `<div class="ds-brief-field">
+                        ${productNames.length ? `<div class="ds-brief-field" style="grid-column:1/-1">
                             <div class="ds-brief-label">Products Required</div>
-                            <div class="ds-brief-value">${chips(task.products_required)}</div>
+                            <div class="ds-brief-value">${chips(productNames)}</div>
                         </div>` : ''}
+                    </div>
+
+                    <!-- Design brief text -->
+                    ${(task.design_brief || task.design_summary) ? `<div style="margin-bottom:16px">
+                        <div class="ds-brief-label" style="margin-bottom:6px">Design Brief</div>
+                        <div style="padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;color:#0f172a;line-height:1.7;white-space:pre-wrap">${escHtml(task.design_brief || task.design_summary)}</div>
                     </div>` : ''}
 
-                    ${isApproved ? `<div style="margin-top:20px;background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:12px;padding:14px;color:#16a34a;font-size:13px;font-weight:600">
-                        ✓ Brief accepted — Stage 2 (Concepts) is now unlocked.
+                    <!-- Key notes -->
+                    ${task.key_notes ? `<div style="margin-bottom:16px">
+                        <div class="ds-brief-label" style="margin-bottom:6px">Key Notes / Special Instructions</div>
+                        <div style="padding:14px 16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;font-size:13px;color:#78350f;line-height:1.7;white-space:pre-wrap">${escHtml(task.key_notes)}</div>
                     </div>` : ''}
-                    ${isDeclined ? `<div style="margin-top:20px;background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:12px;padding:14px;color:#dc2626;font-size:13px;font-weight:600">
-                        ✕ Brief declined. Update the brief and re-accept when ready.
+
+                    <!-- Status banners -->
+                    ${isApproved ? `<div style="margin-top:4px;background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:10px;padding:13px 16px;color:#16a34a;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+                        <span style="font-size:16px">✓</span> Brief accepted — Stage 2 (Concepts) is now unlocked.
                     </div>` : ''}
-                    ${isNeedsInfo ? `<div style="margin-top:20px;background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:12px;padding:14px;color:#b45309;font-size:13px;font-weight:600">
-                        ? More information requested — awaiting client response.
+                    ${isDeclined ? `<div style="margin-top:4px;background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:10px;padding:13px 16px;color:#dc2626;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+                        <span style="font-size:16px">✕</span> Brief declined — update details and re-accept when ready.
+                    </div>` : ''}
+                    ${isNeedsInfo ? `<div style="margin-top:4px;background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:10px;padding:13px 16px;color:#b45309;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+                        <span style="font-size:16px">?</span> More information requested — awaiting client response.
                     </div>` : ''}
                 </div>
 
@@ -16307,9 +16341,16 @@
                 const ok = await updateStageStatus(stage, 'approved', 'Brief accepted');
                 if (!ok) return;
                 await dsLogActivity(stage.task_id, stage.id, 'stage_accepted', { stage_name: 'Brief' });
+                // Auto-advance stage 2 to in_progress
+                const stage2 = currentStages.find(s => s.stage_number === 2);
+                if (stage2 && stage2.status === 'not_started') {
+                    await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', stage2.id);
+                    stage2.status = 'in_progress';
+                }
                 renderStageTabs();
-                renderStagePanel(1);
-                showToast('Brief accepted — Stage 2 unlocked ✓');
+                showToast('Brief accepted — jumping to Concepts ✓');
+                // Auto-jump to stage 2
+                setTimeout(() => switchDSStage(2), 300);
             } else {
                 const actionLabel = action === 'decline' ? 'Decline Job' : 'Request More Info';
                 const placeholder = action === 'decline' ? 'Reason for declining...' : 'What information do you need?';
@@ -16425,29 +16466,86 @@
             const isPdf = upload.file_type === 'application/pdf' || upload.file_name?.toLowerCase().endsWith('.pdf');
             const canPreview = isImg || isPdf;
             const sizeStr = upload.file_size ? `${Math.round(upload.file_size / 1024)}KB` : '';
-            return `<div class="ds-version-card vc-${upload.status}" id="dsvc-${upload.id}">
+            const isDeclined = upload.status === 'declined';
+            const isApproved = upload.status === 'approved';
+            const cardStyle = isDeclined ? 'opacity:0.5;filter:grayscale(0.6)' : '';
+            return `<div class="ds-version-card vc-${upload.status}" id="dsvc-${upload.id}" style="${cardStyle}">
                 <div class="ds-version-header">
                     <span class="ds-version-label">${escHtml(upload.version_label || 'V' + vNum)}</span>
                     <span class="ds-version-status vs-${upload.status}">${upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}</span>
                 </div>
                 <div class="ds-version-body">
-                    ${isImg ? `<img src="${escHtml(upload.file_url)}" alt="" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:200px;object-fit:contain;background:#f1f5f9">` : ''}
+                    ${isImg ? `<img src="${escHtml(upload.file_url)}" alt="" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:220px;object-fit:contain;background:#f1f5f9;cursor:pointer" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}')">` : ''}
                     <div class="ds-version-file-info">
                         <span style="font-size:20px">${isPdf ? '📄' : isImg ? '🖼' : '📁'}</span>
                         <div style="flex:1;min-width:0">
                             <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(upload.file_name||'')}</div>
-                            <div style="font-size:11px;color:#94a3b8">${sizeStr}</div>
+                            <div style="font-size:11px;color:#94a3b8">${sizeStr}${sizeStr && upload.uploaded_at ? ' · ' : ''}${upload.uploaded_at ? dsRelativeTime(upload.uploaded_at) : ''}</div>
                         </div>
                     </div>
                     <div class="ds-version-actions">
                         ${canPreview ? `<button class="btn-preview" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}')">Preview</button>
                         <button class="btn-annotate" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}',true)">Annotate</button>` : ''}
-                        ${upload.status !== 'approved' ? `<button class="btn-approve" onclick="approveVersion('${upload.id}','${stage.id}',${stage.stage_number})">✓ Approve</button>` : ''}
-                        ${upload.status !== 'declined' ? `<button class="btn-decline" onclick="declineVersion('${upload.id}','${stage.id}',${stage.stage_number})">✕ Decline</button>` : ''}
+                        ${!isApproved && !isDeclined ? `<button class="btn-approve" onclick="approveVersion('${upload.id}','${stage.id}',${stage.stage_number})">✓ Approve</button>
+                        <button class="btn-decline" onclick="declineVersion('${upload.id}','${stage.id}',${stage.stage_number})">✕ Decline</button>` : ''}
+                        ${isApproved ? `<span style="color:#16a34a;font-size:12px;font-weight:700;padding:4px 0;display:flex;align-items:center;gap:4px">✓ Approved</span>` : ''}
+                        ${isDeclined ? `<span style="color:#dc2626;font-size:12px;font-weight:700;padding:4px 0;display:flex;align-items:center;gap:4px">✕ Declined</span>` : ''}
                     </div>
-                    ${upload.review_comment ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;color:#92400e">${escHtml(upload.review_comment)}</div>` : ''}
+                    ${isDeclined ? `<div style="margin-top:10px;padding:8px 12px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;font-size:12px;color:#dc2626;font-weight:500">
+                        ${upload.review_comment ? escHtml(upload.review_comment) : 'Declined — upload a revised version below'}
+                    </div>` : (upload.review_comment ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;color:#92400e">${escHtml(upload.review_comment)}</div>` : '')}
+                    <!-- Per-version comment thread -->
+                    <div class="ds-version-comments" id="dsvc-comments-${upload.id}">
+                        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin:12px 0 6px">Comments</div>
+                        <div id="dsvc-comment-list-${upload.id}" style="margin-bottom:8px"></div>
+                        <div style="display:flex;gap:6px;align-items:flex-start">
+                            <textarea id="dsvc-comment-input-${upload.id}" placeholder="Add a comment…" rows="2"
+                                style="flex:1;padding:7px 10px;font-size:12px;border:1.5px solid #e2e8f0;border-radius:8px;resize:vertical;font-family:inherit;color:#0f172a;outline:none"
+                                onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                            <button onclick="addVersionComment('${upload.id}','${stage.id}',${stage.stage_number})"
+                                style="padding:7px 12px;background:#0f172a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;margin-top:0">Send</button>
+                        </div>
+                    </div>
                 </div>
             </div>`;
+        }
+
+        async function loadVersionComments(uploadId) {
+            const list = document.getElementById(`dsvc-comment-list-${uploadId}`);
+            if (!list) return;
+            const { data } = await supabase.from('stage_status_log')
+                .select('*').eq('upload_id', uploadId).order('created_at');
+            if (!data?.length) { list.innerHTML = ''; return; }
+            list.innerHTML = data.map(e => {
+                const initials = dsActorInitials(e.actor_name || '');
+                return `<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start">
+                    <div class="ds-actor-pill" style="font-size:10px;min-width:26px;height:26px">${initials}</div>
+                    <div style="flex:1;background:#f1f5f9;border-radius:8px;padding:6px 10px">
+                        <div style="font-size:11px;font-weight:600;color:#0f172a;margin-bottom:2px">${escHtml(e.actor_name||'Unknown')}</div>
+                        <div style="font-size:12px;color:#334155">${escHtml(e.comment||'')}</div>
+                        <div style="font-size:10px;color:#94a3b8;margin-top:3px">${dsRelativeTime(e.created_at)}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function addVersionComment(uploadId, stageId, stageNum) {
+            const input = document.getElementById(`dsvc-comment-input-${uploadId}`);
+            const comment = input?.value?.trim();
+            if (!comment) { showToast('Please enter a comment', 'warning'); return; }
+            const actor = await supabase.auth.getUser();
+            const actorName = currentUserProfile
+                ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim()
+                : actor?.data?.user?.email || 'Unknown';
+            const stage = currentStages.find(s => s.id === stageId);
+            await supabase.from('stage_status_log').insert({
+                stage_id: stageId, task_id: stage?.task_id, brand_id: currentBrand?.id,
+                upload_id: uploadId, actor_id: actor?.data?.user?.id || null, actor_name: actorName,
+                previous_status: stage?.status, new_status: stage?.status, comment
+            });
+            input.value = '';
+            await loadVersionComments(uploadId);
+            showToast('Comment added');
         }
 
         function addVersionCard(stageId, vNum) {
@@ -16499,12 +16597,25 @@
             if (file) uploadVersionFile(stageId, vNum, file);
         }
 
+        // Ensure the design-uploads storage bucket exists (creates it if missing)
+        let _designBucketReady = false;
+        async function ensureDesignBucket() {
+            if (_designBucketReady) return;
+            const { data: buckets } = await supabase.storage.listBuckets();
+            const exists = (buckets || []).some(b => b.name === 'design-uploads');
+            if (!exists) {
+                await supabase.storage.createBucket('design-uploads', { public: true, fileSizeLimit: 52428800 });
+            }
+            _designBucketReady = true;
+        }
+
         async function uploadVersionFile(stageId, vNum, file) {
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage || !currentBrand?.id) return;
             const dz = document.getElementById(`dsvz-${stageId}-${vNum}`);
             if (dz) dz.innerHTML = '<div class="spinner" style="margin:0 auto"></div>';
             try {
+                await ensureDesignBucket();
                 const ext = file.name.split('.').pop();
                 const path = `${currentBrand.id}/design-stages/${stageId}/V${vNum}-${Date.now()}.${ext}`;
                 const { data: stored, error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
@@ -16559,10 +16670,13 @@
             if (!stage) return;
             const ok = await updateStageStatus(stage, 'in_review', 'Submitted for review');
             if (!ok) return;
+            // Update the parent task status to 'in_review' so it surfaces in the dashboard Review queue
+            await supabase.from('design_tasks').update({ status: 'in_review' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_review';
             await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: stage.stage_name });
             renderStageTabs();
             renderStagePanel(stageNum);
-            showToast('Stage submitted for review');
+            showToast('Stage submitted for review — task moved to Review queue');
         }
 
         async function approveStage(stageId, stageNum) {
@@ -16571,18 +16685,30 @@
             const ok = await updateStageStatus(stage, 'approved', 'Stage approved');
             if (!ok) return;
             await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: stage.stage_name });
+
+            // Auto-advance next stage to in_progress (turns tab orange)
+            const nextStage = currentStages.find(s => s.stage_number === stageNum + 1);
+            if (nextStage && nextStage.status === 'not_started') {
+                await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', nextStage.id);
+                nextStage.status = 'in_progress';
+            }
+
             // Auto-complete task if all 4 stages done
             const allApproved = currentStages.every(s => s.id === stageId ? true : ['approved','skipped'].includes(s.status));
             if (allApproved) {
                 await supabase.from('design_tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', stage.task_id);
                 if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'completed';
                 await dsLogActivity(stage.task_id, null, 'task_completed', {});
+                renderStageTabs();
+                renderStagePanel(stageNum);
                 showToast('All stages complete — task marked Completed 🎉');
             } else {
+                renderStageTabs();
                 showToast(`Stage ${stageNum} approved ✓`);
+                // Auto-jump to next stage
+                if (nextStage) setTimeout(() => switchDSStage(nextStage.stage_number), 300);
+                else renderStagePanel(stageNum);
             }
-            renderStageTabs();
-            renderStagePanel(stageNum);
         }
 
         async function requestRevisions(stageId, stageNum) {
@@ -16761,6 +16887,7 @@
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage || !currentBrand?.id) return;
             try {
+                await ensureDesignBucket();
                 const ext = file.name.split('.').pop();
                 const path = `${currentBrand.id}/design-stages/${stageId}/${sectionKey}-${Date.now()}.${ext}`;
                 const { error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
