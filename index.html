@@ -705,6 +705,71 @@
         .ds-brief-field:last-child { border-bottom:none; }
         .ds-brief-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; }
         .ds-brief-value { font-size:13px; font-weight:500; color:#0f172a; line-height:1.4; }
+
+        /* ── Design Brief Overview (Stage 1) ─────────────────────────────── */
+        /* Section headers */
+        .ds-ov-section { margin-bottom:28px; }
+        .ds-ov-section-hdr { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+        .ds-ov-section-num { width:22px; height:22px; border-radius:50%; background:#0f172a; color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ds-ov-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:#64748b; }
+
+        /* Top-level detail grid */
+        .ds-tl-grid { display:grid; grid-template-columns:repeat(3,1fr); border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fff; }
+        .ds-tl-cell { padding:14px 16px; border-right:1px solid #f1f5f9; border-bottom:1px solid #f1f5f9; }
+        .ds-tl-cell:nth-child(3n) { border-right:none; }
+        .ds-tl-cell:nth-last-child(-n+3) { border-bottom:none; }
+        .ds-tl-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:5px; }
+        .ds-tl-val { font-size:14px; font-weight:600; color:#0f172a; line-height:1.3; }
+        .ds-priority { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; }
+        .ds-priority-standard { background:#f1f5f9; color:#64748b; }
+        .ds-priority-high     { background:#fff7ed; color:#c2410c; }
+        .ds-priority-urgent   { background:#fef2f2; color:#dc2626; }
+
+        /* Colour section */
+        .ds-toggle { width:40px; height:22px; border-radius:11px; background:#e2e8f0; position:relative; cursor:pointer; transition:background 0.2s; flex-shrink:0; }
+        .ds-toggle.on { background:#00e5cc; }
+        .ds-toggle::after { content:''; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.25); transition:left 0.2s; }
+        .ds-toggle.on::after { left:21px; }
+        .ds-colour-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+        .ds-colour-card { border:1.5px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fff; transition:border-color 0.15s; }
+        .ds-colour-card:hover { border-color:#94a3b8; }
+        .ds-colour-swatch { height:72px; width:100%; position:relative; cursor:pointer; overflow:hidden; }
+        .ds-colour-swatch-overlay { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; opacity:0; transition:opacity 0.15s; background:rgba(0,0,0,0.12); color:#fff; }
+        .ds-colour-swatch:hover .ds-colour-swatch-overlay { opacity:1; }
+        .ds-colour-body { padding:10px 12px; }
+        .ds-colour-name { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:5px; }
+        .ds-colour-pantone { font-size:12px; font-weight:600; color:#0f172a; margin-bottom:4px; min-height:18px; }
+        .ds-colour-hex-display { font-size:11px; color:#64748b; font-family:monospace; }
+        .ds-colour-input { width:100%; padding:5px 8px; border:1.5px solid #e2e8f0; border-radius:7px; font-size:12px; font-family:monospace; color:#0f172a; margin-top:4px; outline:none; transition:border-color 0.15s; box-sizing:border-box; background:#fff; }
+        .ds-colour-input:focus { border-color:#00e5cc; }
+
+        /* Product cards */
+        .ds-prod-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:10px; }
+        .ds-prod-card { border:2px solid #e2e8f0; border-radius:12px; overflow:hidden; cursor:pointer; transition:all 0.15s; background:#fff; position:relative; }
+        .ds-prod-card:hover { border-color:#94a3b8; transform:translateY(-1px); box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+        .ds-prod-card.selected { border-color:#00e5cc; box-shadow:0 0 0 3px rgba(0,229,204,0.15); }
+        .ds-prod-check { position:absolute; top:6px; right:6px; width:20px; height:20px; background:#00e5cc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; color:#fff; font-weight:900; opacity:0; transition:opacity 0.15s; z-index:2; box-shadow:0 2px 4px rgba(0,0,0,0.15); }
+        .ds-prod-card.selected .ds-prod-check { opacity:1; }
+        .ds-prod-img { height:88px; display:flex; align-items:center; justify-content:center; background:#f8fafc; overflow:hidden; padding:8px; }
+        .ds-prod-img img { max-width:100%; max-height:100%; object-fit:contain; }
+        .ds-prod-info { padding:8px 10px; border-top:1px solid #f1f5f9; }
+        .ds-prod-name { font-size:11px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+        .ds-prod-code { font-size:10px; color:#94a3b8; font-family:monospace; }
+        .ds-prod-range { font-size:10px; color:#3b82f6; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; margin-top:3px; }
+
+        /* Asset upload */
+        .ds-asset-dz { border:2px dashed #cbd5e1; border-radius:12px; padding:28px 24px; text-align:center; cursor:pointer; transition:all 0.2s; background:#fafbfc; }
+        .ds-asset-dz:hover,.ds-asset-dz.drag-over { border-color:#00e5cc; background:rgba(0,229,204,0.03); }
+        .ds-asset-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(100px,1fr)); gap:10px; margin-top:14px; }
+        .ds-asset-card { border:1.5px solid #e2e8f0; border-radius:10px; overflow:hidden; background:#fff; position:relative; transition:border-color 0.15s; }
+        .ds-asset-card:hover { border-color:#94a3b8; }
+        .ds-asset-thumb { height:70px; background:#f1f5f9; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+        .ds-asset-thumb img { width:100%; height:100%; object-fit:cover; }
+        .ds-asset-label { padding:6px 8px 8px; }
+        .ds-asset-fname { font-size:10px; color:#0f172a; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:1px; }
+        .ds-asset-date { font-size:10px; color:#94a3b8; }
+        .ds-asset-del { position:absolute; top:4px; right:4px; width:18px; height:18px; background:rgba(15,23,42,0.65); color:#fff; border:none; border-radius:50%; font-size:13px; line-height:1; cursor:pointer; display:none; align-items:center; justify-content:center; padding:0; }
+        .ds-asset-card:hover .ds-asset-del { display:flex; }
         .dt-sidebar-section { margin-bottom:20px; }
         .dt-sidebar-section:last-child { margin-bottom:0; }
         .dt-sidebar-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#94a3b8; margin-bottom:10px; }
@@ -16057,7 +16122,7 @@
         async function loadDesignTaskRecordV2(taskId) {
             const { data: task } = await supabase
                 .from('design_tasks')
-                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number)')
+                .select('*, clubs(id,name,logo_url,club_crest_url,sport,pantone_main,pantone_secondary,pantone_accent,hex_main,hex_secondary,hex_accent), jobs(id,job_name,job_number)')
                 .eq('id', taskId).single();
             if (!task) { showToast('Task not found', 'error'); return; }
 
@@ -16208,104 +16273,256 @@
         // ── Stage 1: Brief ─────────────────────────────────────────────────────
 
         async function buildStage1Panel(stage) {
-            const { data: log } = await supabase.from('stage_status_log')
-                .select('*').eq('stage_id', stage.id).order('created_at');
-            const logHtml = buildCommentLog(log || []);
             const task = currentDesignTaskRecord || {};
-            const isApproved = stage.status === 'approved';
-            const isDeclined = stage.status === 'declined';
+            const club = task.clubs || {};
+
+            // Parallel data loads
+            const [logRes, assetsRes, prodsRes] = await Promise.all([
+                supabase.from('stage_status_log').select('*').eq('stage_id', stage.id).order('created_at'),
+                supabase.from('design_task_assets').select('*').eq('design_task_id', stage.task_id).order('created_at'),
+                task.club_id
+                    ? supabase.from('club_products')
+                        .select('id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category)')
+                        .eq('club_id', task.club_id).eq('is_active', true).order('created_at')
+                    : Promise.resolve({ data: [] })
+            ]);
+
+            const assets   = assetsRes.data || [];
+            const clubProds = prodsRes.data || [];
+            const logHtml  = buildCommentLog(logRes.data || []);
+            const isApproved  = stage.status === 'approved';
+            const isDeclined  = stage.status === 'declined';
             const isNeedsInfo = stage.status === 'in_review';
+            const useClub = task.use_club_colours !== false;
+            const cc = task.custom_colours || {};
+            const selectedIds = new Set(task.products_required || []);
 
-            // Helpers
-            const field = (label, val, fullWidth) => val ? `<div class="ds-brief-field"${fullWidth ? ' style="grid-column:1/-1"' : ''}>
-                <div class="ds-brief-label">${label}</div>
-                <div class="ds-brief-value">${escHtml(String(val))}</div>
-            </div>` : '';
-            const chips = (items) => (items||[]).length
-                ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px">${items.map(i => `<span style="padding:3px 10px;background:#e2e8f0;border-radius:20px;font-size:12px;color:#0f172a">${escHtml(String(i))}</span>`).join('')}</div>`
-                : '<span style="color:#94a3b8;font-size:13px">—</span>';
+            // ── Colour data ─────────────────────────────────────────────────
+            const cols = [
+                { key:'primary',   label:'Primary',   pantone: club.pantone_main       || '', hex: cc.primary?.hex   || club.hex_main       || '' },
+                { key:'secondary', label:'Secondary', pantone: club.pantone_secondary   || '', hex: cc.secondary?.hex || club.hex_secondary   || '' },
+                { key:'accent',    label:'Accent',    pantone: club.pantone_accent      || '', hex: cc.accent?.hex    || club.hex_accent      || '' },
+            ];
+            const colCardsHtml = cols.map(c => {
+                const bg  = c.hex || '#e2e8f0';
+                const txt = briefIsLight(c.hex) ? '#0f172a' : '#fff';
+                return `<div class="ds-colour-card" data-colkey="${c.key}">
+                    <div class="ds-colour-swatch" style="background:${bg}" onclick="document.getElementById('dscp-${c.key}').click()">
+                        <input type="color" id="dscp-${c.key}" value="${c.hex || '#000000'}"
+                            oninput="briefColourPick('${c.key}',this.value)"
+                            style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+                        <div class="ds-colour-swatch-overlay">Edit</div>
+                        ${!c.hex ? `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;font-weight:600">Click to set</div>` : ''}
+                    </div>
+                    <div class="ds-colour-body">
+                        <div class="ds-colour-name">${c.label}</div>
+                        <div class="ds-colour-pantone">
+                            ${useClub
+                                ? `<span style="font-size:12px;font-weight:600;color:#0f172a">${c.pantone || '<span style="color:#94a3b8;font-weight:400">No Pantone on record</span>'}</span>`
+                                : `<input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C" onblur="briefColourSave('${c.key}','pantone',this.value)">`
+                            }
+                        </div>
+                        <input class="ds-colour-input" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB"
+                            onblur="briefColourSave('${c.key}','hex',this.value)">
+                    </div>
+                </div>`;
+            }).join('');
 
-            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
-            const due = task.due_date ? new Date(task.due_date) : null;
-            const daysLeft = due ? Math.ceil((due - new Date()) / 86400000) : null;
-            const dueBadge = daysLeft !== null
-                ? (daysLeft < 0
-                    ? `<span style="margin-left:8px;padding:2px 8px;background:#fef2f2;color:#dc2626;border-radius:10px;font-size:11px;font-weight:700">${Math.abs(daysLeft)}d overdue</span>`
-                    : daysLeft <= 7
-                        ? `<span style="margin-left:8px;padding:2px 8px;background:#fff7ed;color:#c2410c;border-radius:10px;font-size:11px;font-weight:700">${daysLeft}d left</span>`
-                        : '')
-                : '';
+            // ── Product cards ───────────────────────────────────────────────
+            const prodCardsHtml = !task.club_id
+                ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">Link a club to this task to see products.</p>`
+                : !clubProds.length
+                    ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">No products in this club's catalogue.</p>`
+                    : clubProds.map(cp => {
+                        const sel = selectedIds.has(cp.id);
+                        const nm  = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                        const cod = cp.products?.product_code || '';
+                        const rng = cp.products?.range_name || cp.products?.category || '';
+                        const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                        const img  = imgs[0] || cp.image_url || '';
+                        return `<div class="ds-prod-card${sel ? ' selected' : ''}" onclick="briefToggleProduct('${cp.id}',this)">
+                            <div class="ds-prod-check">✓</div>
+                            <div class="ds-prod-img">
+                                ${img
+                                    ? `<img src="${escHtml(img)}" alt="${nm}" loading="lazy">`
+                                    : `<svg width="28" height="28" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
+                            </div>
+                            <div class="ds-prod-info">
+                                <div class="ds-prod-name" title="${nm}">${nm}</div>
+                                ${cod ? `<div class="ds-prod-code">${escHtml(cod)}</div>` : ''}
+                                ${rng ? `<div class="ds-prod-range">${escHtml(rng)}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }).join('');
 
-            const appetiteLabel = { minimal: 'Minimal', moderate: 'Moderate', bold: 'Bold', bespoke: 'Bespoke' };
-            const linkedJob = task.jobs ? `${task.jobs.job_name || ''}${task.jobs.job_number ? ' · ' + task.jobs.job_number : ''}`.trim() : null;
-            const productNames = (task._productNames || []);
+            // ── Asset cards ─────────────────────────────────────────────────
+            const assetCardsHtml = assets.map(a => {
+                const isImg = a.file_type?.startsWith('image/');
+                const ext   = (a.file_name || '').split('.').pop().toUpperCase();
+                return `<div class="ds-asset-card">
+                    <div class="ds-asset-thumb">
+                        ${isImg
+                            ? `<img src="${escHtml(a.file_url)}" alt="" loading="lazy">`
+                            : `<div style="font-size:11px;font-weight:800;color:#475569;background:#e2e8f0;padding:5px 10px;border-radius:6px">${escHtml(ext)}</div>`}
+                    </div>
+                    <div class="ds-asset-label">
+                        <div class="ds-asset-fname" title="${escHtml(a.file_name||'')}">${escHtml(a.file_name||'File')}</div>
+                        <div class="ds-asset-date">${dsRelativeTime(a.created_at)}</div>
+                    </div>
+                    <button class="ds-asset-del" onclick="deleteBriefAsset('${a.id}',event)" title="Remove">×</button>
+                </div>`;
+            }).join('');
+
+            // ── Helpers ─────────────────────────────────────────────────────
+            const OT = { match_kit:'Match Kit', training_range:'Training Range', travel_range:'Travel Range', leisurewear:'Leisurewear', other:'Other' };
+            const PRI = { standard:{ label:'Standard', dot:'⚪' }, high:{ label:'High', dot:'🟠' }, urgent:{ label:'Urgent', dot:'🔴' } };
+            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+            const daysLeft = task.due_date ? Math.ceil((new Date(task.due_date) - new Date()) / 86400000) : null;
+            const dueExtra = daysLeft !== null
+                ? daysLeft < 0 ? ` <span style="font-size:11px;color:#dc2626;font-weight:700">(${Math.abs(daysLeft)}d overdue)</span>`
+                : daysLeft <= 7 ? ` <span style="font-size:11px;color:#c2410c;font-weight:700">(${daysLeft}d left)</span>` : '' : '';
+            const pri = PRI[task.priority || 'standard'] || PRI.standard;
+            const priCls = task.priority || 'standard';
+
+            const briefText = task.design_brief || task.design_summary || '';
+            const logoUrl   = club.club_crest_url || club.logo_url || '';
 
             return `<div class="dt-stage-layout">
                 <div class="dt-stage-content">
-                    <!-- Task title -->
-                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px">
-                        <div>
-                            <h3 style="font-size:18px;font-weight:800;margin:0 0 4px;color:#0f172a">${escHtml(task.task_name || 'Untitled Task')}</h3>
-                            ${task.task_ref ? `<div style="font-size:12px;color:#94a3b8;font-weight:600;letter-spacing:0.4px">Ref: ${escHtml(task.task_ref)}</div>` : ''}
+
+                    <!-- Club / Task header -->
+                    <div style="display:flex;align-items:center;gap:14px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:24px">
+                        ${logoUrl ? `<img src="${escHtml(logoUrl)}" alt="" style="width:48px;height:48px;object-fit:contain;border-radius:8px;background:#fff;padding:3px;border:1px solid #e2e8f0;flex-shrink:0">` : `<div style="width:48px;height:48px;border-radius:8px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="22" height="22" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>`}
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:17px;font-weight:800;color:#0f172a;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name || 'Untitled Task')}</div>
+                            <div style="font-size:12px;color:#64748b">${escHtml(club.name || '')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                         </div>
-                        <span class="ds-stage-badge ds-status-${task.status||'new'}" style="flex-shrink:0;margin-top:2px">${DS_STATUS_LABELS[task.status]||task.status||'New'}</span>
+                        <span class="ds-stage-badge ${stage.status}" style="flex-shrink:0;font-size:11px;padding:4px 11px">${dsStageStatusLabel(stage.status)}</span>
                     </div>
 
-                    <!-- Core job info grid -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;margin-bottom:20px">
-                        ${field('Club / Client', task.clubs?.name)}
-                        ${field('Assigned Designer', task.assigned_designer_name)}
-                        <div class="ds-brief-field" style="grid-column:1/-1">
-                            <div class="ds-brief-label">Due Date</div>
-                            <div class="ds-brief-value" style="display:flex;align-items:center">${dueDate}${dueBadge}</div>
+                    <!-- ① Top Level Details -->
+                    <div class="ds-ov-section">
+                        <div class="ds-ov-section-hdr">
+                            <div class="ds-ov-section-num">1</div>
+                            <div class="ds-ov-section-title">Top Level Details</div>
                         </div>
-                        ${linkedJob ? field('Linked Job', linkedJob) : ''}
-                        ${field('Sport / Discipline', task.sport)}
-                        ${field('Product Type', task.product_type)}
-                        ${field('Colour Palette', task.colour_palette)}
-                        ${field('Kit Details', task.kit_details)}
-                        ${task.design_appetite ? `<div class="ds-brief-field">
-                            <div class="ds-brief-label">Design Appetite</div>
-                            <div class="ds-brief-value"><span style="padding:3px 10px;background:#ede9fe;color:#6d28d9;border-radius:20px;font-size:12px;font-weight:600">${escHtml(appetiteLabel[task.design_appetite]||task.design_appetite)}</span></div>
+                        <div class="ds-tl-grid">
+                            <div class="ds-tl-cell">
+                                <div class="ds-tl-label">Club</div>
+                                <div class="ds-tl-val">${escHtml(club.name || '—')}</div>
+                            </div>
+                            <div class="ds-tl-cell">
+                                <div class="ds-tl-label">Team</div>
+                                <div class="ds-tl-val">${escHtml(task.team || '—')}</div>
+                            </div>
+                            <div class="ds-tl-cell">
+                                <div class="ds-tl-label">Order Type</div>
+                                <div class="ds-tl-val">${OT[task.order_type] || (task.job_type ? task.job_type.replace(/_/g,' ') : '—')}</div>
+                            </div>
+                            <div class="ds-tl-cell">
+                                <div class="ds-tl-label">Season / Event</div>
+                                <div class="ds-tl-val">${escHtml(task.season_event || task.sport || '—')}</div>
+                            </div>
+                            <div class="ds-tl-cell">
+                                <div class="ds-tl-label">Deadline</div>
+                                <div class="ds-tl-val">${dueDate}${dueExtra}</div>
+                            </div>
+                            <div class="ds-tl-cell">
+                                <div class="ds-tl-label">Priority</div>
+                                <div class="ds-tl-val"><span class="ds-priority ds-priority-${priCls}">${pri.dot} ${pri.label}</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ② Design Description -->
+                    <div class="ds-ov-section">
+                        <div class="ds-ov-section-hdr">
+                            <div class="ds-ov-section-num">2</div>
+                            <div class="ds-ov-section-title">Design Description</div>
+                        </div>
+                        <textarea id="ds-brief-desc"
+                            style="width:100%;padding:14px 16px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;color:#0f172a;line-height:1.7;font-family:inherit;resize:vertical;min-height:90px;outline:none;transition:border-color 0.15s;box-sizing:border-box"
+                            onfocus="this.style.borderColor='#00e5cc'"
+                            onblur="this.style.borderColor='#e2e8f0';saveBriefDescription(this.value)"
+                            oninput="document.getElementById('ds-brief-cc').textContent=this.value.length"
+                            placeholder="Modern navy cricket kit with subtle wave pattern referencing coastal heritage."
+                            maxlength="500">${escHtml(briefText)}</textarea>
+                        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:#94a3b8">
+                            <span>Describe the creative direction clearly — guide your designer.</span>
+                            <span><span id="ds-brief-cc">${briefText.length}</span> / 500</span>
+                        </div>
+                        ${task.key_notes ? `<div style="margin-top:10px;padding:11px 14px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;font-size:12px;color:#78350f;line-height:1.6">
+                            <span style="font-weight:700">📌 Key Notes: </span>${escHtml(task.key_notes)}
                         </div>` : ''}
-                        ${task.job_type ? `<div class="ds-brief-field">
-                            <div class="ds-brief-label">Job Type</div>
-                            <div class="ds-brief-value"><span style="padding:3px 10px;background:#e0f2fe;color:#0369a1;border-radius:20px;font-size:12px;font-weight:600">${escHtml(task.job_type)}</span></div>
-                        </div>` : ''}
-                        ${(task.design_types||[]).length ? `<div class="ds-brief-field" style="grid-column:1/-1">
-                            <div class="ds-brief-label">Design Types</div>
-                            <div class="ds-brief-value">${chips(task.design_types)}</div>
-                        </div>` : ''}
-                        ${productNames.length ? `<div class="ds-brief-field" style="grid-column:1/-1">
-                            <div class="ds-brief-label">Products Required</div>
-                            <div class="ds-brief-value">${chips(productNames)}</div>
+                        ${task.kit_details ? `<div style="margin-top:8px;padding:11px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;color:#475569;line-height:1.6">
+                            <span style="font-weight:700">📋 Kit Details: </span>${escHtml(task.kit_details)}
                         </div>` : ''}
                     </div>
 
-                    <!-- Design brief text -->
-                    ${(task.design_brief || task.design_summary) ? `<div style="margin-bottom:16px">
-                        <div class="ds-brief-label" style="margin-bottom:6px">Design Brief</div>
-                        <div style="padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:13px;color:#0f172a;line-height:1.7;white-space:pre-wrap">${escHtml(task.design_brief || task.design_summary)}</div>
-                    </div>` : ''}
+                    <!-- ③ Colours -->
+                    <div class="ds-ov-section">
+                        <div class="ds-ov-section-hdr" style="margin-bottom:10px">
+                            <div class="ds-ov-section-num">3</div>
+                            <div class="ds-ov-section-title">Colours</div>
+                            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                                <span style="font-size:12px;color:#64748b;font-weight:600">Use Club Colours</span>
+                                <div class="ds-toggle${useClub ? ' on' : ''}" onclick="toggleBriefColours()" title="${useClub ? 'Click to use custom colours' : 'Click to use club colours'}"></div>
+                            </div>
+                        </div>
+                        ${!useClub ? `<p style="font-size:11px;color:#94a3b8;margin:0 0 12px">Custom colour mode — edit Pantone codes and hex values below. Click a swatch to use the colour picker.</p>` : `<p style="font-size:11px;color:#64748b;margin:0 0 12px">Showing club colours from record. Click any swatch to set / override the hex value.</p>`}
+                        <div class="ds-colour-grid">
+                            ${colCardsHtml}
+                        </div>
+                        ${task.colour_palette ? `<div style="margin-top:10px;padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#64748b">
+                            <span style="font-weight:600">Colour notes:</span> ${escHtml(task.colour_palette)}
+                        </div>` : ''}
+                    </div>
 
-                    <!-- Key notes -->
-                    ${task.key_notes ? `<div style="margin-bottom:16px">
-                        <div class="ds-brief-label" style="margin-bottom:6px">Key Notes / Special Instructions</div>
-                        <div style="padding:14px 16px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;font-size:13px;color:#78350f;line-height:1.7;white-space:pre-wrap">${escHtml(task.key_notes)}</div>
-                    </div>` : ''}
+                    <!-- ④ Products Required -->
+                    <div class="ds-ov-section">
+                        <div class="ds-ov-section-hdr">
+                            <div class="ds-ov-section-num">4</div>
+                            <div class="ds-ov-section-title">Products Required</div>
+                            ${selectedIds.size ? `<span style="margin-left:auto;padding:2px 10px;background:#e0fdf4;color:#065f46;border-radius:20px;font-size:11px;font-weight:700">${selectedIds.size} selected</span>` : ''}
+                        </div>
+                        <div class="ds-prod-grid">${prodCardsHtml}</div>
+                    </div>
+
+                    <!-- ⑤ Assets for Design -->
+                    <div class="ds-ov-section">
+                        <div class="ds-ov-section-hdr">
+                            <div class="ds-ov-section-num">5</div>
+                            <div class="ds-ov-section-title">Assets for Design</div>
+                            ${assets.length ? `<span style="margin-left:auto;font-size:11px;color:#64748b;font-weight:600">${assets.length} file${assets.length !== 1 ? 's' : ''}</span>` : ''}
+                        </div>
+                        <div class="ds-asset-dz" id="ds-brief-dz"
+                            onclick="document.getElementById('ds-brief-finput').click()"
+                            ondragover="event.preventDefault();this.classList.add('drag-over')"
+                            ondragleave="this.classList.remove('drag-over')"
+                            ondrop="briefAssetDrop(event)">
+                            <svg width="32" height="32" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 10px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            <p style="font-size:13px;font-weight:600;color:#64748b;margin:0 0 4px">Drop files here or click to upload</p>
+                            <p style="font-size:11px;color:#94a3b8;margin:0">AI · SVG · PNG · JPG · PDF accepted</p>
+                        </div>
+                        <input type="file" id="ds-brief-finput" class="hide" multiple
+                            accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf"
+                            onchange="briefAssetSelect(event)">
+                        ${assets.length ? `<div class="ds-asset-grid">${assetCardsHtml}</div>` : ''}
+                    </div>
 
                     <!-- Status banners -->
-                    ${isApproved ? `<div style="margin-top:4px;background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:10px;padding:13px 16px;color:#16a34a;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
-                        <span style="font-size:16px">✓</span> Brief accepted — Stage 2 (Concepts) is now unlocked.
+                    ${isApproved ? `<div style="background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:10px;padding:13px 16px;color:#16a34a;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+                        <span>✓</span> Brief accepted — Stage 2 (Concepts) is now unlocked.
                     </div>` : ''}
-                    ${isDeclined ? `<div style="margin-top:4px;background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:10px;padding:13px 16px;color:#dc2626;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
-                        <span style="font-size:16px">✕</span> Brief declined — update details and re-accept when ready.
+                    ${isDeclined ? `<div style="background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:10px;padding:13px 16px;color:#dc2626;font-size:13px;font-weight:600">
+                        ✕ Brief declined — update details and re-accept when ready.
                     </div>` : ''}
-                    ${isNeedsInfo ? `<div style="margin-top:4px;background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:10px;padding:13px 16px;color:#b45309;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
-                        <span style="font-size:16px">?</span> More information requested — awaiting client response.
+                    ${isNeedsInfo ? `<div style="background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:10px;padding:13px 16px;color:#b45309;font-size:13px;font-weight:600">
+                        ? More information requested — awaiting client response.
                     </div>` : ''}
                 </div>
 
+                <!-- RIGHT SIDEBAR -->
                 <div class="dt-stage-sidebar">
                     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:12px">Stage Status</div>
                     <div style="margin-bottom:20px">
@@ -16332,6 +16549,118 @@
                 </div>
             </div>`;
         }
+
+        // ── Brief Overview helpers ──────────────────────────────────────────
+
+        function briefIsLight(hex) {
+            try {
+                const h = (hex || '').replace(/^#/, '');
+                if (h.length < 6) return true;
+                const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+                return (r*299 + g*587 + b*114) / 1000 > 155;
+            } catch { return true; }
+        }
+
+        async function toggleBriefColours() {
+            if (!currentDesignTaskRecord?.id) return;
+            const newVal = !(currentDesignTaskRecord.use_club_colours !== false);
+            currentDesignTaskRecord.use_club_colours = newVal;
+            await supabase.from('design_tasks').update({ use_club_colours: newVal }).eq('id', currentDesignTaskRecord.id);
+            renderStagePanel(1);
+        }
+
+        function briefColourPick(key, hex) {
+            // Live swatch update
+            const card = document.querySelector(`.ds-colour-card[data-colkey="${key}"]`);
+            if (card) {
+                card.querySelector('.ds-colour-swatch').style.background = hex;
+                const hexInput = document.getElementById(`dshex-${key}`);
+                if (hexInput) hexInput.value = hex;
+            }
+            clearTimeout(briefColourPick._t);
+            briefColourPick._t = setTimeout(() => briefColourSave(key, 'hex', hex), 500);
+        }
+
+        async function briefColourSave(key, field, value) {
+            if (!currentDesignTaskRecord?.id) return;
+            const cols = JSON.parse(JSON.stringify(currentDesignTaskRecord.custom_colours || {}));
+            if (!cols[key]) cols[key] = {};
+            cols[key][field] = value;
+            currentDesignTaskRecord.custom_colours = cols;
+            await supabase.from('design_tasks').update({ custom_colours: cols }).eq('id', currentDesignTaskRecord.id);
+            if (field === 'hex' && value) {
+                const card = document.querySelector(`.ds-colour-card[data-colkey="${key}"]`);
+                if (card) card.querySelector('.ds-colour-swatch').style.background = value;
+            }
+        }
+
+        async function briefToggleProduct(productId, cardEl) {
+            if (!currentDesignTaskRecord) return;
+            const arr = [...(currentDesignTaskRecord.products_required || [])];
+            const idx = arr.indexOf(productId);
+            if (idx === -1) arr.push(productId);
+            else arr.splice(idx, 1);
+            currentDesignTaskRecord.products_required = arr;
+            cardEl.classList.toggle('selected', idx === -1);
+            // Update selected count badge in header
+            const badge = document.querySelector('.ds-ov-section .ds-ov-section-hdr [style*="e0fdf4"]');
+            if (badge) badge.textContent = arr.length + ' selected';
+            await supabase.from('design_tasks').update({ products_required: arr }).eq('id', currentDesignTaskRecord.id);
+        }
+
+        async function saveBriefDescription(text) {
+            if (!currentDesignTaskRecord?.id) return;
+            currentDesignTaskRecord.design_brief = text;
+            await supabase.from('design_tasks').update({ design_brief: text }).eq('id', currentDesignTaskRecord.id);
+        }
+
+        function briefAssetDrop(event) {
+            event.preventDefault();
+            const dz = document.getElementById('ds-brief-dz');
+            if (dz) dz.classList.remove('drag-over');
+            Array.from(event.dataTransfer?.files || []).forEach(f => uploadBriefAsset(f));
+        }
+
+        function briefAssetSelect(event) {
+            Array.from(event.target.files || []).forEach(f => uploadBriefAsset(f));
+            event.target.value = '';
+        }
+
+        async function uploadBriefAsset(file) {
+            if (!currentDesignTaskRecord?.id || !currentBrand?.id) return;
+            showToast(`Uploading ${file.name}…`);
+            try {
+                const ext    = file.name.split('.').pop();
+                const safeName = file.name.replace(/[^a-z0-9._-]/gi, '_');
+                const path   = `${currentBrand.slug || currentBrand.id}/design-tasks/${currentDesignTaskRecord.id}/assets/${Date.now()}-${safeName}`;
+                const { error: upErr } = await supabase.storage.from('club-images').upload(path, file, { upsert: true });
+                if (upErr) throw upErr;
+                const { data: { publicUrl } } = supabase.storage.from('club-images').getPublicUrl(path);
+                const actor     = await supabase.auth.getUser();
+                const actorName = currentUserProfile
+                    ? `${currentUserProfile.first_name||''} ${currentUserProfile.last_name||''}`.trim()
+                    : actor?.data?.user?.email || 'Unknown';
+                await supabase.from('design_task_assets').insert({
+                    design_task_id: currentDesignTaskRecord.id, brand_id: currentBrand.id,
+                    file_name: file.name, file_url: publicUrl, file_type: file.type, file_size: file.size,
+                    uploaded_by: actor?.data?.user?.id, uploaded_by_name: actorName
+                });
+                showToast(`${file.name} uploaded ✓`);
+                renderStagePanel(1);
+            } catch(err) {
+                showToast('Upload failed: ' + (err.message || 'Unknown error'), 'error');
+            }
+        }
+
+        async function deleteBriefAsset(assetId, event) {
+            event.stopPropagation();
+            if (!confirm('Remove this asset?')) return;
+            await supabase.from('design_task_assets').delete().eq('id', assetId);
+            showToast('Asset removed');
+            renderStagePanel(1);
+        }
+
+        // ── Stage 1: Accept / Decline / Needs Info ─────────────────────────
 
         async function stage1Action(action) {
             const stage = currentStages.find(s => s.stage_number === 1);
