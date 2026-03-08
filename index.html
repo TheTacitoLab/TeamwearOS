@@ -17347,29 +17347,31 @@
             if (file) uploadVersionFile(stageId, vNum, file);
         }
 
-        // Ensure the design-uploads storage bucket exists (creates it if missing)
+        // Ensure the design-uploads storage bucket exists
         let _designBucketReady = false;
         async function ensureDesignBucket() {
             if (_designBucketReady) return;
-            try {
-                // Try to create — if bucket already exists this returns a harmless error
-                const { error: createErr } = await supabase.storage.createBucket('design-uploads', {
-                    public: true, fileSizeLimit: 52428800
-                });
-                if (createErr && !createErr.message?.toLowerCase().includes('already exist')) {
-                    // Creation failed; check if it exists anyway (e.g. we don't have create perms but bucket is there)
-                    const { data: buckets } = await supabase.storage.listBuckets();
-                    const exists = (buckets || []).some(b => b.name === 'design-uploads');
-                    if (!exists) {
-                        console.warn('ensureDesignBucket: bucket may be missing, attempting upload anyway', createErr);
-                    }
-                }
+            // 1. Try to create (no-op if it already exists)
+            const { error: createErr } = await supabase.storage.createBucket('design-uploads', {
+                public: true, fileSizeLimit: 52428800
+            });
+            if (!createErr || createErr.message?.toLowerCase().includes('already exist')) {
+                // Created successfully or already existed
                 _designBucketReady = true;
-            } catch(e) {
-                console.error('ensureDesignBucket error:', e);
-                // Optimistically mark ready and let the upload surface any real error
-                _designBucketReady = true;
+                return;
             }
+            // Creation failed (likely no permission with anon key) — check if bucket exists anyway
+            const { data: buckets, error: listErr } = await supabase.storage.listBuckets();
+            if (!listErr && (buckets || []).some(b => b.name === 'design-uploads')) {
+                _designBucketReady = true;
+                return;
+            }
+            // Bucket genuinely does not exist and we can't create it client-side
+            throw new Error(
+                'Storage bucket "design-uploads" not found. ' +
+                'Please create it in your Supabase project → Storage → New Bucket ' +
+                '(name: design-uploads, Public: on).'
+            );
         }
 
         async function uploadVersionFile(stageId, vNum, file) {
