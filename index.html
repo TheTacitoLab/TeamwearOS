@@ -1809,6 +1809,10 @@
                         <span id="dt-meta-created" style="font-size:11px;color:#94a3b8"></span>
                         <span id="dt-ref-display" class="text-xs font-mono font-semibold text-gray-500"></span>
                         <span id="dt-status-badge" class="badge design-status-new text-xs">New</span>
+                        <button id="dt-delete-btn" class="hide" onclick="deleteDesignTask()"
+                            style="padding:4px 10px;border:1.5px solid #fca5a5;border-radius:6px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer">
+                            🗑 Delete
+                        </button>
                     </div>
                 </div>
 
@@ -16331,12 +16335,12 @@
             // Load tasks
             const { data: brandTasks } = await supabase
                 .from('design_tasks')
-                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number,brand_id)')
+                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number,job_type,brand_id)')
                 .eq('brand_id', currentBrand.id)
                 .order('updated_at', { ascending: false });
             const { data: legacyTasks } = await supabase
                 .from('design_tasks')
-                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number,brand_id)')
+                .select('*, clubs(id,name,logo_url), jobs(id,job_name,job_number,job_type,brand_id)')
                 .is('brand_id', null).not('job_id', 'is', null)
                 .order('updated_at', { ascending: false });
             const legacy = (legacyTasks||[]).filter(t => t.jobs?.brand_id === currentBrand.id);
@@ -16377,7 +16381,7 @@
         async function loadDesignTaskRecordV2(taskId) {
             const { data: task } = await supabase
                 .from('design_tasks')
-                .select('*, clubs(id,name,logo_url,club_crest_url,sport,pantone_main,pantone_secondary,pantone_accent,hex_main,hex_secondary,hex_accent), jobs(id,job_name,job_number)')
+                .select('*, clubs(id,name,logo_url,club_crest_url,sport,pantone_main,pantone_secondary,pantone_accent,hex_main,hex_secondary,hex_accent), jobs(id,job_name,job_number,job_type)')
                 .eq('id', taskId).single();
             if (!task) { showToast('Task not found', 'error'); return; }
 
@@ -16434,6 +16438,10 @@
             if (clubDisp) clubDisp.textContent = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
             const designerDisp = document.getElementById('dt-designer-display');
             if (designerDisp) designerDisp.textContent = task.assigned_designer_name ? `👤 ${task.assigned_designer_name}` : '';
+
+            // Show delete button for admins/super admins only
+            const deleteBtn = document.getElementById('dt-delete-btn');
+            if (deleteBtn) deleteBtn.classList.toggle('hide', !isSuperAdmin && currentUserProfile?.role !== 'admin');
 
             // Brief collapse state
             const body = document.getElementById('dt-brief-body');
@@ -16610,7 +16618,10 @@
                         <div class="ds-asset-fname" title="${escHtml(a.file_name||'')}">${escHtml(a.file_name||'File')}</div>
                         <div class="ds-asset-date">${dsRelativeTime(a.created_at)}</div>
                     </div>
-                    <button class="ds-asset-del" onclick="deleteBriefAsset('${a.id}',event)" title="Remove">×</button>
+                    <div style="display:flex;gap:3px">
+                        <button class="ds-asset-del" onclick="downloadFile('${escHtml(a.file_url)}','${escHtml(a.file_name||'file')}');event.stopPropagation()" title="Download" style="background:#e0fdf4;color:#065f46;border-color:#86efac">↓</button>
+                        <button class="ds-asset-del" onclick="deleteBriefAsset('${a.id}',event)" title="Remove">×</button>
+                    </div>
                 </div>`;
             }).join('');
 
@@ -16644,7 +16655,7 @@
                                 <div style="font-size:11px;color:#64748b">${escHtml(club.name || '')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                             </div>
                             <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                                ${task.order_type ? `<span style="padding:2px 8px;background:#e0f2fe;color:#0369a1;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase">${OT[task.order_type] || task.order_type}</span>` : ''}
+                                ${task.jobs?.job_type ? `<span style="padding:2px 8px;background:#e0f2fe;color:#0369a1;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase">${JOB_TYPE_LABELS[task.jobs.job_type] || task.jobs.job_type}</span>` : ''}
                                 <span class="ds-priority ds-priority-${priCls}" style="font-size:10px;padding:2px 8px">${pri.dot} ${pri.label}</span>
                                 <span style="font-size:11px;color:#64748b;font-weight:600">${dueDate}${dueExtra}</span>
                                 <span class="ds-stage-badge ${stage.status}" style="font-size:10px;padding:3px 10px">${dsStageStatusLabel(stage.status)}</span>
@@ -16668,9 +16679,9 @@
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Team</div>
                                     <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.team || '—')}</div>
                                 </div>
-                                <div class="brief-cell" onclick="editBriefCell(this,'order_type','select','${task.order_type||''}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
-                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Order Type</div>
-                                    <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${OT[task.order_type] || (task.job_type ? task.job_type.replace(/_/g,' ') : '—')}</div>
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Job Type</div>
+                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${JOB_TYPE_LABELS[task.jobs?.job_type] || (task.jobs?.job_type ? task.jobs.job_type.replace(/_/g,' ') : '—')}</div>
                                 </div>
                                 <div class="brief-cell" onclick="editBriefCell(this,'season_event','text','${escHtml(task.season_event||'')}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Season / Event</div>
@@ -17276,10 +17287,11 @@
                         : `<div class="ds-version-thumb-placeholder">${isPdf ? '📄' : '📁'}</div>`}
                     <div class="ds-version-file-name" title="${escHtml(upload.file_name||'')}">${escHtml(upload.file_name||'Uploaded file')}</div>
                     <div class="ds-version-file-meta">${sizeStr}${sizeStr && upload.uploaded_at ? ' · ' : ''}${upload.uploaded_at ? dsRelativeTime(upload.uploaded_at) : ''}</div>
-                    ${!isApproved && !isDeclined ? `<div class="ds-version-actions" onclick="event.stopPropagation()">
-                        <button class="btn-approve" onclick="approveVersion('${upload.id}','${stage.id}',${stage.stage_number})">✓ Approve</button>
-                        <button class="btn-decline" onclick="declineVersion('${upload.id}','${stage.id}',${stage.stage_number})">✕ Decline</button>
-                    </div>` : ''}
+                    <div class="ds-version-actions" onclick="event.stopPropagation()">
+                        ${!isApproved && !isDeclined ? `<button class="btn-approve" onclick="approveVersion('${upload.id}','${stage.id}',${stage.stage_number})">✓ Approve</button>
+                        <button class="btn-decline" onclick="declineVersion('${upload.id}','${stage.id}',${stage.stage_number})">✕ Decline</button>` : ''}
+                        <button onclick="downloadFile('${escHtml(upload.file_url)}','${escHtml(upload.file_name||'file')}')" title="Download" style="grid-column:1/-1;padding:4px 0;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid #e2e8f0;background:#f8fafc;color:#475569">↓ Download</button>
+                    </div>
                 </div>
             </div>`;
         }
@@ -17614,13 +17626,19 @@
                         const isImg = u.file_type?.startsWith('image/');
                         const isPdf = u.file_type === 'application/pdf' || u.file_name?.toLowerCase().endsWith('.pdf');
                         const canPreview = isImg || isPdf;
-                        return `<div class="ds-version-file-info" style="margin-bottom:8px">
-                            <span style="font-size:18px">${isPdf ? '📄' : isImg ? '🖼' : '📁'}</span>
-                            <div style="flex:1;min-width:0">
-                                <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(u.file_name||'')}</div>
-                                <div style="font-size:11px;color:#94a3b8">${u.file_size ? Math.round(u.file_size/1024)+'KB' : ''} · ${dsRelativeTime(u.uploaded_at)}</div>
+                        return `<div style="margin-bottom:10px;border:1px solid #f1f5f9;border-radius:8px;overflow:hidden">
+                            ${isImg ? `<img src="${escHtml(u.file_url)}" alt="" style="width:100%;height:100px;object-fit:contain;background:#f8fafc;display:block;cursor:pointer" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${u.file_type||''}')">` : ''}
+                            <div class="ds-version-file-info" style="padding:8px 10px">
+                                <span style="font-size:18px">${isPdf ? '📄' : isImg ? '🖼' : '📁'}</span>
+                                <div style="flex:1;min-width:0">
+                                    <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(u.file_name||'')}</div>
+                                    <div style="font-size:10px;color:#94a3b8">${u.file_size ? Math.round(u.file_size/1024)+'KB' : ''} · ${dsRelativeTime(u.uploaded_at)}</div>
+                                </div>
+                                <div style="display:flex;gap:4px;flex-shrink:0">
+                                    ${canPreview ? `<button class="btn-preview" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${u.file_type||''}')">Preview</button>` : ''}
+                                    <button onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(u.file_name||'file')}')" style="padding:5px 9px;border:1px solid #e2e8f0;border-radius:7px;background:#f8fafc;font-size:11px;font-weight:700;cursor:pointer;color:#475569">↓</button>
+                                </div>
                             </div>
-                            ${canPreview ? `<button class="btn-preview" style="flex-shrink:0" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${u.file_type||''}')">Preview</button>` : ''}
                         </div>`;
                     }).join('')}
                     ${!isApproved ? `<div class="ds-version-dropzone" style="margin-top:${uploads.length ? '8px' : '0'}"
@@ -17836,6 +17854,38 @@
 
             if (startAnnotating) {
                 setTimeout(() => toggleAnnMode(), 300);
+            }
+        }
+
+        async function deleteDesignTask() {
+            if (!currentDesignTaskRecord?.id) return;
+            if (!isSuperAdmin && currentUserProfile?.role !== 'admin') { showToast('Not authorised', 'error'); return; }
+            const taskName = currentDesignTaskRecord.task_name || 'this task';
+            if (!confirm(`Permanently delete "${taskName}"? This cannot be undone.`)) return;
+            const id = currentDesignTaskRecord.id;
+            // Delete related records first
+            await supabase.from('design_stages').delete().eq('task_id', id);
+            await supabase.from('stage_uploads').delete().eq('task_id', id);
+            await supabase.from('design_task_assets').delete().eq('design_task_id', id);
+            await supabase.from('design_activity_feed').delete().eq('task_id', id);
+            const { error } = await supabase.from('design_tasks').delete().eq('id', id);
+            if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
+            allDesignTasks = (allDesignTasks || []).filter(t => t.id !== id);
+            showToast(`"${taskName}" deleted`);
+            showTool('design-studio');
+        }
+
+        async function downloadFile(url, filename) {
+            try {
+                const resp = await fetch(url);
+                const blob = await resp.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl; a.download = filename || 'download';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 3000);
+            } catch(e) {
+                window.open(url, '_blank');
             }
         }
 
