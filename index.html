@@ -2113,6 +2113,14 @@
                                     style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;color:#0f172a;outline:none;box-sizing:border-box"
                                     onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0'">
                             </div>
+                            <div style="grid-column:span 3">
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Salesperson</label>
+                                <select id="sg-salesperson"
+                                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;color:#0f172a;outline:none;background:#fff;box-sizing:border-box;cursor:pointer"
+                                    onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0'">
+                                    <option value="">— No salesperson —</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -18240,6 +18248,13 @@
                     (clubs || []).map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
             }
 
+            // Populate salesperson dropdown
+            const spSel = document.getElementById('sg-salesperson');
+            if (spSel) {
+                spSel.innerHTML = '<option value="">— No salesperson —</option>' +
+                    (salespeople || []).map(s => `<option value="${s.id}">${escHtml(s.first_name)} ${escHtml(s.last_name)}</option>`).join('');
+            }
+
             // Reset file input
             const fi = document.getElementById('sg-file-input');
             if (fi) fi.value = '';
@@ -18346,10 +18361,11 @@
         }
 
         async function sgCreateAndGenerate() {
-            const name      = document.getElementById('sg-club-name')?.value?.trim();
-            const prefix    = document.getElementById('sg-club-suffix')?.value?.trim().toUpperCase() || '';
-            const sport     = document.getElementById('sg-club-sport')?.value?.trim() || null;
-            const priceList = document.getElementById('sg-price-list')?.value || 'retail';
+            const name         = document.getElementById('sg-club-name')?.value?.trim();
+            const prefix       = document.getElementById('sg-club-suffix')?.value?.trim().toUpperCase() || '';
+            const sport        = document.getElementById('sg-club-sport')?.value?.trim() || null;
+            const salespersonId = document.getElementById('sg-salesperson')?.value || null;
+            const priceList    = document.getElementById('sg-price-list')?.value || 'retail';
             const collName  = document.getElementById('sg-collection-name')?.value?.trim() || name;
 
             if (!name) { showToast('Club name is required', 'error'); return; }
@@ -18366,12 +18382,13 @@
                 // 1. Create clubs record
                 const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                 const { data: newClub, error: clubErr } = await supabase.from('clubs').insert({
-                    brand_id:        currentBrand.id,
+                    brand_id:                currentBrand.id,
                     name,
-                    suffix:          prefix || null,
+                    suffix:                  prefix || null,
                     sport,
                     slug,
-                    created_by:      currentUser?.id || null
+                    assigned_salesperson_id: salespersonId || null,
+                    created_by:              currentUser?.id || null
                 }).select().single();
 
                 if (clubErr) throw new Error('Club creation failed: ' + clubErr.message);
