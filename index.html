@@ -16389,6 +16389,9 @@
             currentDesignTaskRecord = task;
             currentDesignTask = task;
             currentJobId = task.job_id;
+            _masterProdsLoaded = false; // reset so master catalogue reloads for new task
+            _masterProdsData = [];
+            _briefActiveTab = 'details'; // reset tab to details when opening new task
 
             // Load stages
             const { data: stages } = await supabase.from('design_stages')
@@ -16548,36 +16551,19 @@
             const cc = task.custom_colours || {};
             const selectedIds = new Set(task.products_required || []);
 
-            // ── Colour data ─────────────────────────────────────────────────
+            // ── Colour data (mode-aware) ────────────────────────────────────
+            // Club mode: hex comes from club record; Custom mode: hex from custom_colours
             const cols = [
-                { key:'primary',   label:'Primary',   pantone: club.pantone_main       || '', hex: cc.primary?.hex   || club.hex_main       || '' },
-                { key:'secondary', label:'Secondary', pantone: club.pantone_secondary   || '', hex: cc.secondary?.hex || club.hex_secondary   || '' },
-                { key:'accent',    label:'Accent',    pantone: club.pantone_accent      || '', hex: cc.accent?.hex    || club.hex_accent      || '' },
+                { key:'primary',   label:'Primary',
+                  hex:     useClub ? (club.hex_main        || '') : (cc.primary?.hex   || ''),
+                  pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { key:'secondary', label:'Secondary',
+                  hex:     useClub ? (club.hex_secondary   || '') : (cc.secondary?.hex || ''),
+                  pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { key:'accent',    label:'Accent',
+                  hex:     useClub ? (club.hex_accent      || '') : (cc.accent?.hex    || ''),
+                  pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
-            const colCardsHtml = cols.map(c => {
-                const bg  = c.hex || '#e2e8f0';
-                const txt = briefIsLight(c.hex) ? '#0f172a' : '#fff';
-                return `<div class="ds-colour-card" data-colkey="${c.key}">
-                    <div class="ds-colour-swatch" style="background:${bg}" onclick="document.getElementById('dscp-${c.key}').click()">
-                        <input type="color" id="dscp-${c.key}" value="${c.hex || '#000000'}"
-                            oninput="briefColourPick('${c.key}',this.value)"
-                            style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-                        <div class="ds-colour-swatch-overlay">Edit</div>
-                        ${!c.hex ? `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:11px;font-weight:600">Click to set</div>` : ''}
-                    </div>
-                    <div class="ds-colour-body">
-                        <div class="ds-colour-name">${c.label}</div>
-                        <div class="ds-colour-pantone">
-                            ${useClub
-                                ? `<span style="font-size:12px;font-weight:600;color:#0f172a">${c.pantone || '<span style="color:#94a3b8;font-weight:400">No Pantone on record</span>'}</span>`
-                                : `<input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C" onblur="briefColourSave('${c.key}','pantone',this.value)">`
-                            }
-                        </div>
-                        <input class="ds-colour-input" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB"
-                            onblur="briefColourSave('${c.key}','hex',this.value)">
-                    </div>
-                </div>`;
-            }).join('');
 
             // ── Product cards ───────────────────────────────────────────────
             const prodCardsHtml = !task.club_id
@@ -16663,13 +16649,13 @@
 
                         <!-- Tab nav -->
                         <div style="display:flex;border-bottom:1px solid #e2e8f0;background:#fff">
-                            <button id="brtab-details" onclick="switchBriefTab('details')" class="brtab active">Details</button>
-                            <button id="brtab-brief" onclick="switchBriefTab('brief')" class="brtab">Description</button>
-                            <button id="brtab-colours" onclick="switchBriefTab('colours')" class="brtab">Colours</button>
+                            <button id="brtab-details" onclick="switchBriefTab('details')" class="brtab ${_briefActiveTab==='details'?'active':''}">Details</button>
+                            <button id="brtab-brief" onclick="switchBriefTab('brief')" class="brtab ${_briefActiveTab==='brief'?'active':''}">Description</button>
+                            <button id="brtab-colours" onclick="switchBriefTab('colours')" class="brtab ${_briefActiveTab==='colours'?'active':''}">Colours</button>
                         </div>
 
                         <!-- Details panel -->
-                        <div id="brpanel-details" style="padding:10px 14px">
+                        <div id="brpanel-details" ${_briefActiveTab!=='details'?'class="hide"':''} style="padding:10px 14px">
                             <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
                                 <span style="font-size:10px;color:#94a3b8;font-style:italic">Click any field to edit</span>
                             </div>
@@ -16701,8 +16687,8 @@
                             </div>
                         </div>
 
-                        <!-- Description panel (hidden by default) -->
-                        <div id="brpanel-brief" class="hide" style="padding:10px 14px">
+                        <!-- Description panel -->
+                        <div id="brpanel-brief" ${_briefActiveTab!=='brief'?'class="hide"':''} style="padding:10px 14px">
                             <textarea id="ds-brief-desc"
                                 style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;color:#0f172a;line-height:1.6;font-family:inherit;resize:vertical;min-height:70px;outline:none;transition:border-color 0.15s;box-sizing:border-box"
                                 onfocus="this.style.borderColor='#00e5cc'"
@@ -16722,40 +16708,46 @@
                         </div>
 
                         <!-- Colours panel (hidden by default) -->
-                        <div id="brpanel-colours" class="hide" style="padding:10px 14px">
-                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                                <span style="font-size:11px;color:#64748b;font-weight:600">Use Club Colours</span>
-                                <div class="ds-toggle${useClub ? ' on' : ''}" onclick="toggleBriefColours()" title="${useClub ? 'Using club colours — click to override' : 'Custom mode — click to use club colours'}"></div>
-                                <span style="font-size:10px;color:#94a3b8;margin-left:2px">${useClub ? 'Pre-filled from club record. Edit to override.' : 'Custom mode — values saved independently.'}</span>
+                        <!-- Colours panel -->
+                        <div id="brpanel-colours" ${_briefActiveTab!=='colours'?'class="hide"':''} style="padding:12px 14px">
+                            <!-- Toggle -->
+                            <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #f1f5f9">
+                                <div class="ds-toggle${useClub ? ' on' : ''}" onclick="toggleBriefColours()"></div>
+                                <span style="font-size:12px;font-weight:600;color:#0f172a">Use Club Colours</span>
+                                <span style="font-size:11px;color:#94a3b8">${useClub ? 'Showing colours from club record — add Pantone codes below' : 'Custom mode — pick your own colours'}</span>
                             </div>
-                            <div style="display:flex;gap:8px">
+                            <!-- Colour columns -->
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
                                 ${cols.map(c => {
                                     const bg = c.hex || '#e2e8f0';
-                                    const pantoneVal = (useClub ? cc[c.key]?.pantone || c.pantone : cc[c.key]?.pantone || c.pantone) || '';
-                                    return `<div style="flex:1;border:1.5px solid #e2e8f0;border-radius:10px;overflow:hidden" data-colkey="${c.key}">
-                                        <!-- Swatch -->
-                                        <div style="height:40px;background:${bg};cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('dscp-${c.key}').click()" title="Click to pick colour">
+                                    return `<div>
+                                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">${c.label}</div>
+                                        <!-- Swatch / colour picker -->
+                                        <div id="brsw-${c.key}" style="height:54px;border-radius:8px;background:${bg};border:1px solid rgba(0,0,0,0.08);margin-bottom:8px;position:relative;overflow:hidden;${!useClub?'cursor:pointer':''}"
+                                             ${!useClub ? `onclick="document.getElementById('dscp-${c.key}').click()"` : ''}>
                                             <input type="color" id="dscp-${c.key}" value="${c.hex || '#000000'}" oninput="briefColourPick('${c.key}',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
-                                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:rgba(255,255,255,0.9);opacity:0;transition:opacity 0.15s;background:rgba(0,0,0,0.15)" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Pick</div>
-                                            ${!c.hex ? `<span style="font-size:10px;font-weight:600;color:#94a3b8">Click to set</span>` : ''}
+                                            ${!useClub ? `<div style="position:absolute;inset:0;background:rgba(0,0,0,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;opacity:0;transition:opacity 0.15s" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Pick colour</div>` : ''}
+                                            ${!c.hex ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#94a3b8;font-weight:600">${useClub?'No colour on record':'Click to set'}</div>` : ''}
                                         </div>
-                                        <!-- Fields -->
-                                        <div style="padding:6px 8px;background:#fff">
-                                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#94a3b8;margin-bottom:4px">${c.label}</div>
-                                            <div style="margin-bottom:3px">
-                                                <div style="font-size:9px;color:#94a3b8;margin-bottom:1px">Hex</div>
-                                                <input class="ds-colour-input" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB" onblur="briefColourSave('${c.key}','hex',this.value)" style="padding:3px 6px;font-size:11px;font-family:monospace">
-                                            </div>
-                                            <div>
-                                                <div style="font-size:9px;color:#94a3b8;margin-bottom:1px">Pantone (ROKOR)</div>
-                                                <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(pantoneVal)}" placeholder="e.g. 286 C" onblur="briefColourSave('${c.key}','pantone',this.value)" style="padding:3px 6px;font-size:11px">
-                                            </div>
+                                        <!-- Hex input (custom mode only) -->
+                                        ${!useClub ? `<div style="margin-bottom:6px">
+                                            <div style="font-size:9px;color:#94a3b8;font-weight:600;margin-bottom:2px">HEX</div>
+                                            <input class="ds-colour-input" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB"
+                                                onblur="briefColourSave('${c.key}','hex',this.value)"
+                                                style="padding:4px 8px;font-size:11px;font-family:monospace;width:100%;box-sizing:border-box">
+                                        </div>` : `<div style="margin-bottom:6px;font-size:11px;color:#475569;font-family:monospace;font-weight:600">${escHtml(c.hex) || '<span style="color:#94a3b8;font-weight:400">—</span>'}</div>`}
+                                        <!-- Pantone (always editable) -->
+                                        <div>
+                                            <div style="font-size:9px;color:#94a3b8;font-weight:600;margin-bottom:2px">PANTONE</div>
+                                            <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C"
+                                                onblur="briefColourSave('${c.key}','pantone',this.value)"
+                                                style="padding:4px 8px;font-size:11px;width:100%;box-sizing:border-box">
                                         </div>
                                     </div>`;
                                 }).join('')}
                             </div>
-                            ${task.colour_palette ? `<div style="margin-top:8px;padding:7px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;color:#64748b">
-                                <span style="font-weight:600">Colour notes:</span> ${escHtml(task.colour_palette)}
+                            ${task.colour_palette ? `<div style="margin-top:10px;padding:7px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;color:#64748b">
+                                <span style="font-weight:600">Notes:</span> ${escHtml(task.colour_palette)}
                             </div>` : ''}
                         </div>
                     </div><!-- /compact tabbed card -->
@@ -16938,17 +16930,20 @@
             const newVal = !(currentDesignTaskRecord.use_club_colours !== false);
             currentDesignTaskRecord.use_club_colours = newVal;
             await supabase.from('design_tasks').update({ use_club_colours: newVal }).eq('id', currentDesignTaskRecord.id);
-            renderStagePanel(1);
+            // Re-render but stay on colours tab and preserve scroll
+            _briefActiveTab = 'colours';
+            const panel = document.getElementById('dt-stage-panel');
+            const scrollY = window.scrollY;
+            await renderStagePanel(1);
+            window.scrollTo({ top: scrollY, behavior: 'instant' });
         }
 
         function briefColourPick(key, hex) {
-            // Live swatch update
-            const card = document.querySelector(`.ds-colour-card[data-colkey="${key}"]`);
-            if (card) {
-                card.querySelector('.ds-colour-swatch').style.background = hex;
-                const hexInput = document.getElementById(`dshex-${key}`);
-                if (hexInput) hexInput.value = hex;
-            }
+            // Live update swatch and hex input
+            const swatch = document.getElementById(`brsw-${key}`);
+            if (swatch) swatch.style.background = hex;
+            const hexInput = document.getElementById(`dshex-${key}`);
+            if (hexInput) hexInput.value = hex;
             clearTimeout(briefColourPick._t);
             briefColourPick._t = setTimeout(() => briefColourSave(key, 'hex', hex), 500);
         }
@@ -16981,6 +16976,8 @@
         }
 
         let _masterProdsLoaded = false;
+        let _masterProdsData = [];
+
         function switchProdTab(tab) {
             document.getElementById('brprod-club')?.classList.toggle('hide', tab !== 'club');
             document.getElementById('brprod-master')?.classList.toggle('hide', tab !== 'master');
@@ -16990,43 +16987,74 @@
             document.getElementById('prdtab-master').style.color     = tab === 'master' ? '#fff'    : '#64748b';
             if (tab === 'master' && !_masterProdsLoaded) loadMasterCatProducts();
         }
+
         async function loadMasterCatProducts() {
             _masterProdsLoaded = true;
             const container = document.getElementById('brprod-master');
-            if (!container) return;
+            if (!container || !currentBrand?.id) return;
+            container.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">Loading…</div>';
             const { data: prods } = await supabase
                 .from('products')
                 .select('id, product_code, item_name, range_name, category')
+                .eq('brand_id', currentBrand.id)
                 .order('range_name').order('item_name');
-            if (!prods || !prods.length) {
-                container.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">No products in master catalogue.</div>';
+            _masterProdsData = prods || [];
+            if (!_masterProdsData.length) {
+                container.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">No products in your catalogue.</div>';
                 return;
             }
+            renderMasterRanges();
+        }
+
+        function renderMasterRanges() {
+            const container = document.getElementById('brprod-master');
+            if (!container) return;
+            // Build unique ranges
+            const ranges = [...new Set(_masterProdsData.map(p => p.range_name || p.category || 'Other'))];
             const selectedIds = new Set(currentDesignTaskRecord?.products_required || []);
-            // Group by range_name / category
-            const groups = {};
-            prods.forEach(p => {
-                const grp = p.range_name || p.category || 'Other';
-                if (!groups[grp]) groups[grp] = [];
-                groups[grp].push(p);
-            });
-            container.innerHTML = Object.entries(groups).map(([grp, items]) => `
-                <div style="margin-bottom:12px">
-                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px;padding:0 2px">${escHtml(grp)}</div>
-                    <div class="ds-prod-grid">
-                        ${items.map(p => {
-                            const sel = selectedIds.has(p.id);
-                            return `<div class="ds-prod-card${sel ? ' selected' : ''}" onclick="briefToggleProduct('${p.id}',this)">
-                                <div class="ds-prod-check">✓</div>
-                                <div class="ds-prod-img"><svg width="24" height="24" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-                                <div class="ds-prod-info">
-                                    <div class="ds-prod-name" title="${escHtml(p.item_name||'')}">${escHtml(p.item_name||'Product')}</div>
-                                    ${p.product_code ? `<div class="ds-prod-code">${escHtml(p.product_code)}</div>` : ''}
-                                </div>
-                            </div>`;
-                        }).join('')}
-                    </div>
-                </div>`).join('');
+            container.innerHTML = `
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px">
+                    ${ranges.map(r => {
+                        const count = _masterProdsData.filter(p => (p.range_name || p.category || 'Other') === r).length;
+                        const selCount = _masterProdsData.filter(p => (p.range_name || p.category || 'Other') === r && selectedIds.has(p.id)).length;
+                        return `<div onclick="renderMasterProducts('${r.replace(/'/g,"\\'")}','${escHtml(r)}')"
+                            style="border:1.5px solid #e2e8f0;border-radius:10px;padding:12px 10px;cursor:pointer;background:#fff;text-align:center;transition:all 0.15s"
+                            onmouseover="this.style.borderColor='#00e5cc';this.style.background='#f0fffe'"
+                            onmouseout="this.style.borderColor='#e2e8f0';this.style.background='#fff'">
+                            <div style="font-size:12px;font-weight:700;color:#0f172a;margin-bottom:4px">${escHtml(r)}</div>
+                            <div style="font-size:10px;color:#94a3b8">${count} item${count!==1?'s':''}</div>
+                            ${selCount ? `<div style="margin-top:4px;font-size:10px;font-weight:700;color:#065f46;background:#e0fdf4;border-radius:10px;padding:1px 6px">${selCount} selected</div>` : ''}
+                        </div>`;
+                    }).join('')}
+                </div>`;
+        }
+
+        function renderMasterProducts(rangeRaw, rangeLabel) {
+            const container = document.getElementById('brprod-master');
+            if (!container) return;
+            const items = _masterProdsData.filter(p => (p.range_name || p.category || 'Other') === rangeRaw);
+            const selectedIds = new Set(currentDesignTaskRecord?.products_required || []);
+            container.innerHTML = `
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                    <button onclick="renderMasterRanges()" style="display:flex;align-items:center;gap:4px;padding:4px 10px;border:1.5px solid #e2e8f0;border-radius:6px;background:#fff;cursor:pointer;font-size:11px;font-weight:600;color:#64748b">
+                        ← Ranges
+                    </button>
+                    <span style="font-size:13px;font-weight:700;color:#0f172a">${escHtml(rangeLabel)}</span>
+                    <span style="font-size:10px;color:#94a3b8">${items.length} items</span>
+                </div>
+                <div class="ds-prod-grid">
+                    ${items.map(p => {
+                        const sel = selectedIds.has(p.id);
+                        return `<div class="ds-prod-card${sel ? ' selected' : ''}" onclick="briefToggleProduct('${p.id}',this)">
+                            <div class="ds-prod-check">✓</div>
+                            <div class="ds-prod-img"><svg width="24" height="24" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+                            <div class="ds-prod-info">
+                                <div class="ds-prod-name" title="${escHtml(p.item_name||'')}">${escHtml(p.item_name||'Product')}</div>
+                                ${p.product_code ? `<div class="ds-prod-code">${escHtml(p.product_code)}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>`;
         }
 
         async function saveBriefDescription(text) {
