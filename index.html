@@ -708,10 +708,15 @@
 
         /* ── Design Brief Overview (Stage 1) ─────────────────────────────── */
         /* Section headers */
-        .ds-ov-section { margin-bottom:28px; }
-        .ds-ov-section-hdr { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-        .ds-ov-section-num { width:22px; height:22px; border-radius:50%; background:#0f172a; color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-        .ds-ov-section-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:#64748b; }
+        .ds-ov-section { margin-bottom:14px; }
+        .ds-ov-section-hdr { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+        .ds-ov-section-num { width:20px; height:20px; border-radius:50%; background:#0f172a; color:#fff; font-size:9px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ds-ov-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:#64748b; }
+
+        /* Brief compact tab bar */
+        .brtab { padding:7px 14px; font-size:12px; font-weight:600; color:#64748b; border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
+        .brtab.active { color:#0f172a; border-bottom-color:#00e5cc; background:rgba(0,229,204,0.04); }
+        .brtab:hover:not(.active) { color:#0f172a; background:#f8fafc; }
 
         /* Top-level detail grid */
         .ds-tl-grid { display:grid; grid-template-columns:repeat(3,1fr); border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; background:#fff; }
@@ -1699,31 +1704,32 @@
         <!-- TOOL: Design Studio V2 -->
         <div id="tool-design-studio" class="hide w-full">
 
-            <!-- Sticky header -->
-            <div class="ds-header">
-                <div class="page-nav-row" style="padding:12px 24px">
-                    <button onclick="showLaunchpad()" class="nav-home-btn">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Launchpad
-                    </button>
-                    <span class="nav-page-btn">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
-                        Design Studio
-                    </span>
-                    <div class="ml-auto flex items-center gap-3">
-                        <button onclick="openCreateDesignTaskModal()" class="btn-primary text-sm flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            New Design Task
-                        </button>
-                    </div>
-                </div>
-                <!-- filter chips row -->
-                <div style="padding:0 24px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                    <span style="font-size:12px;font-weight:600;color:#64748b;margin-right:4px">Filter:</span>
+            <!-- Sticky header — single compact row -->
+            <div class="ds-header" style="padding:0 24px;display:flex;align-items:center;gap:0;min-height:44px;border-bottom:1px solid #e2e8f0;background:#fff;">
+                <button onclick="showLaunchpad()" class="nav-home-btn" style="flex-shrink:0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Launchpad
+                </button>
+                <span class="nav-page-btn" style="flex-shrink:0">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
+                    Design Studio
+                </span>
+                <!-- Divider -->
+                <span style="width:1px;height:18px;background:#e2e8f0;margin:0 12px;flex-shrink:0"></span>
+                <!-- Filter chips inline -->
+                <span style="font-size:11px;font-weight:600;color:#94a3b8;margin-right:6px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em">Filter:</span>
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
                     <button class="ds-filter-chip active" id="ds-filter-all" onclick="setDSFilter('all')">All Active</button>
                     <button class="ds-filter-chip" id="ds-filter-in_progress" onclick="setDSFilter('in_progress')">In Progress</button>
                     <button class="ds-filter-chip" id="ds-filter-in_review" onclick="setDSFilter('in_review')">In Review</button>
                     <button class="ds-filter-chip" id="ds-filter-completed" onclick="setDSFilter('completed')">Completed</button>
+                </div>
+                <!-- Push button to right -->
+                <div style="margin-left:auto">
+                    <button onclick="openCreateDesignTaskModal()" class="btn-primary text-sm flex items-center gap-2" style="padding:6px 14px;font-size:12px">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        New Design Task
+                    </button>
                 </div>
             </div>
 
@@ -1765,38 +1771,34 @@
 
         <!-- TOOL: Design Task Record -->
         <div id="tool-design-task" class="hide w-full">
-            <!-- Sticky header: nav + title bar + progress + stage tabs -->
+            <!-- Sticky header: single slim bar + progress + stage tabs -->
             <div class="dt-top-nav" style="position:sticky;top:56px;z-index:30;background:#fff;">
 
-                <!-- Nav breadcrumb row -->
-                <div class="page-nav-row" style="padding:10px 24px">
-                    <button onclick="showLaunchpad()" class="nav-home-btn">
+                <!-- Single slim combined nav + meta bar -->
+                <div style="display:flex;align-items:center;gap:0;padding:0 24px;min-height:42px;border-bottom:1px solid #e2e8f0;background:#fff;">
+                    <button onclick="showLaunchpad()" class="nav-home-btn" style="flex-shrink:0;padding:4px 8px 4px 0">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         Launchpad
                     </button>
-                    <button id="dt-back-btn" onclick="goBack()" class="nav-back-btn hide">
+                    <button id="dt-back-btn" onclick="goBack()" class="nav-back-btn hide" style="flex-shrink:0">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span id="dt-back-label">Back</span>
                     </button>
-                    <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none">Design Studio</button>
-                    <span class="nav-page-btn font-semibold" style="color:#0f172a" id="dt-task-name-display">Design Task</span>
-                    <div class="ml-auto flex items-center gap-3">
+                    <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none;flex-shrink:0;padding:4px 6px">Design Studio</button>
+                    <svg class="w-3 h-3 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <span class="font-semibold" style="color:#0f172a;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;margin:0 8px 0 4px" id="dt-task-name-display">Design Task</span>
+                    <!-- Divider -->
+                    <span style="width:1px;height:16px;background:#e2e8f0;margin:0 10px;flex-shrink:0"></span>
+                    <!-- Meta inline: club · designer · countdown -->
+                    <span id="dt-club-display" style="font-size:12px;color:#475569;flex-shrink:0"></span>
+                    <span style="margin:0 6px;color:#cbd5e1;flex-shrink:0">·</span>
+                    <span id="dt-designer-display" style="font-size:12px;color:#be185d;flex-shrink:0"></span>
+                    <div id="dt-countdown" class="dt-countdown hide" style="margin-left:8px;flex-shrink:0"></div>
+                    <!-- Push to right -->
+                    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0">
+                        <span id="dt-meta-created" style="font-size:11px;color:#94a3b8"></span>
                         <span id="dt-ref-display" class="text-xs font-mono font-semibold text-gray-500"></span>
                         <span id="dt-status-badge" class="badge design-status-new text-xs">New</span>
-                    </div>
-                </div>
-
-                <!-- Task title bar: key meta at a glance -->
-                <div class="dt-title-bar">
-                    <div class="dt-title-bar-left">
-                        <div class="dt-title-meta">
-                            <span id="dt-club-display"></span>
-                            <span id="dt-designer-display" style="color:#be185d"></span>
-                            <div id="dt-countdown" class="dt-countdown hide"></div>
-                        </div>
-                    </div>
-                    <div class="dt-title-bar-right">
-                        <span id="dt-meta-created" style="font-size:11px;color:#94a3b8"></span>
                     </div>
                 </div>
 
@@ -4552,58 +4554,155 @@
         <!-- ============================================================
              MODAL: Create Design Task
              ============================================================ -->
-        <div id="create-design-task-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
-            <div class="glass rounded-2xl p-6 w-full max-w-lg mx-4">
-                <div class="flex justify-between items-center mb-5">
-                    <h3 class="text-lg font-bold">New Design Task</h3>
-                    <button onclick="hideCreateDesignTaskModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-                </div>
-                <div class="space-y-4">
+        <div id="create-design-task-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center hide" style="padding-top:40px;padding-bottom:40px;overflow-y:auto">
+            <div class="glass rounded-2xl w-full mx-4" style="max-width:780px;padding:0;overflow:hidden">
+                <!-- Modal header -->
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1px solid #e2e8f0;background:#fff">
                     <div>
-                        <label class="text-xs text-gray-500 mb-1 block">Task Name *</label>
-                        <input type="text" id="cdt-name" placeholder="e.g. Riverside FC Full Kit Range 2025" class="w-full px-3 py-2.5 rounded-lg text-sm">
+                        <h3 style="font-size:16px;font-weight:800;color:#0f172a;margin:0">New Design Task</h3>
+                        <p style="font-size:11px;color:#94a3b8;margin:2px 0 0">Fill in the brief details so your designer has everything they need from day one.</p>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs text-gray-500 mb-1 block">Linked Club</label>
-                            <select id="cdt-club-id" class="w-full px-3 py-2.5 rounded-lg text-sm">
-                                <option value="">— Select Club —</option>
-                            </select>
+                    <button onclick="hideCreateDesignTaskModal()" style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;border:none;cursor:pointer;font-size:18px;color:#64748b;line-height:1">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div style="padding:20px 22px;background:#fff">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+
+                        <!-- LEFT: Top-level details -->
+                        <div style="display:flex;flex-direction:column;gap:12px">
+                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:2px">Task Details</div>
+
+                            <div>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Task Name *</label>
+                                <input type="text" id="cdt-name" placeholder="e.g. Riverside FC Full Kit Range 2025" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'">
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Linked Club *</label>
+                                    <select id="cdt-club-id" onchange="cdtClubChanged()" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
+                                        <option value="">— Select Club —</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Linked Job</label>
+                                    <select id="cdt-job-id" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
+                                        <option value="">— Select Job —</option>
+                                    </select>
+                                    <input type="hidden" id="cdt-linked-job-id">
+                                    <div id="cdt-linked-job-row" class="hide">
+                                        <input type="text" id="cdt-linked-job-display" style="width:100%;padding:6px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:12px;color:#64748b;margin-top:4px;box-sizing:border-box" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Team</label>
+                                    <input type="text" id="cdt-team" placeholder="e.g. 1st Team, U18s" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'">
+                                </div>
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Order Type</label>
+                                    <select id="cdt-order-type" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
+                                        <option value="">— Select —</option>
+                                        <option value="match_kit">Match Kit</option>
+                                        <option value="training_range">Training Range</option>
+                                        <option value="travel_range">Travel Range</option>
+                                        <option value="leisurewear">Leisurewear</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Season / Event</label>
+                                    <input type="text" id="cdt-season-event" placeholder="e.g. 2025/26" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'">
+                                </div>
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Sport</label>
+                                    <input type="text" id="cdt-sport" placeholder="e.g. Football, Cricket" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'">
+                                </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Due Date</label>
+                                    <input type="date" id="cdt-due-date" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box">
+                                </div>
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Priority</label>
+                                    <select id="cdt-priority" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
+                                        <option value="standard">Standard</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Assigned Designer</label>
+                                    <select id="cdt-designer-id" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
+                                        <option value="">— Unassigned —</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Job Type</label>
+                                    <select id="cdt-job-type" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
+                                        <option value="">— Select Type —</option>
+                                        <option value="new_club_full_range">New Club Full Range</option>
+                                        <option value="sales_order_new_design">Sales Order New Design</option>
+                                        <option value="team_sponsor_change">Team Sponsor Change</option>
+                                        <option value="one_off">One Off</option>
+                                        <option value="special_edition">Special Edition</option>
+                                        <option value="internal_task">Internal Task</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="text-xs text-gray-500 mb-1 block">Due Date</label>
-                            <input type="date" id="cdt-due-date" class="w-full px-3 py-2.5 rounded-lg text-sm">
+
+                        <!-- RIGHT: Design brief + notes -->
+                        <div style="display:flex;flex-direction:column;gap:12px">
+                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:2px">Design Brief</div>
+
+                            <div>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Design Description</label>
+                                <textarea id="cdt-design-brief" placeholder="Describe the creative direction, style references, heritage elements…" rows="4" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.6" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                            </div>
+
+                            <div>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Colour Notes</label>
+                                <textarea id="cdt-colour-palette" placeholder="e.g. Navy primary, gold secondary — refer to Pantone 280 C / 116 C" rows="2" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                            </div>
+
+                            <div>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Key Notes / Constraints</label>
+                                <textarea id="cdt-key-notes" placeholder="e.g. Must include sponsor logo zone on chest, no white in the design" rows="2" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="text-xs text-gray-500 mb-1 block">Assigned Designer</label>
-                            <select id="cdt-designer-id" class="w-full px-3 py-2.5 rounded-lg text-sm">
-                                <option value="">— Unassigned —</option>
-                            </select>
+
+                    <!-- Products Required (shown after club is selected) -->
+                    <div id="cdt-products-section" class="hide" style="margin-top:18px;padding-top:16px;border-top:1px solid #f1f5f9">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                            <div>
+                                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#64748b">Products Required</span>
+                                <span id="cdt-prod-count" style="margin-left:8px;font-size:11px;color:#94a3b8"></span>
+                            </div>
+                            <span style="font-size:11px;color:#94a3b8">Click to select from the club catalogue</span>
                         </div>
-                        <div>
-                            <label class="text-xs text-gray-500 mb-1 block">Job Type</label>
-                            <select id="cdt-job-type" class="w-full px-3 py-2.5 rounded-lg text-sm">
-                                <option value="">— Select Type —</option>
-                                <option value="new_club_full_range">New Club Full Range</option>
-                                <option value="sales_order_new_design">Sales Order New Design</option>
-                                <option value="team_sponsor_change">Team Sponsor Change</option>
-                                <option value="one_off">One Off</option>
-                                <option value="special_edition">Special Edition</option>
-                                <option value="internal_task">Internal Task</option>
-                            </select>
+                        <div id="cdt-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">
+                            <div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading products…</div>
                         </div>
-                    </div>
-                    <div id="cdt-linked-job-row" class="hide">
-                        <label class="text-xs text-gray-500 mb-1 block">Linked Job</label>
-                        <input type="text" id="cdt-linked-job-display" class="w-full px-3 py-2.5 rounded-lg text-sm bg-gray-50" readonly>
-                        <input type="hidden" id="cdt-linked-job-id">
                     </div>
                 </div>
-                <div class="flex gap-3 mt-6">
-                    <button onclick="hideCreateDesignTaskModal()" class="flex-1 btn-secondary py-3">Cancel</button>
-                    <button onclick="saveNewDesignTask()" id="cdt-save-btn" class="flex-1 btn-primary py-3">Create Task</button>
+
+                <!-- Modal footer -->
+                <div style="display:flex;gap:10px;padding:14px 22px;border-top:1px solid #e2e8f0;background:#f8fafc">
+                    <button onclick="hideCreateDesignTaskModal()" style="flex:1;padding:9px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:600;color:#64748b;cursor:pointer">Cancel</button>
+                    <button onclick="saveNewDesignTask()" id="cdt-save-btn" class="btn-primary" style="flex:2;padding:9px;font-size:13px;font-weight:700">Create Design Task</button>
                 </div>
             </div>
         </div>
@@ -15035,17 +15134,27 @@
         }
 
         // ── Create Design Task (modal) ────────────────────────────────────────
+        let _cdtSelectedProducts = [];
+
         async function openCreateDesignTaskModal(linkedJobId) {
             if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
             const modal = document.getElementById('create-design-task-modal');
             if (!modal) return;
             try {
-                // Ensure brand users are fresh for the designer dropdown
                 await loadBrandUsers();
-                // Reset form
-                document.getElementById('cdt-name').value = '';
+                // Reset all fields
+                ['cdt-name','cdt-team','cdt-season-event','cdt-sport'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.value = '';
+                });
+                ['cdt-design-brief','cdt-colour-palette','cdt-key-notes'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.value = '';
+                });
                 document.getElementById('cdt-due-date').value = '';
+                document.getElementById('cdt-order-type').value = '';
+                document.getElementById('cdt-priority').value = 'standard';
                 document.getElementById('cdt-job-type').value = '';
+                _cdtSelectedProducts = [];
+                document.getElementById('cdt-products-section')?.classList.add('hide');
 
                 // Populate club dropdown
                 const clubSel = document.getElementById('cdt-club-id');
@@ -15066,6 +15175,10 @@
                     }
                 }
 
+                // Job dropdown (populated by cdtClubChanged after club select)
+                const jobSel = document.getElementById('cdt-job-id');
+                if (jobSel) jobSel.innerHTML = '<option value="">— Select Job —</option>';
+
                 // Pre-fill linked job if provided
                 const linkedJobRow = document.getElementById('cdt-linked-job-row');
                 const linkedJobDisplay = document.getElementById('cdt-linked-job-display');
@@ -15075,8 +15188,10 @@
                     if (linkedJobRow) linkedJobRow.classList.remove('hide');
                     if (linkedJobDisplay) linkedJobDisplay.value = job ? `${job.job_number||''} ${job.job_name||''}`.trim() : linkedJobId;
                     if (linkedJobIdInput) linkedJobIdInput.value = linkedJobId;
-                    // Pre-fill club from job
-                    if (job?.club_id && clubSel) clubSel.value = job.club_id;
+                    if (job?.club_id && clubSel) {
+                        clubSel.value = job.club_id;
+                        await cdtClubChanged(linkedJobId);
+                    }
                 } else {
                     if (linkedJobRow) linkedJobRow.classList.add('hide');
                     if (linkedJobIdInput) linkedJobIdInput.value = '';
@@ -15088,6 +15203,76 @@
                 console.error('openCreateDesignTaskModal error:', err);
                 showToast('Could not open design task form — please try again', 'error');
             }
+        }
+
+        async function cdtClubChanged(preselectJobId) {
+            const clubId = document.getElementById('cdt-club-id')?.value;
+            _cdtSelectedProducts = [];
+
+            // Reset job dropdown
+            const jobSel = document.getElementById('cdt-job-id');
+            if (jobSel) {
+                jobSel.innerHTML = '<option value="">— Select Job —</option>';
+                if (clubId) {
+                    const clubJobs = (jobs || []).filter(j => j.club_id === clubId);
+                    clubJobs.forEach(j => {
+                        const opt = document.createElement('option');
+                        opt.value = j.id;
+                        opt.textContent = `${j.job_number||''} ${j.job_name||''}`.trim();
+                        jobSel.appendChild(opt);
+                    });
+                    if (preselectJobId) jobSel.value = preselectJobId;
+                }
+            }
+
+            if (!clubId) {
+                document.getElementById('cdt-products-section')?.classList.add('hide');
+                return;
+            }
+
+            // Load club products
+            const grid = document.getElementById('cdt-products-grid');
+            const section = document.getElementById('cdt-products-section');
+            if (grid) grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading…</div>';
+            if (section) section.classList.remove('hide');
+
+            const { data: prods } = await supabase
+                .from('club_products')
+                .select('id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category)')
+                .eq('club_id', clubId)
+                .eq('is_active', true)
+                .order('created_at');
+
+            if (!grid) return;
+            if (!prods || !prods.length) {
+                grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">No products in this club\'s catalogue.</div>';
+                return;
+            }
+
+            grid.innerHTML = prods.map(cp => {
+                const nm  = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                const cod = cp.products?.product_code || '';
+                const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                const img  = imgs[0] || cp.image_url || '';
+                return `<div class="ds-prod-card" id="cdtprod-${cp.id}" onclick="cdtToggleProduct('${cp.id}',this)" style="cursor:pointer">
+                    <div class="ds-prod-check">✓</div>
+                    <div class="ds-prod-img">
+                        ${img ? `<img src="${escHtml(img)}" alt="${nm}" loading="lazy">` : `<svg width="24" height="24" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
+                    </div>
+                    <div class="ds-prod-info">
+                        <div class="ds-prod-name" title="${nm}">${nm}</div>
+                        ${cod ? `<div class="ds-prod-code">${escHtml(cod)}</div>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function cdtToggleProduct(id, el) {
+            const idx = _cdtSelectedProducts.indexOf(id);
+            if (idx === -1) { _cdtSelectedProducts.push(id); el.classList.add('selected'); }
+            else { _cdtSelectedProducts.splice(idx, 1); el.classList.remove('selected'); }
+            const countEl = document.getElementById('cdt-prod-count');
+            if (countEl) countEl.textContent = _cdtSelectedProducts.length ? `(${_cdtSelectedProducts.length} selected)` : '';
         }
 
         function hideCreateDesignTaskModal() {
@@ -15115,7 +15300,7 @@
                 const clubId    = document.getElementById('cdt-club-id')?.value || null;
                 const dueDate   = document.getElementById('cdt-due-date')?.value || null;
                 const jobType   = document.getElementById('cdt-job-type')?.value || null;
-                const linkedJobId = document.getElementById('cdt-linked-job-id')?.value || null;
+                const linkedJobId = document.getElementById('cdt-job-id')?.value || document.getElementById('cdt-linked-job-id')?.value || null;
                 const dsnSel    = document.getElementById('cdt-designer-id');
                 const designerId   = dsnSel?.value || null;
                 const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
@@ -15131,7 +15316,17 @@
                     assigned_designer_id:   designerId || null,
                     assigned_designer_name: designerName || null,
                     status: 'new',
-                    design_types: []
+                    design_types: [],
+                    team:         document.getElementById('cdt-team')?.value?.trim() || null,
+                    order_type:   document.getElementById('cdt-order-type')?.value || null,
+                    season_event: document.getElementById('cdt-season-event')?.value?.trim() || null,
+                    sport:        document.getElementById('cdt-sport')?.value?.trim() || null,
+                    priority:     document.getElementById('cdt-priority')?.value || 'standard',
+                    design_brief: document.getElementById('cdt-design-brief')?.value?.trim() || null,
+                    colour_palette: document.getElementById('cdt-colour-palette')?.value?.trim() || null,
+                    key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
+                    products_required: _cdtSelectedProducts.length ? _cdtSelectedProducts : [],
+                    use_club_colours: true
                 };
 
                 const { data, error } = await supabase.from('design_tasks').insert(payload).select().single();
@@ -16390,100 +16585,118 @@
             return `<div class="dt-stage-layout">
                 <div class="dt-stage-content">
 
-                    <!-- Club / Task header -->
-                    <div style="display:flex;align-items:center;gap:14px;padding:16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:24px">
-                        ${logoUrl ? `<img src="${escHtml(logoUrl)}" alt="" style="width:48px;height:48px;object-fit:contain;border-radius:8px;background:#fff;padding:3px;border:1px solid #e2e8f0;flex-shrink:0">` : `<div style="width:48px;height:48px;border-radius:8px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="22" height="22" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>`}
-                        <div style="flex:1;min-width:0">
-                            <div style="font-size:17px;font-weight:800;color:#0f172a;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name || 'Untitled Task')}</div>
-                            <div style="font-size:12px;color:#64748b">${escHtml(club.name || '')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8">· ${escHtml(task.task_ref)}</span>` : ''}</div>
-                        </div>
-                        <span class="ds-stage-badge ${stage.status}" style="flex-shrink:0;font-size:11px;padding:4px 11px">${dsStageStatusLabel(stage.status)}</span>
-                    </div>
+                    <!-- ── Compact tabbed brief card (Details · Description · Colours) ── -->
+                    <div style="border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff;margin-bottom:12px">
 
-                    <!-- ① Top Level Details -->
-                    <div class="ds-ov-section">
-                        <div class="ds-ov-section-hdr">
-                            <div class="ds-ov-section-num">1</div>
-                            <div class="ds-ov-section-title">Top Level Details</div>
-                        </div>
-                        <div class="ds-tl-grid">
-                            <div class="ds-tl-cell">
-                                <div class="ds-tl-label">Club</div>
-                                <div class="ds-tl-val">${escHtml(club.name || '—')}</div>
+                        <!-- Always-visible summary row -->
+                        <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:#f8fafc;border-bottom:1px solid #e2e8f0">
+                            ${logoUrl
+                                ? `<img src="${escHtml(logoUrl)}" alt="" style="width:36px;height:36px;object-fit:contain;border-radius:6px;background:#fff;padding:2px;border:1px solid #e2e8f0;flex-shrink:0">`
+                                : `<div style="width:36px;height:36px;border-radius:6px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="16" height="16" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>`}
+                            <div style="flex:1;min-width:0">
+                                <div style="font-size:13px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name || 'Untitled Task')}</div>
+                                <div style="font-size:11px;color:#64748b">${escHtml(club.name || '')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                             </div>
-                            <div class="ds-tl-cell">
-                                <div class="ds-tl-label">Team</div>
-                                <div class="ds-tl-val">${escHtml(task.team || '—')}</div>
-                            </div>
-                            <div class="ds-tl-cell">
-                                <div class="ds-tl-label">Order Type</div>
-                                <div class="ds-tl-val">${OT[task.order_type] || (task.job_type ? task.job_type.replace(/_/g,' ') : '—')}</div>
-                            </div>
-                            <div class="ds-tl-cell">
-                                <div class="ds-tl-label">Season / Event</div>
-                                <div class="ds-tl-val">${escHtml(task.season_event || task.sport || '—')}</div>
-                            </div>
-                            <div class="ds-tl-cell">
-                                <div class="ds-tl-label">Deadline</div>
-                                <div class="ds-tl-val">${dueDate}${dueExtra}</div>
-                            </div>
-                            <div class="ds-tl-cell">
-                                <div class="ds-tl-label">Priority</div>
-                                <div class="ds-tl-val"><span class="ds-priority ds-priority-${priCls}">${pri.dot} ${pri.label}</span></div>
+                            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                                ${task.order_type ? `<span style="padding:2px 8px;background:#e0f2fe;color:#0369a1;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase">${OT[task.order_type] || task.order_type}</span>` : ''}
+                                <span class="ds-priority ds-priority-${priCls}" style="font-size:10px;padding:2px 8px">${pri.dot} ${pri.label}</span>
+                                <span style="font-size:11px;color:#64748b;font-weight:600">${dueDate}${dueExtra}</span>
+                                <span class="ds-stage-badge ${stage.status}" style="font-size:10px;padding:3px 10px">${dsStageStatusLabel(stage.status)}</span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- ② Design Description -->
-                    <div class="ds-ov-section">
-                        <div class="ds-ov-section-hdr">
-                            <div class="ds-ov-section-num">2</div>
-                            <div class="ds-ov-section-title">Design Description</div>
+                        <!-- Tab nav -->
+                        <div style="display:flex;border-bottom:1px solid #e2e8f0;background:#fff">
+                            <button id="brtab-details" onclick="switchBriefTab('details')" class="brtab active">Details</button>
+                            <button id="brtab-brief" onclick="switchBriefTab('brief')" class="brtab">Description</button>
+                            <button id="brtab-colours" onclick="switchBriefTab('colours')" class="brtab">Colours</button>
                         </div>
-                        <textarea id="ds-brief-desc"
-                            style="width:100%;padding:14px 16px;border:1.5px solid #e2e8f0;border-radius:12px;font-size:13px;color:#0f172a;line-height:1.7;font-family:inherit;resize:vertical;min-height:90px;outline:none;transition:border-color 0.15s;box-sizing:border-box"
-                            onfocus="this.style.borderColor='#00e5cc'"
-                            onblur="this.style.borderColor='#e2e8f0';saveBriefDescription(this.value)"
-                            oninput="document.getElementById('ds-brief-cc').textContent=this.value.length"
-                            placeholder="Modern navy cricket kit with subtle wave pattern referencing coastal heritage."
-                            maxlength="500">${escHtml(briefText)}</textarea>
-                        <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:#94a3b8">
-                            <span>Describe the creative direction clearly — guide your designer.</span>
-                            <span><span id="ds-brief-cc">${briefText.length}</span> / 500</span>
-                        </div>
-                        ${task.key_notes ? `<div style="margin-top:10px;padding:11px 14px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:10px;font-size:12px;color:#78350f;line-height:1.6">
-                            <span style="font-weight:700">📌 Key Notes: </span>${escHtml(task.key_notes)}
-                        </div>` : ''}
-                        ${task.kit_details ? `<div style="margin-top:8px;padding:11px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:12px;color:#475569;line-height:1.6">
-                            <span style="font-weight:700">📋 Kit Details: </span>${escHtml(task.kit_details)}
-                        </div>` : ''}
-                    </div>
 
-                    <!-- ③ Colours -->
-                    <div class="ds-ov-section">
-                        <div class="ds-ov-section-hdr" style="margin-bottom:10px">
-                            <div class="ds-ov-section-num">3</div>
-                            <div class="ds-ov-section-title">Colours</div>
-                            <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-                                <span style="font-size:12px;color:#64748b;font-weight:600">Use Club Colours</span>
+                        <!-- Details panel -->
+                        <div id="brpanel-details" style="padding:10px 14px">
+                            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Team</div>
+                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.team || '—')}</div>
+                                </div>
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Order Type</div>
+                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${OT[task.order_type] || (task.job_type ? task.job_type.replace(/_/g,' ') : '—')}</div>
+                                </div>
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Season / Event</div>
+                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.season_event || '—')}</div>
+                                </div>
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Sport</div>
+                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.sport || '—')}</div>
+                                </div>
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Designer</div>
+                                    <div style="font-size:12px;font-weight:600;color:#be185d">${escHtml(task.assigned_designer_name || '—')}</div>
+                                </div>
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Job Type</div>
+                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${task.job_type ? task.job_type.replace(/_/g,' ') : '—'}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description panel (hidden by default) -->
+                        <div id="brpanel-brief" class="hide" style="padding:10px 14px">
+                            <textarea id="ds-brief-desc"
+                                style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:13px;color:#0f172a;line-height:1.6;font-family:inherit;resize:vertical;min-height:70px;outline:none;transition:border-color 0.15s;box-sizing:border-box"
+                                onfocus="this.style.borderColor='#00e5cc'"
+                                onblur="this.style.borderColor='#e2e8f0';saveBriefDescription(this.value)"
+                                oninput="document.getElementById('ds-brief-cc').textContent=this.value.length"
+                                placeholder="Modern navy cricket kit with subtle wave pattern referencing coastal heritage."
+                                maxlength="500">${escHtml(briefText)}</textarea>
+                            <div style="display:flex;justify-content:flex-end;margin-top:3px;font-size:11px;color:#94a3b8">
+                                <span><span id="ds-brief-cc">${briefText.length}</span> / 500</span>
+                            </div>
+                            ${task.key_notes ? `<div style="margin-top:6px;padding:8px 12px;background:#fffbeb;border:1.5px solid #fde68a;border-radius:8px;font-size:12px;color:#78350f;line-height:1.5">
+                                <span style="font-weight:700">📌 Key Notes: </span>${escHtml(task.key_notes)}
+                            </div>` : ''}
+                            ${task.kit_details ? `<div style="margin-top:5px;padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#475569;line-height:1.5">
+                                <span style="font-weight:700">📋 Kit Details: </span>${escHtml(task.kit_details)}
+                            </div>` : ''}
+                        </div>
+
+                        <!-- Colours panel (hidden by default) -->
+                        <div id="brpanel-colours" class="hide" style="padding:10px 14px">
+                            <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:8px">
+                                <span style="font-size:11px;font-weight:600;color:#64748b">Use Club Colours</span>
                                 <div class="ds-toggle${useClub ? ' on' : ''}" onclick="toggleBriefColours()" title="${useClub ? 'Click to use custom colours' : 'Click to use club colours'}"></div>
                             </div>
+                            <div style="display:flex;gap:8px">
+                                ${cols.map(c => {
+                                    const bg = c.hex || '#e2e8f0';
+                                    return `<div style="flex:1;display:flex;align-items:center;gap:8px;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px;overflow:hidden" data-colkey="${c.key}">
+                                        <div style="width:34px;height:34px;border-radius:6px;background:${bg};border:1px solid rgba(0,0,0,0.08);cursor:pointer;flex-shrink:0;position:relative" onclick="document.getElementById('dscp-${c.key}').click()">
+                                            <input type="color" id="dscp-${c.key}" value="${c.hex || '#000000'}" oninput="briefColourPick('${c.key}',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+                                        </div>
+                                        <div style="flex:1;min-width:0">
+                                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#94a3b8;margin-bottom:2px">${c.label}</div>
+                                            ${useClub
+                                                ? `<div style="font-size:11px;color:#0f172a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.pantone || '<span style="color:#94a3b8;font-weight:400">No Pantone</span>'}</div>`
+                                                : `<input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C" onblur="briefColourSave('${c.key}','pantone',this.value)" style="padding:2px 6px;font-size:10px;margin:0">`}
+                                            <input class="ds-colour-input ds-colour-card" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB" onblur="briefColourSave('${c.key}','hex',this.value)" style="padding:2px 6px;font-size:10px;margin:2px 0 0">
+                                        </div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                            ${task.colour_palette ? `<div style="margin-top:8px;padding:7px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;color:#64748b">
+                                <span style="font-weight:600">Colour notes:</span> ${escHtml(task.colour_palette)}
+                            </div>` : ''}
                         </div>
-                        ${!useClub ? `<p style="font-size:11px;color:#94a3b8;margin:0 0 12px">Custom colour mode — edit Pantone codes and hex values below. Click a swatch to use the colour picker.</p>` : `<p style="font-size:11px;color:#64748b;margin:0 0 12px">Showing club colours from record. Click any swatch to set / override the hex value.</p>`}
-                        <div class="ds-colour-grid">
-                            ${colCardsHtml}
-                        </div>
-                        ${task.colour_palette ? `<div style="margin-top:10px;padding:8px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#64748b">
-                            <span style="font-weight:600">Colour notes:</span> ${escHtml(task.colour_palette)}
-                        </div>` : ''}
-                    </div>
+                    </div><!-- /compact tabbed card -->
 
                     <!-- ④ Products Required -->
                     <div class="ds-ov-section">
                         <div class="ds-ov-section-hdr">
                             <div class="ds-ov-section-num">4</div>
                             <div class="ds-ov-section-title">Products Required</div>
-                            ${selectedIds.size ? `<span style="margin-left:auto;padding:2px 10px;background:#e0fdf4;color:#065f46;border-radius:20px;font-size:11px;font-weight:700">${selectedIds.size} selected</span>` : ''}
+                            ${selectedIds.size ? `<span style="margin-left:auto;padding:2px 8px;background:#e0fdf4;color:#065f46;border-radius:20px;font-size:10px;font-weight:700">${selectedIds.size} selected</span>` : ''}
                         </div>
                         <div class="ds-prod-grid">${prodCardsHtml}</div>
                     </div>
@@ -16493,16 +16706,16 @@
                         <div class="ds-ov-section-hdr">
                             <div class="ds-ov-section-num">5</div>
                             <div class="ds-ov-section-title">Assets for Design</div>
-                            ${assets.length ? `<span style="margin-left:auto;font-size:11px;color:#64748b;font-weight:600">${assets.length} file${assets.length !== 1 ? 's' : ''}</span>` : ''}
+                            ${assets.length ? `<span style="margin-left:auto;font-size:10px;color:#64748b;font-weight:600">${assets.length} file${assets.length !== 1 ? 's' : ''}</span>` : ''}
                         </div>
-                        <div class="ds-asset-dz" id="ds-brief-dz"
+                        <div class="ds-asset-dz" id="ds-brief-dz" style="padding:14px 18px"
                             onclick="document.getElementById('ds-brief-finput').click()"
                             ondragover="event.preventDefault();this.classList.add('drag-over')"
                             ondragleave="this.classList.remove('drag-over')"
                             ondrop="briefAssetDrop(event)">
-                            <svg width="32" height="32" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 10px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <p style="font-size:13px;font-weight:600;color:#64748b;margin:0 0 4px">Drop files here or click to upload</p>
-                            <p style="font-size:11px;color:#94a3b8;margin:0">AI · SVG · PNG · JPG · PDF accepted</p>
+                            <svg width="24" height="24" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 6px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            <p style="font-size:12px;font-weight:600;color:#64748b;margin:0 0 2px">Drop files or click to upload</p>
+                            <p style="font-size:10px;color:#94a3b8;margin:0">AI · SVG · PNG · JPG · PDF</p>
                         </div>
                         <input type="file" id="ds-brief-finput" class="hide" multiple
                             accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf"
@@ -16511,13 +16724,13 @@
                     </div>
 
                     <!-- Status banners -->
-                    ${isApproved ? `<div style="background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:10px;padding:13px 16px;color:#16a34a;font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px">
+                    ${isApproved ? `<div style="background:rgba(34,197,94,0.07);border:1.5px solid #86efac;border-radius:10px;padding:11px 14px;color:#16a34a;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px">
                         <span>✓</span> Brief accepted — Stage 2 (Concepts) is now unlocked.
                     </div>` : ''}
-                    ${isDeclined ? `<div style="background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:10px;padding:13px 16px;color:#dc2626;font-size:13px;font-weight:600">
+                    ${isDeclined ? `<div style="background:rgba(239,68,68,0.07);border:1.5px solid #fca5a5;border-radius:10px;padding:11px 14px;color:#dc2626;font-size:12px;font-weight:600">
                         ✕ Brief declined — update details and re-accept when ready.
                     </div>` : ''}
-                    ${isNeedsInfo ? `<div style="background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:10px;padding:13px 16px;color:#b45309;font-size:13px;font-weight:600">
+                    ${isNeedsInfo ? `<div style="background:rgba(245,158,11,0.07);border:1.5px solid #fde68a;border-radius:10px;padding:11px 14px;color:#b45309;font-size:12px;font-weight:600">
                         ? More information requested — awaiting client response.
                     </div>` : ''}
                 </div>
@@ -16551,6 +16764,15 @@
         }
 
         // ── Brief Overview helpers ──────────────────────────────────────────
+
+        let _briefActiveTab = 'details';
+        function switchBriefTab(tab) {
+            _briefActiveTab = tab;
+            ['details','brief','colours'].forEach(t => {
+                document.getElementById(`brpanel-${t}`)?.classList.toggle('hide', t !== tab);
+                document.getElementById(`brtab-${t}`)?.classList.toggle('active', t === tab);
+            });
+        }
 
         function briefIsLight(hex) {
             try {
