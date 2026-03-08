@@ -17381,40 +17381,12 @@
             if (file) uploadVersionFile(stageId, vNum, file);
         }
 
-        // Ensure the design-uploads storage bucket exists
-        let _designBucketReady = false;
-        async function ensureDesignBucket() {
-            if (_designBucketReady) return;
-            // 1. Try to create (no-op if it already exists)
-            const { error: createErr } = await supabase.storage.createBucket('design-uploads', {
-                public: true, fileSizeLimit: 52428800
-            });
-            if (!createErr || createErr.message?.toLowerCase().includes('already exist')) {
-                // Created successfully or already existed
-                _designBucketReady = true;
-                return;
-            }
-            // Creation failed (likely no permission with anon key) — check if bucket exists anyway
-            const { data: buckets, error: listErr } = await supabase.storage.listBuckets();
-            if (!listErr && (buckets || []).some(b => b.name === 'design-uploads')) {
-                _designBucketReady = true;
-                return;
-            }
-            // Bucket genuinely does not exist and we can't create it client-side
-            throw new Error(
-                'Storage bucket "design-uploads" not found. ' +
-                'Please create it in your Supabase project → Storage → New Bucket ' +
-                '(name: design-uploads, Public: on).'
-            );
-        }
-
         async function uploadVersionFile(stageId, vNum, file) {
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage || !currentBrand?.id) return;
             const dz = document.getElementById(`dsvz-${stageId}-${vNum}`);
             if (dz) dz.innerHTML = '<div class="spinner" style="margin:0 auto"></div>';
             try {
-                await ensureDesignBucket();
                 const ext = file.name.split('.').pop();
                 const path = `${currentBrand.id}/design-stages/${stageId}/V${vNum}-${Date.now()}.${ext}`;
                 const { data: stored, error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
@@ -17686,7 +17658,6 @@
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage || !currentBrand?.id) return;
             try {
-                await ensureDesignBucket();
                 const ext = file.name.split('.').pop();
                 const path = `${currentBrand.id}/design-stages/${stageId}/${sectionKey}-${Date.now()}.${ext}`;
                 const { error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
