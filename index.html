@@ -2101,10 +2101,11 @@
                                     onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0'">
                             </div>
                             <div>
-                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Club Prefix</label>
-                                <input id="sg-club-prefix" type="text" placeholder="e.g. LUFC" maxlength="8"
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Club Suffix</label>
+                                <input id="sg-club-suffix" type="text" placeholder="e.g. LUFC" maxlength="8"
                                     style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;font-family:monospace;font-weight:700;color:#0f172a;outline:none;text-transform:uppercase;box-sizing:border-box"
-                                    onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0';this.value=this.value.toUpperCase()">
+                                    onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0';this.value=this.value.toUpperCase()" oninput="sgCheckSuffixUniqueness(this.value)">
+                                <div id="sg-suffix-feedback" style="font-size:11px;margin-top:4px;min-height:16px"></div>
                             </div>
                             <div>
                                 <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Sport</label>
@@ -7212,6 +7213,17 @@
             return { productCode: productCode.toUpperCase(), view, variantNumber };
         }
 
+        // Filenames cannot contain "/" so product codes like APX/WAR/004 are saved
+        // as APX-WAR-004.png. This helper tries an exact match first, then a
+        // dash→slash normalised match so both storage conventions work.
+        function findProductByFilenameCode(parsedCode) {
+            const withSlashes = parsedCode.replace(/-/g, '/');
+            return (products || []).find(p => {
+                const pCode = p.product_code?.toUpperCase() || '';
+                return pCode === parsedCode || pCode === withSlashes;
+            });
+        }
+
         function showMockupUploadModal() {
             document.getElementById('mockup-upload-modal').classList.remove('hide');
             document.getElementById('mockup-preview-table').innerHTML = '';
@@ -7236,9 +7248,7 @@
 
             files.forEach(file => {
                 const { productCode, view, variantNumber } = parseDesignFilename(file.name);
-                const masterProduct = products.find(p =>
-                    p.product_code.toUpperCase() === productCode
-                );
+                const masterProduct = findProductByFilenameCode(productCode);
                 const tr = document.createElement('tr');
                 tr.className = 'border-b border-white/5';
                 tr.innerHTML = `
@@ -7266,7 +7276,7 @@
 
             for (const file of files) {
                 const { productCode, variantNumber } = parseDesignFilename(file.name);
-                const masterProduct = products.find(p => p.product_code.toUpperCase() === productCode);
+                const masterProduct = findProductByFilenameCode(productCode);
                 if (!masterProduct) { errors.push(`${file.name}: no matching product`); continue; }
 
                 const storagePath = `${brandSlug}/${clubSuffix}/${file.name}`;
@@ -18201,7 +18211,7 @@
         function initStoreGenerator() {
             _sgFiles = [];
             _sgFileData = [];
-            ['sg-club-name','sg-club-prefix','sg-club-sport','sg-collection-name'].forEach(id => {
+            ['sg-club-name','sg-club-suffix','sg-club-sport','sg-collection-name'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) { el.value = ''; delete el.dataset.userEdited; }
             });
@@ -18263,13 +18273,28 @@
             if (ul) ul.innerHTML = '';
             const fi = document.getElementById('sg-file-input');
             if (fi) fi.value = '';
+            const fb = document.getElementById('sg-suffix-feedback');
+            if (fb) fb.innerHTML = '';
+        }
+
+        function sgCheckSuffixUniqueness(rawValue) {
+            const val = (rawValue || '').trim().toUpperCase();
+            const fb  = document.getElementById('sg-suffix-feedback');
+            if (!fb) return;
+            if (!val) { fb.innerHTML = ''; return; }
+            const existing = (clubs || []).find(c => c.suffix?.toUpperCase() === val);
+            if (existing) {
+                fb.innerHTML = `<span style="color:#dc2626;font-weight:600">⚠️ "${escHtml(val)}" is already used by ${escHtml(existing.name)}</span>`;
+            } else {
+                fb.innerHTML = `<span style="color:#16a34a;font-weight:600">✓ Available</span>`;
+            }
         }
 
         function _sgRenderPreview() {
             // Parse every file exactly as uploadMockupsAndCreateProducts does
             _sgFileData = _sgFiles.map(file => {
                 const { productCode, view, variantNumber } = parseDesignFilename(file.name);
-                const product = (products || []).find(p => p.product_code?.toUpperCase() === productCode);
+                const product = findProductByFilenameCode(productCode);
                 return { file, productCode, view, variantNumber, product };
             });
 
@@ -18322,12 +18347,15 @@
 
         async function sgCreateAndGenerate() {
             const name      = document.getElementById('sg-club-name')?.value?.trim();
-            const prefix    = document.getElementById('sg-club-prefix')?.value?.trim().toUpperCase() || '';
+            const prefix    = document.getElementById('sg-club-suffix')?.value?.trim().toUpperCase() || '';
             const sport     = document.getElementById('sg-club-sport')?.value?.trim() || null;
             const priceList = document.getElementById('sg-price-list')?.value || 'retail';
             const collName  = document.getElementById('sg-collection-name')?.value?.trim() || name;
 
             if (!name) { showToast('Club name is required', 'error'); return; }
+            if (prefix && (clubs || []).some(c => c.suffix?.toUpperCase() === prefix)) {
+                showToast(`Suffix "${prefix}" is already used by another club`, 'error'); return;
+            }
             const matchedFiles = (_sgFileData || []).filter(f => f.product);
             if (!matchedFiles.length) { showToast('No matched product images to upload', 'error'); return; }
 
