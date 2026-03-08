@@ -18195,15 +18195,15 @@
 
         // ── Store Generator (Rapid Club Creator) ──────────────────────────────
 
-        let _sgFiles = [];          // accumulated File objects
-        let _sgFileData = [];       // { file, productCode, product, objUrl }
+        let _sgFiles = [];      // accumulated File objects
+        let _sgFileData = [];   // { file, productCode, view, variantNumber, product }
 
         function initStoreGenerator() {
             _sgFiles = [];
             _sgFileData = [];
             ['sg-club-name','sg-club-prefix','sg-club-sport','sg-collection-name'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) el.value = '';
+                if (el) { el.value = ''; delete el.dataset.userEdited; }
             });
             const preview = document.getElementById('sg-image-preview');
             if (preview) preview.innerHTML = '';
@@ -18229,11 +18229,13 @@
                 ecSel.innerHTML = '<option value="">Select existing club...</option>' +
                     (clubs || []).map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
             }
+
+            // Reset file input
+            const fi = document.getElementById('sg-file-input');
+            if (fi) fi.value = '';
         }
 
-        function resetStoreGenerator() {
-            initStoreGenerator();
-        }
+        function resetStoreGenerator() { initStoreGenerator(); }
 
         function sgUpdateCollectionName() {
             const name = document.getElementById('sg-club-name')?.value?.trim() || '';
@@ -18245,48 +18247,85 @@
             const newFiles = Array.from(filesOrList);
             if (!newFiles.length) return;
             _sgFiles = [..._sgFiles, ...newFiles];
+            _sgRenderPreview();
+        }
 
-            // Parse each file
+        function sgClearFiles() {
+            _sgFiles = [];
+            _sgFileData = [];
+            const preview = document.getElementById('sg-image-preview');
+            if (preview) preview.innerHTML = '';
+            const mc = document.getElementById('sg-matched-count');
+            const uc = document.getElementById('sg-unmatched-count');
+            const ul = document.getElementById('sg-unmatched-list');
+            if (mc) mc.textContent = '0';
+            if (uc) uc.textContent = '0';
+            if (ul) ul.innerHTML = '';
+            const fi = document.getElementById('sg-file-input');
+            if (fi) fi.value = '';
+        }
+
+        function _sgRenderPreview() {
+            // Parse every file exactly as uploadMockupsAndCreateProducts does
             _sgFileData = _sgFiles.map(file => {
-                const { productCode } = parseDesignFilename(file.name);
+                const { productCode, view, variantNumber } = parseDesignFilename(file.name);
                 const product = (products || []).find(p => p.product_code?.toUpperCase() === productCode);
-                return { file, productCode, product, objUrl: URL.createObjectURL(file) };
+                return { file, productCode, view, variantNumber, product };
             });
 
-            const matched   = _sgFileData.filter(f => f.product).length;
+            const matched   = _sgFileData.filter(f => f.product);
             const unmatched = _sgFileData.filter(f => !f.product);
 
             const mc = document.getElementById('sg-matched-count');
             const uc = document.getElementById('sg-unmatched-count');
             const ul = document.getElementById('sg-unmatched-list');
-            if (mc) mc.textContent = matched;
+            if (mc) mc.textContent = matched.length;
             if (uc) uc.textContent = unmatched.length;
             if (ul) ul.innerHTML = unmatched.length
-                ? '<strong>Unmatched:</strong> ' + unmatched.map(f => escHtml(f.file.name)).join(', ')
+                ? unmatched.map(f => `<div style="margin-top:2px">⚠️ <span style="font-family:monospace">${escHtml(f.file.name)}</span> — code <strong>${escHtml(f.productCode)}</strong> not found in catalogue</div>`).join('')
                 : '';
 
-            // Render preview grid
+            // Render preview table (same style as the mockup upload modal)
             const preview = document.getElementById('sg-image-preview');
-            if (preview) {
-                preview.innerHTML = `
-                <div style="font-size:12px;font-weight:600;color:#475569;margin-bottom:6px">${_sgFileData.length} file${_sgFileData.length !== 1 ? 's' : ''} selected</div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px">
-                    ${_sgFileData.map(f => `
-                    <div style="text-align:center">
-                        <img src="${f.objUrl}" style="width:100%;height:64px;object-fit:cover;border-radius:8px;border:2px solid ${f.product ? '#22c55e' : '#f87171'}">
-                        <div style="font-size:9px;font-weight:700;color:${f.product ? '#16a34a' : '#dc2626'};margin-top:3px;word-break:break-all;line-height:1.2">${escHtml(f.productCode)}</div>
-                        ${f.product ? `<div style="font-size:9px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(f.product.item_name||'')}</div>` : '<div style="font-size:9px;color:#f87171">No match</div>'}
-                    </div>`).join('')}
-                </div>`;
-            }
+            if (!preview) return;
+            if (!_sgFileData.length) { preview.innerHTML = ''; return; }
+
+            preview.innerHTML = `
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                <span style="font-size:12px;font-weight:600;color:#475569">${_sgFileData.length} file${_sgFileData.length !== 1 ? 's' : ''} selected</span>
+                <button onclick="sgClearFiles()" style="font-size:11px;color:#94a3b8;background:transparent;border:none;cursor:pointer;text-decoration:underline">Clear all</button>
+            </div>
+            <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
+                <table style="width:100%;border-collapse:collapse;font-size:12px">
+                    <thead>
+                        <tr style="background:#f8fafc;border-bottom:1px solid #e2e8f0">
+                            <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Filename</th>
+                            <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Code</th>
+                            <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Product</th>
+                            <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">View</th>
+                            <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Variant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${_sgFileData.map(f => `
+                        <tr style="border-bottom:1px solid #f1f5f9">
+                            <td style="padding:6px 10px;color:#64748b;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(f.file.name)}">${escHtml(f.file.name)}</td>
+                            <td style="padding:6px 10px;font-family:monospace;font-weight:700;color:#0369a1">${escHtml(f.productCode)}</td>
+                            <td style="padding:6px 10px;font-weight:600;color:${f.product ? '#0f172a' : '#dc2626'}">${f.product ? escHtml(f.product.item_name) : '⚠️ No match'}</td>
+                            <td style="padding:6px 10px;color:#94a3b8;text-transform:capitalize">${escHtml(f.view)}</td>
+                            <td style="padding:6px 10px;color:#94a3b8">V${f.variantNumber}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>`;
         }
 
         async function sgCreateAndGenerate() {
-            const name       = document.getElementById('sg-club-name')?.value?.trim();
-            const prefix     = document.getElementById('sg-club-prefix')?.value?.trim().toUpperCase() || '';
-            const sport      = document.getElementById('sg-club-sport')?.value?.trim() || null;
-            const priceList  = document.getElementById('sg-price-list')?.value || 'retail';
-            const collName   = document.getElementById('sg-collection-name')?.value?.trim() || name;
+            const name      = document.getElementById('sg-club-name')?.value?.trim();
+            const prefix    = document.getElementById('sg-club-prefix')?.value?.trim().toUpperCase() || '';
+            const sport     = document.getElementById('sg-club-sport')?.value?.trim() || null;
+            const priceList = document.getElementById('sg-price-list')?.value || 'retail';
+            const collName  = document.getElementById('sg-collection-name')?.value?.trim() || name;
 
             if (!name) { showToast('Club name is required', 'error'); return; }
             const matchedFiles = (_sgFileData || []).filter(f => f.product);
@@ -18299,13 +18338,13 @@
                 // 1. Create clubs record
                 const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
                 const { data: newClub, error: clubErr } = await supabase.from('clubs').insert({
-                    brand_id: currentBrand.id,
+                    brand_id:        currentBrand.id,
                     name,
-                    suffix: prefix || null,
+                    suffix:          prefix || null,
                     sport,
                     slug,
                     collection_name: collName || null,
-                    created_by: currentUser?.id || null
+                    created_by:      currentUser?.id || null
                 }).select().single();
 
                 if (clubErr) throw new Error('Club creation failed: ' + clubErr.message);
@@ -18313,53 +18352,62 @@
 
                 if (btn) btn.textContent = 'Uploading images…';
 
-                // 2. Upload images and create club_products
+                // 2. Upload images + create/update club_products — identical to uploadMockupsAndCreateProducts
                 const brandSlug  = (currentBrand.slug || currentBrand.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
-                const clubSuffix = (prefix || newClub.id).toLowerCase();
-                let uploaded = 0, errors = [];
+                const clubSuffix = (prefix || newClub.suffix || newClub.id).toLowerCase();
+                let successCount = 0;
+                const errors = [];
 
                 for (const fd of matchedFiles) {
                     const storagePath = `${brandSlug}/${clubSuffix}/${fd.file.name}`;
-                    const { error: upErr } = await supabase.storage.from('club-images')
+                    const { error: uploadErr } = await supabase.storage.from('club-images')
                         .upload(storagePath, fd.file, { upsert: true });
-                    if (upErr) { errors.push(fd.file.name + ': ' + upErr.message); continue; }
+                    if (uploadErr) { errors.push(`${fd.file.name}: ${uploadErr.message}`); continue; }
 
                     const { data: { publicUrl } } = supabase.storage.from('club-images').getPublicUrl(storagePath);
 
+                    // Match on product_id + variant_number, exactly as the club record does
                     const { data: existingCP } = await supabase.from('club_products')
-                        .select('*').eq('club_id', newClub.id)
-                        .eq('product_id', fd.product.id).maybeSingle();
+                        .select('*')
+                        .eq('club_id',       newClub.id)
+                        .eq('product_id',    fd.product.id)
+                        .eq('variant_number', fd.variantNumber)
+                        .maybeSingle();
 
                     if (!existingCP) {
-                        await supabase.from('club_products').insert({
-                            club_id:       newClub.id,
-                            product_id:    fd.product.id,
-                            custom_name:   `${name} ${fd.product.item_name}`,
-                            image_urls:    [publicUrl],
-                            web_price:     fd.product.adult_retail_price || fd.product.single_retail_price || 0,
-                            partner_price: fd.product.adult_partner_price || fd.product.single_partner_price || 0,
-                            is_active:     true
+                        const { error: createErr } = await supabase.from('club_products').insert({
+                            club_id:        newClub.id,
+                            product_id:     fd.product.id,
+                            custom_name:    `${name} ${fd.product.item_name}`,
+                            variant_number: fd.variantNumber,
+                            image_urls:     [publicUrl],
+                            web_price:      fd.product.adult_retail_price || fd.product.single_retail_price || 0,
+                            partner_price:  fd.product.adult_partner_price || fd.product.single_partner_price || 0,
+                            is_active:      true
                         });
+                        if (createErr) { errors.push(`${fd.file.name}: ${createErr.message}`); continue; }
                     } else {
                         const urls = Array.isArray(existingCP.image_urls) ? existingCP.image_urls : [];
                         if (!urls.includes(publicUrl)) urls.push(publicUrl);
-                        await supabase.from('club_products').update({ image_urls: urls }).eq('id', existingCP.id);
+                        const { error: updateErr } = await supabase.from('club_products')
+                            .update({ image_urls: urls }).eq('id', existingCP.id);
+                        if (updateErr) { errors.push(`${fd.file.name}: ${updateErr.message}`); continue; }
                     }
-                    uploaded++;
+                    successCount++;
                 }
 
-                if (errors.length) showToast(`${errors.length} upload error(s) — check console`, 'warning');
+                if (errors.length) {
+                    showToast(`${successCount} uploaded, ${errors.length} failed`, 'warning');
+                    console.error('Store Generator upload errors:', errors);
+                }
 
                 if (btn) btn.textContent = 'Generating CSV…';
 
-                // 3. Set currentClub so generateShopifyCSVForClub can use it if needed
                 currentClub = newClub;
-
-                // 4. Generate CSV
                 await generateShopifyCSVForClub(newClub.id, priceList);
-                showToast(`Club "${name}" created with ${uploaded} images. CSV downloaded! ✓`);
+                showToast(`Club "${name}" created — ${successCount} product${successCount !== 1 ? 's' : ''} mapped. CSV downloaded ✓`);
 
-                // Refresh existing-club dropdown
+                // Refresh existing-club dropdown with the new club included
                 const ecSel = document.getElementById('sg-existing-club');
                 if (ecSel) ecSel.innerHTML = '<option value="">Select existing club...</option>' +
                     clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
