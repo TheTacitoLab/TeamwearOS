@@ -2067,63 +2067,141 @@
         </div>
 
         <!-- TOOL: Store Generator -->
-        <div id="tool-generator" class="hide w-full p-6 md:p-8 lg:px-12">
-            <!-- Page nav row -->
-            <div class="page-nav-row">
+        <div id="tool-generator" class="hide w-full">
+            <!-- Sticky header -->
+            <div style="position:sticky;top:56px;z-index:30;background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;min-height:44px;display:flex;align-items:center;gap:12px">
                 <button onclick="showLaunchpad()" class="nav-home-btn">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     Launchpad
                 </button>
-                <span class="nav-page-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z"/></svg>
-                    Store Generator
-                </span>
+                <span class="nav-page-btn" style="font-size:13px;font-weight:600;color:#0f172a">Store Generator</span>
+                <div style="margin-left:auto;display:flex;gap:8px">
+                    <button onclick="resetStoreGenerator()" style="padding:5px 14px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;font-size:12px;font-weight:600;cursor:pointer">Reset</button>
+                </div>
             </div>
 
-            <div class="glass rounded-2xl p-6 mb-6">
-                <h3 class="font-semibold mb-4">Generate Shopify CSV</h3>
-                
-                <div class="grid md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="text-gray-400 text-sm mb-2 block">Salesperson</label>
-                        <select id="gen-salesperson" class="w-full px-4 py-3 rounded-lg">
-                            <option value="">Select salesperson...</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-2 block">Club (with uploaded images)</label>
-                        <div class="relative">
-                            <input type="text" id="gen-club-search" placeholder="Type to search clubs..." class="w-full px-4 py-3 rounded-lg" oninput="filterClubDropdown()" onfocus="showClubDropdown()" onblur="hideClubDropdown()">
-                            <input type="hidden" id="gen-club" value="">
-                            <div id="gen-club-dropdown" class="absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg max-h-60 overflow-y-auto hide">
-                                <!-- Club options populated by JS -->
+            <!-- Main layout -->
+            <div style="max-width:1080px;margin:0 auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start">
+
+                <!-- LEFT COLUMN: Club details + Images -->
+                <div style="display:flex;flex-direction:column;gap:16px">
+
+                    <!-- 1. Club Details -->
+                    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:20px">
+                        <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                            <span style="background:#0f172a;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span>
+                            Club Details
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                            <div style="grid-column:span 2">
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Club Name *</label>
+                                <input id="sg-club-name" type="text" placeholder="e.g. Leeds United FC"
+                                    oninput="sgUpdateCollectionName()"
+                                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;font-weight:600;color:#0f172a;outline:none;transition:border-color 0.15s;box-sizing:border-box"
+                                    onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0'">
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Club Prefix</label>
+                                <input id="sg-club-prefix" type="text" placeholder="e.g. LUFC" maxlength="8"
+                                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;font-family:monospace;font-weight:700;color:#0f172a;outline:none;text-transform:uppercase;box-sizing:border-box"
+                                    onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0';this.value=this.value.toUpperCase()">
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Sport</label>
+                                <input id="sg-club-sport" type="text" placeholder="e.g. Football"
+                                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;color:#0f172a;outline:none;box-sizing:border-box"
+                                    onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0'">
                             </div>
                         </div>
+                    </div>
+
+                    <!-- 2. Upload Product Images -->
+                    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:20px">
+                        <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:6px;display:flex;align-items:center;gap:8px">
+                            <span style="background:#0f172a;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span>
+                            Upload Product Images
+                        </div>
+                        <p style="font-size:12px;color:#64748b;margin:0 0 12px">Filenames must include product codes (e.g. <code style="background:#f1f5f9;padding:1px 5px;border-radius:4px">RP100.jpg</code>, <code style="background:#f1f5f9;padding:1px 5px;border-radius:4px">RP100-B.jpg</code>).</p>
+                        <div id="sg-dropzone"
+                            ondragover="event.preventDefault();this.style.borderColor='#0f172a';this.style.background='#f8fafc'"
+                            ondragleave="this.style.borderColor='#cbd5e1';this.style.background='#fafbfc'"
+                            ondrop="event.preventDefault();this.style.borderColor='#cbd5e1';this.style.background='#fafbfc';sgHandleFiles(event.dataTransfer.files)"
+                            onclick="document.getElementById('sg-file-input').click()"
+                            style="border:2px dashed #cbd5e1;border-radius:10px;padding:24px 16px;text-align:center;cursor:pointer;background:#fafbfc;transition:all 0.15s">
+                            <svg style="width:32px;height:32px;margin:0 auto 8px;display:block;color:#94a3b8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <p style="font-size:13px;font-weight:600;color:#475569;margin:0 0 4px">Drop images here or click to browse</p>
+                            <p style="font-size:11px;color:#94a3b8;margin:0">JPG, PNG, WebP — multiple files supported</p>
+                        </div>
+                        <input type="file" id="sg-file-input" multiple accept="image/*" class="hide" onchange="sgHandleFiles(this.files)">
+                        <div id="sg-image-preview" style="margin-top:10px"></div>
                     </div>
                 </div>
 
-                <div id="gen-preview" class="hide mb-6">
-                    <div class="bg-gray-900 rounded-lg p-4">
-                        <div class="grid grid-cols-2 gap-4 mb-3">
+                <!-- RIGHT COLUMN: Export options + Summary + Generate -->
+                <div style="display:flex;flex-direction:column;gap:16px">
+
+                    <!-- 3. Export Options -->
+                    <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:20px">
+                        <div style="font-size:13px;font-weight:800;color:#0f172a;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                            <span style="background:#0f172a;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</span>
+                            Export Options
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:10px">
                             <div>
-                                <p class="text-gray-400 text-sm">Selected Club:</p>
-                                <p id="gen-selected-club" class="text-xl font-bold text-white">-</p>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Price List</label>
+                                <select id="sg-price-list" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;font-weight:600;color:#0f172a;background:#fff;outline:none;cursor:pointer">
+                                    <!-- populated by initStoreGenerator() -->
+                                </select>
                             </div>
                             <div>
-                                <p class="text-gray-400 text-sm">Products with images:</p>
-                                <p id="gen-product-count" class="text-3xl font-bold text-brand-400">0</p>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Shopify Collection Name</label>
+                                <input id="sg-collection-name" type="text" placeholder="Auto-filled from club name"
+                                    oninput="this.dataset.userEdited='1'"
+                                    style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;font-weight:600;color:#0f172a;outline:none;box-sizing:border-box"
+                                    onfocus="this.style.borderColor='#0f172a'" onblur="this.style.borderColor='#e2e8f0'">
                             </div>
                         </div>
-                        <div class="border-t border-gray-800 pt-3">
-                            <p class="text-gray-500 text-sm">Collection: <span id="gen-collection-name" class="text-brand-400 font-semibold"></span></p>
-                            <p id="gen-collection-image-info" class="text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Summary Card -->
+                    <div id="sg-summary-card" style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px">
+                        <div style="font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Summary</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                            <div style="background:#fff;border-radius:9px;padding:10px 12px;border:1px solid #e2e8f0">
+                                <div style="font-size:22px;font-weight:800;color:#22c55e" id="sg-matched-count">0</div>
+                                <div style="font-size:11px;color:#64748b">Images matched</div>
+                            </div>
+                            <div style="background:#fff;border-radius:9px;padding:10px 12px;border:1px solid #e2e8f0">
+                                <div style="font-size:22px;font-weight:800;color:#f87171" id="sg-unmatched-count">0</div>
+                                <div style="font-size:11px;color:#64748b">Unmatched</div>
+                            </div>
+                        </div>
+                        <div id="sg-unmatched-list" style="margin-top:8px;font-size:11px;color:#dc2626"></div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="sg-generate-btn" onclick="sgCreateAndGenerate()" style="width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:opacity 0.2s;letter-spacing:0.3px">
+                        ⚡ Create Club &amp; Generate Shopify CSV
+                    </button>
+
+                    <!-- Also generate for existing club -->
+                    <div style="border-top:1px solid #e2e8f0;padding-top:16px">
+                        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Or generate for existing club</div>
+                        <div style="display:flex;gap:8px">
+                            <select id="sg-existing-club" style="flex:1;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:12px;color:#0f172a;background:#fff;outline:none">
+                                <option value="">Select existing club...</option>
+                            </select>
+                            <button onclick="sgGenerateExisting()" style="padding:9px 16px;border:1.5px solid #e2e8f0;border-radius:9px;background:#fff;color:#0f172a;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap">Generate CSV</button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <button onclick="generateShopifyCSV()" class="w-full bg-brand-500 hover:bg-brand-600 py-4 rounded-lg font-semibold text-lg transition">
-                    Generate Shopify CSV
-                </button>
+            <!-- Hidden legacy elements for backward compatibility -->
+            <div class="hide">
+                <select id="gen-salesperson"></select>
+                <input id="gen-club-search"><input id="gen-club"><div id="gen-club-dropdown"></div>
+                <div id="gen-preview"><p id="gen-selected-club"></p><p id="gen-product-count"></p><span id="gen-collection-name"></span><p id="gen-collection-image-info"></p></div>
             </div>
         </div>
 
@@ -5702,7 +5780,7 @@
                     loadAllSubmissions();
                     break;
                 case 'generator':
-                    populateGeneratorSelects();
+                    initStoreGenerator();
                     break;
                 case 'orders':
                     populateOrderSelects();
@@ -15389,7 +15467,9 @@
         }
 
         // ── Navigate to Design Task Record ────────────────────────────────────
-        async function showDesignTask(taskId) {
+        // NOTE: The authoritative showDesignTask is defined later in the V2 block (line ~18025).
+        // This stub ensures backward-compatible calls; the V2 declaration wins via hoisting.
+        async function _showDesignTaskLegacy(taskId) {
             // Push the originating view to navStack so goBack() can return to it
             const inJob = !document.getElementById('tool-job-record').classList.contains('hide');
             const inStudio = !document.getElementById('tool-design-studio').classList.contains('hide');
@@ -16699,6 +16779,13 @@
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Deadline</div>
                                     <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${dueDate}${dueExtra}</div>
                                 </div>
+                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;grid-column:span 3">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:4px">Owner</div>
+                                    <select onchange="saveDesignTaskOwner(this.value)" style="width:100%;border:none;background:transparent;font-size:12px;font-weight:600;color:#0f172a;outline:none;cursor:pointer;padding:0">
+                                        <option value="">— Unassigned —</option>
+                                        ${brandUsers.map(u => `<option value="${u.id}" ${u.id === task.owner_id ? 'selected' : ''}>${escHtml(userDisplayName(u))}</option>`).join('')}
+                                    </select>
+                                </div>
                             </div>
                         </div>
 
@@ -17742,6 +17829,15 @@
         // ── Save Design Task (extended for new fields) ─────────────────────────
 
         const _origSaveDesignTaskOverview = saveDesignTaskOverview;
+        async function saveDesignTaskOwner(userId) {
+            if (!currentDesignTaskRecord?.id) return;
+            const { error } = await supabase.from('design_tasks')
+                .update({ owner_id: userId || null }).eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error saving owner', 'error'); return; }
+            if (currentDesignTaskRecord) currentDesignTaskRecord.owner_id = userId || null;
+            showToast('Owner updated ✓');
+        }
+
         async function saveDesignTaskOverviewV2() {
             if (!currentDesignTaskRecord?.id) return;
             try {
@@ -18018,20 +18114,30 @@
             if (item) { item.classList.add('highlight'); item.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
         }
 
-        // ── Override entry point functions ─────────────────────────────────────
+        // ── Authoritative showDesignTask (V2) ──────────────────────────────────
 
-        // Override showDesignTask to use V2 loader
-        const _origShowDesignTask = showDesignTask;
         async function showDesignTask(taskId) {
+            if (!taskId) return;
+            // Record where we came from for back-navigation
             const inJob    = !document.getElementById('tool-job-record')?.classList.contains('hide');
             const inStudio = !document.getElementById('tool-design-studio')?.classList.contains('hide');
+            const inLaunch = !document.getElementById('launchpad')?.classList.contains('hide');
             if (inJob && currentJobId) {
                 navStack.push({ type: 'job', jobId: currentJobId, label: currentJob?.job_name || 'Job Record' });
             } else if (inStudio) {
                 navStack.push({ type: 'tool', tool: 'design-studio', label: 'Design Studio' });
+            } else if (!inLaunch && !inJob && !inStudio) {
+                // Coming from somewhere else — default back destination is Design Studio
+                navStack.push({ type: 'tool', tool: 'design-studio', label: 'Design Studio' });
             }
             showToolRaw('design-task');
-            await loadDesignTaskRecordV2(taskId);
+            try {
+                await loadDesignTaskRecordV2(taskId);
+            } catch (err) {
+                console.error('loadDesignTaskRecordV2 error:', err);
+                showToast('Error loading design task', 'error');
+                return;
+            }
             if (!Array.isArray(navTrail) || !navTrail.length) navTrail = [{ label: 'Home', type: 'launchpad' }];
             if (navTrail[navTrail.length - 1]?.type !== 'design-task') {
                 navTrail.push({ label: currentDesignTaskRecord?.task_name || 'Design Task', type: 'design-task', taskId });
@@ -18086,6 +18192,193 @@
         }
 
         init();
+
+        // ── Store Generator (Rapid Club Creator) ──────────────────────────────
+
+        let _sgFiles = [];          // accumulated File objects
+        let _sgFileData = [];       // { file, productCode, product, objUrl }
+
+        function initStoreGenerator() {
+            _sgFiles = [];
+            _sgFileData = [];
+            ['sg-club-name','sg-club-prefix','sg-club-sport','sg-collection-name'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            const preview = document.getElementById('sg-image-preview');
+            if (preview) preview.innerHTML = '';
+            const mc = document.getElementById('sg-matched-count');
+            const uc = document.getElementById('sg-unmatched-count');
+            const ul = document.getElementById('sg-unmatched-list');
+            if (mc) mc.textContent = '0';
+            if (uc) uc.textContent = '0';
+            if (ul) ul.innerHTML = '';
+
+            // Populate price list selector
+            const plSel = document.getElementById('sg-price-list');
+            if (plSel) {
+                const tiers = brandPricingTiers.length
+                    ? brandPricingTiers
+                    : [{ tier_key: 'retail', tier_name: 'Retail' }, { tier_key: 'partner', tier_name: 'Partner' }];
+                plSel.innerHTML = tiers.map(t => `<option value="${escHtml(t.tier_key)}">${escHtml(t.tier_name)}</option>`).join('');
+            }
+
+            // Populate existing clubs dropdown
+            const ecSel = document.getElementById('sg-existing-club');
+            if (ecSel) {
+                ecSel.innerHTML = '<option value="">Select existing club...</option>' +
+                    (clubs || []).map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+            }
+        }
+
+        function resetStoreGenerator() {
+            initStoreGenerator();
+        }
+
+        function sgUpdateCollectionName() {
+            const name = document.getElementById('sg-club-name')?.value?.trim() || '';
+            const col  = document.getElementById('sg-collection-name');
+            if (col && !col.dataset.userEdited) col.value = name;
+        }
+
+        function sgHandleFiles(filesOrList) {
+            const newFiles = Array.from(filesOrList);
+            if (!newFiles.length) return;
+            _sgFiles = [..._sgFiles, ...newFiles];
+
+            // Parse each file
+            _sgFileData = _sgFiles.map(file => {
+                const { productCode } = parseDesignFilename(file.name);
+                const product = (products || []).find(p => p.product_code?.toUpperCase() === productCode);
+                return { file, productCode, product, objUrl: URL.createObjectURL(file) };
+            });
+
+            const matched   = _sgFileData.filter(f => f.product).length;
+            const unmatched = _sgFileData.filter(f => !f.product);
+
+            const mc = document.getElementById('sg-matched-count');
+            const uc = document.getElementById('sg-unmatched-count');
+            const ul = document.getElementById('sg-unmatched-list');
+            if (mc) mc.textContent = matched;
+            if (uc) uc.textContent = unmatched.length;
+            if (ul) ul.innerHTML = unmatched.length
+                ? '<strong>Unmatched:</strong> ' + unmatched.map(f => escHtml(f.file.name)).join(', ')
+                : '';
+
+            // Render preview grid
+            const preview = document.getElementById('sg-image-preview');
+            if (preview) {
+                preview.innerHTML = `
+                <div style="font-size:12px;font-weight:600;color:#475569;margin-bottom:6px">${_sgFileData.length} file${_sgFileData.length !== 1 ? 's' : ''} selected</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:6px">
+                    ${_sgFileData.map(f => `
+                    <div style="text-align:center">
+                        <img src="${f.objUrl}" style="width:100%;height:64px;object-fit:cover;border-radius:8px;border:2px solid ${f.product ? '#22c55e' : '#f87171'}">
+                        <div style="font-size:9px;font-weight:700;color:${f.product ? '#16a34a' : '#dc2626'};margin-top:3px;word-break:break-all;line-height:1.2">${escHtml(f.productCode)}</div>
+                        ${f.product ? `<div style="font-size:9px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(f.product.item_name||'')}</div>` : '<div style="font-size:9px;color:#f87171">No match</div>'}
+                    </div>`).join('')}
+                </div>`;
+            }
+        }
+
+        async function sgCreateAndGenerate() {
+            const name       = document.getElementById('sg-club-name')?.value?.trim();
+            const prefix     = document.getElementById('sg-club-prefix')?.value?.trim().toUpperCase() || '';
+            const sport      = document.getElementById('sg-club-sport')?.value?.trim() || null;
+            const priceList  = document.getElementById('sg-price-list')?.value || 'retail';
+            const collName   = document.getElementById('sg-collection-name')?.value?.trim() || name;
+
+            if (!name) { showToast('Club name is required', 'error'); return; }
+            const matchedFiles = (_sgFileData || []).filter(f => f.product);
+            if (!matchedFiles.length) { showToast('No matched product images to upload', 'error'); return; }
+
+            const btn = document.getElementById('sg-generate-btn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Creating club…'; }
+
+            try {
+                // 1. Create clubs record
+                const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                const { data: newClub, error: clubErr } = await supabase.from('clubs').insert({
+                    brand_id: currentBrand.id,
+                    name,
+                    suffix: prefix || null,
+                    sport,
+                    slug,
+                    collection_name: collName || null,
+                    created_by: currentUser?.id || null
+                }).select().single();
+
+                if (clubErr) throw new Error('Club creation failed: ' + clubErr.message);
+                clubs.push(newClub);
+
+                if (btn) btn.textContent = 'Uploading images…';
+
+                // 2. Upload images and create club_products
+                const brandSlug  = (currentBrand.slug || currentBrand.name || '').toLowerCase().replace(/[^a-z0-9]/g, '-');
+                const clubSuffix = (prefix || newClub.id).toLowerCase();
+                let uploaded = 0, errors = [];
+
+                for (const fd of matchedFiles) {
+                    const storagePath = `${brandSlug}/${clubSuffix}/${fd.file.name}`;
+                    const { error: upErr } = await supabase.storage.from('club-images')
+                        .upload(storagePath, fd.file, { upsert: true });
+                    if (upErr) { errors.push(fd.file.name + ': ' + upErr.message); continue; }
+
+                    const { data: { publicUrl } } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+
+                    const { data: existingCP } = await supabase.from('club_products')
+                        .select('*').eq('club_id', newClub.id)
+                        .eq('product_id', fd.product.id).maybeSingle();
+
+                    if (!existingCP) {
+                        await supabase.from('club_products').insert({
+                            club_id:       newClub.id,
+                            product_id:    fd.product.id,
+                            custom_name:   `${name} ${fd.product.item_name}`,
+                            image_urls:    [publicUrl],
+                            web_price:     fd.product.adult_retail_price || fd.product.single_retail_price || 0,
+                            partner_price: fd.product.adult_partner_price || fd.product.single_partner_price || 0,
+                            is_active:     true
+                        });
+                    } else {
+                        const urls = Array.isArray(existingCP.image_urls) ? existingCP.image_urls : [];
+                        if (!urls.includes(publicUrl)) urls.push(publicUrl);
+                        await supabase.from('club_products').update({ image_urls: urls }).eq('id', existingCP.id);
+                    }
+                    uploaded++;
+                }
+
+                if (errors.length) showToast(`${errors.length} upload error(s) — check console`, 'warning');
+
+                if (btn) btn.textContent = 'Generating CSV…';
+
+                // 3. Set currentClub so generateShopifyCSVForClub can use it if needed
+                currentClub = newClub;
+
+                // 4. Generate CSV
+                await generateShopifyCSVForClub(newClub.id, priceList);
+                showToast(`Club "${name}" created with ${uploaded} images. CSV downloaded! ✓`);
+
+                // Refresh existing-club dropdown
+                const ecSel = document.getElementById('sg-existing-club');
+                if (ecSel) ecSel.innerHTML = '<option value="">Select existing club...</option>' +
+                    clubs.map(c => `<option value="${c.id}">${escHtml(c.name)}</option>`).join('');
+
+            } catch (err) {
+                console.error('sgCreateAndGenerate error:', err);
+                showToast(err.message || 'An error occurred', 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '⚡ Create Club & Generate Shopify CSV'; }
+            }
+        }
+
+        async function sgGenerateExisting() {
+            const clubId    = document.getElementById('sg-existing-club')?.value;
+            const priceList = document.getElementById('sg-price-list')?.value || 'retail';
+            if (!clubId) { showToast('Select a club first', 'error'); return; }
+            await generateShopifyCSVForClub(clubId, priceList);
+        }
+
     </script>
 </body>
 </html>
