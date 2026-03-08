@@ -713,6 +713,10 @@
         .ds-ov-section-num { width:20px; height:20px; border-radius:50%; background:#0f172a; color:#fff; font-size:9px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         .ds-ov-section-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.7px; color:#64748b; }
 
+        /* Brief editable cells */
+        .brief-cell:hover { border-color:#00e5cc !important; background:#f0fffe !important; }
+        .brief-cell { transition:border-color 0.15s,background 0.15s; }
+
         /* Brief compact tab bar */
         .brtab { padding:7px 14px; font-size:12px; font-weight:600; color:#64748b; border:none; background:transparent; cursor:pointer; border-bottom:2px solid transparent; transition:all 0.15s; white-space:nowrap; }
         .brtab.active { color:#0f172a; border-bottom-color:#00e5cc; background:rgba(0,229,204,0.04); }
@@ -1748,7 +1752,10 @@
                 <div class="ds-feed-panel">
                     <div class="ds-feed-header">
                         <h3>Activity Feed <span id="ds-unread-badge" class="ds-notif-badge hide">0</span></h3>
-                        <button onclick="markAllFeedRead()" style="font-size:11px;color:#64748b;background:transparent;border:none;cursor:pointer;padding:0">Mark all read</button>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <button id="ds-feed-history-btn" onclick="toggleFeedHistory()" style="font-size:11px;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;padding:2px 8px;transition:all 0.15s">History</button>
+                            <button onclick="markAllFeedRead()" style="font-size:11px;color:#64748b;background:transparent;border:none;cursor:pointer;padding:0">Mark all read</button>
+                        </div>
                     </div>
                     <div class="ds-feed-list" id="ds-feed-list">
                         <div class="ds-empty-state" style="padding:30px 16px">
@@ -16196,40 +16203,58 @@
 
         // ── Activity Feed ──────────────────────────────────────────────────────
 
+        let _feedShowHistory = false;
+        let _feedAllItems = [];
+
         async function loadDSActivityFeed() {
             if (!currentBrand?.id) return;
             const { data } = await supabase.from('design_activity_feed')
                 .select('*, design_tasks(task_name,task_ref)')
                 .eq('brand_id', currentBrand.id)
                 .order('created_at', { ascending: false })
-                .limit(50);
-            renderDSActivityFeed(data || []);
-            // Update unread badge
-            const unread = (data||[]).filter(f => !f.is_read).length;
+                .limit(100);
+            _feedAllItems = data || [];
+            renderDSActivityFeed(_feedAllItems);
+            // Update unread badge — only count items NOT marked read
+            const unread = _feedAllItems.filter(f => !f.is_read).length;
             const badge = document.getElementById('ds-unread-badge');
-            if (badge) {
-                badge.textContent = unread;
-                badge.classList.toggle('hide', unread === 0);
+            if (badge) { badge.textContent = unread; badge.classList.toggle('hide', unread === 0); }
+        }
+
+        function toggleFeedHistory() {
+            _feedShowHistory = !_feedShowHistory;
+            const btn = document.getElementById('ds-feed-history-btn');
+            if (btn) {
+                btn.style.background = _feedShowHistory ? '#0f172a' : 'transparent';
+                btn.style.color      = _feedShowHistory ? '#fff'    : '#64748b';
+                btn.style.borderColor = _feedShowHistory ? '#0f172a' : '#e2e8f0';
             }
+            renderDSActivityFeed(_feedAllItems);
         }
 
         function renderDSActivityFeed(items) {
             const list = document.getElementById('ds-feed-list');
             if (!list) return;
-            if (!items.length) {
-                list.innerHTML = '<div class="ds-empty-state" style="padding:30px 16px"><div class="es-icon">💬</div><p>No activity yet</p></div>';
+            // In live mode show only unread; in history mode show all
+            const visible = _feedShowHistory ? items : items.filter(f => !f.is_read);
+            if (!visible.length) {
+                list.innerHTML = `<div class="ds-empty-state" style="padding:30px 16px"><div class="es-icon">💬</div>
+                    <p>${_feedShowHistory ? 'No activity on record' : 'All caught up!'}</p>
+                    ${!_feedShowHistory && items.length ? `<span style="font-size:11px;color:#94a3b8">Toggle History to see past activity</span>` : ''}
+                </div>`;
                 return;
             }
-            list.innerHTML = items.map(item => {
+            list.innerHTML = visible.map(item => {
                 const initials = dsActorInitials(item.actor_name || '');
                 const detail = item.action_detail || {};
                 const taskName = item.design_tasks?.task_name || detail.task_name || 'Task';
                 const taskRef  = item.design_tasks?.task_ref || '';
                 const label = dsActivityLabel(item.action_type, detail);
-                return `<div class="ds-feed-item ${!item.is_read ? 'unread' : ''}" onclick="showDesignTask('${item.task_id}')">
+                const isRead = item.is_read;
+                return `<div class="ds-feed-item ${!isRead ? 'unread' : ''}" id="dsfeed-${item.id}" style="${isRead ? 'opacity:0.65' : ''}">
                     <div style="display:flex;gap:8px;align-items:flex-start">
-                        <div class="ds-feed-actor">${initials}</div>
-                        <div style="flex:1;min-width:0">
+                        <div class="ds-feed-actor" style="${isRead ? 'background:#e2e8f0;color:#94a3b8' : ''}">${initials}</div>
+                        <div style="flex:1;min-width:0;cursor:pointer" onclick="showDesignTask('${item.task_id}')">
                             <div class="ds-feed-text">
                                 <strong>${escHtml(item.actor_name||'Someone')}</strong> ${escHtml(label)}
                             </div>
@@ -16238,9 +16263,40 @@
                             </div>
                             <div class="ds-feed-time">${dsRelativeTime(item.created_at)}</div>
                         </div>
+                        <!-- Action buttons (only in live mode / unread) -->
+                        ${!isRead ? `<div style="display:flex;gap:4px;flex-shrink:0;margin-left:4px">
+                            <button onclick="completeFeedItem('${item.id}',this)" title="Mark complete"
+                                style="width:22px;height:22px;border-radius:50%;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1">✓</button>
+                            <button onclick="dismissFeedItem('${item.id}',this)" title="Dismiss"
+                                style="width:22px;height:22px;border-radius:50%;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1">×</button>
+                        </div>` : ''}
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        async function completeFeedItem(id, btn) {
+            btn.closest('.ds-feed-item')?.classList.add('hide');
+            await supabase.from('design_activity_feed').update({ is_read: true }).eq('id', id);
+            const item = _feedAllItems.find(f => f.id === id);
+            if (item) item.is_read = true;
+            // Update badge
+            const unread = _feedAllItems.filter(f => !f.is_read).length;
+            const badge = document.getElementById('ds-unread-badge');
+            if (badge) { badge.textContent = unread; badge.classList.toggle('hide', unread === 0); }
+            setTimeout(() => { btn.closest('.ds-feed-item')?.remove(); }, 400);
+        }
+
+        async function dismissFeedItem(id, btn) {
+            const el = btn.closest('.ds-feed-item');
+            if (el) { el.style.transition = 'opacity 0.3s,transform 0.3s'; el.style.opacity = '0'; el.style.transform = 'translateX(20px)'; }
+            await supabase.from('design_activity_feed').update({ is_read: true }).eq('id', id);
+            const item = _feedAllItems.find(f => f.id === id);
+            if (item) item.is_read = true;
+            const unread = _feedAllItems.filter(f => !f.is_read).length;
+            const badge = document.getElementById('ds-unread-badge');
+            if (badge) { badge.textContent = unread; badge.classList.toggle('hide', unread === 0); }
+            setTimeout(() => { el?.remove(); }, 350);
         }
 
         async function markAllFeedRead() {
@@ -16614,30 +16670,33 @@
 
                         <!-- Details panel -->
                         <div id="brpanel-details" style="padding:10px 14px">
+                            <div style="display:flex;justify-content:flex-end;margin-bottom:6px">
+                                <span style="font-size:10px;color:#94a3b8;font-style:italic">Click any field to edit</span>
+                            </div>
                             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
-                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                <div class="brief-cell" onclick="editBriefCell(this,'team','text','${escHtml(task.team||'')}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Team</div>
-                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.team || '—')}</div>
+                                    <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.team || '—')}</div>
                                 </div>
-                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                <div class="brief-cell" onclick="editBriefCell(this,'order_type','select','${task.order_type||''}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Order Type</div>
-                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${OT[task.order_type] || (task.job_type ? task.job_type.replace(/_/g,' ') : '—')}</div>
+                                    <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${OT[task.order_type] || (task.job_type ? task.job_type.replace(/_/g,' ') : '—')}</div>
                                 </div>
-                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                <div class="brief-cell" onclick="editBriefCell(this,'season_event','text','${escHtml(task.season_event||'')}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Season / Event</div>
-                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.season_event || '—')}</div>
+                                    <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.season_event || '—')}</div>
                                 </div>
-                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
+                                <div class="brief-cell" onclick="editBriefCell(this,'sport','text','${escHtml(task.sport||'')}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Sport</div>
-                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.sport || '—')}</div>
+                                    <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.sport || '—')}</div>
                                 </div>
-                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
-                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Designer</div>
-                                    <div style="font-size:12px;font-weight:600;color:#be185d">${escHtml(task.assigned_designer_name || '—')}</div>
+                                <div class="brief-cell" onclick="editBriefCell(this,'priority','select','${task.priority||'standard'}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Priority</div>
+                                    <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a"><span class="ds-priority ds-priority-${priCls}" style="font-size:10px;padding:2px 8px">${pri.dot} ${pri.label}</span></div>
                                 </div>
-                                <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc">
-                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Job Type</div>
-                                    <div style="font-size:12px;font-weight:600;color:#0f172a">${task.job_type ? task.job_type.replace(/_/g,' ') : '—'}</div>
+                                <div class="brief-cell" onclick="editBriefCell(this,'due_date','date','${task.due_date||''}')" style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;cursor:pointer" title="Click to edit">
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Deadline</div>
+                                    <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${dueDate}${dueExtra}</div>
                                 </div>
                             </div>
                         </div>
@@ -16664,23 +16723,33 @@
 
                         <!-- Colours panel (hidden by default) -->
                         <div id="brpanel-colours" class="hide" style="padding:10px 14px">
-                            <div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:8px">
-                                <span style="font-size:11px;font-weight:600;color:#64748b">Use Club Colours</span>
-                                <div class="ds-toggle${useClub ? ' on' : ''}" onclick="toggleBriefColours()" title="${useClub ? 'Click to use custom colours' : 'Click to use club colours'}"></div>
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                                <span style="font-size:11px;color:#64748b;font-weight:600">Use Club Colours</span>
+                                <div class="ds-toggle${useClub ? ' on' : ''}" onclick="toggleBriefColours()" title="${useClub ? 'Using club colours — click to override' : 'Custom mode — click to use club colours'}"></div>
+                                <span style="font-size:10px;color:#94a3b8;margin-left:2px">${useClub ? 'Pre-filled from club record. Edit to override.' : 'Custom mode — values saved independently.'}</span>
                             </div>
                             <div style="display:flex;gap:8px">
                                 ${cols.map(c => {
                                     const bg = c.hex || '#e2e8f0';
-                                    return `<div style="flex:1;display:flex;align-items:center;gap:8px;border:1.5px solid #e2e8f0;border-radius:8px;padding:8px;overflow:hidden" data-colkey="${c.key}">
-                                        <div style="width:34px;height:34px;border-radius:6px;background:${bg};border:1px solid rgba(0,0,0,0.08);cursor:pointer;flex-shrink:0;position:relative" onclick="document.getElementById('dscp-${c.key}').click()">
+                                    const pantoneVal = (useClub ? cc[c.key]?.pantone || c.pantone : cc[c.key]?.pantone || c.pantone) || '';
+                                    return `<div style="flex:1;border:1.5px solid #e2e8f0;border-radius:10px;overflow:hidden" data-colkey="${c.key}">
+                                        <!-- Swatch -->
+                                        <div style="height:40px;background:${bg};cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center" onclick="document.getElementById('dscp-${c.key}').click()" title="Click to pick colour">
                                             <input type="color" id="dscp-${c.key}" value="${c.hex || '#000000'}" oninput="briefColourPick('${c.key}',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+                                            <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:rgba(255,255,255,0.9);opacity:0;transition:opacity 0.15s;background:rgba(0,0,0,0.15)" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0">Pick</div>
+                                            ${!c.hex ? `<span style="font-size:10px;font-weight:600;color:#94a3b8">Click to set</span>` : ''}
                                         </div>
-                                        <div style="flex:1;min-width:0">
-                                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#94a3b8;margin-bottom:2px">${c.label}</div>
-                                            ${useClub
-                                                ? `<div style="font-size:11px;color:#0f172a;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.pantone || '<span style="color:#94a3b8;font-weight:400">No Pantone</span>'}</div>`
-                                                : `<input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C" onblur="briefColourSave('${c.key}','pantone',this.value)" style="padding:2px 6px;font-size:10px;margin:0">`}
-                                            <input class="ds-colour-input ds-colour-card" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB" onblur="briefColourSave('${c.key}','hex',this.value)" style="padding:2px 6px;font-size:10px;margin:2px 0 0">
+                                        <!-- Fields -->
+                                        <div style="padding:6px 8px;background:#fff">
+                                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#94a3b8;margin-bottom:4px">${c.label}</div>
+                                            <div style="margin-bottom:3px">
+                                                <div style="font-size:9px;color:#94a3b8;margin-bottom:1px">Hex</div>
+                                                <input class="ds-colour-input" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB" onblur="briefColourSave('${c.key}','hex',this.value)" style="padding:3px 6px;font-size:11px;font-family:monospace">
+                                            </div>
+                                            <div>
+                                                <div style="font-size:9px;color:#94a3b8;margin-bottom:1px">Pantone (ROKOR)</div>
+                                                <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(pantoneVal)}" placeholder="e.g. 286 C" onblur="briefColourSave('${c.key}','pantone',this.value)" style="padding:3px 6px;font-size:11px">
+                                            </div>
                                         </div>
                                     </div>`;
                                 }).join('')}
@@ -16696,9 +16765,17 @@
                         <div class="ds-ov-section-hdr">
                             <div class="ds-ov-section-num">4</div>
                             <div class="ds-ov-section-title">Products Required</div>
-                            ${selectedIds.size ? `<span style="margin-left:auto;padding:2px 8px;background:#e0fdf4;color:#065f46;border-radius:20px;font-size:10px;font-weight:700">${selectedIds.size} selected</span>` : ''}
+                            ${selectedIds.size ? `<span id="brief-prod-count" style="margin-left:8px;padding:2px 8px;background:#e0fdf4;color:#065f46;border-radius:20px;font-size:10px;font-weight:700">${selectedIds.size} selected</span>` : `<span id="brief-prod-count" class="hide" style="margin-left:8px;padding:2px 8px;background:#e0fdf4;color:#065f46;border-radius:20px;font-size:10px;font-weight:700">0 selected</span>`}
                         </div>
-                        <div class="ds-prod-grid">${prodCardsHtml}</div>
+                        <!-- Source toggle -->
+                        <div style="display:flex;align-items:center;gap:0;border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:10px;width:fit-content">
+                            <button id="prdtab-club" onclick="switchProdTab('club')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#0f172a;color:#fff;border-right:1px solid #e2e8f0;transition:all 0.15s">Club Catalogue</button>
+                            <button id="prdtab-master" onclick="switchProdTab('master')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#64748b;transition:all 0.15s">All Products</button>
+                        </div>
+                        <div id="brprod-club"><div class="ds-prod-grid">${prodCardsHtml}</div></div>
+                        <div id="brprod-master" class="hide">
+                            <div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">Loading master catalogue…</div>
+                        </div>
                     </div>
 
                     <!-- ⑤ Assets for Design -->
@@ -16708,19 +16785,30 @@
                             <div class="ds-ov-section-title">Assets for Design</div>
                             ${assets.length ? `<span style="margin-left:auto;font-size:10px;color:#64748b;font-weight:600">${assets.length} file${assets.length !== 1 ? 's' : ''}</span>` : ''}
                         </div>
-                        <div class="ds-asset-dz" id="ds-brief-dz" style="padding:14px 18px"
-                            onclick="document.getElementById('ds-brief-finput').click()"
-                            ondragover="event.preventDefault();this.classList.add('drag-over')"
-                            ondragleave="this.classList.remove('drag-over')"
-                            ondrop="briefAssetDrop(event)">
-                            <svg width="24" height="24" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 6px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <p style="font-size:12px;font-weight:600;color:#64748b;margin:0 0 2px">Drop files or click to upload</p>
-                            <p style="font-size:10px;color:#94a3b8;margin:0">AI · SVG · PNG · JPG · PDF</p>
+                        <div style="display:flex;gap:12px;align-items:flex-start">
+                            <!-- Left: compact uploader (1/4 width) -->
+                            <div style="flex:0 0 22%;min-width:100px">
+                                <div class="ds-asset-dz" id="ds-brief-dz"
+                                    onclick="document.getElementById('ds-brief-finput').click()"
+                                    ondragover="event.preventDefault();this.classList.add('drag-over')"
+                                    ondragleave="this.classList.remove('drag-over')"
+                                    ondrop="briefAssetDrop(event)"
+                                    style="padding:18px 8px;min-height:90px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                                    <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin-bottom:5px;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                    <p style="font-size:11px;font-weight:600;color:#64748b;margin:0 0 2px;text-align:center">Drop or click</p>
+                                    <p style="font-size:9px;color:#94a3b8;margin:0;text-align:center">AI · SVG · PNG<br>JPG · PDF</p>
+                                </div>
+                                <input type="file" id="ds-brief-finput" class="hide" multiple
+                                    accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf"
+                                    onchange="briefAssetSelect(event)">
+                            </div>
+                            <!-- Right: files grid (3/4 width) -->
+                            <div style="flex:1;min-width:0">
+                                ${assets.length
+                                    ? `<div class="ds-asset-grid" style="grid-template-columns:repeat(auto-fill,minmax(90px,1fr));margin-top:0">${assetCardsHtml}</div>`
+                                    : `<div style="height:90px;display:flex;align-items:center;justify-content:center;border:1px dashed #e2e8f0;border-radius:10px;background:#fafbfc"><p style="font-size:12px;color:#94a3b8;margin:0">No files uploaded yet</p></div>`}
+                            </div>
                         </div>
-                        <input type="file" id="ds-brief-finput" class="hide" multiple
-                            accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf"
-                            onchange="briefAssetSelect(event)">
-                        ${assets.length ? `<div class="ds-asset-grid">${assetCardsHtml}</div>` : ''}
                     </div>
 
                     <!-- Status banners -->
@@ -16774,6 +16862,68 @@
             });
         }
 
+        // ── Brief cell inline editing ───────────────────────────────────────────
+        const _BRIEF_SELECT_OPTS = {
+            order_type: [['','— Select —'],['match_kit','Match Kit'],['training_range','Training Range'],['travel_range','Travel Range'],['leisurewear','Leisurewear'],['other','Other']],
+            priority:   [['standard','Standard'],['high','High'],['urgent','Urgent']],
+        };
+        function editBriefCell(cellEl, field, type, currentVal) {
+            if (cellEl.querySelector('input,select')) return; // already editing
+            const valDiv = cellEl.querySelector('.brief-cell-val');
+            if (!valDiv) return;
+            cellEl.style.borderColor = '#00e5cc';
+            cellEl.style.background = '#f0fffe';
+            cellEl.onclick = null; // prevent re-trigger
+            let input;
+            if (type === 'select') {
+                input = document.createElement('select');
+                input.style.cssText = 'width:100%;padding:3px 6px;border:1.5px solid #00e5cc;border-radius:6px;font-size:12px;font-weight:600;outline:none;background:#fff;box-sizing:border-box';
+                (_BRIEF_SELECT_OPTS[field] || []).forEach(([v,l]) => {
+                    const o = document.createElement('option');
+                    o.value = v; o.textContent = l;
+                    if (v === currentVal) o.selected = true;
+                    input.appendChild(o);
+                });
+            } else if (type === 'date') {
+                input = document.createElement('input');
+                input.type = 'date'; input.value = currentVal;
+                input.style.cssText = 'width:100%;padding:3px 6px;border:1.5px solid #00e5cc;border-radius:6px;font-size:12px;font-weight:600;outline:none;box-sizing:border-box';
+            } else {
+                input = document.createElement('input');
+                input.type = 'text'; input.value = currentVal;
+                input.style.cssText = 'width:100%;padding:3px 6px;border:1.5px solid #00e5cc;border-radius:6px;font-size:12px;font-weight:600;outline:none;box-sizing:border-box';
+            }
+            valDiv.innerHTML = '';
+            valDiv.appendChild(input);
+            input.focus();
+            const save = () => {
+                const newVal = input.value?.trim?.() ?? input.value;
+                saveBriefField(field, newVal, cellEl, valDiv, type);
+            };
+            input.addEventListener('blur', save);
+            input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } if (e.key === 'Escape') { renderStagePanel(1); } });
+        }
+        async function saveBriefField(field, value, cellEl, valDiv, type) {
+            if (!currentDesignTaskRecord?.id) return;
+            const update = { [field]: value || null };
+            currentDesignTaskRecord[field] = value || null;
+            await supabase.from('design_tasks').update(update).eq('id', currentDesignTaskRecord.id);
+            // Re-render just the cell value without full panel rebuild
+            const OT = { match_kit:'Match Kit', training_range:'Training Range', travel_range:'Travel Range', leisurewear:'Leisurewear', other:'Other' };
+            const PRI = { standard:'⚪ Standard', high:'🟠 High', urgent:'🔴 Urgent' };
+            let displayVal = value || '—';
+            if (field === 'order_type') displayVal = OT[value] || value || '—';
+            if (field === 'priority') displayVal = PRI[value] || value || '—';
+            if (field === 'due_date' && value) {
+                displayVal = new Date(value).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+            }
+            valDiv.innerHTML = `<span style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(displayVal)}</span>`;
+            cellEl.style.borderColor = '#f1f5f9';
+            cellEl.style.background = '#fafbfc';
+            cellEl.onclick = () => editBriefCell(cellEl, field, type, value);
+            showToast('Saved', 'success');
+        }
+
         function briefIsLight(hex) {
             try {
                 const h = (hex || '').replace(/^#/, '');
@@ -16824,10 +16974,59 @@
             else arr.splice(idx, 1);
             currentDesignTaskRecord.products_required = arr;
             cardEl.classList.toggle('selected', idx === -1);
-            // Update selected count badge in header
-            const badge = document.querySelector('.ds-ov-section .ds-ov-section-hdr [style*="e0fdf4"]');
-            if (badge) badge.textContent = arr.length + ' selected';
+            // Update selected count badge
+            const badge = document.getElementById('brief-prod-count');
+            if (badge) { badge.textContent = arr.length + ' selected'; badge.classList.toggle('hide', arr.length === 0); }
             await supabase.from('design_tasks').update({ products_required: arr }).eq('id', currentDesignTaskRecord.id);
+        }
+
+        let _masterProdsLoaded = false;
+        function switchProdTab(tab) {
+            document.getElementById('brprod-club')?.classList.toggle('hide', tab !== 'club');
+            document.getElementById('brprod-master')?.classList.toggle('hide', tab !== 'master');
+            document.getElementById('prdtab-club').style.background = tab === 'club' ? '#0f172a' : '#fff';
+            document.getElementById('prdtab-club').style.color     = tab === 'club' ? '#fff'    : '#64748b';
+            document.getElementById('prdtab-master').style.background = tab === 'master' ? '#0f172a' : '#fff';
+            document.getElementById('prdtab-master').style.color     = tab === 'master' ? '#fff'    : '#64748b';
+            if (tab === 'master' && !_masterProdsLoaded) loadMasterCatProducts();
+        }
+        async function loadMasterCatProducts() {
+            _masterProdsLoaded = true;
+            const container = document.getElementById('brprod-master');
+            if (!container) return;
+            const { data: prods } = await supabase
+                .from('products')
+                .select('id, product_code, item_name, range_name, category')
+                .order('range_name').order('item_name');
+            if (!prods || !prods.length) {
+                container.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">No products in master catalogue.</div>';
+                return;
+            }
+            const selectedIds = new Set(currentDesignTaskRecord?.products_required || []);
+            // Group by range_name / category
+            const groups = {};
+            prods.forEach(p => {
+                const grp = p.range_name || p.category || 'Other';
+                if (!groups[grp]) groups[grp] = [];
+                groups[grp].push(p);
+            });
+            container.innerHTML = Object.entries(groups).map(([grp, items]) => `
+                <div style="margin-bottom:12px">
+                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px;padding:0 2px">${escHtml(grp)}</div>
+                    <div class="ds-prod-grid">
+                        ${items.map(p => {
+                            const sel = selectedIds.has(p.id);
+                            return `<div class="ds-prod-card${sel ? ' selected' : ''}" onclick="briefToggleProduct('${p.id}',this)">
+                                <div class="ds-prod-check">✓</div>
+                                <div class="ds-prod-img"><svg width="24" height="24" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+                                <div class="ds-prod-info">
+                                    <div class="ds-prod-name" title="${escHtml(p.item_name||'')}">${escHtml(p.item_name||'Product')}</div>
+                                    ${p.product_code ? `<div class="ds-prod-code">${escHtml(p.product_code)}</div>` : ''}
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`).join('');
         }
 
         async function saveBriefDescription(text) {
@@ -17152,12 +17351,25 @@
         let _designBucketReady = false;
         async function ensureDesignBucket() {
             if (_designBucketReady) return;
-            const { data: buckets } = await supabase.storage.listBuckets();
-            const exists = (buckets || []).some(b => b.name === 'design-uploads');
-            if (!exists) {
-                await supabase.storage.createBucket('design-uploads', { public: true, fileSizeLimit: 52428800 });
+            try {
+                // Try to create — if bucket already exists this returns a harmless error
+                const { error: createErr } = await supabase.storage.createBucket('design-uploads', {
+                    public: true, fileSizeLimit: 52428800
+                });
+                if (createErr && !createErr.message?.toLowerCase().includes('already exist')) {
+                    // Creation failed; check if it exists anyway (e.g. we don't have create perms but bucket is there)
+                    const { data: buckets } = await supabase.storage.listBuckets();
+                    const exists = (buckets || []).some(b => b.name === 'design-uploads');
+                    if (!exists) {
+                        console.warn('ensureDesignBucket: bucket may be missing, attempting upload anyway', createErr);
+                    }
+                }
+                _designBucketReady = true;
+            } catch(e) {
+                console.error('ensureDesignBucket error:', e);
+                // Optimistically mark ready and let the upload surface any real error
+                _designBucketReady = true;
             }
-            _designBucketReady = true;
         }
 
         async function uploadVersionFile(stageId, vNum, file) {
