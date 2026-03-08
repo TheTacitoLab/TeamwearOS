@@ -1433,25 +1433,14 @@
                 </span>
             </div>
 
-            <!-- Uniform Structure Guide -->
-            <div class="glass rounded-2xl p-4 mb-6 border" style="border-color:rgba(59,130,246,0.2)">
-                <div class="flex items-start gap-3">
-                    <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
-                    <div class="flex-1">
-                        <p class="text-sm font-semibold text-brand-400 mb-1">Master Product SKU</p>
-                        <p class="text-xs text-gray-400 mb-2">Enter your brand's master product SKU in whatever format your brand uses — e.g. <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">APX-ATL-001</code> or <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">NK/RANGE/001</code>. The club suffix and size will be appended automatically according to your brand's SKU Format setting.</p>
-                        <div class="grid grid-cols-2 gap-3 text-xs text-gray-500">
-                            <div><span class="text-gray-300 font-medium">Master SKU</span> — the base code you define for each product</div>
-                            <div><span class="text-gray-300 font-medium">Club SKU</span> — club suffix &amp; size appended automatically via SKU Format</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Action Bar -->
             <div class="flex flex-wrap gap-4 mb-6">
                 <button onclick="showAddProductModal()" class="bg-brand-500 hover:bg-brand-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
                     + Add Product
+                </button>
+                <button onclick="downloadProductTemplate()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2" title="Download blank CSV template pre-configured with your pricing tiers">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
+                    CSV Template
                 </button>
                 <button onclick="document.getElementById('csv-upload').click()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
@@ -1465,6 +1454,14 @@
                 <button onclick="showCatalogueSettings()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Catalogue Settings
+                </button>
+                <button onclick="toggleSkuInfoPopover(event)" id="sku-info-btn" class="bg-gray-700 hover:bg-gray-600 w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" title="Master Product SKU — how SKUs work">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                </button>
+                <!-- VAT status pill — always visible, click to toggle -->
+                <button id="vat-toggle-btn" onclick="csToggleVatFromToolbar()" title="VAT status — click to toggle on/off. Controls 'Charge Tax' in Shopify CSV, order totals and PDFs." class="px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors border">
+                    <span id="vat-status-dot" class="w-2 h-2 rounded-full flex-shrink-0"></span>
+                    <span id="vat-status-text"></span>
                 </button>
                 <div class="flex-1"></div>
                 <button onclick="showBulkDeleteModal()" class="bg-red-500/20 hover:bg-red-500/30 text-red-400 px-4 py-2 rounded-lg font-semibold flex items-center gap-2 border border-red-500/50">
@@ -1502,9 +1499,11 @@
                     <div>
                         <label class="text-gray-400 text-xs mb-1 block">Fit Type</label>
                         <select id="filter-fit" class="w-full px-3 py-2 rounded-lg text-sm" onchange="filterProducts()">
-                            <option value="">All</option>
-                            <option value="Adult / Youth">Adult / Youth</option>
-                            <option value="One Size Only">One Size Only</option>
+                            <option value="">All Fits</option>
+                            <option value="adult">Adult</option>
+                            <option value="youth">Youth Unisex</option>
+                            <option value="women">Women's</option>
+                            <option value="one_size">One Size</option>
                         </select>
                     </div>
                     <div>
@@ -1581,20 +1580,16 @@
                             Manage Tiers
                         </button>
                     </div>
+                    <p class="text-gray-500 text-xs mb-3">Prices update based on size categories checked below. Adult &amp; Women's = taxable. Youth = zero-rated (UK VAT).</p>
                     <div id="product-pricing-fields" class="space-y-3">
-                        <!-- Rendered dynamically by renderPricingFields() based on brand tiers -->
+                        <!-- Rendered dynamically by renderPricingFieldsDynamic() -->
                     </div>
                     <!-- Legacy hidden fields for backward compatibility -->
                     <input type="hidden" id="prod-youth-retail">
                     <input type="hidden" id="prod-youth-partner">
                     <input type="hidden" id="prod-adult-retail">
                     <input type="hidden" id="prod-adult-partner">
-                    <div class="mt-3 pt-3 border-t border-gray-700">
-                        <label class="flex items-center gap-2 text-sm cursor-pointer">
-                            <input type="checkbox" id="prod-single-price" onchange="toggleSinglePrice()" class="rounded">
-                            <span class="text-gray-300">Single price item (one size / accessories)</span>
-                        </label>
-                    </div>
+                    <input type="hidden" id="prod-single-price" value="false">
                 </div>
 
                 <!-- Product Details -->
@@ -1618,7 +1613,7 @@
                         <!-- Adult -->
                         <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <label class="flex items-center gap-3 cursor-pointer select-none">
-                                <input type="checkbox" id="prod-fit-adult" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
+                                <input type="checkbox" id="prod-fit-adult" onchange="onFitsChanged('prod-fit-adult')" class="w-4 h-4 accent-brand-500">
                                 <span class="text-sm font-medium">Adult <span class="text-gray-500 font-normal text-xs ml-1">S, M, L, XL, 2XL, 3XL, 4XL, 5XL, 6XL</span></span>
                             </label>
                             <div id="prod-adult-sizes-row" class="mt-2 ml-7 hide">
@@ -1629,25 +1624,53 @@
                         <!-- Youth Unisex -->
                         <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <label class="flex items-center gap-3 cursor-pointer select-none">
-                                <input type="checkbox" id="prod-fit-youth" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
+                                <input type="checkbox" id="prod-fit-youth" onchange="onFitsChanged('prod-fit-youth')" class="w-4 h-4 accent-brand-500">
                                 <span class="text-sm font-medium">Youth Unisex <span class="text-gray-500 font-normal text-xs ml-1">YXXS, YXS, YS, YM, YL, YXL</span></span>
                             </label>
                             <div id="prod-youth-sizes-row" class="mt-2 ml-7 hide">
-                                <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
+                                <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated — remove any not available)</label>
                                 <input type="text" id="prod-youth-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
                             </div>
                         </div>
                         <!-- Women's -->
                         <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <label class="flex items-center gap-3 cursor-pointer select-none">
-                                <input type="checkbox" id="prod-fit-women" onchange="onFitsChanged()" class="w-4 h-4 accent-brand-500">
-                                <span class="text-sm font-medium">Women's <span class="text-gray-500 font-normal text-xs ml-1">6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26</span></span>
+                                <input type="checkbox" id="prod-fit-women" onchange="onFitsChanged('prod-fit-women')" class="w-4 h-4 accent-brand-500">
+                                <span class="text-sm font-medium">Women's <span class="text-gray-500 font-normal text-xs ml-1">4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24</span></span>
                             </label>
                             <div id="prod-women-sizes-row" class="mt-2 ml-7 hide">
-                                <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated)</label>
+                                <label class="text-xs text-gray-500 mb-1 block">Sizes (comma-separated — remove any not available)</label>
                                 <input type="text" id="prod-women-sizes" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
                             </div>
                         </div>
+                        <!-- One Size -->
+                        <div class="p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <label class="flex items-center gap-3 cursor-pointer select-none">
+                                <input type="checkbox" id="prod-fit-onesize" onchange="onFitsChanged('prod-fit-onesize')" class="w-4 h-4 accent-brand-500">
+                                <span class="text-sm font-medium">One Size <span class="text-gray-500 font-normal text-xs ml-1">Accessories, socks, caps — single size, single price per tier</span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Shopify Settings -->
+                    <div class="mt-3 pt-3 border-t border-gray-700">
+                        <p class="text-gray-400 text-xs mb-2 font-medium">Shopify Settings</p>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="text-gray-500 text-xs mb-1 block">Product Template <span class="text-gray-600 font-normal">(optional)</span></label>
+                                <input type="text" id="prod-template-suffix" placeholder="Leave blank for default" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
+                                <p class="text-gray-600 text-xs mt-0.5">Liquid template suffix e.g. <span class="font-mono">product.teamwear</span></p>
+                            </div>
+                            <div>
+                                <label class="text-gray-500 text-xs mb-1 block">Product Category</label>
+                                <input type="text" id="prod-shopify-category" placeholder="Apparel & Accessories > Clothing" class="w-full px-3 py-1.5 rounded-lg text-xs" style="background:#f8fafc;border:1px solid #e2e8f0">
+                                <p class="text-gray-600 text-xs mt-0.5">Shopify standard taxonomy for Google Shopping</p>
+                            </div>
+                        </div>
+                        <label class="flex items-center gap-2 text-sm cursor-pointer">
+                            <input type="checkbox" id="prod-made-to-order" checked class="rounded">
+                            <span class="text-gray-300">Made to order <span class="text-gray-500 text-xs font-normal">(inventory policy = continue selling when out of stock)</span></span>
+                        </label>
                     </div>
 
                     <!-- Shopify Tags (replaces has_addons) -->
@@ -1664,9 +1687,20 @@
 
                 <!-- Description -->
                 <div class="mb-6">
-                    <label class="text-gray-400 text-sm mb-1 block">Product Description (for Shopify)</label>
-                    <textarea id="prod-description" rows="4" placeholder="Use *ADD CLUB NAME + RANGE* or *ADD CLUB NAME* as placeholders — these are replaced automatically when generating the Shopify CSV for each club." class="w-full px-3 py-2 rounded-lg"></textarea>
-                    <p class="text-gray-500 text-xs mt-1">Placeholders: <code class="bg-gray-900 px-1 rounded">*ADD CLUB NAME*</code> and <code class="bg-gray-900 px-1 rounded">*ADD CLUB NAME + RANGE*</code></p>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="text-gray-400 text-sm">Product Description (for Shopify)</label>
+                        <div class="flex gap-1.5">
+                            <button type="button" onclick="insertProductDescPlaceholder('*CLUB_NAME*')" class="text-xs px-2 py-0.5 rounded border border-brand-500/40 text-brand-400 hover:bg-brand-500/10 transition">+ Club Name</button>
+                            <button type="button" onclick="insertProductDescPlaceholder('*CLUB_NAME_RANGE*')" class="text-xs px-2 py-0.5 rounded border border-brand-500/40 text-brand-400 hover:bg-brand-500/10 transition">+ Club Name + Range</button>
+                            <button type="button" onclick="insertProductDescPlaceholder('*PRODUCT_NAME*')" class="text-xs px-2 py-0.5 rounded border border-brand-500/40 text-brand-400 hover:bg-brand-500/10 transition">+ Product Name</button>
+                        </div>
+                    </div>
+                    <textarea id="prod-description" rows="5" placeholder="Write the product description here. Use the placeholder buttons above to insert dynamic values that will be replaced automatically when club products are created.&#10;&#10;Example: The *CLUB_NAME* *CLUB_NAME_RANGE* is crafted for elite performance..." class="w-full px-3 py-2 rounded-lg"></textarea>
+                    <div class="flex flex-wrap gap-3 mt-1.5">
+                        <p class="text-gray-600 text-xs"><code class="bg-gray-900 px-1 rounded text-brand-500">*CLUB_NAME*</code> → replaced with the club's full name</p>
+                        <p class="text-gray-600 text-xs"><code class="bg-gray-900 px-1 rounded text-brand-500">*CLUB_NAME_RANGE*</code> → club name + product range</p>
+                        <p class="text-gray-600 text-xs"><code class="bg-gray-900 px-1 rounded text-brand-500">*PRODUCT_NAME*</code> → item name from master product</p>
+                    </div>
                 </div>
 
                 <!-- Actions -->
@@ -2265,8 +2299,8 @@
                     <span class="text-gray-400">Subtotal</span>
                     <span id="order-subtotal" class="text-xl font-semibold">£0.00</span>
                 </div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-400">VAT (20% on adult items)</span>
+                <div id="order-vat-row" class="flex justify-between items-center mb-4">
+                    <span class="text-gray-400">VAT (20%)</span>
                     <span id="order-vat" class="text-xl font-semibold">£0.00</span>
                 </div>
                 <div class="flex justify-between items-center mb-6 pt-4 border-t border-gray-800">
@@ -4388,6 +4422,31 @@
         <!-- ============================================================
              MODAL: Catalogue Settings
              ============================================================ -->
+        <!-- ── Tag Editor Popover ──────────────────────────────────────────── -->
+        <div id="tag-editor-popover" class="hide fixed z-[200] w-72 glass rounded-2xl p-4 shadow-2xl border border-white/10">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Edit Tags</p>
+            <div id="tag-editor-chips" class="flex flex-wrap gap-1 min-h-6 mb-3"></div>
+            <div class="flex gap-2">
+                <input type="text" id="tag-editor-input" placeholder="Add tag…" class="flex-1 px-2.5 py-1.5 rounded-lg text-xs bg-gray-800 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-brand-500" onkeydown="if(event.key==='Enter'){event.preventDefault();addTagFromEditor();}">
+                <button onclick="addTagFromEditor()" class="btn-primary text-xs px-3 py-1.5 rounded-lg">Add</button>
+            </div>
+        </div>
+
+        <!-- ── SKU Info Popover ───────────────────────────────────────────── -->
+        <div id="sku-info-popover" class="hide fixed z-[200] w-80 glass rounded-2xl p-5 shadow-2xl border" style="border-color:rgba(59,130,246,0.25)">
+            <div class="flex items-start gap-3">
+                <svg class="w-5 h-5 mt-0.5 flex-shrink-0 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"/></svg>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-brand-400 mb-1">Master Product SKU</p>
+                    <p class="text-xs text-gray-400 mb-3">Enter your brand's master product SKU in whatever format your brand uses — e.g. <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">APX-ATL-001</code> or <code class="bg-gray-900 px-1 py-0.5 rounded text-brand-300">NK/RANGE/001</code>. The club suffix and size will be appended automatically according to your brand's SKU Format setting.</p>
+                    <div class="grid grid-cols-2 gap-3 text-xs text-gray-500">
+                        <div><span class="text-gray-300 font-medium">Master SKU</span><br>The base code you define for each product</div>
+                        <div><span class="text-gray-300 font-medium">Club SKU</span><br>Club suffix &amp; size appended automatically via SKU Format</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="catalogue-settings-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide overflow-y-auto py-8">
             <div class="glass rounded-2xl w-full max-w-2xl mx-4 my-auto">
                 <div class="flex justify-between items-center p-6 border-b border-white/5">
@@ -4399,8 +4458,25 @@
                 </div>
                 <div class="p-6 space-y-6">
 
-                    <!-- Pricing Tiers -->
+                    <!-- VAT Settings -->
                     <div>
+                        <h4 class="font-semibold text-brand-400 mb-1">VAT Settings</h4>
+                        <p class="text-gray-500 text-xs mb-3">Controls whether VAT is included on adult, women's and accessory products. Youth is always zero-rated. Disable if your business is not VAT registered.</p>
+                        <label class="flex items-center justify-between cursor-pointer select-none bg-gray-900/50 rounded-xl px-4 py-3">
+                            <div>
+                                <span class="text-sm font-medium">Charge VAT on Adult, Women's &amp; Accessories</span>
+                                <p class="text-xs text-gray-500 mt-0.5">Affects order totals, Purchase Order PDFs and Shopify CSV "Charge Tax" column</p>
+                            </div>
+                            <div class="relative ml-4 flex-shrink-0">
+                                <input type="checkbox" id="cs-vat-enabled" class="sr-only peer" onchange="csToggleVat(this.checked)">
+                                <div class="w-11 h-6 bg-gray-700 peer-checked:bg-brand-500 rounded-full transition-colors duration-200"></div>
+                                <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200 peer-checked:translate-x-5"></div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- Pricing Tiers -->
+                    <div class="pt-4 border-t border-white/5">
                         <div class="flex items-center justify-between mb-3">
                             <div>
                                 <h4 class="font-semibold text-brand-400">Price Lists</h4>
@@ -4455,6 +4531,27 @@
                         <div class="flex gap-2">
                             <input type="text" id="cs-new-fittype" placeholder="e.g. Ladies Fit, Junior" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <button onclick="csAddFitType()" class="btn-primary text-sm px-4">Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Tags -->
+                    <div class="pt-4 border-t border-white/5">
+                        <h4 class="font-semibold text-brand-400 mb-1">Bulk Tags</h4>
+                        <p class="text-gray-500 text-xs mb-3">Add or remove a Shopify tag across multiple products at once. You can also edit tags product-by-product directly in the catalogue table.</p>
+                        <div class="space-y-2">
+                            <input type="text" id="cs-bulk-tag-input" placeholder="Tag e.g. teamwear" class="w-full px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <div class="flex gap-2 items-center">
+                                <select id="cs-bulk-tag-scope" onchange="csBulkTagScopeChange()" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
+                                    <option value="all">All Products</option>
+                                    <option value="range">By Range</option>
+                                    <option value="category">By Category</option>
+                                </select>
+                                <select id="cs-bulk-tag-scope-value" class="flex-1 px-3 py-2 rounded-lg text-sm hide" style="background:#f8fafc;border:1px solid #e2e8f0"></select>
+                            </div>
+                            <div class="flex gap-2 pt-1">
+                                <button onclick="csBulkApplyTag()" class="flex-1 btn-primary text-sm py-2">+ Add Tag to Products</button>
+                                <button onclick="csBulkRemoveTag()" class="flex-1 text-sm py-2 rounded-lg font-semibold bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30 transition-colors">− Remove Tag</button>
+                            </div>
                         </div>
                     </div>
 
@@ -4592,24 +4689,49 @@
         <div id="create-store-modal" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center hide">
             <div class="glass rounded-2xl w-full max-w-lg mx-4">
                 <div class="flex justify-between items-center p-6 border-b border-white/5">
-                    <h3 class="text-xl font-bold">Create Club Store</h3>
+                    <div>
+                        <h3 class="text-xl font-bold">Create Club Store via CSV</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">Generates a Shopify-ready product import file</p>
+                    </div>
                     <button onclick="document.getElementById('create-store-modal').classList.add('hide')" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
-                <div class="p-6">
-                    <div class="mb-5">
-                        <label class="text-gray-400 text-sm mb-2 block font-semibold">Price List</label>
+                <div class="p-6 space-y-5">
+
+                    <!-- Pricing tier -->
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block font-semibold">Pricing Tier</label>
+                        <p class="text-gray-600 text-xs mb-2">Prices for each variant will be pulled from the selected tier. The club's default tier is pre-selected.</p>
                         <div id="price-list-options" class="space-y-2">
                             <!-- Populated dynamically from brandPricingTiers by openCreateStoreModal() -->
                         </div>
                     </div>
 
-                    <div id="store-preview-info" class="mb-5 p-4 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
-                        <p class="text-xs text-gray-500 mb-2">Store overview</p>
+                    <!-- Import status -->
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block font-semibold">Product Status on Import</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="store-import-status" value="draft" id="store-status-draft" checked class="accent-brand-500">
+                                <span class="text-sm">Draft <span class="text-xs text-gray-500">(review before publishing)</span></span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="radio" name="store-import-status" value="active" id="store-status-active" class="accent-brand-500">
+                                <span class="text-sm">Active <span class="text-xs text-gray-500">(publish immediately)</span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Store overview -->
+                    <div id="store-preview-info" class="p-4 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <p class="text-xs text-gray-500 mb-2 font-medium">Store overview</p>
                         <div class="grid grid-cols-2 gap-3 text-sm">
-                            <div><p class="text-gray-500 text-xs">Club</p><p id="cstore-club-name" class="font-semibold">—</p></div>
+                            <div><p class="text-gray-500 text-xs">Club</p><p id="cstore-club-name" class="font-semibold text-gray-800">—</p></div>
                             <div><p class="text-gray-500 text-xs">Products with images</p><p id="cstore-product-count" class="font-semibold text-brand-400">—</p></div>
-                            <div><p class="text-gray-500 text-xs">Collection image</p><p id="cstore-collection-img" class="font-semibold">—</p></div>
-                            <div><p class="text-gray-500 text-xs">Collection name</p><p id="cstore-collection-name" class="font-semibold">—</p></div>
+                            <div><p class="text-gray-500 text-xs">Shopify Collection</p><p id="cstore-collection-name" class="font-semibold text-gray-800">—</p></div>
+                            <div><p class="text-gray-500 text-xs">Collection tag (auto)</p><p id="cstore-club-slug" class="font-semibold font-mono text-xs text-gray-700">—</p></div>
+                        </div>
+                        <div class="mt-3 pt-3 border-t border-gray-200">
+                            <p class="text-xs text-gray-400">Add a <strong>Smart Collection</strong> in Shopify filtered by the collection tag to auto-populate this club's storefront. No manual product assignment needed.</p>
                         </div>
                     </div>
 
@@ -5224,6 +5346,7 @@
         let catalogueRangePrefixes = {};      // {rangeName: skuPrefix} — covers DB ranges AND custom ranges
         let catalogueCustomFitTypes = [];     // persisted in localStorage per brand
         let catalogueActivePriceKeys = [];    // which tier keys to show in the catalogue table (array)
+        let vatEnabled = true;                // master VAT toggle — false for non-VAT-registered brands
         let clubImages = [];
         let orderLines = [];
         let poSequence = 1;
@@ -5588,6 +5711,7 @@
 
             // Load catalogue settings from localStorage
             loadCatalogueSettings();
+            renderVatStatus();   // sync toolbar pill + order row with loaded vatEnabled state
             if (!catalogueActivePriceKeys.length && brandPricingTiers.length) {
                 catalogueActivePriceKeys = [brandPricingTiers[0].tier_key];
             }
@@ -6156,142 +6280,119 @@
         async function handleCSVUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+            event.target.value = ''; // reset so same file can be re-imported
 
             showToast('Parsing CSV...');
 
             Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
                 complete: async function(results) {
                     const rows = results.data;
-                    let imported = 0;
-                    let currentRange = '';
-                    let currentCategory = '';
+                    let imported = 0, skipped = 0;
+                    const errors = [];
+                    const fitOrder = ['adult', 'youth', 'women', 'one_size'];
 
-                    // Determine if it's cut & sew based on range
-                    const cutAndSewRanges = ['ATLAS', 'CENTURION', 'ELITE', 'SPARTAN', 'VANGUARD', 'WARRIOR', 'ACADEMY', 'ESSENTIALS'];
+                    const parseMoney = (val) => parseFloat(String(val || '').replace(/[£$,\s]/g, '')) || null;
+                    const parseBool  = (val, def = false) => {
+                        if (val === undefined || val === null || val === '') return def;
+                        return ['true', 'yes', '1'].includes(String(val).toLowerCase().trim());
+                    };
+                    // Normalise a header key to snake_case for matching
+                    const norm = (s) => s.toLowerCase().replace(/[\s\-()\/]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
 
-                    for (const row of rows) {
-                        // Check for range header
-                        if (row[0] && !row[0].includes('/') && row[0].toUpperCase() === row[0] && row[0].length > 2) {
-                            const possibleRange = row[0].trim().toUpperCase();
-                            if (cutAndSewRanges.includes(possibleRange)) {
-                                currentRange = row[0].trim();
-                                currentCategory = 'Cut & Sew Teamwear';
-                            } else if (possibleRange.includes('SUBLIMATED')) {
-                                currentRange = 'Sublimated';
-                                currentCategory = 'Sublimated Training';
-                            } else if (possibleRange.includes('JACKET')) {
-                                currentRange = 'Jackets';
-                                currentCategory = 'Jackets';
-                            } else if (possibleRange.includes('FOOTBALL MATCH')) {
-                                currentRange = 'Football';
-                                currentCategory = 'Football Match Kit';
-                            } else if (possibleRange.includes('FOOTBALL SOCK')) {
-                                currentRange = 'Football Socks';
-                                currentCategory = 'Football Socks';
-                            } else if (possibleRange.includes('RUGBY')) {
-                                currentRange = 'Rugby';
-                                currentCategory = 'Rugby Match Kit';
-                            } else if (possibleRange.includes('BASKETBALL')) {
-                                currentRange = 'Basketball';
-                                currentCategory = 'Basketball Match Kit';
-                            } else if (possibleRange.includes('NETBALL')) {
-                                currentRange = 'Netball';
-                                currentCategory = 'Netball';
-                            } else if (possibleRange.includes('CRICKET')) {
-                                currentRange = 'Cricket';
-                                currentCategory = 'Cricket';
-                            } else if (possibleRange.includes('ACCESSOR')) {
-                                currentRange = 'Accessories';
-                                currentCategory = 'Accessories';
+                    for (const rawRow of rows) {
+                        // Build a normalised-key version of the row for flexible header matching
+                        const row = {};
+                        for (const [k, v] of Object.entries(rawRow)) { row[norm(k)] = v; }
+
+                        const productCode = (row.product_code || '').trim();
+                        if (!productCode || productCode.startsWith('#')) { skipped++; continue; }
+                        const itemName = (row.item_name || '').trim();
+                        if (!itemName) { skipped++; continue; }
+
+                        // ── Pricing: detect {tier_key}_{fit} and {tier_key}_compare_at_{fit} cols ──
+                        const tierPrices = {};
+                        const fitsWithPrices = new Set();
+                        for (const [col, rawVal] of Object.entries(row)) {
+                            const price = parseMoney(rawVal);
+                            if (!price) continue;
+                            // compare-at first (longer pattern)
+                            const caMatch = col.match(/^(.+)_compare_at_(adult|youth|women|one_size)$/);
+                            if (caMatch) {
+                                const [, tk, fit] = caMatch;
+                                if (!tierPrices[tk]) tierPrices[tk] = {};
+                                tierPrices[tk][`compare_at_${fit}`] = price;
+                                continue;
                             }
-                            continue;
+                            const pMatch = col.match(/^(.+)_(adult|youth|women|one_size)$/);
+                            if (pMatch) {
+                                const [, tk, fit] = pMatch;
+                                if (!tierPrices[tk]) tierPrices[tk] = {};
+                                tierPrices[tk][fit] = price;
+                                fitsWithPrices.add(fit);
+                            }
                         }
 
-                        // Check for product row (starts with APX/)
-                        if (row[0] && row[0].startsWith('APX/')) {
-                            const productCode = row[0].trim();
-                            const itemName = row[2]?.trim() || '';
-                            
-                            // Parse prices (remove £ and convert to number)
-                            const parsePrice = (val) => {
-                                if (!val) return null;
-                                return parseFloat(val.replace('£', '').replace(',', '').trim()) || null;
-                            };
-
-                            const youthRetail = parsePrice(row[6]);
-                            const youthPartner = parsePrice(row[8]);
-                            const adultRetail = parsePrice(row[10]);
-                            const adultPartner = parsePrice(row[12]);
-
-                            // Get description (column 14)
-                            const description = row[14]?.trim() || '';
-
-                            // Get sizes (last column with sizes)
-                            let sizes = 'YXXS,YXS,YS,YM,YL,YXL,S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
-                            const lastCol = row[row.length - 1];
-                            if (lastCol && lastCol.includes(',')) {
-                                sizes = lastCol.trim();
-                            } else if (lastCol && lastCol.includes('One Size')) {
-                                sizes = 'One Size';
-                            }
-
-                            // Determine if single price (accessories)
-                            const isSinglePrice = currentCategory === 'Accessories' || currentCategory === 'Football Socks';
-
-                            // Determine if has addons
-                            const hasAddons = cutAndSewRanges.includes(currentRange.toUpperCase());
-
-                            // Extract range from product code if not set
-                            let rangeFromCode = currentRange;
-                            const codeParts = productCode.split('/');
-                            if (codeParts.length >= 2) {
-                                const rangeCode = codeParts[1];
-                                const rangeMap = {
-                                    'ATL': 'Atlas', 'CEN': 'Centurion', 'ELI': 'Elite', 
-                                    'SPA': 'Spartan', 'VAN': 'Vanguard', 'WAR': 'Warrior',
-                                    'ACA': 'Academy', 'ESS': 'Essentials', 'SUB': 'Sublimated',
-                                    'JKT': 'Jackets', 'FOT': 'Football', 'SOC': 'Football Socks',
-                                    'RUG': 'Rugby', 'BAS': 'Basketball', 'NET': 'Netball',
-                                    'CRI': 'Cricket', 'ACC': 'Accessories'
-                                };
-                                rangeFromCode = rangeMap[rangeCode] || currentRange;
-                            }
-
-                            // Insert or update product
-                            const { error } = await supabase
-                                .from('products')
-                                .upsert({
-                                    brand_id: currentBrand.id,
-                                    product_code: productCode,
-                                    range_name: rangeFromCode,
-                                    category: currentCategory,
-                                    item_name: itemName,
-                                    youth_retail_price: youthRetail,
-                                    youth_partner_price: youthPartner,
-                                    adult_retail_price: adultRetail,
-                                    adult_partner_price: adultPartner,
-                                    is_single_price: isSinglePrice,
-                                    single_retail_price: isSinglePrice ? youthRetail : null,
-                                    single_partner_price: isSinglePrice ? youthPartner : null,
-                                    description: description,
-                                    sizes: sizes,
-                                    has_addons: hasAddons,
-                                    fit_type: isSinglePrice ? 'One Size Only' : 'Adult / Youth'
-                                }, { 
-                                    onConflict: 'brand_id,product_code' 
-                                });
-
-                            if (!error) imported++;
+                        // ── available_fits ───────────────────────────────────────────────
+                        const fitsRaw = (row.available_fits || '').trim();
+                        let availableFits;
+                        if (fitsRaw) {
+                            availableFits = fitsRaw.toLowerCase().replace(/\s/g, '');
+                        } else if (fitsWithPrices.size) {
+                            availableFits = fitOrder.filter(f => fitsWithPrices.has(f)).join(',');
+                        } else {
+                            availableFits = 'adult';
                         }
+                        const isOneSize = availableFits.includes('one_size');
+
+                        // ── Sizes ────────────────────────────────────────────────────────
+                        const adultSizes = (row.adult_sizes || row.sizes || (!isOneSize ? 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL' : '')).trim();
+                        const youthSizes = (row.youth_sizes || (availableFits.includes('youth') ? 'YXXS,YXS,YS,YM,YL,YXL' : '')).trim();
+                        const womenSizes = (row.women_sizes || row.womens_sizes || (availableFits.includes('women') ? '4,6,8,10,12,14,16,18,20,22,24' : '')).trim();
+
+                        // ── Shopify tags ─────────────────────────────────────────────────
+                        const tagsRaw = (row.shopify_tags || '').trim();
+                        const shopifyTags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : null;
+
+                        const { error } = await supabase
+                            .from('products')
+                            .upsert({
+                                brand_id:                 currentBrand.id,
+                                product_code:             productCode,
+                                item_name:                itemName,
+                                category:                 (row.category || '').trim() || null,
+                                range_name:               (row.range_name || row.range || '').trim() || null,
+                                description:              (row.description || '').trim() || null,
+                                available_fits:           availableFits,
+                                sizes:                    adultSizes || null,
+                                youth_sizes:              youthSizes || null,
+                                women_sizes:              womenSizes || null,
+                                tier_prices:              Object.keys(tierPrices).length ? tierPrices : null,
+                                shopify_tags:             shopifyTags,
+                                shopify_template_suffix:  (row.shopify_template_suffix || row.template_suffix || '').trim() || null,
+                                shopify_product_category: (row.shopify_product_category || row.product_category || '').trim() || null,
+                                is_made_to_order:         parseBool(row.is_made_to_order ?? row.made_to_order, true),
+                                has_addons:               parseBool(row.has_addons),
+                                weight_grams:             parseFloat(row.weight_grams || row.weight_g || '') || null,
+                                cogs:                     parseMoney(row.cogs),
+                                fit_type:                 isOneSize ? 'One Size Only' : 'Adult / Youth',
+                                is_single_price:          isOneSize,
+                            }, { onConflict: 'brand_id,product_code' });
+
+                        if (error) { errors.push(`${productCode}: ${error.message}`); }
+                        else { imported++; }
                     }
 
-                    // Reload products
                     await loadAllData();
                     renderProductsTable();
 
+                    const summary = errors.length
+                        ? `Imported ${imported} products. ${errors.length} error(s): ${errors.slice(0, 3).join('; ')}${errors.length > 3 ? '…' : ''}`
+                        : `Successfully imported ${imported} products${skipped ? ` (${skipped} rows skipped)` : ''}`;
                     document.getElementById('import-status').classList.remove('hide');
-                    document.getElementById('import-message').textContent = `Successfully imported ${imported} products`;
-                    showToast(`Imported ${imported} products`);
+                    document.getElementById('import-message').textContent = summary;
+                    showToast(summary.split('.')[0]);
                 },
                 error: function(error) {
                     showToast('Error parsing CSV: ' + error.message, 'error');
@@ -6351,7 +6452,10 @@
                     <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.category || '-')}</td>
                     <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.range_name || '-')}</td>
                     ${priceCells}
-                    <td class="py-3 pr-3">${renderProductTagChips(p.shopify_tags)}</td>
+                    <td id="product-tags-${p.id}" class="py-3 pr-3 cursor-pointer group" onclick="openTagEditor(event, '${p.id}')">
+                        ${renderProductTagChips(p.shopify_tags)}
+                        <svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
+                    </td>
                     <td class="py-3 text-center whitespace-nowrap">
                         <button onclick="editProduct('${p.id}')" class="text-brand-400 hover:text-brand-300 text-sm mr-2">Edit</button>
                         <button onclick="showDeleteProductModal('${p.id}')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
@@ -6378,8 +6482,11 @@
                 if (categoryFilter && p.category !== categoryFilter) return false;
                 // Range filter
                 if (rangeFilter && p.range_name !== rangeFilter) return false;
-                // Fit type filter
-                if (fitFilter && p.fit_type !== fitFilter) return false;
+                // Fit type filter — matches against available_fits (e.g. 'adult', 'youth', 'women', 'one_size')
+                if (fitFilter) {
+                    const af = (p.available_fits || '').split(',').map(f => f.trim().toLowerCase());
+                    if (!af.includes(fitFilter)) return false;
+                }
                 // Tag filter
                 if (tagFilter) {
                     const tags = Array.isArray(p.shopify_tags) ? p.shopify_tags : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
@@ -6394,6 +6501,159 @@
             if (!arr.length) return '<span class="text-gray-700 text-xs">—</span>';
             return arr.slice(0, 3).map(t => `<span class="inline-block px-1.5 py-0.5 rounded text-xs bg-gray-800 text-gray-400 mr-1">${escHtml(t)}</span>`).join('') + (arr.length > 3 ? `<span class="text-gray-600 text-xs">+${arr.length - 3}</span>` : '');
         }
+
+        // ── Inline Tag Editor ─────────────────────────────────────────────────
+        let _tagEditorProductId = null;
+        let _tagEditorTags = [];
+
+        function openTagEditor(event, productId) {
+            event.stopPropagation();
+            _tagEditorProductId = productId;
+            const p = products.find(x => x.id === productId);
+            _tagEditorTags = p ? (Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : [])) : [];
+            renderTagEditorChips();
+            const popover = document.getElementById('tag-editor-popover');
+            popover.classList.remove('hide');
+            // Position below the clicked cell, clamped to viewport
+            const rect = event.currentTarget.getBoundingClientRect();
+            const scrollY = window.scrollY;
+            const pw = 288; // w-72
+            let left = rect.left;
+            if (left + pw > window.innerWidth - 12) left = window.innerWidth - pw - 12;
+            if (left < 8) left = 8;
+            popover.style.top = (rect.bottom + scrollY + 6) + 'px';
+            popover.style.left = left + 'px';
+            const inp = document.getElementById('tag-editor-input');
+            inp.value = '';
+            inp.focus();
+        }
+
+        function closeTagEditor() {
+            document.getElementById('tag-editor-popover').classList.add('hide');
+            _tagEditorProductId = null;
+        }
+
+        function renderTagEditorChips() {
+            document.getElementById('tag-editor-chips').innerHTML = _tagEditorTags.length
+                ? _tagEditorTags.map(t => `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-700 text-gray-200">${escHtml(t)}<button type="button" onclick="removeTagFromEditor('${escHtml(t)}')" class="text-gray-400 hover:text-red-400 leading-none">&times;</button></span>`).join('')
+                : '<span class="text-gray-600 text-xs">No tags yet</span>';
+        }
+
+        async function addTagFromEditor() {
+            const inp = document.getElementById('tag-editor-input');
+            const tag = inp.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag || _tagEditorTags.includes(tag)) { inp.value = ''; return; }
+            _tagEditorTags.push(tag);
+            inp.value = '';
+            renderTagEditorChips();
+            await saveTagEditorTags();
+        }
+
+        async function removeTagFromEditor(tag) {
+            _tagEditorTags = _tagEditorTags.filter(t => t !== tag);
+            renderTagEditorChips();
+            await saveTagEditorTags();
+        }
+
+        async function saveTagEditorTags() {
+            if (!_tagEditorProductId) return;
+            const newTags = _tagEditorTags.length ? _tagEditorTags : null;
+            const { error } = await supabase
+                .from('products')
+                .update({ shopify_tags: newTags })
+                .eq('id', _tagEditorProductId);
+            if (!error) {
+                const p = products.find(x => x.id === _tagEditorProductId);
+                if (p) p.shopify_tags = newTags;
+                // Refresh just this row's tag cell
+                const cell = document.getElementById(`product-tags-${_tagEditorProductId}`);
+                if (cell) {
+                    cell.innerHTML = renderProductTagChips(newTags) +
+                        `<svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>`;
+                }
+            }
+        }
+
+        // ── Bulk Tag Operations (from Catalogue Settings) ──────────────────────
+        function csBulkTagScopeChange() {
+            const scope = document.getElementById('cs-bulk-tag-scope').value;
+            const valSel = document.getElementById('cs-bulk-tag-scope-value');
+            if (scope === 'all') { valSel.classList.add('hide'); return; }
+            valSel.classList.remove('hide');
+            const items = scope === 'range'
+                ? [...new Set(products.map(p => p.range_name).filter(Boolean))]
+                : [...new Set(products.map(p => p.category).filter(Boolean))];
+            valSel.innerHTML = items.map(v => `<option value="${escHtml(v)}">${escHtml(v)}</option>`).join('');
+        }
+
+        async function csBulkApplyTag() {
+            const tag = document.getElementById('cs-bulk-tag-input').value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { showToast('Enter a tag first', 'error'); return; }
+            const scope = document.getElementById('cs-bulk-tag-scope').value;
+            const scopeVal = document.getElementById('cs-bulk-tag-scope-value').value;
+            let targets = products;
+            if (scope === 'range') targets = products.filter(p => p.range_name === scopeVal);
+            else if (scope === 'category') targets = products.filter(p => p.category === scopeVal);
+            let updated = 0;
+            for (const p of targets) {
+                const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                if (tags.includes(tag)) continue;
+                tags.push(tag);
+                const { error } = await supabase.from('products').update({ shopify_tags: tags }).eq('id', p.id);
+                if (!error) { p.shopify_tags = tags; updated++; }
+            }
+            renderProductsTable();
+            showToast(`Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        async function csBulkRemoveTag() {
+            const tag = document.getElementById('cs-bulk-tag-input').value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { showToast('Enter a tag first', 'error'); return; }
+            const scope = document.getElementById('cs-bulk-tag-scope').value;
+            const scopeVal = document.getElementById('cs-bulk-tag-scope-value').value;
+            let targets = products;
+            if (scope === 'range') targets = products.filter(p => p.range_name === scopeVal);
+            else if (scope === 'category') targets = products.filter(p => p.category === scopeVal);
+            let updated = 0;
+            for (const p of targets) {
+                const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                const newTags = tags.filter(t => t !== tag);
+                if (newTags.length === tags.length) continue;
+                const newVal = newTags.length ? newTags : null;
+                const { error } = await supabase.from('products').update({ shopify_tags: newVal }).eq('id', p.id);
+                if (!error) { p.shopify_tags = newVal; updated++; }
+            }
+            renderProductsTable();
+            showToast(`Removed "${tag}" from ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        // ── SKU Info Popover ──────────────────────────────────────────────────
+        function toggleSkuInfoPopover(event) {
+            event.stopPropagation();
+            const popover = document.getElementById('sku-info-popover');
+            if (!popover.classList.contains('hide')) { popover.classList.add('hide'); return; }
+            const btn = document.getElementById('sku-info-btn');
+            const rect = btn.getBoundingClientRect();
+            const scrollY = window.scrollY;
+            const pw = 320; // w-80
+            let left = rect.right - pw;
+            if (left < 8) left = 8;
+            if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+            popover.style.top = (rect.bottom + scrollY + 8) + 'px';
+            popover.style.left = left + 'px';
+            popover.classList.remove('hide');
+        }
+
+        // Close popovers on outside click
+        document.addEventListener('click', function(e) {
+            const tagPopover = document.getElementById('tag-editor-popover');
+            if (tagPopover && !tagPopover.classList.contains('hide') && !tagPopover.contains(e.target)) closeTagEditor();
+            const skuPopover = document.getElementById('sku-info-popover');
+            if (skuPopover && !skuPopover.classList.contains('hide') &&
+                !skuPopover.contains(e.target) && !document.getElementById('sku-info-btn')?.contains(e.target)) {
+                skuPopover.classList.add('hide');
+            }
+        });
 
         function populateFilterDropdowns() {
             // Get unique categories and ranges (from products + custom catalogue settings)
@@ -6433,51 +6693,78 @@
             renderProductsTable();
         }
 
-        function toggleSinglePrice() {
-            const isSingle = document.getElementById('prod-single-price').checked;
-            brandPricingTiers.forEach(tier => {
-                const adultEl = document.getElementById(`tier-adult-${tier.tier_key}`);
-                if (adultEl) { adultEl.disabled = isSingle; if (isSingle) adultEl.value = ''; }
-            });
-            if (isSingle) {
-                ['prod-fit-adult', 'prod-fit-youth', 'prod-fit-women'].forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.checked = false;
-                });
-            } else {
-                const fAdult = document.getElementById('prod-fit-adult');
-                if (fAdult && !document.getElementById('prod-fit-youth')?.checked && !document.getElementById('prod-fit-women')?.checked) {
-                    fAdult.checked = true;
-                }
-            }
-            onFitsChanged();
+        // Legacy — no-op now that One Size is a checkbox category
+        function toggleSinglePrice() {}
+
+        // Insert placeholder text at cursor position in the description textarea
+        function insertProductDescPlaceholder(placeholder) {
+            const ta = document.getElementById('prod-description');
+            if (!ta) return;
+            const start = ta.selectionStart, end = ta.selectionEnd;
+            const before = ta.value.substring(0, start);
+            const after  = ta.value.substring(end);
+            ta.value = before + placeholder + after;
+            const pos = start + placeholder.length;
+            ta.setSelectionRange(pos, pos);
+            ta.focus();
         }
 
         // onFitTypeChange kept for backward compat — now delegates to onFitsChanged
         function onFitTypeChange() { onFitsChanged(); }
 
-        function onFitsChanged() {
-            const hasAdult = document.getElementById('prod-fit-adult')?.checked;
-            const hasYouth = document.getElementById('prod-fit-youth')?.checked;
-            const hasWomen = document.getElementById('prod-fit-women')?.checked;
-            // Show/hide size rows and adult row
+        function onFitsChanged(changedId) {
+            const elAdult   = document.getElementById('prod-fit-adult');
+            const elYouth   = document.getElementById('prod-fit-youth');
+            const elWomen   = document.getElementById('prod-fit-women');
+            const elOneSize = document.getElementById('prod-fit-onesize');
+
+            // One Size is exclusive: if it was just checked, clear all others.
+            // If any sized fit was just checked, clear One Size.
+            if (changedId === 'prod-fit-onesize' && elOneSize?.checked) {
+                if (elAdult)   elAdult.checked   = false;
+                if (elYouth)   elYouth.checked   = false;
+                if (elWomen)   elWomen.checked   = false;
+            } else if (changedId && changedId !== 'prod-fit-onesize') {
+                if (elOneSize) elOneSize.checked = false;
+            }
+
+            const hasAdult   = !!elAdult?.checked;
+            const hasYouth   = !!elYouth?.checked;
+            const hasWomen   = !!elWomen?.checked;
+            const hasOneSize = !!elOneSize?.checked;
+
+            // Show/hide size rows
             document.getElementById('prod-adult-sizes-row')?.classList.toggle('hide', !hasAdult);
             document.getElementById('prod-youth-sizes-row')?.classList.toggle('hide', !hasYouth);
             document.getElementById('prod-women-sizes-row')?.classList.toggle('hide', !hasWomen);
+
             // Pre-fill standard sizes when first ticked (only if currently empty)
             const adultInput = document.getElementById('prod-sizes');
             const youthInput = document.getElementById('prod-youth-sizes');
             const womenInput = document.getElementById('prod-women-sizes');
-            if (hasAdult && adultInput && !adultInput.value) adultInput.value = 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
-            if (hasYouth && youthInput && !youthInput.value) youthInput.value = 'YXXS,YXS,YS,YM,YL,YXL';
-            if (hasWomen && womenInput && !womenInput.value) womenInput.value = '6,8,10,12,14,16,18,20,22,24,26';
+            if (hasAdult   && adultInput && !adultInput.value) adultInput.value = 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
+            if (hasYouth   && youthInput && !youthInput.value) youthInput.value = 'YXXS,YXS,YS,YM,YL,YXL';
+            if (hasWomen   && womenInput && !womenInput.value) womenInput.value = '4,6,8,10,12,14,16,18,20,22,24';
+
             // Sync hidden fit_type for backward compat
             const parts = [];
-            if (hasAdult) parts.push('Adult');
-            if (hasYouth) parts.push('Youth');
-            if (hasWomen) parts.push("Women's");
+            if (hasAdult)   parts.push('Adult');
+            if (hasYouth)   parts.push('Youth');
+            if (hasWomen)   parts.push("Women's");
+            if (hasOneSize) parts.push('One Size');
             const fitTypeEl = document.getElementById('prod-fit-type');
             if (fitTypeEl) fitTypeEl.value = parts.join(' / ') || 'One Size Only';
+
+            // Snapshot DOM prices before re-render so user entries aren't lost
+            if (typeof collectCurrentTierPriceInputs === 'function') {
+                const snap = collectCurrentTierPriceInputs();
+                brandPricingTiers.forEach(t => {
+                    if (!_lastTierPrices[t.tier_key]) _lastTierPrices[t.tier_key] = {};
+                    Object.assign(_lastTierPrices[t.tier_key], snap[t.tier_key] || {});
+                });
+            }
+            // Re-render pricing fields to show/hide the right fit columns
+            renderPricingFieldsDynamic(null);
         }
 
         function showAddProductModal() {
@@ -6485,26 +6772,36 @@
             document.getElementById('edit-product-id').value = '';
 
             // Clear all fields
-            document.getElementById('prod-code').value = '';
-            document.getElementById('prod-name').value = '';
-            document.getElementById('prod-category').value = '';
-            document.getElementById('prod-range').value = '';
-            document.getElementById('prod-single-price').checked = false;
+            ['prod-code','prod-name','prod-category','prod-range','prod-description',
+             'prod-template-suffix','prod-shopify-category'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
             document.getElementById('prod-weight').value = '450';
-            // Default: Adult only ticked
-            const fAdult = document.getElementById('prod-fit-adult');
-            const fYouth = document.getElementById('prod-fit-youth');
-            const fWomen = document.getElementById('prod-fit-women');
-            if (fAdult) fAdult.checked = true;
-            if (fYouth) fYouth.checked = false;
-            if (fWomen) fWomen.checked = false;
+            document.getElementById('prod-cogs').value = '';
+            const mto = document.getElementById('prod-made-to-order');
+            if (mto) mto.checked = true;
+
+            // Default: Adult only ticked, clear One Size
+            const fAdult   = document.getElementById('prod-fit-adult');
+            const fYouth   = document.getElementById('prod-fit-youth');
+            const fWomen   = document.getElementById('prod-fit-women');
+            const fOneSize = document.getElementById('prod-fit-onesize');
+            if (fAdult)   fAdult.checked   = true;
+            if (fYouth)   fYouth.checked   = false;
+            if (fWomen)   fWomen.checked   = false;
+            if (fOneSize) fOneSize.checked = false;
+
             document.getElementById('prod-sizes').value = 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
             const ySizes = document.getElementById('prod-youth-sizes');
             if (ySizes) ySizes.value = 'YXXS,YXS,YS,YM,YL,YXL';
             const wSizes = document.getElementById('prod-women-sizes');
-            if (wSizes) wSizes.value = '6,8,10,12,14,16,18,20,22,24,26';
-            onFitsChanged();
-            document.getElementById('prod-description').value = '';
+            if (wSizes) wSizes.value = '4,6,8,10,12,14,16,18,20,22,24';
+
+            // Reset pricing state and re-render
+            _lastTierPrices = {};
+            onFitsChanged(null);
+            renderPricingFields({});
 
             // Reset tags
             currentProductTags = [];
@@ -6512,7 +6809,6 @@
             populateProdCategoryDatalist();
             populateProdRangeDatalist();
             populateProdFitTypeSelect();
-            renderPricingFields({});
 
             document.getElementById('product-modal').classList.remove('hide');
         }
@@ -6524,54 +6820,75 @@
             document.getElementById('product-modal-title').textContent = 'Edit Product';
             document.getElementById('edit-product-id').value = productId;
 
-            // Populate fields
-            document.getElementById('prod-code').value = product.product_code || '';
-            document.getElementById('prod-name').value = product.item_name || '';
-            document.getElementById('prod-category').value = product.category || '';
-            document.getElementById('prod-range').value = product.range_name || '';
-            document.getElementById('prod-single-price').checked = product.is_single_price || false;
-            document.getElementById('prod-weight').value = product.weight_grams || 450;
-            document.getElementById('prod-sizes').value = product.sizes || '';
+            // Basic fields
+            document.getElementById('prod-code').value        = product.product_code || '';
+            document.getElementById('prod-name').value        = product.item_name || '';
+            document.getElementById('prod-category').value    = product.category || '';
+            document.getElementById('prod-range').value       = product.range_name || '';
+            document.getElementById('prod-weight').value      = product.weight_grams || 450;
+            document.getElementById('prod-cogs').value        = product.cogs || '';
             document.getElementById('prod-description').value = product.description || '';
+
+            // Shopify fields
+            const tmpl = document.getElementById('prod-template-suffix');
+            if (tmpl) tmpl.value = product.shopify_template_suffix || '';
+            const cat = document.getElementById('prod-shopify-category');
+            if (cat) cat.value = product.shopify_product_category || '';
+            const mto = document.getElementById('prod-made-to-order');
+            if (mto) mto.checked = product.is_made_to_order !== false; // default TRUE
+
             populateProdCategoryDatalist();
             populateProdRangeDatalist();
             populateProdFitTypeSelect();
-            // Set fit checkboxes from available_fits
-            const availFits = (product.available_fits || 'adult').split(',').map(f => f.trim().toLowerCase());
-            const fAdult = document.getElementById('prod-fit-adult');
-            const fYouth = document.getElementById('prod-fit-youth');
-            const fWomen = document.getElementById('prod-fit-women');
-            if (fAdult) fAdult.checked = availFits.includes('adult');
-            if (fYouth) fYouth.checked = availFits.includes('youth');
-            if (fWomen) fWomen.checked = availFits.includes('women');
-            // Set size fields (fall back to standard defaults)
+
+            // Fit checkboxes — derived from available_fits
+            const availFits = (product.available_fits || (product.is_single_price ? 'one_size' : 'adult'))
+                .split(',').map(f => f.trim().toLowerCase());
+            const fAdult   = document.getElementById('prod-fit-adult');
+            const fYouth   = document.getElementById('prod-fit-youth');
+            const fWomen   = document.getElementById('prod-fit-women');
+            const fOneSize = document.getElementById('prod-fit-onesize');
+            if (fAdult)   fAdult.checked   = availFits.includes('adult');
+            if (fYouth)   fYouth.checked   = availFits.includes('youth');
+            if (fWomen)   fWomen.checked   = availFits.includes('women');
+            if (fOneSize) fOneSize.checked = availFits.includes('one_size') || !!product.is_single_price;
+
+            // Size fields
             document.getElementById('prod-sizes').value = product.sizes || 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL';
             const ySizes = document.getElementById('prod-youth-sizes');
             if (ySizes) ySizes.value = product.youth_sizes || 'YXXS,YXS,YS,YM,YL,YXL';
             const wSizes = document.getElementById('prod-women-sizes');
-            if (wSizes) wSizes.value = product.women_sizes || '6,8,10,12,14,16,18,20,22,24,26';
-            onFitsChanged();
+            if (wSizes) wSizes.value = product.women_sizes || '4,6,8,10,12,14,16,18,20,22,24';
 
-            // Load tier prices
+            // Load tier prices — migrate legacy if needed
             let tierPrices = {};
-            if (product.tier_prices && typeof product.tier_prices === 'object') {
+            if (product.tier_prices && typeof product.tier_prices === 'object' && Object.keys(product.tier_prices).length) {
                 tierPrices = product.tier_prices;
+                // Ensure women and one_size keys exist from legacy pricing
+                if (!tierPrices.retail?.women && (product.women_retail_price || product.adult_retail_price)) {
+                    if (tierPrices.retail)  tierPrices.retail.women  = product.women_retail_price  || product.adult_retail_price;
+                    if (tierPrices.partner) tierPrices.partner.women = product.women_partner_price || product.adult_partner_price;
+                }
+                if (!tierPrices.retail?.one_size && product.is_single_price && product.single_retail_price) {
+                    if (tierPrices.retail)  tierPrices.retail.one_size  = product.single_retail_price;
+                    if (tierPrices.partner) tierPrices.partner.one_size = product.single_partner_price;
+                }
             } else if (product.youth_retail_price || product.adult_retail_price) {
-                // Migrate legacy pricing
                 tierPrices = {
-                    retail: { youth: product.youth_retail_price, adult: product.adult_retail_price },
+                    retail:  { youth: product.youth_retail_price,  adult: product.adult_retail_price },
                     partner: { youth: product.youth_partner_price, adult: product.adult_partner_price }
                 };
             }
+
+            // Reset pricing state then render with correct fits visible
+            _lastTierPrices = {};
+            onFitsChanged(null);
             renderPricingFields(tierPrices);
 
-            // Load tags
+            // Tags
             const rawTags = product.shopify_tags;
             currentProductTags = Array.isArray(rawTags) ? [...rawTags] : (rawTags ? (typeof rawTags === 'string' ? JSON.parse(rawTags) : []) : []);
-            populateProdCategoryDatalist();
-            populateProdRangeDatalist();
             renderProductTagsUI();
-            toggleSinglePrice();
 
             document.getElementById('product-modal').classList.remove('hide');
         }
@@ -6581,32 +6898,99 @@
         }
 
         // =============================================
-        // PRODUCT: DYNAMIC PRICING FIELDS
+        // PRODUCT: DYNAMIC PRICING FIELDS (fit-aware)
         // =============================================
-        function renderPricingFields(tierPrices) {
+        // Store last-used tier prices so re-renders on fit change don't lose entered values
+        let _lastTierPrices = {};
+
+        function collectCurrentTierPriceInputs() {
+            // Snapshot any values currently in the DOM before re-rendering
+            const snapshot = {};
+            brandPricingTiers.forEach(tier => {
+                const k = tier.tier_key;
+                const get = id => { const el = document.getElementById(id); return el ? (parseFloat(el.value) || null) : null; };
+                snapshot[k] = {
+                    adult:           get(`tier-adult-${k}`),
+                    youth:           get(`tier-youth-${k}`),
+                    women:           get(`tier-women-${k}`),
+                    one_size:        get(`tier-onesize-${k}`),
+                    compare_at_adult:  get(`tier-adult-compare-${k}`),
+                    compare_at_youth:  get(`tier-youth-compare-${k}`),
+                    compare_at_women:  get(`tier-women-compare-${k}`)
+                };
+                // Remove null keys for cleanliness
+                Object.keys(snapshot[k]).forEach(key => { if (snapshot[k][key] === null) delete snapshot[k][key]; });
+            });
+            return snapshot;
+        }
+
+        function renderPricingFieldsDynamic(tierPrices) {
             const container = document.getElementById('product-pricing-fields');
             if (!container) return;
             if (!brandPricingTiers.length) {
                 container.innerHTML = '<p class="text-gray-600 text-sm">No pricing tiers configured. Click "Manage Tiers" to add.</p>';
                 return;
             }
+            // Merge saved prices with current DOM values (so re-renders on fit-change keep values)
+            const merged = {};
+            brandPricingTiers.forEach(t => {
+                merged[t.tier_key] = Object.assign({}, (tierPrices || {})[t.tier_key] || {}, (_lastTierPrices || {})[t.tier_key] || {});
+            });
+            _lastTierPrices = merged;
+
+            const hasAdult   = document.getElementById('prod-fit-adult')?.checked;
+            const hasYouth   = document.getElementById('prod-fit-youth')?.checked;
+            const hasWomen   = document.getElementById('prod-fit-women')?.checked;
+            const hasOneSize = document.getElementById('prod-fit-onesize')?.checked;
+
+            // Build a list of active fit columns
+            const fitCols = [];
+            if (hasOneSize) {
+                fitCols.push({ key: 'one_size', label: 'One Size', compareKey: null, tax: 'TRUE' });
+            } else {
+                if (hasAdult) fitCols.push({ key: 'adult', label: 'Adult', compareKey: 'compare_at_adult', tax: 'TRUE' });
+                if (hasYouth) fitCols.push({ key: 'youth', label: 'Youth Unisex', compareKey: 'compare_at_youth', tax: 'FALSE (zero-rated)' });
+                if (hasWomen) fitCols.push({ key: 'women', label: "Women's", compareKey: 'compare_at_women', tax: 'TRUE' });
+            }
+
+            if (!fitCols.length) {
+                container.innerHTML = '<p class="text-gray-600 text-xs">Tick a size category above to set pricing.</p>';
+                return;
+            }
+
+            const gridCols = fitCols.length === 1 ? 'grid-cols-1' : fitCols.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
+
             container.innerHTML = brandPricingTiers.map(tier => {
-                const tp = tierPrices[tier.tier_key] || {};
+                const tp = merged[tier.tier_key] || {};
+                const inputs = fitCols.map(fit => {
+                    const val = tp[fit.key] || '';
+                    const compareVal = fit.compareKey ? (tp[fit.compareKey] || '') : '';
+                    const taxBadge = fit.tax === 'TRUE'
+                        ? '<span class="text-green-600 text-xs">✓ Taxable</span>'
+                        : '<span class="text-blue-500 text-xs">Zero-rated</span>';
+                    return `<div>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="text-gray-500 text-xs font-medium">${escHtml(fit.label)}</label>
+                            ${taxBadge}
+                        </div>
+                        <input type="number" step="0.01" id="tier-${fit.key === 'one_size' ? 'onesize' : fit.key}-${escHtml(tier.tier_key)}"
+                            value="${val}" placeholder="0.00"
+                            class="w-full px-3 py-2 rounded-lg text-sm mb-1">
+                        ${fit.compareKey ? `<input type="number" step="0.01" id="tier-${fit.key}-compare-${escHtml(tier.tier_key)}"
+                            value="${compareVal}" placeholder="Compare-at (optional)"
+                            class="w-full px-2 py-1.5 rounded-lg text-xs text-gray-500"
+                            style="background:rgba(0,0,0,0.15)">` : ''}
+                    </div>`;
+                }).join('');
                 return `<div class="rounded-lg p-3" style="background:#f8fafc;border:1px solid #e2e8f0">
                     <p class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">${escHtml(tier.tier_name)}</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-gray-500 text-xs mb-1 block">Youth Price</label>
-                            <input type="number" step="0.01" id="tier-youth-${escHtml(tier.tier_key)}" value="${tp.youth || ''}" placeholder="0.00" class="w-full px-3 py-2 rounded-lg text-sm">
-                        </div>
-                        <div>
-                            <label class="text-gray-500 text-xs mb-1 block">Adult Price</label>
-                            <input type="number" step="0.01" id="tier-adult-${escHtml(tier.tier_key)}" value="${tp.adult || ''}" placeholder="0.00" class="w-full px-3 py-2 rounded-lg text-sm">
-                        </div>
-                    </div>
+                    <div class="grid ${gridCols} gap-3">${inputs}</div>
                 </div>`;
             }).join('');
         }
+
+        // Backward-compat alias (old call sites)
+        function renderPricingFields(tierPrices) { renderPricingFieldsDynamic(tierPrices); }
 
         // =============================================
         // PRODUCT: SHOPIFY TAGS UI
@@ -6737,9 +7121,10 @@
             if (brandPricingTiers.find(t => t.tier_key === key)) { showToast('Tier key already exists', 'error'); return; }
 
             const newTier = { brand_id: currentBrand.id, tier_key: key, tier_name: name, sort_order: brandPricingTiers.length };
-            const { data, error } = await supabase.from('brand_pricing_tiers').insert(newTier).select().single();
+            const { data, error } = await supabase.from('brand_pricing_tiers').upsert(newTier, { onConflict: 'brand_id,tier_key' }).select().single();
             if (error) { showToast(error.message, 'error'); return; }
-            brandPricingTiers.push(data);
+            const existingIdx = brandPricingTiers.findIndex(t => t.tier_key === data.tier_key);
+            if (existingIdx >= 0) { brandPricingTiers[existingIdx] = data; } else { brandPricingTiers.push(data); }
             keyEl.value = ''; nameEl.value = '';
             renderPricingTiersList();
             showToast(`Tier "${name}" added`);
@@ -6789,6 +7174,7 @@
                     });
                     catalogueCustomFitTypes = s.fitTypes || [];
                     catalogueActivePriceKeys = s.activePriceKeys || (s.activePriceKey ? [s.activePriceKey] : []);
+                    vatEnabled = s.vatEnabled !== false; // default true
                 }
             } catch (e) { /* ignore */ }
         }
@@ -6800,7 +7186,8 @@
                     ranges: catalogueCustomRanges,
                     rangePrefixes: catalogueRangePrefixes,
                     fitTypes: catalogueCustomFitTypes,
-                    activePriceKeys: catalogueActivePriceKeys
+                    activePriceKeys: catalogueActivePriceKeys,
+                    vatEnabled: vatEnabled
                 }));
             } catch (e) { /* ignore */ }
         }
@@ -6829,7 +7216,50 @@
             renderCsRangesList();
             // Render fit types
             renderCsFitTypesList();
+            // Sync VAT toggle (renderVatStatus handles both toolbar pill and settings checkbox)
+            renderVatStatus();
+            // Reset bulk tag UI
+            const bulkScope = document.getElementById('cs-bulk-tag-scope');
+            if (bulkScope) { bulkScope.value = 'all'; csBulkTagScopeChange(); }
             document.getElementById('catalogue-settings-modal').classList.remove('hide');
+        }
+
+        // Renders the toolbar VAT pill and keeps the settings checkbox + order row in sync.
+        // Call this whenever vatEnabled changes or on brand load.
+        function renderVatStatus() {
+            const btn  = document.getElementById('vat-toggle-btn');
+            const dot  = document.getElementById('vat-status-dot');
+            const text = document.getElementById('vat-status-text');
+            if (btn) {
+                if (vatEnabled) {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors border bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30';
+                    if (dot)  dot.className  = 'w-2 h-2 rounded-full flex-shrink-0 bg-green-400';
+                    if (text) text.textContent = 'VAT ON';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors border bg-gray-800 text-gray-500 border-gray-700 hover:bg-gray-700 hover:text-gray-400';
+                    if (dot)  dot.className  = 'w-2 h-2 rounded-full flex-shrink-0 bg-gray-600';
+                    if (text) text.textContent = 'VAT OFF';
+                }
+            }
+            // Keep the settings modal checkbox in sync
+            const toggle = document.getElementById('cs-vat-enabled');
+            if (toggle) toggle.checked = vatEnabled;
+            // Show/hide the VAT row in the order summary
+            const vatRow = document.getElementById('order-vat-row');
+            if (vatRow) vatRow.style.display = vatEnabled ? '' : 'none';
+        }
+
+        // Called from the toolbar pill — flips the current state
+        function csToggleVatFromToolbar() {
+            csToggleVat(!vatEnabled);
+        }
+
+        function csToggleVat(enabled) {
+            vatEnabled = enabled;
+            saveCatalogueSettings();
+            renderVatStatus();
+            // Refresh order totals (function is defined in the order-builder section)
+            if (typeof recalculateOrder === 'function') recalculateOrder();
         }
 
         function hideCatalogueSettings() {
@@ -6871,9 +7301,10 @@
             if (!key || !name) { showToast('Enter both a key and display name', 'error'); return; }
             if (brandPricingTiers.find(t => t.tier_key === key)) { showToast('That key already exists', 'error'); return; }
             const newTier = { brand_id: currentBrand.id, tier_key: key, tier_name: name, sort_order: brandPricingTiers.length };
-            const { data, error } = await supabase.from('brand_pricing_tiers').insert(newTier).select().single();
+            const { data, error } = await supabase.from('brand_pricing_tiers').upsert(newTier, { onConflict: 'brand_id,tier_key' }).select().single();
             if (error) { showToast(error.message, 'error'); return; }
-            brandPricingTiers.push(data);
+            const existingIdx = brandPricingTiers.findIndex(t => t.tier_key === data.tier_key);
+            if (existingIdx >= 0) { brandPricingTiers[existingIdx] = data; } else { brandPricingTiers.push(data); }
             keyEl.value = ''; nameEl.value = '';
             renderCsTiersList();
             showToast(`Price list "${name}" added`);
@@ -7054,22 +7485,43 @@
         async function saveProduct() {
             if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
             try {
-            const productId = document.getElementById('edit-product-id').value;
-            const isSinglePrice = document.getElementById('prod-single-price').checked;
+            const productId   = document.getElementById('edit-product-id').value;
+            const hasAdult    = !!document.getElementById('prod-fit-adult')?.checked;
+            const hasYouth    = !!document.getElementById('prod-fit-youth')?.checked;
+            const hasWomen    = !!document.getElementById('prod-fit-women')?.checked;
+            const hasOneSize  = !!document.getElementById('prod-fit-onesize')?.checked;
+            const isSinglePrice = hasOneSize; // One Size = single price
 
-            // Collect tier prices from dynamic fields
+            // Collect full tier prices from all dynamic fields
             const tierPrices = {};
             brandPricingTiers.forEach(tier => {
-                const youthEl = document.getElementById(`tier-youth-${tier.tier_key}`);
-                const adultEl = document.getElementById(`tier-adult-${tier.tier_key}`);
-                const youthVal = youthEl ? parseFloat(youthEl.value) || null : null;
-                const adultVal = adultEl ? parseFloat(adultEl.value) || null : null;
-                if (youthVal !== null || adultVal !== null) {
-                    tierPrices[tier.tier_key] = { youth: youthVal, adult: adultVal };
+                const k = tier.tier_key;
+                const v = (id) => { const el = document.getElementById(id); return el ? (parseFloat(el.value) || null) : null; };
+                const tp = {};
+                if (hasOneSize) {
+                    const os = v(`tier-onesize-${k}`);
+                    if (os) tp.one_size = os;
+                } else {
+                    if (hasAdult) {
+                        const a = v(`tier-adult-${k}`), ca = v(`tier-adult-compare-${k}`);
+                        if (a)  tp.adult = a;
+                        if (ca) tp.compare_at_adult = ca;
+                    }
+                    if (hasYouth) {
+                        const y = v(`tier-youth-${k}`), cy = v(`tier-youth-compare-${k}`);
+                        if (y)  tp.youth = y;
+                        if (cy) tp.compare_at_youth = cy;
+                    }
+                    if (hasWomen) {
+                        const w = v(`tier-women-${k}`), cw = v(`tier-women-compare-${k}`);
+                        if (w)  tp.women = w;
+                        if (cw) tp.compare_at_women = cw;
+                    }
                 }
+                if (Object.keys(tp).length) tierPrices[k] = tp;
             });
 
-            // Also save tags to brand_shopify_tags for future reuse
+            // Save new tags to brand library
             for (const tag of currentProductTags) {
                 if (tag && !brandShopifyTags.find(t => t.tag === tag)) {
                     const { data: newTag } = await supabase.from('brand_shopify_tags')
@@ -7079,45 +7531,57 @@
                 }
             }
 
-            // Extract legacy pricing from tiers for backward compat
-            const retailTier = tierPrices['retail'] || {};
-            const partnerTier = tierPrices['partner'] || {};
+            // Legacy price column backward-compat (retail/partner tiers only)
+            const retTp = tierPrices['retail']  || {};
+            const parTp = tierPrices['partner'] || {};
+
+            // Derive available_fits
+            const availFits = (() => {
+                if (hasOneSize) return 'one_size';
+                const f = [];
+                if (hasAdult) f.push('adult');
+                if (hasYouth) f.push('youth');
+                if (hasWomen) f.push('women');
+                return f.length ? f.join(',') : 'adult';
+            })();
 
             const productData = {
-                brand_id: currentBrand.id,
-                product_code: document.getElementById('prod-code').value.trim().toUpperCase(),
-                item_name: document.getElementById('prod-name').value.trim(),
-                category: document.getElementById('prod-category').value.trim(),
-                range_name: document.getElementById('prod-range').value.trim(),
-                tier_prices: tierPrices,
-                youth_retail_price: retailTier.youth || null,
-                youth_partner_price: partnerTier.youth || null,
-                adult_retail_price: isSinglePrice ? null : (retailTier.adult || null),
-                adult_partner_price: isSinglePrice ? null : (partnerTier.adult || null),
-                is_single_price: isSinglePrice,
-                single_retail_price: isSinglePrice ? (retailTier.youth || null) : null,
-                single_partner_price: isSinglePrice ? (partnerTier.youth || null) : null,
-                fit_type: document.getElementById('prod-fit-type').value,
-                weight_grams: parseInt(document.getElementById('prod-weight').value) || 450,
-                sizes: document.getElementById('prod-sizes').value.trim(),
-                youth_sizes: document.getElementById('prod-youth-sizes')?.value.trim() || null,
-                women_sizes: document.getElementById('prod-women-sizes')?.value.trim() || null,
-                available_fits: (() => {
-                    if (document.getElementById('prod-single-price').checked) return 'adult';
-                    const fits = [];
-                    if (document.getElementById('prod-fit-adult')?.checked) fits.push('adult');
-                    if (document.getElementById('prod-fit-youth')?.checked) fits.push('youth');
-                    if (document.getElementById('prod-fit-women')?.checked) fits.push('women');
-                    return fits.length ? fits.join(',') : 'adult';
-                })(),
-                has_addons: false,
-                shopify_tags: currentProductTags,
-                description: document.getElementById('prod-description').value.trim()
+                brand_id:      currentBrand.id,
+                product_code:  document.getElementById('prod-code').value.trim().toUpperCase(),
+                item_name:     document.getElementById('prod-name').value.trim(),
+                category:      document.getElementById('prod-category').value.trim(),
+                range_name:    document.getElementById('prod-range').value.trim(),
+                tier_prices:   tierPrices,
+                // Legacy columns kept for backward compat
+                youth_retail_price:  retTp.youth  || null,
+                youth_partner_price: parTp.youth  || null,
+                adult_retail_price:  isSinglePrice ? null : (retTp.adult  || null),
+                adult_partner_price: isSinglePrice ? null : (parTp.adult  || null),
+                is_single_price:     isSinglePrice,
+                single_retail_price:  isSinglePrice ? (retTp.one_size || null) : null,
+                single_partner_price: isSinglePrice ? (parTp.one_size || null) : null,
+                fit_type:      document.getElementById('prod-fit-type').value,
+                available_fits: availFits,
+                weight_grams:  parseInt(document.getElementById('prod-weight').value) || 450,
+                cogs:          parseFloat(document.getElementById('prod-cogs')?.value) || null,
+                sizes:         document.getElementById('prod-sizes').value.trim(),
+                youth_sizes:   document.getElementById('prod-youth-sizes')?.value.trim() || null,
+                women_sizes:   document.getElementById('prod-women-sizes')?.value.trim() || null,
+                has_addons:    false,
+                shopify_tags:  currentProductTags,
+                description:   document.getElementById('prod-description').value.trim(),
+                // New fields
+                shopify_template_suffix:  document.getElementById('prod-template-suffix')?.value.trim() || null,
+                shopify_product_category: document.getElementById('prod-shopify-category')?.value.trim() || null,
+                is_made_to_order:         document.getElementById('prod-made-to-order')?.checked !== false
             };
 
-            // Validation
             if (!productData.product_code || !productData.item_name || !productData.category || !productData.range_name) {
                 showToast('Please fill in all required fields: Code, Name, Category and Range', 'error');
+                return;
+            }
+            if (!hasAdult && !hasYouth && !hasWomen && !hasOneSize) {
+                showToast('Please tick at least one size category', 'error');
                 return;
             }
 
@@ -7299,15 +7763,21 @@
                     .eq('product_id', masterProduct.id).eq('variant_number', variantNumber).maybeSingle();
 
                 if (!existingCP) {
+                    // Resolve pricing from master product's tier_prices using club's tier
+                    const clubTierKey = currentClub?.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
+                    const mpTp = (masterProduct.tier_prices && typeof masterProduct.tier_prices === 'object')
+                        ? (masterProduct.tier_prices[clubTierKey] || masterProduct.tier_prices['retail'] || {})
+                        : {};
                     const { error: createErr } = await supabase.from('club_products').insert({
-                        club_id: currentClub.id,
-                        product_id: masterProduct.id,
-                        custom_name: `${currentClub.name} ${masterProduct.item_name}`,
+                        club_id:        currentClub.id,
+                        product_id:     masterProduct.id,
+                        custom_name:    `${currentClub.name} ${masterProduct.item_name}`,
                         variant_number: variantNumber,
-                        image_urls: [publicUrl],
-                        web_price: masterProduct.adult_retail_price || masterProduct.single_retail_price,
-                        partner_price: masterProduct.adult_partner_price || masterProduct.single_partner_price,
-                        is_active: true
+                        image_urls:     [publicUrl],
+                        web_price:     mpTp.adult    || mpTp.one_size || masterProduct.adult_retail_price   || null,
+                        partner_price: mpTp.youth                    || masterProduct.youth_retail_price    || null,
+                        non_partner_price: mpTp.women                || null,
+                        is_active:     true
                     });
                     if (createErr) { errors.push(`${file.name}: ${createErr.message}`); continue; }
                 } else {
@@ -7348,37 +7818,53 @@
         function openCreateStoreModal() {
             if (!currentClub) return;
             const withImages = (currentClubProducts || []).filter(cp => (cp.image_urls || []).length > 0);
-            document.getElementById('cstore-club-name').textContent = currentClub.name || '—';
-            document.getElementById('cstore-product-count').textContent = withImages.length;
-            document.getElementById('cstore-collection-img').textContent =
-                currentClub.collection_image_url ? '✓ Uploaded' : '⚠️ Not set';
-            document.getElementById('cstore-collection-name').textContent = currentClub.name || '—';
 
-            // Populate price list options dynamically from brandPricingTiers
+            // Store overview
+            document.getElementById('cstore-club-name').textContent    = currentClub.name || '—';
+            document.getElementById('cstore-product-count').textContent = withImages.length;
+            document.getElementById('cstore-collection-name').textContent = currentClub.name || '—';
+            const clubSlug = (currentClub.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            const slugEl = document.getElementById('cstore-club-slug');
+            if (slugEl) slugEl.textContent = clubSlug || '—';
+
+            // Pre-select the club's assigned pricing tier; fall back to first tier
+            const clubTierKey = currentClub.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
+            _selectedPriceList = clubTierKey;
+
+            // Populate price-list radios — highlight the club's default tier
             const optionsEl = document.getElementById('price-list-options');
             if (optionsEl) {
                 if (brandPricingTiers.length) {
-                    optionsEl.innerHTML = brandPricingTiers.map((tier, idx) => {
-                        const isFirst = idx === 0;
-                        const bg = isFirst ? 'background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.25)' : 'background:#f8fafc;border:1px solid #e2e8f0';
-                        const nameClass = isFirst ? 'text-brand-400' : 'text-white';
+                    optionsEl.innerHTML = brandPricingTiers.map(tier => {
+                        const isClubDefault = tier.tier_key === clubTierKey;
+                        const bg = isClubDefault
+                            ? 'background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.25)'
+                            : 'background:#f8fafc;border:1px solid #e2e8f0';
                         return `<label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="${bg}" onclick="selectPriceList('${escHtml(tier.tier_key)}')">
-                            <input type="radio" name="price-list" value="${escHtml(tier.tier_key)}" id="pl-${escHtml(tier.tier_key)}" class="accent-brand-500" ${isFirst ? 'checked' : ''}>
-                            <div><p class="text-sm font-semibold ${nameClass}">${escHtml(tier.tier_name)}</p></div>
+                            <input type="radio" name="price-list" value="${escHtml(tier.tier_key)}" id="pl-${escHtml(tier.tier_key)}" class="accent-brand-500" ${isClubDefault ? 'checked' : ''}>
+                            <div>
+                                <p class="text-sm font-semibold ${isClubDefault ? 'text-brand-400' : 'text-gray-800'}">${escHtml(tier.tier_name)}</p>
+                                ${isClubDefault ? '<p class="text-xs text-gray-500 mt-0.5">Club\'s default pricing</p>' : ''}
+                            </div>
                         </label>`;
                     }).join('');
-                    _selectedPriceList = brandPricingTiers[0].tier_key;
                 } else {
                     optionsEl.innerHTML = '<p class="text-gray-500 text-sm p-3">No pricing tiers configured. Open Catalogue Settings to add price lists.</p>';
                     _selectedPriceList = 'retail';
                 }
             }
+
+            // Default import status to draft
+            const draftEl = document.getElementById('store-status-draft');
+            if (draftEl) draftEl.checked = true;
+
             document.getElementById('create-store-modal').classList.remove('hide');
         }
 
         async function downloadClubStoreCSV() {
             document.getElementById('create-store-modal').classList.add('hide');
-            await generateShopifyCSVForClub(null, _selectedPriceList);
+            const status = document.querySelector('input[name="store-import-status"]:checked')?.value || 'draft';
+            await generateShopifyCSVForClub(null, _selectedPriceList, status);
         }
 
         // =============================================
@@ -7414,32 +7900,53 @@
         }
 
         function exportProductsCSV() {
-            if (products.length === 0) {
-                showToast('No products to export', 'error');
-                return;
-            }
+            if (!products.length) { showToast('No products to export', 'error'); return; }
+
+            const tierKeys = brandPricingTiers.map(t => t.tier_key);
+            const fitOrder = ['adult', 'youth', 'women', 'one_size'];
+
+            // Build dynamic price column headers: {tier_key}_{fit} then {tier_key}_compare_at_{fit}
+            const priceHeaders = [];
+            tierKeys.forEach(tk => {
+                fitOrder.forEach(fit => priceHeaders.push(`${tk}_${fit}`));
+                fitOrder.filter(f => f !== 'one_size').forEach(fit => priceHeaders.push(`${tk}_compare_at_${fit}`));
+            });
 
             const headers = [
-                'Product Code', 'Item Name', 'Category', 'Range', 
-                'Youth Retail', 'Youth Partner', 'Adult Retail', 'Adult Partner',
-                'Fit Type', 'Sizes', 'Weight (g)', 'Has Addons', 'Description'
+                'product_code', 'item_name', 'category', 'range_name', 'description',
+                'available_fits', 'adult_sizes', 'youth_sizes', 'women_sizes',
+                ...priceHeaders,
+                'shopify_tags', 'shopify_template_suffix', 'shopify_product_category',
+                'is_made_to_order', 'has_addons', 'weight_grams', 'cogs'
             ];
 
-            const rows = products.map(p => [
-                p.product_code,
-                p.item_name,
-                p.category,
-                p.range_name,
-                p.youth_retail_price || '',
-                p.youth_partner_price || '',
-                p.adult_retail_price || '',
-                p.adult_partner_price || '',
-                p.fit_type,
-                p.sizes,
-                p.weight_grams,
-                p.has_addons ? 'Yes' : 'No',
-                p.description || ''
-            ]);
+            const rows = products.map(p => {
+                const tp = p.tier_prices || {};
+                const row = {
+                    product_code:             p.product_code,
+                    item_name:                p.item_name,
+                    category:                 p.category || '',
+                    range_name:               p.range_name || '',
+                    description:              p.description || '',
+                    available_fits:           p.available_fits || '',
+                    adult_sizes:              p.sizes || '',
+                    youth_sizes:              p.youth_sizes || '',
+                    women_sizes:              p.women_sizes || '',
+                    shopify_tags:             Array.isArray(p.shopify_tags) ? p.shopify_tags.join(',') : (p.shopify_tags || ''),
+                    shopify_template_suffix:  p.shopify_template_suffix || '',
+                    shopify_product_category: p.shopify_product_category || '',
+                    is_made_to_order:         p.is_made_to_order !== false ? 'TRUE' : 'FALSE',
+                    has_addons:               p.has_addons ? 'TRUE' : 'FALSE',
+                    weight_grams:             p.weight_grams || '',
+                    cogs:                     p.cogs || '',
+                };
+                tierKeys.forEach(tk => {
+                    const td = tp[tk] || {};
+                    fitOrder.forEach(fit => { row[`${tk}_${fit}`] = td[fit] != null ? Number(td[fit]).toFixed(2) : ''; });
+                    fitOrder.filter(f => f !== 'one_size').forEach(fit => { row[`${tk}_compare_at_${fit}`] = td[`compare_at_${fit}`] != null ? Number(td[`compare_at_${fit}`]).toFixed(2) : ''; });
+                });
+                return headers.map(h => row[h] ?? '');
+            });
 
             const csv = Papa.unparse({ fields: headers, data: rows });
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -7448,8 +7955,143 @@
             a.href = url;
             a.download = `${currentBrand.slug}_products_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported ${products.length} products`);
+        }
 
-            showToast('Products exported');
+        function downloadProductTemplate() {
+            const tierKeys = brandPricingTiers.map(t => t.tier_key);
+            if (!tierKeys.length) { showToast('Set up pricing tiers first in Catalogue Settings', 'error'); return; }
+
+            const fitOrder = ['adult', 'youth', 'women', 'one_size'];
+            const priceHeaders = [];
+            tierKeys.forEach(tk => {
+                fitOrder.forEach(fit => priceHeaders.push(`${tk}_${fit}`));
+                fitOrder.filter(f => f !== 'one_size').forEach(fit => priceHeaders.push(`${tk}_compare_at_${fit}`));
+            });
+
+            const headers = [
+                'product_code', 'item_name', 'category', 'range_name', 'description',
+                'available_fits', 'adult_sizes', 'youth_sizes', 'women_sizes',
+                ...priceHeaders,
+                'shopify_tags', 'shopify_template_suffix', 'shopify_product_category',
+                'is_made_to_order', 'has_addons', 'weight_grams', 'cogs'
+            ];
+
+            // Row 2: field-by-field instructions
+            const instrRow = {
+                product_code:             'REQUIRED. Unique code per brand — any format (e.g. POLO-001)',
+                item_name:                'REQUIRED. Product display name (e.g. Classic Polo Shirt)',
+                category:                 'Product category (e.g. Cut & Sew Teamwear, Accessories, Jackets)',
+                range_name:               'Range or collection name (e.g. Elite, Academy, Accessories)',
+                description:              'Use *CLUB_NAME*, *CLUB_NAME_RANGE*, *PRODUCT_NAME* as dynamic placeholders',
+                available_fits:           'Comma-separated fits: adult,youth,women,one_size  (e.g. adult,youth  or  one_size)',
+                adult_sizes:              'Adult sizes, comma-separated (e.g. S,M,L,XL,2XL,3XL,4XL,5XL,6XL). Leave blank for one_size.',
+                youth_sizes:              'Youth sizes, comma-separated (e.g. YXXS,YXS,YS,YM,YL,YXL). Fill only if youth fit is used.',
+                women_sizes:              "Women's UK sizes, comma-separated (e.g. 4,6,8,10,12,14,16,18,20,22,24). Fill only if women's fit is used.",
+                shopify_tags:             'Comma-separated Shopify tags (e.g. polo,teamwear,cotton)',
+                shopify_template_suffix:  'Shopify liquid template override (e.g. teamwear). Leave blank for default product template.',
+                shopify_product_category: 'Shopify standard category (e.g. Apparel & Accessories > Clothing > Activewear)',
+                is_made_to_order:         'TRUE = continue selling when out of stock (made-to-order). FALSE = deny sales when out of stock.',
+                has_addons:               'TRUE if product has embroidery / print add-ons available.',
+                weight_grams:             'Product weight in grams for shipping (e.g. 450)',
+                cogs:                     'Cost of goods sold — appears as "Cost per item" in Shopify CSV (e.g. 14.50)',
+            };
+            tierKeys.forEach(tk => {
+                const tName = brandPricingTiers.find(t => t.tier_key === tk)?.tier_name || tk;
+                fitOrder.forEach(fit => { instrRow[`${tk}_${fit}`] = `${tName} price for ${fit.replace('_', ' ')} fit (e.g. 29.99). Leave blank if fit not used.`; });
+                fitOrder.filter(f => f !== 'one_size').forEach(fit => { instrRow[`${tk}_compare_at_${fit}`] = `Optional. ${tName} compare-at (was) price for ${fit} fit — shown as strikethrough on Shopify.`; });
+            });
+
+            // Row 3: adult+youth product example
+            const ex1 = {
+                product_code:             'POLO-001',
+                item_name:                'Classic Polo Shirt',
+                category:                 'Cut & Sew Teamwear',
+                range_name:               'Elite',
+                description:              '*CLUB_NAME* Classic Polo Shirt — premium piqué polo, part of the *CLUB_NAME_RANGE* range.',
+                available_fits:           'adult,youth',
+                adult_sizes:              'S,M,L,XL,2XL,3XL,4XL,5XL,6XL',
+                youth_sizes:              'YXXS,YXS,YS,YM,YL,YXL',
+                women_sizes:              '',
+                shopify_tags:             'polo,teamwear,pique',
+                shopify_template_suffix:  'teamwear',
+                shopify_product_category: 'Apparel & Accessories > Clothing > Activewear',
+                is_made_to_order:         'TRUE',
+                has_addons:               'TRUE',
+                weight_grams:             '450',
+                cogs:                     '14.50',
+            };
+            tierKeys.forEach((tk, i) => {
+                const a = (i === 0 ? 42.95 : 34.95).toFixed(2);
+                const y = (i === 0 ? 35.95 : 28.95).toFixed(2);
+                ex1[`${tk}_adult`] = a; ex1[`${tk}_youth`] = y;
+                ex1[`${tk}_women`] = ''; ex1[`${tk}_one_size`] = '';
+                ex1[`${tk}_compare_at_adult`] = ''; ex1[`${tk}_compare_at_youth`] = ''; ex1[`${tk}_compare_at_women`] = '';
+            });
+
+            // Row 4: adult+youth+women product example
+            const ex2 = {
+                product_code:             'HOODY-001',
+                item_name:                'Team Hoodie',
+                category:                 'Jackets',
+                range_name:               'Academy',
+                description:              '*CLUB_NAME* Team Hoodie — fleece-lined for training and travel.',
+                available_fits:           'adult,youth,women',
+                adult_sizes:              'S,M,L,XL,2XL,3XL',
+                youth_sizes:              'YXS,YS,YM,YL,YXL',
+                women_sizes:              '8,10,12,14,16,18,20',
+                shopify_tags:             'hoodie,training,fleece',
+                shopify_template_suffix:  'teamwear',
+                shopify_product_category: 'Apparel & Accessories > Clothing > Activewear',
+                is_made_to_order:         'TRUE',
+                has_addons:               'TRUE',
+                weight_grams:             '650',
+                cogs:                     '22.00',
+            };
+            tierKeys.forEach((tk, i) => {
+                const a = (i === 0 ? 54.95 : 44.95).toFixed(2);
+                const y = (i === 0 ? 44.95 : 36.95).toFixed(2);
+                const w = (i === 0 ? 54.95 : 44.95).toFixed(2);
+                ex2[`${tk}_adult`] = a; ex2[`${tk}_youth`] = y; ex2[`${tk}_women`] = w; ex2[`${tk}_one_size`] = '';
+                ex2[`${tk}_compare_at_adult`] = ''; ex2[`${tk}_compare_at_youth`] = ''; ex2[`${tk}_compare_at_women`] = '';
+            });
+
+            // Row 5: one_size accessory example
+            const ex3 = {
+                product_code:             'SCARF-001',
+                item_name:                'Team Scarf',
+                category:                 'Accessories',
+                range_name:               'Accessories',
+                description:              'Official *CLUB_NAME* supporters scarf — one size.',
+                available_fits:           'one_size',
+                adult_sizes:              '',
+                youth_sizes:              '',
+                women_sizes:              '',
+                shopify_tags:             'scarf,accessories,supporters',
+                shopify_template_suffix:  '',
+                shopify_product_category: 'Apparel & Accessories > Accessories',
+                is_made_to_order:         'TRUE',
+                has_addons:               'FALSE',
+                weight_grams:             '150',
+                cogs:                     '6.50',
+            };
+            tierKeys.forEach((tk, i) => {
+                const os = (i === 0 ? 14.95 : 11.95).toFixed(2);
+                ex3[`${tk}_adult`] = ''; ex3[`${tk}_youth`] = ''; ex3[`${tk}_women`] = ''; ex3[`${tk}_one_size`] = os;
+                ex3[`${tk}_compare_at_adult`] = ''; ex3[`${tk}_compare_at_youth`] = ''; ex3[`${tk}_compare_at_women`] = '';
+            });
+
+            const data = [instrRow, ex1, ex2, ex3].map(row => headers.map(h => row[h] ?? ''));
+            const csv = Papa.unparse({ fields: headers, data });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentBrand.slug}_master_catalogue_template.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Template downloaded — row 2 contains field instructions, rows 3–5 are examples');
         }
 
         function showBulkDeleteModal() {
@@ -8661,8 +9303,8 @@
                 const lineTotal = (price || 0) * line.quantity;
                 subtotal += lineTotal;
 
-                // VAT only on adult
-                if (line.fit === 'Adult' && !product.is_single_price) {
+                // VAT on adult, women and accessories when vatEnabled; youth always zero-rated
+                if (vatEnabled && !line.fit?.toLowerCase().includes('youth')) {
                     vatAmount += lineTotal * 0.2;
                 }
 
@@ -8787,7 +9429,7 @@
                 const lineTotal = (price || 0) * line.quantity;
                 subtotal += lineTotal;
                 
-                if (line.fit === 'Adult' && !product.is_single_price) {
+                if (vatEnabled && !line.fit?.toLowerCase().includes('youth')) {
                     vatAmount += lineTotal * 0.2;
                 }
             }
@@ -9089,11 +9731,20 @@
             renderClubsEnhanced();
         }
 
-        async function generateShopifyCSVForClub(overrideClubId, priceList = 'shop') {
+        // ─────────────────────────────────────────────────────────────
+        // generateShopifyCSVForClub
+        // Produces a fully-compliant Shopify product import CSV.
+        //
+        // priceList : tier_key (e.g. 'retail', 'partner') — passed from
+        //             the Create Club Store dialog.
+        // status    : 'active' | 'draft' — import status on Shopify.
+        //             Defaults to 'draft' so the brand can QA before live.
+        // ─────────────────────────────────────────────────────────────
+        async function generateShopifyCSVForClub(overrideClubId, priceList = 'retail', status = 'draft') {
             const club = overrideClubId ? clubs.find(c => c.id === overrideClubId) : currentClub;
             if (!club) { showToast('No club selected', 'error'); return; }
 
-            // Fetch club products with master product data
+            // Fetch club products with full master product data
             let clubProds = currentClubProducts;
             if (overrideClubId && overrideClubId !== currentClub?.id) {
                 const { data } = await supabase.from('club_products')
@@ -9102,52 +9753,76 @@
                 clubProds = data || [];
             }
 
-            // Only products that have mock-up images uploaded
             const productsWithImages = clubProds.filter(cp => (cp.image_urls || []).length > 0);
             if (!productsWithImages.length) {
                 showToast('No products with images — upload mock-ups first.', 'error');
                 return;
             }
 
+            // Shopify-compliant headers (2024+ format)
             const headers = [
                 'Title', 'URL handle', 'Description', 'Vendor', 'Product category', 'Type',
-                'Tags', 'Published on online store', 'Status', 'Collection', 'SKU', 'Barcode',
+                'Tags', 'Published on online store', 'Status', 'Template suffix', 'Collection',
+                'SKU', 'Barcode',
                 'Option1 name', 'Option1 value', 'Option2 name', 'Option2 value',
-                'Option3 name', 'Option3 value', 'Price', 'Compare-at price', 'Cost per item',
+                'Option3 name', 'Option3 value',
+                'Price', 'Compare-at price', 'Cost per item',
                 'Charge tax', 'Tax code', 'Inventory policy', 'Inventory tracker',
-                'Inventory quantity', 'Continue selling when out of stock', 'Weight value (grams)',
-                'Weight unit for display', 'Requires shipping', 'Fulfillment service',
+                'Inventory quantity', 'Continue selling when out of stock',
+                'Weight value (grams)', 'Weight unit for display',
+                'Requires shipping', 'Fulfillment service',
                 'Product image URL', 'Image position', 'Image alt text', 'Variant image URL',
-                'Gift card', 'SEO title', 'SEO description'
+                'Gift card', 'SEO title', 'SEO description',
+                'Google Shopping / Google product category', 'Google Shopping / Gender',
+                'Google Shopping / Age group', 'Google Shopping / MPN',
+                'Google Shopping / Condition', 'Google Shopping / Custom product',
+                'Google Shopping / Custom label 0', 'Google Shopping / Custom label 1',
+                'Google Shopping / Custom label 2'
             ];
 
-            // Price helper: uses tier_prices[priceList] from the master product (no markup)
+            // ── Price helper ─────────────────────────────────────────────
+            // Resolves the correct price for a given fit from tier_prices,
+            // with legacy field fallbacks.
             function derivePrice(cp, mp, fit) {
-                const tierPrices = (mp.tier_prices && typeof mp.tier_prices === 'object') ? mp.tier_prices : {};
-                const tp = tierPrices[priceList] || {};
+                const tp = ((mp.tier_prices && typeof mp.tier_prices === 'object')
+                    ? mp.tier_prices[priceList] : null) || {};
 
-                if (mp.is_single_price) {
-                    // Use tier price if available, otherwise fall back to legacy fields
-                    if (tp.youth) return tp.youth;
-                    if (priceList === 'retail') return mp.single_retail_price || 0;
-                    return mp.single_partner_price || mp.single_retail_price || 0;
+                const isOneSize = mp.is_single_price || (mp.available_fits || '').includes('one_size');
+                if (isOneSize) {
+                    return tp.one_size || tp.youth || tp.adult
+                        || mp.single_retail_price || mp.adult_retail_price || 0;
                 }
                 if (fit === 'Youth') {
-                    if (tp.youth) return tp.youth;
-                    if (priceList === 'retail') return mp.youth_retail_price || 0;
-                    return mp.youth_partner_price || mp.youth_retail_price || 0;
+                    return tp.youth || mp.youth_retail_price || 0;
                 }
                 if (fit === "Women's") {
-                    if (tp.adult) return tp.adult;
-                    const pp = mp.women_partner_price || mp.adult_partner_price || 0;
-                    const rp = mp.women_retail_price || mp.adult_retail_price || 0;
-                    return priceList === 'retail' ? rp : pp;
+                    return tp.women || tp.adult
+                        || mp.women_retail_price || mp.adult_retail_price || 0;
                 }
-                // Adult / Unisex
-                if (tp.adult) return tp.adult || cp.web_price || 0;
-                const pp = mp.adult_partner_price || 0, rp = mp.adult_retail_price || 0;
-                return (priceList === 'retail' ? rp : pp) || cp.web_price || 0;
+                // Adult
+                return tp.adult || mp.adult_retail_price || cp.web_price || 0;
             }
+
+            // Compare-at price — from tier_prices[key].compare_at_* fields
+            function deriveCompareAt(mp, fit) {
+                const tp = ((mp.tier_prices && typeof mp.tier_prices === 'object')
+                    ? mp.tier_prices[priceList] : null) || {};
+                if (fit === 'Youth')   return tp.compare_at_youth  ? Number(tp.compare_at_youth).toFixed(2)  : '';
+                if (fit === "Women's") return tp.compare_at_women  ? Number(tp.compare_at_women).toFixed(2)  : '';
+                return                        tp.compare_at_adult  ? Number(tp.compare_at_adult).toFixed(2)  : '';
+            }
+
+            // ── Tax per fit (UK VAT rules) ───────────────────────────────
+            // Adult = TRUE, Women's = TRUE, Youth = FALSE (zero-rated), One Size = TRUE by default
+            function taxForFit(fit) {
+                if (!vatEnabled) return 'FALSE';
+                return fit.toLowerCase().includes('youth') ? 'FALSE' : 'TRUE';
+            }
+
+            // Club slug for smart collection routing via tags
+            const clubSlug = club.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+            const vendor = currentBrand?.shopify_vendor_name || currentBrand?.name || '';
+            const invPolicy = 'continue';    // Made-to-order by default; overridden per-product below
 
             const rows = [];
 
@@ -9155,143 +9830,174 @@
                 const mp = cp.products;
                 if (!mp) continue;
 
-                const imageUrls = cp.image_urls || [];
-                const title = cp.custom_name || `${club.name} ${mp.item_name}`;
+                const imageUrls = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                const title  = cp.custom_name || `${club.name} ${mp.item_name}`;
                 const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-                let description = mp.description || '';
+                // Resolve description — replace all placeholder variants
+                let description = cp.custom_description || mp.description || '';
                 description = description
+                    .replace(/\*CLUB_NAME_RANGE\*/g,       `${club.name} ${mp.range_name}`)
+                    .replace(/\*CLUB_NAME\*/g,              club.name)
+                    .replace(/\*PRODUCT_NAME\*/g,           mp.item_name)
+                    // Legacy placeholder formats
                     .replace(/\*ADD CLUB NAME \+ RANGE\*/g, `${club.name} ${mp.range_name}`)
-                    .replace(/\*ADD CLUB \+ RANGE\*/g, `${club.name} ${mp.range_name}`)
-                    .replace(/\*ADD CLUB NAME\*/g, club.name);
+                    .replace(/\*ADD CLUB \+ RANGE\*/g,      `${club.name} ${mp.range_name}`)
+                    .replace(/\*ADD CLUB NAME\*/g,           club.name);
                 description = description.split(/\n+/).filter(p => p.trim()).map(p => `<p>${p.trim()}</p>`).join('');
 
-                // Build tags: club name, range, category + any product shopify_tags + salesperson
-                const tags = [club.name, mp.range_name, mp.category].filter(Boolean);
-                const productTags = Array.isArray(mp.shopify_tags) ? mp.shopify_tags : (mp.shopify_tags ? JSON.parse(mp.shopify_tags) : []);
-                tags.push(...productTags);
-                // Add salesperson as tag (required for Shopify CSV upload routing)
+                // Tags: club slug (for smart collection), club full name, range, category, product tags, salesperson
+                const productTags = Array.isArray(mp.shopify_tags)
+                    ? mp.shopify_tags
+                    : (mp.shopify_tags ? JSON.parse(mp.shopify_tags) : []);
+                const tags = [clubSlug, club.name, mp.range_name, mp.category, ...productTags].filter(Boolean);
+                if (club.suffix) tags.push(club.suffix.toLowerCase());
                 if (club.assigned_salesperson_id) {
                     const sp = salespeople.find(s => s.id === club.assigned_salesperson_id);
                     if (sp) tags.push(`salesperson-${sp.first_name}-${sp.last_name}`.toLowerCase().replace(/\s+/g, '-'));
                 }
-                // Legacy: keep has_addons for backward compat
                 if (mp.has_addons) tags.push('with-addons');
 
-                const chargeText = mp.is_taxable !== false ? 'TRUE' : 'FALSE';
-                const cogs = mp.cogs ? Number(mp.cogs).toFixed(2) : '';
+                const cogs          = mp.cogs ? Number(mp.cogs).toFixed(2) : '';
+                const templateSuffix = mp.shopify_template_suffix || '';
+                const productCategory = mp.shopify_product_category || 'Apparel & Accessories > Clothing';
+                const madeToOrder   = mp.is_made_to_order !== false; // default TRUE
+                const productInvPolicy = madeToOrder ? 'continue' : 'deny';
 
-                // Determine fits
-                const fits = (mp.available_fits || 'adult,youth').split(',').map(f => f.trim());
-                const hasYouth = fits.includes('youth');
-                const hasAdult = fits.includes('adult');
-                const hasWomen = fits.includes('women');
-                const multifit = (hasYouth ? 1 : 0) + (hasAdult ? 1 : 0) + (hasWomen ? 1 : 0) > 1;
+                // Determine fits from available_fits
+                const afRaw   = (mp.available_fits || '').split(',').map(f => f.trim().toLowerCase());
+                const isOneSize = afRaw.includes('one_size') || !!mp.is_single_price;
+                const hasYouth  = afRaw.includes('youth')  && !isOneSize;
+                const hasAdult  = afRaw.includes('adult')  && !isOneSize;
+                const hasWomen  = afRaw.includes('women')  && !isOneSize;
+                const multifit  = (hasYouth ? 1 : 0) + (hasAdult ? 1 : 0) + (hasWomen ? 1 : 0) > 1;
 
                 // Size arrays — use stored values, fall back to standard defaults
                 let adultSizes = (mp.sizes || 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL').split(',').map(s => s.trim()).filter(Boolean);
                 let youthSizes = (mp.youth_sizes || 'YXXS,YXS,YS,YM,YL,YXL').split(',').map(s => s.trim()).filter(Boolean);
-                if (!mp.youth_sizes && mp.sizes) {
-                    // Legacy: if youth sizes not set separately, extract Y-prefixed from adult
+                // Legacy: separate Y-prefixed sizes from a combined sizes field
+                if (!mp.youth_sizes && mp.sizes && hasYouth) {
                     const yFromAdult = adultSizes.filter(s => s.startsWith('Y'));
                     if (yFromAdult.length) {
                         youthSizes = yFromAdult;
-                        adultSizes = adultSizes.filter(s => !s.startsWith('Y') && s !== 'One Size');
+                        adultSizes = adultSizes.filter(s => !s.startsWith('Y'));
                     }
                 }
-                const womenSizes = (mp.women_sizes || '6,8,10,12,14,16,18,20,22,24,26').split(',').map(s => s.trim()).filter(Boolean);
+                const womenSizes = (mp.women_sizes || '4,6,8,10,12,14,16,18,20,22,24').split(',').map(s => s.trim()).filter(Boolean);
 
                 let variantIndex = 0;
-                const buildRow = (fit, size, price, imgUrl, imgPos) => {
-                    const sku = buildSku(mp, club, size);
+                // First image is used on the first variant row; remaining images follow as image-only rows
+                const firstImg = imageUrls[0] || '';
+
+                const buildRow = (fit, size, price, compareAt) => {
+                    const sku     = buildSku(mp, club, size);
                     const isFirst = variantIndex === 0;
                     variantIndex++;
+                    const imgUrl  = isFirst ? firstImg : '';
+                    const seoTitle = `${title} | Official ${club.name} Merchandise`;
+                    const seoDesc  = description.replace(/<[^>]+>/g, '').substring(0, 160) || `Shop the official ${title}. Premium quality teamwear.`;
+                    const tax = taxForFit(fit);
+
                     return {
-                        'Title': isFirst ? title : '',
-                        'URL handle': handle,
-                        'Description': isFirst ? description : '',
-                        'Vendor': isFirst ? (currentBrand?.name || '') : '',
-                        'Product category': isFirst ? 'Apparel & Accessories > Clothing' : '',
-                        'Type': isFirst ? mp.category : '',
-                        'Tags': isFirst ? tags : '',
+                        'Title':                  isFirst ? title : '',
+                        'URL handle':             handle,
+                        'Description':            isFirst ? description : '',
+                        'Vendor':                 isFirst ? vendor : '',
+                        'Product category':       isFirst ? productCategory : '',
+                        'Type':                   isFirst ? (mp.category || '') : '',
+                        'Tags':                   isFirst ? tags.join(', ') : '',
                         'Published on online store': isFirst ? 'TRUE' : '',
-                        'Status': 'active',
-                        'Collection': isFirst ? club.name : '',
-                        'SKU': sku, 'Barcode': '',
-                        'Option1 name': multifit ? 'Fit' : 'Size',
-                        'Option1 value': multifit ? fit : size,
-                        'Option2 name': multifit ? 'Size' : '',
-                        'Option2 value': multifit ? size : '',
-                        'Option3 name': '', 'Option3 value': '',
-                        'Price': price > 0 ? Number(price).toFixed(2) : '',
-                        'Compare-at price': '',
-                        'Cost per item': cogs,
-                        'Charge tax': chargeText, 'Tax code': '',
-                        'Inventory policy': 'continue', 'Inventory tracker': 'shopify',
-                        'Inventory quantity': '0', 'Continue selling when out of stock': 'TRUE',
-                        'Weight value (grams)': mp.weight_grams || '450',
-                        'Weight unit for display': 'g', 'Requires shipping': 'TRUE',
-                        'Fulfillment service': 'manual',
-                        'Product image URL': imgUrl || '',
-                        'Image position': imgUrl ? String(imgPos) : '',
-                        'Image alt text': imgUrl ? title : '',
-                        'Variant image URL': '',
-                        'Gift card': 'FALSE',
-                        'SEO title': isFirst ? `${title} | Official ${club.name} Merchandise` : '',
-                        'SEO description': isFirst ? `Shop the official ${title}. Premium quality teamwear.` : ''
+                        'Status':                 isFirst ? status : '',
+                        'Template suffix':        isFirst ? templateSuffix : '',
+                        'Collection':             isFirst ? club.name : '',
+                        'SKU':                    sku,
+                        'Barcode':                '',
+                        'Option1 name':           multifit ? 'Fit'  : 'Size',
+                        'Option1 value':          multifit ? fit    : size,
+                        'Option2 name':           multifit ? 'Size' : '',
+                        'Option2 value':          multifit ? size   : '',
+                        'Option3 name':           '',
+                        'Option3 value':          '',
+                        'Price':                  price > 0 ? Number(price).toFixed(2) : '',
+                        'Compare-at price':       compareAt || '',
+                        'Cost per item':          cogs,
+                        'Charge tax':             tax,
+                        'Tax code':               '',
+                        'Inventory policy':       productInvPolicy,
+                        'Inventory tracker':      'shopify',
+                        'Inventory quantity':     '0',
+                        'Continue selling when out of stock': madeToOrder ? 'TRUE' : 'FALSE',
+                        'Weight value (grams)':   mp.weight_grams || '450',
+                        'Weight unit for display': 'g',
+                        'Requires shipping':      'TRUE',
+                        'Fulfillment service':    'manual',
+                        'Product image URL':      imgUrl,
+                        'Image position':         imgUrl ? '1' : '',
+                        'Image alt text':         imgUrl ? `${title} - Front` : '',
+                        'Variant image URL':      '',
+                        'Gift card':              'FALSE',
+                        'SEO title':              isFirst ? seoTitle.substring(0, 70) : '',
+                        'SEO description':        isFirst ? seoDesc : '',
+                        'Google Shopping / Google product category': isFirst ? productCategory : '',
+                        'Google Shopping / Gender':    isFirst ? (fit === 'Youth' ? 'Unisex' : fit === "Women's" ? 'Female' : 'Unisex') : '',
+                        'Google Shopping / Age group': isFirst ? (fit === 'Youth' ? 'Kids' : 'Adult') : '',
+                        'Google Shopping / MPN':       sku,
+                        'Google Shopping / Condition': isFirst ? 'new' : '',
+                        'Google Shopping / Custom product': isFirst ? 'FALSE' : '',
+                        'Google Shopping / Custom label 0': isFirst ? club.name : '',
+                        'Google Shopping / Custom label 1': isFirst ? (mp.range_name || '') : '',
+                        'Google Shopping / Custom label 2': isFirst ? (mp.category || '') : ''
                     };
                 };
 
-                if (mp.is_single_price || (!hasAdult && !hasYouth && !hasWomen)) {
+                if (isOneSize) {
                     const price = derivePrice(cp, mp, 'Adult');
-                    rows.push(buildRow('One Size', 'OS', price, imageUrls[0] || '', 1));
+                    rows.push(buildRow('One Size', 'OS', price, ''));
                 } else {
+                    // Order: Youth → Adult → Women's (Youth first keeps zero-rated variants grouped)
                     if (hasYouth && youthSizes.length) {
-                        youthSizes.forEach(size => {
-                            rows.push(buildRow('Youth', size, derivePrice(cp, mp, 'Youth'),
-                                variantIndex === 1 ? (imageUrls[0] || '') : '', 1));
-                        });
+                        youthSizes.forEach(size =>
+                            rows.push(buildRow('Youth Unisex', size, derivePrice(cp, mp, 'Youth'), deriveCompareAt(mp, 'Youth')))
+                        );
                     }
                     if (hasAdult && adultSizes.length) {
-                        adultSizes.forEach(size => {
-                            rows.push(buildRow('Adult', size, derivePrice(cp, mp, 'Adult'),
-                                variantIndex === 1 ? (imageUrls[0] || '') : '', 1));
-                        });
+                        adultSizes.forEach(size =>
+                            rows.push(buildRow('Adult', size, derivePrice(cp, mp, 'Adult'), deriveCompareAt(mp, 'Adult')))
+                        );
                     }
                     if (hasWomen && womenSizes.length) {
-                        womenSizes.forEach(size => {
-                            rows.push(buildRow("Women's", size, derivePrice(cp, mp, "Women's"),
-                                variantIndex === 1 ? (imageUrls[0] || '') : '', 1));
-                        });
+                        womenSizes.forEach(size =>
+                            rows.push(buildRow("Women's", size, derivePrice(cp, mp, "Women's"), deriveCompareAt(mp, "Women's")))
+                        );
                     }
                 }
 
-                // Additional images as extra rows
+                // Additional images (back, side, V2, V3…) — image-only rows sharing the same handle
                 imageUrls.slice(1).forEach((imgUrl, i) => {
                     rows.push({
-                        'URL handle': handle,
-                        'Product image URL': imgUrl,
-                        'Image position': String(i + 2),
-                        'Image alt text': title,
-                        'Status': ''
+                        'URL handle':         handle,
+                        'Status':             '',
+                        'Product image URL':  imgUrl,
+                        'Image position':     String(i + 2),
+                        'Image alt text':     `${title} - View ${i + 2}`
                     });
                 });
             }
 
             if (!rows.length) {
-                showToast('Could not generate CSV — check club products have images and master product data', 'error');
+                showToast('Could not generate CSV — check products have images and master product data', 'error');
                 return;
             }
 
             const csv = Papa.unparse({ fields: headers, data: rows.map(row => headers.map(h => row[h] ?? '')) });
             const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
             a.href = url;
-            a.download = `${club.suffix}_shopify_products.csv`;
+            a.download = `${club.suffix || club.name.replace(/\s+/g, '-')}_shopify_${priceList}.csv`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast(`CSV downloaded — ${productsWithImages.length} product${productsWithImages.length !== 1 ? 's' : ''} (${priceList} pricing)`);
+            showToast(`CSV downloaded — ${productsWithImages.length} product${productsWithImages.length !== 1 ? 's' : ''} · ${priceList} pricing · ${status}`);
         }
 
         // =============================================
@@ -10075,9 +10781,21 @@
         async function loadCurrentClubProducts() {
             if (!currentClub) return;
             const { data } = await supabase.from('club_products')
-                .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs)')
+                .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs, is_single_price, single_retail_price, single_partner_price, shopify_tags, is_taxable, shopify_template_suffix, shopify_product_category, is_made_to_order, women_retail_price, adult_retail_price, youth_retail_price, adult_partner_price, youth_partner_price)')
                 .eq('club_id', currentClub.id).eq('is_active', true).order('created_at');
             currentClubProducts = data || [];
+        }
+
+        // Per-product CSV download (individual product, uses club's default tier)
+        async function downloadSingleProductCSV(cpId) {
+            const cp = currentClubProducts.find(p => p.id === cpId);
+            if (!cp || !currentClub) return;
+            const tierKey = currentClub.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
+            // Temporarily scope to just this product
+            const origProds = currentClubProducts;
+            currentClubProducts = [cp];
+            await generateShopifyCSVForClub(null, tierKey, 'draft');
+            currentClubProducts = origProds;
         }
 
         function renderClubProducts() {
@@ -10101,35 +10819,51 @@
 
             container.innerHTML = currentClubProducts.map(cp => {
                 const syncBadge = cp.shopify_product_id
-                    ? `<span class="text-xs text-green-400">✓ Shopify</span>`
+                    ? `<span class="text-xs px-1.5 py-0.5 rounded font-medium" style="background:rgba(34,197,94,0.1);color:#16a34a;border:1px solid rgba(34,197,94,0.2)">✓ Shopify</span>`
                     : '<span class="text-xs text-gray-600">Not synced</span>';
                 const imgUrls = Array.isArray(cp.image_urls) ? cp.image_urls : (cp.image_urls ? JSON.parse(cp.image_urls) : []);
-                const hasImage = imgUrls.length > 0;
-                const imageSection = hasImage
-                    ? `<div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-800">
-                            <img src="${imgUrls[0]}" class="w-full h-full object-cover" loading="lazy">
+                const imgCount = imgUrls.length;
+
+                // Product image — larger card with image count badge
+                const imageSection = imgCount > 0
+                    ? `<div class="relative flex-shrink-0" style="width:72px;height:72px">
+                            <img src="${imgUrls[0]}" class="w-full h-full object-cover rounded-xl" loading="lazy">
+                            ${imgCount > 1 ? `<span class="absolute bottom-1 right-1 text-xs font-semibold px-1 rounded" style="background:rgba(0,0,0,0.7);color:#fff">${imgCount}</span>` : ''}
                        </div>`
-                    : `<div class="w-16 h-16 rounded-xl flex-shrink-0 bg-gray-800 border border-dashed border-gray-700 flex items-center justify-center" title="Images managed via onboarding">
-                            <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    : `<div class="flex-shrink-0 rounded-xl border-2 border-dashed border-gray-700 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-brand-500/50 transition" style="width:72px;height:72px" onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')" title="Click to upload image">
+                            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+                            <span class="text-gray-600 text-xs">Add image</span>
                        </div>`;
-                // Derive prices from master product for each brand tier
+
+                // Derive prices per tier from master product
                 const mp = cp.products;
                 const tierPricesObj = (mp?.tier_prices && typeof mp.tier_prices === 'object') ? mp.tier_prices : {};
                 const pricingHtml = brandPricingTiers.map(tier => {
                     const tp = tierPricesObj[tier.tier_key] || {};
-                    const adultP = tp.adult || null;
-                    const youthP = tp.youth || null;
-                    if (!adultP && !youthP) return '';
-                    const val = adultP ? `£${Number(adultP).toFixed(2)}` : `£${Number(youthP).toFixed(2)}`;
-                    return `<div><p class="text-xs text-gray-500 mb-0.5">${escHtml(tier.tier_name)}</p><p class="font-semibold">${val}</p></div>`;
+                    const vals = [];
+                    if (tp.adult)    vals.push(`A: £${Number(tp.adult).toFixed(2)}`);
+                    if (tp.youth)    vals.push(`Y: £${Number(tp.youth).toFixed(2)}`);
+                    if (tp.women)    vals.push(`W: £${Number(tp.women).toFixed(2)}`);
+                    if (tp.one_size) vals.push(`OS: £${Number(tp.one_size).toFixed(2)}`);
+                    if (!vals.length) return '';
+                    return `<div>
+                        <p class="text-xs text-gray-500 mb-0.5">${escHtml(tier.tier_name)}</p>
+                        <p class="text-xs font-semibold">${vals.join(' · ')}</p>
+                    </div>`;
                 }).filter(Boolean).join('');
-                // Size summary from available_fits
+
+                // Size fit labels
                 const availFits = (mp?.available_fits || 'adult').split(',').map(f => f.trim().toLowerCase());
-                const fitLabels = [
-                    availFits.includes('adult') ? 'Adult' : null,
-                    availFits.includes('youth') ? 'Youth Unisex' : null,
-                    availFits.includes('women') ? "Women's" : null
+                const fitBadges = [
+                    availFits.includes('adult')    ? '<span class="px-1.5 py-0.5 rounded text-xs" style="background:#dbeafe;color:#1d4ed8">Adult</span>'         : null,
+                    availFits.includes('youth')    ? '<span class="px-1.5 py-0.5 rounded text-xs" style="background:#dcfce7;color:#15803d">Youth</span>'         : null,
+                    availFits.includes('women')    ? '<span class="px-1.5 py-0.5 rounded text-xs" style="background:#f3e8ff;color:#7c3aed">Women\'s</span>'      : null,
+                    availFits.includes('one_size') ? '<span class="px-1.5 py-0.5 rounded text-xs" style="background:#fef9c3;color:#854d0e">One Size</span>'      : null
                 ].filter(Boolean);
+
+                // SKU preview (first size)
+                const skuPreview = mp ? buildSku(mp, currentClub, availFits.includes('one_size') ? 'OS' : 'S') : '';
+
                 return `
                 <div class="club-product-card" id="cp-card-${cp.id}">
                     <div class="flex items-start gap-4">
@@ -10139,19 +10873,20 @@
                                 <span class="font-semibold text-sm">${escHtml(cp.custom_name)}</span>
                                 ${syncBadge}
                             </div>
-                            <div class="text-xs text-gray-500 mb-2">
-                                <span class="font-mono text-gray-600 mr-2">${escHtml(mp?.product_code || '')}</span>
-                                <span>${escHtml(mp?.item_name || '')}</span>
-                                ${mp?.range_name ? `· <span>${escHtml(mp.range_name)}</span>` : ''}
-                                ${fitLabels.length ? `<span class="text-gray-600 ml-2">${fitLabels.join(' · ')}</span>` : ''}
+                            <div class="flex items-center gap-2 flex-wrap mb-1.5">
+                                <span class="font-mono text-xs text-gray-500">${escHtml(mp?.product_code || '')}</span>
+                                ${mp?.range_name ? `<span class="text-xs text-gray-600">${escHtml(mp.range_name)}</span>` : ''}
+                                ${fitBadges.join('')}
                             </div>
+                            ${skuPreview ? `<p class="text-xs text-gray-600 font-mono mb-1.5">SKU pattern: <span class="text-gray-400">${escHtml(skuPreview)}</span> …</p>` : ''}
                             <div class="flex gap-4 text-sm flex-wrap">
-                                ${pricingHtml || '<p class="text-xs text-gray-600">Pricing in master product</p>'}
+                                ${pricingHtml || '<p class="text-xs text-gray-600">Pricing set in master product</p>'}
                             </div>
                         </div>
                         <div class="flex flex-col gap-1.5 flex-shrink-0">
                             <button onclick="editClubProduct('${cp.id}')" class="btn-secondary text-xs py-1 px-3">Edit</button>
-                            <button onclick="syncProductToShopify('${cp.id}')" class="btn-secondary text-xs py-1 px-3 text-brand-400">Sync</button>
+                            <button onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')" class="btn-secondary text-xs py-1 px-3">Image</button>
+                            <button onclick="downloadSingleProductCSV('${cp.id}')" class="btn-secondary text-xs py-1 px-2 text-brand-400">CSV</button>
                             <button onclick="removeClubProduct('${cp.id}')" class="btn-secondary text-xs py-1.5 px-2 text-red-400">Remove</button>
                         </div>
                     </div>
@@ -10299,20 +11034,21 @@
             for (const productId of bulkSelectedProducts) {
                 const p = products.find(x => x.id === productId);
                 if (!p) continue;
-                const tierPrices = (p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {};
-                const clubTierKey = currentClub?.club_status || 'retail';
-                const tp = tierPrices[clubTierKey] || tierPrices['retail'] || {};
-                const partnerPrice = tp.adult || (p.is_single_price ? p.single_partner_price : p.adult_partner_price);
-                const retailPrice  = tp.youth || (p.is_single_price ? p.single_retail_price  : p.adult_retail_price);
-                const webPrice = partnerPrice ? Number(partnerPrice) : null;
+                const tierPricesObj = (p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {};
+                const clubTierKey = currentClub?.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
+                const tp = tierPricesObj[clubTierKey] || tierPricesObj['retail'] || {};
+                // Resolve per-fit prices
+                const webPrice    = tp.adult    || tp.one_size || p.adult_retail_price   || null;
+                const youthPrice  = tp.youth                  || p.youth_retail_price    || null;
+                const womenPrice  = tp.women                  || null;
                 const { error } = await supabase.from('club_products').insert({
-                    club_id: currentClub.id,
-                    product_id: productId,
-                    custom_name: `${currentClub.name} ${p.item_name}`,
-                    web_price: webPrice,
-                    partner_price: partnerPrice ? Number(partnerPrice) : null,
-                    non_partner_price: retailPrice ? Number(retailPrice) : null,
-                    is_active: true
+                    club_id:          currentClub.id,
+                    product_id:       productId,
+                    custom_name:      `${currentClub.name} ${p.item_name}`,
+                    web_price:        webPrice   ? Number(webPrice)   : null,
+                    partner_price:    youthPrice ? Number(youthPrice) : null,
+                    non_partner_price: womenPrice ? Number(womenPrice) : null,
+                    is_active:        true
                 });
                 if (error) failed++; else added++;
             }
@@ -10389,19 +11125,19 @@
             if (!document.getElementById('cp-custom-name').value && !document.getElementById('edit-club-product-id').value) {
                 document.getElementById('cp-custom-name').value = `${currentClub.name} ${product.item_name}`;
             }
-            // Show pricing info derived from master product tiers
+            // Show pricing info derived from master product tiers (all fits)
             const tierPrices = (product.tier_prices && typeof product.tier_prices === 'object') ? product.tier_prices : {};
             const pricingRows = document.getElementById('cp-pricing-rows');
             const pricingInfo = document.getElementById('cp-pricing-info');
             if (pricingRows && brandPricingTiers.length) {
                 pricingRows.innerHTML = brandPricingTiers.map(tier => {
                     const tp = tierPrices[tier.tier_key] || {};
-                    const adultP = tp.adult || null;
-                    const youthP = tp.youth || null;
-                    if (!adultP && !youthP) return '';
                     const parts = [];
-                    if (adultP) parts.push(`Adult £${Number(adultP).toFixed(2)}`);
-                    if (youthP && !product.is_single_price) parts.push(`Youth £${Number(youthP).toFixed(2)}`);
+                    if (tp.adult)    parts.push(`Adult £${Number(tp.adult).toFixed(2)}`);
+                    if (tp.youth)    parts.push(`Youth £${Number(tp.youth).toFixed(2)}`);
+                    if (tp.women)    parts.push(`Women's £${Number(tp.women).toFixed(2)}`);
+                    if (tp.one_size) parts.push(`One Size £${Number(tp.one_size).toFixed(2)}`);
+                    if (!parts.length) return '';
                     return `<div class="flex items-baseline gap-3">
                         <span class="text-xs font-medium text-gray-400 w-28 flex-shrink-0">${escHtml(tier.tier_name)}</span>
                         <span class="text-sm font-semibold text-white">${parts.join(' · ')}</span>
@@ -10412,17 +11148,21 @@
             // Build structured sizes display by category
             const availFits = (product.available_fits || 'adult').split(',').map(f => f.trim().toLowerCase());
             const sizeRows = [];
-            if (availFits.includes('adult')) {
-                const sz = (product.sizes || 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL').split(',').map(s => s.trim()).filter(Boolean);
-                sizeRows.push({ label: 'Adult', sizes: sz, color: 'text-brand-400' });
-            }
-            if (availFits.includes('youth')) {
-                const sz = (product.youth_sizes || 'YXXS,YXS,YS,YM,YL,YXL').split(',').map(s => s.trim()).filter(Boolean);
-                sizeRows.push({ label: 'Youth Unisex', sizes: sz, color: 'text-green-400' });
-            }
-            if (availFits.includes('women')) {
-                const sz = (product.women_sizes || '6,8,10,12,14,16,18,20,22,24,26').split(',').map(s => s.trim()).filter(Boolean);
-                sizeRows.push({ label: "Women's", sizes: sz, color: 'text-purple-400' });
+            if (availFits.includes('one_size') || product.is_single_price) {
+                sizeRows.push({ label: 'One Size', sizes: ['OS'], color: 'text-yellow-400' });
+            } else {
+                if (availFits.includes('adult')) {
+                    const sz = (product.sizes || 'S,M,L,XL,2XL,3XL,4XL,5XL,6XL').split(',').map(s => s.trim()).filter(Boolean);
+                    sizeRows.push({ label: 'Adult', sizes: sz, color: 'text-brand-400' });
+                }
+                if (availFits.includes('youth')) {
+                    const sz = (product.youth_sizes || 'YXXS,YXS,YS,YM,YL,YXL').split(',').map(s => s.trim()).filter(Boolean);
+                    sizeRows.push({ label: 'Youth Unisex', sizes: sz, color: 'text-green-400' });
+                }
+                if (availFits.includes('women')) {
+                    const sz = (product.women_sizes || '4,6,8,10,12,14,16,18,20,22,24').split(',').map(s => s.trim()).filter(Boolean);
+                    sizeRows.push({ label: "Women's", sizes: sz, color: 'text-purple-400' });
+                }
             }
             const display = document.getElementById('cp-sizes-display');
             if (sizeRows.length) {
@@ -10462,15 +11202,21 @@
                 }
             }
             window._jobProductMode = false;
-            // Resolve tier pricing from master product based on club's partnership level
+            // Resolve tier pricing from master product based on club's tier
             const prod = products.find(p => p.id === productId);
-            const tierKey = currentClub?.club_status;
-            const tierPrices = (prod?.tier_prices || {})[tierKey] || {};
+            const tierKey  = currentClub?.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
+            const tp = (prod?.tier_prices && typeof prod.tier_prices === 'object')
+                ? (prod.tier_prices[tierKey] || prod.tier_prices['retail'] || {})
+                : {};
+            // web_price = primary display price (adult or one_size); partner_price = youth
             const cpData = {
-                club_id: currentClub.id, product_id: productId, custom_name: customName, is_active: true,
-                web_price:         tierPrices.adult       || tierPrices.web         || null,
-                partner_price:     tierPrices.youth       || tierPrices.partner     || null,
-                non_partner_price: tierPrices.non_partner || null
+                club_id:          currentClub.id,
+                product_id:       productId,
+                custom_name:      customName,
+                is_active:        true,
+                web_price:        tp.adult    || tp.one_size || prod?.adult_retail_price   || null,
+                partner_price:    tp.youth                  || prod?.youth_retail_price    || null,
+                non_partner_price: tp.women                 || null
             };
             let result;
             if (cpId) {
