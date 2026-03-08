@@ -813,30 +813,32 @@
         .dt-section-heading { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#64748b; margin:0 0 12px; padding-bottom:8px; border-bottom:1px solid #e2e8f0; }
         .dt-section-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px 20px; margin-bottom:16px; }
 
-        /* Version upload cards */
-        .ds-version-grid { display:grid; gap:16px; }
-        .ds-version-card { background:#fff; border:1.5px solid #e2e8f0; border-radius:14px; overflow:hidden; transition:border-color 0.2s; }
-        .ds-version-card.vc-approved { border-color:#86efac; background:rgba(34,197,94,0.02); }
-        .ds-version-card.vc-declined { border-color:#fca5a5; background:rgba(239,68,68,0.02); }
-        .ds-version-header { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border-bottom:1px solid #e2e8f0; }
-        .ds-version-label { font-size:13px; font-weight:700; color:#0f172a; }
-        .ds-version-status { font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+        /* Version upload cards — 3-column compact grid */
+        .ds-version-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+        .ds-version-card { background:#fff; border:1.5px solid #e2e8f0; border-radius:12px; overflow:hidden; transition:all 0.2s; cursor:pointer; }
+        .ds-version-card:hover { border-color:#94a3b8; box-shadow:0 2px 8px rgba(0,0,0,0.07); }
+        .ds-version-card.vc-approved { border-color:#22c55e !important; background:rgba(34,197,94,0.04); box-shadow:0 0 0 1.5px rgba(34,197,94,0.25); }
+        .ds-version-card.vc-declined { opacity:0.45; filter:grayscale(0.6); }
+        .ds-version-card.vc-declined:hover { box-shadow:none; border-color:#e2e8f0; }
+        .ds-version-header { padding:7px 10px; display:flex; align-items:center; justify-content:space-between; background:#f8fafc; border-bottom:1px solid #f1f5f9; }
+        .ds-version-label { font-size:11px; font-weight:700; color:#0f172a; }
+        .ds-version-status { font-size:9px; font-weight:700; padding:2px 6px; border-radius:20px; text-transform:uppercase; letter-spacing:0.3px; }
         .ds-version-status.vs-pending  { background:#f1f5f9; color:#64748b; }
-        .ds-version-status.vs-approved { background:rgba(34,197,94,0.12); color:#16a34a; }
+        .ds-version-status.vs-approved { background:rgba(34,197,94,0.15); color:#16a34a; }
         .ds-version-status.vs-declined { background:rgba(239,68,68,0.1); color:#dc2626; }
-        .ds-version-body { padding:16px; }
-        .ds-version-dropzone { border:2px dashed #cbd5e1; border-radius:10px; padding:32px 16px; text-align:center; cursor:pointer; transition:all 0.2s; background:#f8fafc; }
+        .ds-version-body { padding:8px 10px; }
+        .ds-version-thumb { width:100%; height:90px; object-fit:contain; background:#f8fafc; border-radius:6px; margin-bottom:7px; display:block; }
+        .ds-version-thumb-placeholder { width:100%; height:90px; background:#f8fafc; border-radius:6px; margin-bottom:7px; display:flex; align-items:center; justify-content:center; font-size:26px; }
+        .ds-version-dropzone { border:2px dashed #cbd5e1; border-radius:8px; padding:20px 10px; text-align:center; cursor:pointer; transition:all 0.2s; background:#f8fafc; }
         .ds-version-dropzone:hover, .ds-version-dropzone.drag-over { border-color:#00e5cc; background:rgba(0,229,204,0.04); }
-        .ds-version-file-info { display:flex; align-items:center; gap:10px; padding:10px 14px; background:#f8fafc; border-radius:10px; border:1px solid #e2e8f0; }
-        .ds-version-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
-        .ds-version-actions .btn-preview { background:#f1f5f9; border:1px solid #e2e8f0; color:#374151; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
-        .ds-version-actions .btn-preview:hover { background:#e2e8f0; }
-        .ds-version-actions .btn-approve { background:rgba(34,197,94,0.1); border:1px solid #86efac; color:#16a34a; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+        .ds-version-file-name { font-size:11px; font-weight:600; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:1px; }
+        .ds-version-file-meta { font-size:10px; color:#94a3b8; }
+        .ds-version-actions { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:7px; }
+        .ds-version-actions button { padding:5px 0; border-radius:6px; font-size:11px; font-weight:700; cursor:pointer; border:1.5px solid; transition:all 0.15s; }
+        .ds-version-actions .btn-approve { background:rgba(34,197,94,0.08); border-color:#86efac; color:#16a34a; }
         .ds-version-actions .btn-approve:hover { background:rgba(34,197,94,0.18); }
-        .ds-version-actions .btn-decline { background:rgba(239,68,68,0.08); border:1px solid #fca5a5; color:#dc2626; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s; }
-        .ds-version-actions .btn-decline:hover { background:rgba(239,68,68,0.15); }
-        .ds-version-actions .btn-annotate { background:rgba(0,229,204,0.1); border:1px solid rgba(0,229,204,0.4); color:#0f766e; padding:6px 14px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
-        .ds-version-actions .btn-annotate:hover { background:rgba(0,229,204,0.2); }
+        .ds-version-actions .btn-decline { background:rgba(239,68,68,0.06); border-color:#fca5a5; color:#dc2626; }
+        .ds-version-actions .btn-decline:hover { background:rgba(239,68,68,0.14); }
 
         /* Stage 4 sections */
         .ds-s4-section { border:1.5px solid #e2e8f0; border-radius:14px; overflow:hidden; margin-bottom:16px; }
@@ -847,15 +849,16 @@
         /* Full-screen preview modal */
         #ds-preview-modal { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); display:flex; align-items:stretch; }
         #ds-preview-modal.hide { display:none; }
-        #ds-preview-main { flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
+        #ds-preview-main { flex:1; overflow-y:auto; overflow-x:hidden; display:flex; align-items:flex-start; justify-content:center; padding:24px; position:relative; }
         #ds-preview-sidebar { width:300px; background:#1a1a1a; border-left:1px solid #333; display:flex; flex-direction:column; overflow:hidden; }
         @media(max-width:768px) { #ds-preview-sidebar { display:none; } }
-        #ds-preview-close { position:absolute; top:16px; right:16px; z-index:10; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
+        #ds-preview-close { position:fixed; top:16px; right:316px; z-index:10000; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
         #ds-preview-close:hover { background:rgba(255,255,255,0.22); }
-        #ds-preview-img-wrap { position:relative; max-width:100%; max-height:100%; }
-        #ds-preview-img { max-width:calc(100vw - 320px); max-height:90vh; border-radius:8px; display:block; }
+        /* img-wrap is the pin canvas — sized to content so pins scroll with it */
+        #ds-preview-img-wrap { position:relative; display:inline-block; }
+        #ds-preview-img { max-width:calc(100vw - 380px); display:block; border-radius:8px; }
         @media(max-width:768px) { #ds-preview-img { max-width:95vw; } }
-        #ds-preview-iframe { width:calc(100vw - 320px); height:90vh; border:none; border-radius:8px; background:#fff; }
+        #ds-preview-iframe { width:calc(100vw - 380px); height:85vh; border:none; border-radius:8px; background:#fff; display:block; }
         @media(max-width:768px) { #ds-preview-iframe { width:95vw; } }
         #ann-overlay-v2 { position:absolute; inset:0; cursor:crosshair; border-radius:8px; }
         .ann-pin { position:absolute; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; transform:translate(-50%,-50%); cursor:pointer; border:2px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,0.4); z-index:5; transition:transform 0.15s; }
@@ -1723,7 +1726,7 @@
                 <!-- Filter chips inline -->
                 <span style="font-size:11px;font-weight:600;color:#94a3b8;margin-right:6px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em">Filter:</span>
                 <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                    <button class="ds-filter-chip active" id="ds-filter-all" onclick="setDSFilter('all')">All Active</button>
+                    <button class="ds-filter-chip active" id="ds-filter-new" onclick="setDSFilter('new')">New</button>
                     <button class="ds-filter-chip" id="ds-filter-in_progress" onclick="setDSFilter('in_progress')">In Progress</button>
                     <button class="ds-filter-chip" id="ds-filter-in_review" onclick="setDSFilter('in_review')">In Review</button>
                     <button class="ds-filter-chip" id="ds-filter-completed" onclick="setDSFilter('completed')">Completed</button>
@@ -16059,7 +16062,7 @@
         // ═══════════════════════════════════════════════════════════════════════
 
         // State (currentAnnotations already declared earlier in this file)
-        let dsFilter = 'all';
+        let dsFilter = 'new';
         let dsActivityChannel = null;
         let currentStages = [];
         let currentActiveStageNum = 1;
@@ -16143,10 +16146,11 @@
             if (!container) return;
 
             let tasks = allDesignTasks || [];
-            if (dsFilter === 'in_progress') tasks = tasks.filter(t => t.status === 'in_progress');
+            if (dsFilter === 'new') tasks = tasks.filter(t => t.status === 'new');
+            else if (dsFilter === 'in_progress') tasks = tasks.filter(t => t.status === 'in_progress');
             else if (dsFilter === 'in_review') tasks = tasks.filter(t => ['in_review','awaiting_approval'].includes(t.status));
             else if (dsFilter === 'completed') tasks = tasks.filter(t => t.status === 'completed');
-            else tasks = tasks.filter(t => t.status !== 'completed'); // 'all' = all active
+            else tasks = tasks.filter(t => t.status !== 'completed');
 
             // Update launchpad stats
             const elA = document.getElementById('stat-design-active');
@@ -17124,6 +17128,11 @@
             if (action === 'accept') {
                 const ok = await updateStageStatus(stage, 'approved', 'Brief accepted');
                 if (!ok) return;
+                // Move task to in_progress
+                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
+                if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
+                const taskInList = (allDesignTasks||[]).find(t => t.id === stage.task_id);
+                if (taskInList) taskInList.status = 'in_progress';
                 await dsLogActivity(stage.task_id, stage.id, 'stage_accepted', { stage_name: 'Brief' });
                 // Auto-advance stage 2 to in_progress
                 const stage2 = currentStages.find(s => s.stage_number === 2);
@@ -17132,7 +17141,7 @@
                     stage2.status = 'in_progress';
                 }
                 renderStageTabs();
-                showToast('Brief accepted — jumping to Concepts ✓');
+                showToast('Job accepted — moving to In Progress ✓');
                 // Auto-jump to stage 2
                 setTimeout(() => switchDSStage(2), 300);
             } else {
@@ -17185,10 +17194,6 @@
                     <div class="ds-version-grid" id="ds-version-cards-${stage.id}">
                         ${uploadsHtml}
                     </div>
-                    ${!isApproved ? `<button id="ds-add-version-btn-${stage.id}" onclick="addVersionCard('${stage.id}', ${(uploads||[]).length + 1})" style="display:flex;align-items:center;gap:8px;padding:10px 16px;border:2px dashed #cbd5e1;background:transparent;border-radius:10px;color:#64748b;font-size:13px;font-weight:600;cursor:pointer;margin-top:12px;transition:all 0.15s" onmouseover="this.style.borderColor='#00e5cc';this.style.color='#0f766e'" onmouseout="this.style.borderColor='#cbd5e1';this.style.color='#64748b'">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Version V${(uploads||[]).length + 1}
-                    </button>` : ''}
                 </div>
 
                 <div class="dt-stage-sidebar">
@@ -17199,11 +17204,11 @@
 
                     ${!isApproved ? `<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Actions</div>
                     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:24px">
-                        ${!isInReview ? `<button class="ds-action-btn-primary" ${!hasApprovedVersion ? 'disabled style="opacity:0.4;cursor:not-allowed" title="Approve at least one version first"' : ''} onclick="submitStageForReview('${stage.id}', ${stage.stage_number})">
-                            Submit for Review
+                        ${!isInReview ? `<button class="ds-action-btn-primary" onclick="submitStageForReview('${stage.id}', ${stage.stage_number})">
+                            Request Review
                         </button>` : ''}
                         ${isInReview ? `<button class="ds-action-btn-success" onclick="approveStage('${stage.id}', ${stage.stage_number})">
-                            ✓ Approve Stage ${stage.stage_number}
+                            ✓ Approve Stage
                         </button>
                         <button class="ds-action-btn-warning" onclick="requestRevisions('${stage.id}', ${stage.stage_number})">
                             ↩ Request Revisions
@@ -17222,27 +17227,32 @@
         }
 
         function buildVersionCards(stage, uploads) {
-            if (!uploads.length) {
-                return `<div class="ds-version-card">
-                    <div class="ds-version-header">
-                        <span class="ds-version-label">V1</span>
-                        <span class="ds-version-status vs-pending">Pending</span>
+            const isStageApproved = stage.status === 'approved';
+            // Build the empty uploader card for next version
+            const nextVNum = uploads.length + 1;
+            const emptyCard = isStageApproved ? '' : `<div class="ds-version-card" id="dsvc-new-${nextVNum}">
+                <div class="ds-version-header">
+                    <span class="ds-version-label">V${nextVNum}</span>
+                    <span class="ds-version-status vs-pending">Pending</span>
+                </div>
+                <div class="ds-version-body">
+                    <div class="ds-version-dropzone" id="dsvz-${stage.id}-${nextVNum}"
+                        onclick="document.getElementById('dsvinput-${stage.id}-${nextVNum}').click()"
+                        ondragover="event.preventDefault();this.classList.add('drag-over')"
+                        ondragleave="this.classList.remove('drag-over')"
+                        ondrop="handleVersionDrop(event,'${stage.id}',${nextVNum})">
+                        <svg width="24" height="24" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 6px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p style="font-size:11px;color:#64748b;margin:0">Drop or click to upload V${nextVNum}</p>
+                        <p style="font-size:10px;color:#94a3b8;margin:4px 0 0">PNG, JPG, PDF, AI, EPS</p>
                     </div>
-                    <div class="ds-version-body">
-                        <div class="ds-version-dropzone" id="dsvz-${stage.id}-1"
-                            onclick="document.getElementById('dsvinput-${stage.id}-1').click()"
-                            ondragover="event.preventDefault();this.classList.add('drag-over')"
-                            ondragleave="this.classList.remove('drag-over')"
-                            ondrop="handleVersionDrop(event,'${stage.id}',1)">
-                            <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <p style="font-size:13px;color:#64748b">Click or drag to upload V1</p>
-                            <p style="font-size:11px;color:#94a3b8;margin-top:4px">PNG, JPG, PDF, AI, EPS, SVG</p>
-                        </div>
-                        <input type="file" id="dsvinput-${stage.id}-1" class="hide" accept="image/*,.pdf,.ai,.eps,.svg,.zip" onchange="handleVersionFileSelect(event,'${stage.id}',1)">
-                    </div>
-                </div>`;
-            }
-            return uploads.map((upload, idx) => buildVersionCard(stage, upload, idx + 1)).join('');
+                    <input type="file" id="dsvinput-${stage.id}-${nextVNum}" class="hide" accept="image/*,.pdf,.ai,.eps,.svg,.zip" onchange="handleVersionFileSelect(event,'${stage.id}',${nextVNum})">
+                </div>
+            </div>`;
+            // Show newest first, then empty uploader
+            const uploadedCards = [...uploads].reverse().map((upload, idx) =>
+                buildVersionCard(stage, upload, uploads.length - idx)
+            ).join('');
+            return emptyCard + uploadedCards;
         }
 
         function buildVersionCard(stage, upload, vNum) {
@@ -17252,44 +17262,24 @@
             const sizeStr = upload.file_size ? `${Math.round(upload.file_size / 1024)}KB` : '';
             const isDeclined = upload.status === 'declined';
             const isApproved = upload.status === 'approved';
-            const cardStyle = isDeclined ? 'opacity:0.5;filter:grayscale(0.6)' : '';
-            return `<div class="ds-version-card vc-${upload.status}" id="dsvc-${upload.id}" style="${cardStyle}">
+            const label = escHtml(upload.version_label || 'V' + vNum);
+            const statusLabel = upload.status.charAt(0).toUpperCase() + upload.status.slice(1);
+            return `<div class="ds-version-card vc-${upload.status}" id="dsvc-${upload.id}"
+                onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}')">
                 <div class="ds-version-header">
-                    <span class="ds-version-label">${escHtml(upload.version_label || 'V' + vNum)}</span>
-                    <span class="ds-version-status vs-${upload.status}">${upload.status.charAt(0).toUpperCase() + upload.status.slice(1)}</span>
+                    <span class="ds-version-label">${label}</span>
+                    <span class="ds-version-status vs-${upload.status}">${statusLabel}</span>
                 </div>
                 <div class="ds-version-body">
-                    ${isImg ? `<img src="${escHtml(upload.file_url)}" alt="" style="width:100%;border-radius:8px;margin-bottom:12px;max-height:220px;object-fit:contain;background:#f1f5f9;cursor:pointer" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}')">` : ''}
-                    <div class="ds-version-file-info">
-                        <span style="font-size:20px">${isPdf ? '📄' : isImg ? '🖼' : '📁'}</span>
-                        <div style="flex:1;min-width:0">
-                            <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(upload.file_name||'')}</div>
-                            <div style="font-size:11px;color:#94a3b8">${sizeStr}${sizeStr && upload.uploaded_at ? ' · ' : ''}${upload.uploaded_at ? dsRelativeTime(upload.uploaded_at) : ''}</div>
-                        </div>
-                    </div>
-                    <div class="ds-version-actions">
-                        ${canPreview ? `<button class="btn-preview" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}')">Preview</button>
-                        <button class="btn-annotate" onclick="openPreviewModal('${upload.id}','${escHtml(upload.file_url)}','${upload.file_type||''}',true)">Annotate</button>` : ''}
-                        ${!isApproved && !isDeclined ? `<button class="btn-approve" onclick="approveVersion('${upload.id}','${stage.id}',${stage.stage_number})">✓ Approve</button>
-                        <button class="btn-decline" onclick="declineVersion('${upload.id}','${stage.id}',${stage.stage_number})">✕ Decline</button>` : ''}
-                        ${isApproved ? `<span style="color:#16a34a;font-size:12px;font-weight:700;padding:4px 0;display:flex;align-items:center;gap:4px">✓ Approved</span>` : ''}
-                        ${isDeclined ? `<span style="color:#dc2626;font-size:12px;font-weight:700;padding:4px 0;display:flex;align-items:center;gap:4px">✕ Declined</span>` : ''}
-                    </div>
-                    ${isDeclined ? `<div style="margin-top:10px;padding:8px 12px;background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;font-size:12px;color:#dc2626;font-weight:500">
-                        ${upload.review_comment ? escHtml(upload.review_comment) : 'Declined — upload a revised version below'}
-                    </div>` : (upload.review_comment ? `<div style="margin-top:10px;padding:8px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;font-size:12px;color:#92400e">${escHtml(upload.review_comment)}</div>` : '')}
-                    <!-- Per-version comment thread -->
-                    <div class="ds-version-comments" id="dsvc-comments-${upload.id}">
-                        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin:12px 0 6px">Comments</div>
-                        <div id="dsvc-comment-list-${upload.id}" style="margin-bottom:8px"></div>
-                        <div style="display:flex;gap:6px;align-items:flex-start">
-                            <textarea id="dsvc-comment-input-${upload.id}" placeholder="Add a comment…" rows="2"
-                                style="flex:1;padding:7px 10px;font-size:12px;border:1.5px solid #e2e8f0;border-radius:8px;resize:vertical;font-family:inherit;color:#0f172a;outline:none"
-                                onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-                            <button onclick="addVersionComment('${upload.id}','${stage.id}',${stage.stage_number})"
-                                style="padding:7px 12px;background:#0f172a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;margin-top:0">Send</button>
-                        </div>
-                    </div>
+                    ${isImg
+                        ? `<img src="${escHtml(upload.file_url)}" alt="" class="ds-version-thumb">`
+                        : `<div class="ds-version-thumb-placeholder">${isPdf ? '📄' : '📁'}</div>`}
+                    <div class="ds-version-file-name" title="${escHtml(upload.file_name||'')}">${escHtml(upload.file_name||'Uploaded file')}</div>
+                    <div class="ds-version-file-meta">${sizeStr}${sizeStr && upload.uploaded_at ? ' · ' : ''}${upload.uploaded_at ? dsRelativeTime(upload.uploaded_at) : ''}</div>
+                    ${!isApproved && !isDeclined ? `<div class="ds-version-actions" onclick="event.stopPropagation()">
+                        <button class="btn-approve" onclick="approveVersion('${upload.id}','${stage.id}',${stage.stage_number})">✓ Approve</button>
+                        <button class="btn-decline" onclick="declineVersion('${upload.id}','${stage.id}',${stage.stage_number})">✕ Decline</button>
+                    </div>` : ''}
                 </div>
             </div>`;
         }
@@ -17474,6 +17464,9 @@
                 renderStagePanel(stageNum);
                 showToast('All stages complete — task marked Completed 🎉');
             } else {
+                // Move task back to in_progress for next stage
+                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
+                if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
                 renderStageTabs();
                 showToast(`Stage ${stageNum} approved ✓`);
                 // Auto-jump to next stage
@@ -17489,6 +17482,8 @@
                 if (!stage) return;
                 const ok = await updateStageStatus(stage, 'revisions_required', comment);
                 if (!ok) return;
+                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
+                if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
                 await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: stage.stage_name, comment });
                 renderStageTabs();
                 renderStagePanel(stageNum);
