@@ -1760,10 +1760,10 @@
                 <!-- Filter chips inline -->
                 <span style="font-size:11px;font-weight:600;color:#94a3b8;margin-right:6px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em">Filter:</span>
                 <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                    <button class="ds-filter-chip active" id="ds-filter-new" onclick="setDSFilter('new')">New</button>
-                    <button class="ds-filter-chip" id="ds-filter-in_progress" onclick="setDSFilter('in_progress')">In Progress</button>
-                    <button class="ds-filter-chip" id="ds-filter-in_review" onclick="setDSFilter('in_review')">In Review</button>
-                    <button class="ds-filter-chip" id="ds-filter-completed" onclick="setDSFilter('completed')">Completed</button>
+                    <button class="ds-filter-chip active" id="ds-filter-new" onclick="setDSFilter('new')">New <span id="ds-fcount-new" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
+                    <button class="ds-filter-chip" id="ds-filter-in_progress" onclick="setDSFilter('in_progress')">In Progress <span id="ds-fcount-in_progress" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
+                    <button class="ds-filter-chip" id="ds-filter-in_review" onclick="setDSFilter('in_review')">In Review <span id="ds-fcount-in_review" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
+                    <button class="ds-filter-chip" id="ds-filter-completed" onclick="setDSFilter('completed')">Completed <span id="ds-fcount-completed" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
                 </div>
                 <!-- Push button to right -->
                 <div style="margin-left:auto">
@@ -3306,8 +3306,8 @@
                         </div>
                         <!-- Design Stage Pipeline -->
                         <div class="glass rounded-2xl p-4">
-                            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Stage</span>
-                            <div class="design-stage-row" id="jr-design-stage-pills"></div>
+                            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Pipeline</span>
+                            <div class="design-stage-row" id="jr-design-stage-pills" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px"></div>
                         </div>
                     </div>
                     <!-- Tab content area -->
@@ -12730,10 +12730,12 @@
             }
             renderBreadcrumb();
 
+            _jobLinkedDesignTask   = null;
+            _jobLinkedDesignStages = [];
             renderJobHeader();
             showJobTab('overview');
-            // Load activity log and populate user assignment (multi-user)
-            await Promise.all([loadJobActivity(), loadBrandUsers()]);
+            // Load activity log, user assignment, and design pipeline in parallel
+            await Promise.all([loadJobActivity(), loadBrandUsers(), loadJobDesignPipeline(jobId)]);
             // Populate multi-user assignment list
             const currentAssignedIds = currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []);
             populateMultiUserAssign('jr-assigned-users-list', 'jr-assigned-users-chips', currentAssignedIds);
@@ -12837,24 +12839,93 @@
         };
         const DESIGN_STAGES_ORDER = ['not_started','briefed','in_progress','in_review','revisions','awaiting_approval','complete'];
 
+        // Linked design task and stages for the job record pipeline display
+        let _jobLinkedDesignTask   = null;
+        let _jobLinkedDesignStages = [];
+
+        async function loadJobDesignPipeline(jobId) {
+            _jobLinkedDesignTask   = null;
+            _jobLinkedDesignStages = [];
+            if (!jobId) { renderDesignStagePills(); return; }
+            // Fetch first (most recent) design task linked to this job
+            const { data: task } = await supabase.from('design_tasks')
+                .select('id, task_name, task_ref, status')
+                .eq('job_id', jobId)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle();
+            _jobLinkedDesignTask = task || null;
+            if (task) {
+                const { data: stages } = await supabase.from('design_stages')
+                    .select('*').eq('task_id', task.id).order('stage_number');
+                _jobLinkedDesignStages = stages || [];
+            }
+            renderDesignStagePills();
+        }
+
         function renderDesignStagePills() {
             const container = document.getElementById('jr-design-stage-pills');
             if (!container) return;
-            container.innerHTML = DESIGN_STAGES_ORDER.map(key => {
-                const active = (currentJob?.design_stage || 'not_started') === key;
-                const c = DESIGN_STAGE_COLORS[key] || '#888';
-                return `<button onclick="updateJobDesignStage('${key}')" class="stage-pill-btn${active ? ' active' : ''}"
-                    style="${active ? `color:${c};border-color:${c};background:${c}18` : ''}">${DESIGN_STAGE_LABELS[key]}</button>`;
+
+            if (!_jobLinkedDesignTask) {
+                // No design task linked — show greyed pipeline
+                const DS_PIPELINE_LABELS = ['Brief', 'Concepts', 'Full Range', 'Final Artwork', 'Completed'];
+                container.innerHTML = DS_PIPELINE_LABELS.map(label =>
+                    `<span class="stage-pill-btn" style="opacity:0.35;cursor:default;pointer-events:none">${escHtml(label)}</span>`
+                ).join('') +
+                `<span style="font-size:11px;color:#94a3b8;margin-left:8px;align-self:center">No design task linked</span>`;
+                return;
+            }
+
+            // Map the 4 design stages to pipeline labels
+            const DS_STAGE_NAMES = { 1: 'Brief', 2: 'Concepts', 3: 'Full Range', 4: 'Final Artwork' };
+            const DS_STAGE_COLORS_PIPELINE = {
+                not_started:        '#94a3b8',
+                in_progress:        '#d97706',
+                in_review:          '#7c3aed',
+                approved:           '#16a34a',
+                declined:           '#dc2626',
+                revisions_required: '#c2410c',
+                skipped:            '#22c55e',
+            };
+
+            const stagesHtml = [1,2,3,4].map(num => {
+                const stage = _jobLinkedDesignStages.find(s => s.stage_number === num);
+                const label = DS_STAGE_NAMES[num];
+                if (!stage || stage.status === 'not_started') {
+                    return `<span class="stage-pill-btn" style="opacity:0.4;cursor:default;pointer-events:none">${escHtml(label)}</span>`;
+                }
+                const c = DS_STAGE_COLORS_PIPELINE[stage.status] || '#64748b';
+                const isActive = ['in_progress','in_review','revisions_required'].includes(stage.status);
+                const isDone   = ['approved','skipped'].includes(stage.status);
+                let style = `color:${c};border-color:${c};background:${c}18`;
+                if (isDone) style = `color:#16a34a;border-color:#86efac;background:rgba(34,197,94,0.08)`;
+                const statusDot = isDone ? '✓ ' : isActive ? '● ' : '';
+                return `<span class="stage-pill-btn active" style="${style}">${statusDot}${escHtml(label)}</span>`;
             }).join('');
+
+            // "Completed" pill
+            const isCompleted = _jobLinkedDesignTask.status === 'completed';
+            const completedStyle = isCompleted
+                ? 'color:#16a34a;border-color:#16a34a;background:rgba(22,163,74,0.1);font-weight:800'
+                : 'opacity:0.4;cursor:default;pointer-events:none';
+            const completedPill = `<span class="stage-pill-btn active" style="${completedStyle}">${isCompleted ? '✓ ' : ''}Completed</span>`;
+
+            // Link to open the design task
+            const taskLink = `<button onclick="showDesignTask('${_jobLinkedDesignTask.id}')" style="margin-left:auto;font-size:11px;color:#be185d;background:transparent;border:none;cursor:pointer;padding:2px 6px;font-weight:700;text-decoration:underline;flex-shrink:0">Open Task →</button>`;
+
+            container.innerHTML = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;width:100%">
+                ${stagesHtml}${completedPill}${taskLink}
+            </div>`;
         }
 
         async function updateJobDesignStage(newStage) {
+            // Legacy function kept for backward compat — no longer used directly
             if (!currentJobId) return;
             const { error } = await supabase.from('jobs').update({ design_stage: newStage }).eq('id', currentJobId);
             if (error) { showToast('Error updating design stage', 'error'); return; }
             currentJob = { ...currentJob, design_stage: newStage };
             renderDesignStagePills();
-            showToast('Design stage → ' + DESIGN_STAGE_LABELS[newStage]);
         }
 
         async function updateJobStage(newStage) {
@@ -16867,6 +16938,8 @@
                 currentDesignVersions = [];
             }
             renderJobDesignTasks(tasks || []);
+            // Refresh the design pipeline at the top of the job record
+            await loadJobDesignPipeline(currentJobId);
         }
 
         function renderJobDesignTasks(tasks) {
@@ -16955,6 +17028,8 @@
                 stage_revisions_requested: `requested revisions on Stage ${detail?.stage_name||''}`,
                 stage_skipped:             `skipped Stage ${detail?.stage_name||''}`,
                 task_completed:            'completed the task',
+                comment_added:             `commented: "${(detail?.message||'').substring(0,60)}${(detail?.message||'').length > 60 ? '…' : ''}"`,
+                sub_task_added:            `added a sub-task: "${(detail?.message||'').substring(0,60)}${(detail?.message||'').length > 60 ? '…' : ''}"`,
             };
             return map[action_type] || action_type.replace(/_/g,' ');
         }
@@ -16993,7 +17068,20 @@
             const empty = document.getElementById('ds-task-list-empty');
             if (!container) return;
 
-            let tasks = allDesignTasks || [];
+            const allTasks = allDesignTasks || [];
+
+            // Update filter chip counts
+            const countNew       = allTasks.filter(t => t.status === 'new').length;
+            const countInProg    = allTasks.filter(t => t.status === 'in_progress').length;
+            const countInReview  = allTasks.filter(t => ['in_review','awaiting_approval'].includes(t.status)).length;
+            const countCompleted = allTasks.filter(t => t.status === 'completed').length;
+            const setCount = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+            setCount('ds-fcount-new', countNew);
+            setCount('ds-fcount-in_progress', countInProg);
+            setCount('ds-fcount-in_review', countInReview);
+            setCount('ds-fcount-completed', countCompleted);
+
+            let tasks = allTasks;
             if (dsFilter === 'new') tasks = tasks.filter(t => t.status === 'new');
             else if (dsFilter === 'in_progress') tasks = tasks.filter(t => t.status === 'in_progress');
             else if (dsFilter === 'in_review') tasks = tasks.filter(t => ['in_review','awaiting_approval'].includes(t.status));
@@ -17048,7 +17136,10 @@
                     <span style="font-size:11px;font-weight:600;${dueClass}">
                         ${dueLabel ? `📅 ${dueLabel}${dueInfo?.text ? ' · ' + dueInfo.text : ''}` : ''}
                     </span>
-                    <span style="font-size:11px;color:#94a3b8">${approvedCount}/4 stages</span>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        ${task._subtasks ? `<span style="font-size:11px;font-weight:700;color:${task._subtasks.done === task._subtasks.total ? '#16a34a' : '#c2410c'};background:${task._subtasks.done === task._subtasks.total ? 'rgba(34,197,94,0.08)' : 'rgba(194,65,12,0.08)'};border-radius:6px;padding:1px 7px">📋 ${task._subtasks.done}/${task._subtasks.total} Sub-Tasks</span>` : ''}
+                        <span style="font-size:11px;color:#94a3b8">${approvedCount}/4 stages</span>
+                    </div>
                 </div>
             </div>`;
         }
@@ -17190,17 +17281,28 @@
             const legacy = (legacyTasks||[]).filter(t => t.jobs?.brand_id === currentBrand.id);
             allDesignTasks = [...(brandTasks||[]), ...legacy];
 
-            // Load all stages for this brand's tasks in one query
+            // Load all stages and sub-task counts for this brand's tasks in parallel
             const taskIds = allDesignTasks.map(t => t.id);
             if (taskIds.length) {
-                const { data: allStages } = await supabase.from('design_stages')
-                    .select('*').in('task_id', taskIds).order('stage_number');
+                const [stagesRes, subtaskRes] = await Promise.all([
+                    supabase.from('design_stages').select('*').in('task_id', taskIds).order('stage_number'),
+                    supabase.from('design_task_activity').select('design_task_id, task_completed').in('design_task_id', taskIds).eq('activity_type', 'sub_task')
+                ]);
                 const stagesByTask = {};
-                (allStages||[]).forEach(s => {
+                (stagesRes.data||[]).forEach(s => {
                     if (!stagesByTask[s.task_id]) stagesByTask[s.task_id] = [];
                     stagesByTask[s.task_id].push(s);
                 });
-                allDesignTasks.forEach(t => { t._stages = stagesByTask[t.id] || []; });
+                const subtasksByTask = {};
+                (subtaskRes.data||[]).forEach(r => {
+                    if (!subtasksByTask[r.design_task_id]) subtasksByTask[r.design_task_id] = { total: 0, done: 0 };
+                    subtasksByTask[r.design_task_id].total++;
+                    if (r.task_completed) subtasksByTask[r.design_task_id].done++;
+                });
+                allDesignTasks.forEach(t => {
+                    t._stages = stagesByTask[t.id] || [];
+                    t._subtasks = subtasksByTask[t.id] || null;
+                });
             }
 
             renderDSHome();
@@ -17378,6 +17480,9 @@
             } else if (stageNum === 4) {
                 panel.innerHTML = await buildStage4Panel(stage);
             }
+            // Restore input type state and load activity for this task
+            setDTInputType(_dtActivityInputType);
+            if (currentDesignTaskRecord?.id) loadDesignTaskActivity(currentDesignTaskRecord.id);
         }
 
         // ── Stage 1: Brief ─────────────────────────────────────────────────────
@@ -17701,10 +17806,11 @@
                         </button>
                     </div>` : ''}
 
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Activity</div>
-                    <div style="font-size:13px">
-                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No activity yet</p>'}
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Stage History</div>
+                    <div style="font-size:13px;margin-bottom:4px">
+                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No stage history yet</p>'}
                     </div>
+                    ${buildDTActivitySidebarHTML()}
                 </div>
             </div>`;
         }
@@ -18080,10 +18186,11 @@
                         </button>
                     </div>` : ''}
 
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Activity</div>
-                    <div style="font-size:13px">
-                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No activity yet</p>'}
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Stage History</div>
+                    <div style="font-size:13px;margin-bottom:4px">
+                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No stage history yet</p>'}
                     </div>
+                    ${buildDTActivitySidebarHTML()}
                 </div>
             </div>`;
         }
@@ -18448,10 +18555,11 @@
                         </button>
                     </div>` : ''}
 
-                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Activity</div>
-                    <div style="font-size:13px">
-                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No activity yet</p>'}
+                    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Stage History</div>
+                    <div style="font-size:13px;margin-bottom:4px">
+                        ${logHtml || '<p style="color:#94a3b8;font-size:12px;margin:0">No stage history yet</p>'}
                     </div>
+                    ${buildDTActivitySidebarHTML()}
                 </div>
             </div>`;
         }
@@ -18588,6 +18696,171 @@
                     </div>
                 </div>`;
             }).join('')}</div>`;
+        }
+
+        // ── Design Task Activity (Comments & Sub-Tasks) ────────────────────────
+
+        let _dtActivityLog = [];
+        let _dtActivityInputType = 'comment'; // 'comment' | 'sub_task'
+
+        function setDTInputType(type) {
+            _dtActivityInputType = type;
+            const commentBtn = document.getElementById('dt-act-comment-btn');
+            const taskBtn    = document.getElementById('dt-act-task-btn');
+            const placeholder = document.getElementById('dt-act-input');
+            if (commentBtn) commentBtn.classList.toggle('active', type === 'comment');
+            if (taskBtn)    taskBtn.classList.toggle('active', type === 'sub_task');
+            if (placeholder) placeholder.placeholder = type === 'sub_task' ? 'Add a sub-task…' : 'Add a comment…';
+        }
+
+        async function loadDesignTaskActivity(taskId) {
+            if (!taskId) return;
+            const { data } = await supabase.from('design_task_activity')
+                .select('*').eq('design_task_id', taskId).order('created_at', { ascending: false });
+            _dtActivityLog = data || [];
+            renderDesignTaskActivity();
+        }
+
+        function renderDesignTaskActivity() {
+            const list = document.getElementById('dt-act-list');
+            if (!list) return;
+            if (!_dtActivityLog.length) {
+                list.innerHTML = '<p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">No activity yet.</p>';
+                return;
+            }
+            list.innerHTML = _dtActivityLog.map(entry => {
+                const initials = (entry.user_name || '?').charAt(0).toUpperCase();
+                const ts = dsRelativeTime(entry.created_at);
+                const isTask = entry.activity_type === 'sub_task';
+                const done   = entry.task_completed;
+                if (isTask) {
+                    return `<div class="task-item${done ? ' task-done' : ''}" style="margin-bottom:8px;background:#fff7ed;border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:8px 10px">
+                        <div style="display:flex;align-items:flex-start;gap:8px">
+                            <input type="checkbox" style="margin-top:2px;width:14px;height:14px;accent-color:#16a34a;flex-shrink:0;cursor:pointer" ${done ? 'checked' : ''} onchange="toggleDTSubtask('${entry.id}',this.checked)">
+                            <div style="flex:1;min-width:0">
+                                <p style="font-size:11px;font-weight:700;color:#c2410c;margin:0 0 2px">📋 Sub-Task</p>
+                                <p style="font-size:12px;color:#374151;margin:0;${done ? 'text-decoration:line-through;color:#9ca3af' : ''}">${escHtml(entry.message)}</p>
+                                <p style="font-size:10px;color:#9ca3af;margin:3px 0 0">${escHtml(entry.user_name||'Unknown')} · ${ts}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+                return `<div class="ds-comment-row" style="margin-bottom:8px">
+                    <div class="ds-actor-pill" style="width:24px;height:24px;font-size:10px;flex-shrink:0">${initials}</div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:2px">${escHtml(entry.user_name||'Unknown')}</div>
+                        <div style="font-size:12px;color:#374151;line-height:1.4">${escHtml(entry.message)}</div>
+                        <div class="ds-comment-time">${ts}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function addDesignTaskActivity() {
+            const input = document.getElementById('dt-act-input');
+            const msg = input?.value?.trim();
+            if (!msg) return;
+            if (!currentDesignTaskRecord?.id || !currentBrand?.id) return;
+
+            const actor = await supabase.auth.getUser();
+            const actorId = actor?.data?.user?.id || null;
+            const userName = currentUserProfile
+                ? ((currentUserProfile.first_name || '') + ' ' + (currentUserProfile.last_name || '')).trim() || currentUserProfile.email?.split('@')[0] || 'Unknown'
+                : 'Unknown';
+
+            const actType = _dtActivityInputType; // 'comment' or 'sub_task'
+
+            const { data, error } = await supabase.from('design_task_activity').insert({
+                design_task_id: currentDesignTaskRecord.id,
+                brand_id: currentBrand.id,
+                user_id: actorId,
+                user_name: userName,
+                message: msg,
+                activity_type: actType,
+                task_completed: false
+            }).select().single();
+
+            if (error) { showToast('Error adding activity', 'error'); return; }
+
+            // Prepend to local log and re-render
+            _dtActivityLog.unshift(data);
+            if (input) input.value = '';
+            renderDesignTaskActivity();
+
+            // Push to DS Studio activity feed
+            await supabase.from('design_activity_feed').insert({
+                task_id: currentDesignTaskRecord.id,
+                brand_id: currentBrand.id,
+                actor_id: actorId,
+                actor_name: userName,
+                action_type: actType === 'sub_task' ? 'sub_task_added' : 'comment_added',
+                action_detail: { message: msg, task_name: currentDesignTaskRecord.task_name }
+            });
+
+            // Also push to job_activity feed if task is linked to a job
+            if (currentDesignTaskRecord.job_id) {
+                await supabase.from('job_activity').insert({
+                    job_id: currentDesignTaskRecord.job_id,
+                    brand_id: currentBrand.id,
+                    user_id: actorId,
+                    user_name: userName,
+                    message: `[Design Task] ${msg}`,
+                    activity_type: actType === 'sub_task' ? 'task' : 'note',
+                    task_completed: false
+                });
+                loadHomeActivityFeed();
+            }
+
+            // Reload sub-task counts in task list if visible
+            if (actType === 'sub_task') {
+                const t = allDesignTasks?.find(x => x.id === currentDesignTaskRecord.id);
+                if (t) {
+                    if (!t._subtasks) t._subtasks = { total: 0, done: 0 };
+                    t._subtasks.total++;
+                    renderDSTaskList();
+                }
+            }
+        }
+
+        async function toggleDTSubtask(id, completed) {
+            const { error } = await supabase.from('design_task_activity')
+                .update({ task_completed: completed }).eq('id', id);
+            if (error) { showToast('Error updating sub-task', 'error'); return; }
+            const entry = _dtActivityLog.find(e => e.id === id);
+            if (entry) entry.task_completed = completed;
+            renderDesignTaskActivity();
+            // Update sub-task count in task list
+            const t = allDesignTasks?.find(x => x.id === currentDesignTaskRecord?.id);
+            if (t && t._subtasks) {
+                t._subtasks.done = _dtActivityLog.filter(e => e.activity_type === 'sub_task' && e.task_completed).length;
+                renderDSTaskList();
+            }
+            showToast(completed ? 'Sub-task complete ✓' : 'Sub-task reopened');
+        }
+
+        // Builds the activity sidebar HTML block (used in all stage panels)
+        function buildDTActivitySidebarHTML() {
+            return `<div style="margin-top:24px">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:10px">Activity</div>
+                <!-- Tab toggle -->
+                <div style="display:flex;gap:4px;margin-bottom:10px">
+                    <button id="dt-act-comment-btn" onclick="setDTInputType('comment')" class="act-tab-btn active" style="flex:1;font-size:11px">+ Comment</button>
+                    <button id="dt-act-task-btn" onclick="setDTInputType('sub_task')" class="act-tab-btn task-tab" style="flex:1;font-size:11px">+ Sub-Task</button>
+                </div>
+                <!-- Activity log -->
+                <div id="dt-act-list" style="margin-bottom:12px">
+                    <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
+                </div>
+                <!-- Input -->
+                <div style="display:flex;gap:6px">
+                    <input type="text" id="dt-act-input" placeholder="Add a comment…"
+                        style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;transition:border-color 0.15s"
+                        onfocus="this.style.borderColor='#00e5cc'"
+                        onblur="this.style.borderColor='#e2e8f0'"
+                        onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
+                    <button onclick="addDesignTaskActivity()" style="padding:7px 12px;border-radius:8px;background:#0f172a;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">Post</button>
+                </div>
+            </div>`;
         }
 
         // ── Save Design Task (extended for new fields) ─────────────────────────
