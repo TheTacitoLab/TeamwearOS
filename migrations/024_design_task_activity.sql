@@ -21,11 +21,11 @@ CREATE INDEX IF NOT EXISTS idx_dta_created ON design_task_activity(created_at DE
 
 ALTER TABLE design_task_activity ENABLE ROW LEVEL SECURITY;
 
--- Brand members (authenticated users whose profile is linked to this brand_id) can manage entries
+-- Brand members (authenticated users whose user_profile is linked to this brand_id) can manage entries
 CREATE POLICY "Brand members can manage design task activity"
     ON design_task_activity FOR ALL
     USING (
         brand_id IN (
-            SELECT brand_id FROM profiles WHERE id = auth.uid()
+            SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         )
     );
