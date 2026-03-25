@@ -2084,9 +2084,12 @@
                 <div class="space-y-3 text-sm">
                     <div>
                         <p class="text-gray-400 mb-1">Product Images:</p>
-                        <div class="bg-black/50 rounded-lg p-2 font-mono text-xs">
-                            <span class="text-gray-500">Code:</span> <span class="text-brand-400">APX/ATL/001</span><br>
-                            <span class="text-gray-500">File:</span> <span class="text-green-400">APX-ATL-001.png</span>
+                        <div class="bg-black/50 rounded-lg p-2 font-mono text-xs space-y-0.5">
+                            <div><span class="text-green-400">APX-ATL-001.png</span> <span class="text-gray-600">→ front</span></div>
+                            <div><span class="text-green-400">APX-ATL-001-BACK.png</span> <span class="text-gray-600">→ back</span></div>
+                            <div><span class="text-green-400">APX-ATL-001-SIDE.png</span> <span class="text-gray-600">→ side</span></div>
+                            <div><span class="text-green-400">APX-ATL-001-STYLE-BLACK.png</span> <span class="text-gray-600">→ style variant</span></div>
+                            <div><span class="text-green-400">APX-ATL-001-V2.png</span> <span class="text-gray-600">→ separate product</span></div>
                         </div>
                     </div>
                     <div>
@@ -2095,7 +2098,7 @@
                             <span class="text-green-400">collection-image.png</span>
                         </div>
                     </div>
-                    <p class="text-gray-500 text-xs">Replace / with - in product codes</p>
+                    <p class="text-gray-500 text-xs">Replace / with - in product codes · Keywords case-insensitive</p>
                 </div>
             </div>
         </div>
@@ -4629,14 +4632,39 @@
 
                 <!-- Filename guide -->
                 <div class="mx-6 mt-4 p-4 rounded-xl text-xs font-mono" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2)">
-                    <p class="text-brand-400 font-semibold mb-1.5 font-sans text-sm">Filename naming convention</p>
-                    <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-400">
-                        <span><span class="text-white">APX-COR-001.png</span> → Front view, product V1</span>
-                        <span><span class="text-white">APX-COR-001-B.png</span> → Back view (-B)</span>
-                        <span><span class="text-white">APX-COR-001-S.png</span> → Side view (-S)</span>
-                        <span><span class="text-white">APX-COR-001-V2.png</span> → Second product variant (V2)</span>
-                        <span><span class="text-white">APX-COR-001-B-V2.png</span> → Back view of V2 variant</span>
-                        <span class="text-gray-600">V1 is never written — just the code + view</span>
+                    <p class="text-brand-400 font-semibold mb-2 font-sans text-sm">Filename naming convention</p>
+                    <p class="text-gray-500 font-sans text-xs mb-3">Replace <span class="text-white">/</span> with <span class="text-white">-</span> in product codes &nbsp;·&nbsp; All keywords case-insensitive</p>
+
+                    <p class="text-gray-400 font-sans font-semibold mb-1">Views (same product)</p>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-0.5 text-gray-400 mb-3">
+                        <span><span class="text-white">PRODUCTCODE.png</span> → Front (default)</span>
+                        <span><span class="text-white">PRODUCTCODE-BACK.png</span> → Back view</span>
+                        <span><span class="text-white">PRODUCTCODE-SIDE.png</span> → Side view</span>
+                        <span><span class="text-white">PRODUCTCODE-EXTRA.png</span> → Additional image</span>
+                        <span><span class="text-white">PRODUCTCODE-EXTRA2.png</span> → Additional image 2</span>
+                        <span><span class="text-white">PRODUCTCODE-EXTRA3.png</span> → Additional image 3</span>
+                    </div>
+
+                    <p class="text-gray-400 font-sans font-semibold mb-1">Style / colour variants <span class="text-gray-600 font-normal">(same Shopify product — adds Style option)</span></p>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-0.5 text-gray-400 mb-3">
+                        <span><span class="text-white">PRODUCTCODE-STYLE-BLACK.png</span> → Front, style = BLACK</span>
+                        <span><span class="text-white">PRODUCTCODE-BACK-STYLE-BLACK.png</span> → Back, style = BLACK</span>
+                        <span><span class="text-white">PRODUCTCODE-STYLE-NAVY.png</span> → Front, style = NAVY</span>
+                        <span><span class="text-white">PRODUCTCODE-EXTRA-STYLE-RED.png</span> → Extra image, style = RED</span>
+                    </div>
+
+                    <p class="text-gray-400 font-sans font-semibold mb-1">Separate Shopify product <span class="text-gray-600 font-normal">(-V2, -V3 …)</span></p>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-0.5 text-gray-400 mb-3">
+                        <span><span class="text-white">PRODUCTCODE-V2.png</span> → New product, V2 front</span>
+                        <span><span class="text-white">PRODUCTCODE-BACK-V2.png</span> → V2 back view</span>
+                        <span><span class="text-white">PRODUCTCODE-STYLE-RED-V2.png</span> → V2 product, style = RED</span>
+                        <span><span class="text-white">PRODUCTCODE-EXTRA-V2.png</span> → V2 additional image</span>
+                    </div>
+
+                    <p class="text-gray-400 font-sans font-semibold mb-1">Special</p>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-0.5 text-gray-400">
+                        <span><span class="text-green-400">collection-image.png</span> → Club store banner</span>
+                        <span class="text-gray-600">V1 is never written — just the code + keywords</span>
                     </div>
                 </div>
 
@@ -4667,6 +4695,7 @@
                                 <th class="pb-1.5 pr-3">Product Code</th>
                                 <th class="pb-1.5 pr-3">Item Name</th>
                                 <th class="pb-1.5 pr-3">View</th>
+                                <th class="pb-1.5 pr-3">Style</th>
                                 <th class="pb-1.5">Variant</th>
                             </tr></thead>
                             <tbody id="mockup-preview-table" class="space-y-1"></tbody>
@@ -7663,26 +7692,48 @@
         // MOCK-UP UPLOAD: filename parser + upload flow
         // =============================================
 
+        // Naming convention (case-insensitive):
+        //   PRODUCTCODE[-VIEW][-STYLE-label][-Vn].ext
+        //
+        // View keywords : BACK, SIDE, EXTRA, EXTRA2, EXTRA3
+        //                 Legacy short codes: -B -S -T -F (still accepted)
+        // Style trigger : -STYLE-{name}  →  same Shopify product, new colour/style option
+        // Variant suffix: -V2, -V3 …    →  separate Shopify product
+        // Special file  : collection-image.png  →  club store banner
+        //
+        // Reserved words (must not appear in product codes):
+        //   BACK, SIDE, EXTRA, EXTRA2, EXTRA3, STYLE
+        //
+        // Example: APX-COR-001-BACK-STYLE-NAVY-V2.png
+        //   → productCode=APX-COR-001, view=back, styleLabel=NAVY, variantNumber=2
         function parseDesignFilename(filename) {
-            const base = filename.replace(/\.[^.]+$/, '');
+            let s = filename.replace(/\.[^.]+$/, '').toUpperCase();
+
+            // 1. Extract trailing -Vn  (separate Shopify product)
             let variantNumber = 1;
-            let name = base;
-            const variantMatch = base.match(/-V(\d+)$/i);
-            if (variantMatch) {
-                variantNumber = parseInt(variantMatch[1]);
-                name = base.slice(0, -variantMatch[0].length);
-            }
-            const viewMap = { '-B': 'back', '-S': 'side', '-T': 'top', '-F': 'front' };
+            const vMatch = s.match(/-V(\d+)$/);
+            if (vMatch) { variantNumber = parseInt(vMatch[1]); s = s.slice(0, -vMatch[0].length); }
+
+            // 2. Extract -STYLE-{label}  (same product, colour/style variant)
+            let styleLabel = null;
+            const styleMatch = s.match(/-STYLE-([A-Z0-9]+(?:-[A-Z0-9]+)*)$/);
+            if (styleMatch) { styleLabel = styleMatch[1]; s = s.slice(0, -styleMatch[0].length); }
+
+            // 3. Extract view keyword  (longest match first to catch EXTRA2/EXTRA3 before EXTRA)
+            const viewKeywords = [
+                ['-EXTRA3', 'extra3'], ['-EXTRA2', 'extra2'], ['-EXTRA', 'extra'],
+                ['-BACK',   'back'],   ['-B',      'back'],
+                ['-SIDE',   'side'],   ['-S',      'side'],
+                ['-TOP',    'top'],    ['-T',      'top'],
+                ['-FRONT',  'front'],  ['-F',      'front'],
+            ];
             let view = 'front';
-            let productCode = name;
-            for (const [suffix, viewName] of Object.entries(viewMap)) {
-                if (name.toUpperCase().endsWith(suffix)) {
-                    view = viewName;
-                    productCode = name.slice(0, -suffix.length);
-                    break;
-                }
+            for (const [sfx, vname] of viewKeywords) {
+                if (s.endsWith(sfx)) { view = vname; s = s.slice(0, -sfx.length); break; }
             }
-            return { productCode: productCode.toUpperCase(), view, variantNumber };
+
+            // 4. Remaining string is the product code
+            return { productCode: s, view, variantNumber, styleLabel };
         }
 
         // Filenames cannot contain "/" so product codes like APX/WAR/004 are saved
@@ -7719,7 +7770,7 @@
             if (countEl) countEl.textContent = files.length;
 
             files.forEach(file => {
-                const { productCode, view, variantNumber } = parseDesignFilename(file.name);
+                const { productCode, view, variantNumber, styleLabel } = parseDesignFilename(file.name);
                 const masterProduct = findProductByFilenameCode(productCode);
                 const tr = document.createElement('tr');
                 tr.className = 'border-b border-white/5';
@@ -7728,6 +7779,7 @@
                     <td class="py-1.5 pr-3 text-xs font-mono text-brand-400">${productCode}</td>
                     <td class="py-1.5 pr-3 text-xs ${masterProduct ? 'text-gray-200' : 'text-red-400'}">${masterProduct ? escHtml(masterProduct.item_name) : '⚠️ No match'}</td>
                     <td class="py-1.5 pr-3 text-xs capitalize text-gray-400">${view}</td>
+                    <td class="py-1.5 pr-3 text-xs text-brand-400">${styleLabel ? escHtml(styleLabel) : '<span class="text-gray-600">—</span>'}</td>
                     <td class="py-1.5 text-xs text-gray-400">V${variantNumber}</td>`;
                 tbody.appendChild(tr);
             });
@@ -7746,8 +7798,11 @@
             const clubSuffix = (currentClub.suffix || currentClub.id).toLowerCase();
             let successCount = 0, errors = [];
 
+            // View display order for sorting image_urls
+            const _viewOrder = { front:0, back:1, side:2, top:3, extra:4, extra2:5, extra3:6 };
+
             for (const file of files) {
-                const { productCode, variantNumber } = parseDesignFilename(file.name);
+                const { productCode, view, variantNumber, styleLabel } = parseDesignFilename(file.name);
                 const masterProduct = findProductByFilenameCode(productCode);
                 if (!masterProduct) { errors.push(`${file.name}: no matching product`); continue; }
 
@@ -7762,6 +7817,8 @@
                     .select('*').eq('club_id', currentClub.id)
                     .eq('product_id', masterProduct.id).eq('variant_number', variantNumber).maybeSingle();
 
+                const imgEntry = { url: publicUrl, view, style: styleLabel };
+
                 if (!existingCP) {
                     // Resolve pricing from master product's tier_prices using club's tier
                     const clubTierKey = currentClub?.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
@@ -7773,7 +7830,7 @@
                         product_id:     masterProduct.id,
                         custom_name:    `${currentClub.name} ${masterProduct.item_name}`,
                         variant_number: variantNumber,
-                        image_urls:     [publicUrl],
+                        image_urls:     [imgEntry],
                         web_price:     mpTp.adult    || mpTp.one_size || masterProduct.adult_retail_price   || null,
                         partner_price: mpTp.youth                    || masterProduct.youth_retail_price    || null,
                         non_partner_price: mpTp.women                || null,
@@ -7782,7 +7839,19 @@
                     if (createErr) { errors.push(`${file.name}: ${createErr.message}`); continue; }
                 } else {
                     const urls = Array.isArray(existingCP.image_urls) ? existingCP.image_urls : [];
-                    if (!urls.includes(publicUrl)) urls.push(publicUrl);
+                    // Avoid duplicates (compare by URL)
+                    if (!urls.some(u => (typeof u === 'object' ? u.url : u) === publicUrl)) {
+                        urls.push(imgEntry);
+                        // Keep images ordered: group by style (null first), then by view
+                        urls.sort((a, b) => {
+                            const sa = (typeof a === 'object' ? a.style : null) || '';
+                            const sb = (typeof b === 'object' ? b.style : null) || '';
+                            if (sa !== sb) return sa.localeCompare(sb);
+                            const va = _viewOrder[(typeof a === 'object' ? a.view : 'front')] ?? 99;
+                            const vb = _viewOrder[(typeof b === 'object' ? b.view : 'front')] ?? 99;
+                            return va - vb;
+                        });
+                    }
                     const { error: updateErr } = await supabase.from('club_products')
                         .update({ image_urls: urls }).eq('id', existingCP.id);
                     if (updateErr) { errors.push(`${file.name}: ${updateErr.message}`); continue; }
@@ -8570,42 +8639,65 @@
                     continue;
                 }
 
-                // Product image
-                const productCode = nameWithoutExt.replace(/-/g, '/').toUpperCase();
-                const product = products.find(p => p.product_code.toUpperCase() === productCode);
-                
+                // Product image — use the shared parser so all view/style/variant suffixes work
+                const { productCode, view: imgView, variantNumber: imgVariant, styleLabel: imgStyle } = parseDesignFilename(file.name);
+                const product = findProductByFilenameCode(productCode);
+
                 if (!product) {
-                    showToast(`No product: ${nameWithoutExt}`, 'error');
+                    showToast(`No product: ${file.name}`, 'error');
                     failed++;
                     continue;
                 }
 
                 try {
                     const storagePath = `${currentBrand.slug}/${club.suffix}/${file.name}`;
-                    
+
                     const { error: uploadError } = await supabase.storage
                         .from('club-images')
                         .upload(storagePath, file, { upsert: true });
 
-                    if (uploadError) {
-                        failed++;
-                        continue;
+                    if (uploadError) { failed++; continue; }
+
+                    const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(storagePath);
+                    const publicUrl = urlData.publicUrl;
+                    const imgEntry = { url: publicUrl, view: imgView, style: imgStyle };
+
+                    // Upsert into club_products (same logic as modal upload)
+                    const { data: existingCP } = await supabase.from('club_products')
+                        .select('*').eq('club_id', selectedClubId)
+                        .eq('product_id', product.id).eq('variant_number', imgVariant).maybeSingle();
+
+                    if (!existingCP) {
+                        const clubTierKey = club?.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
+                        const mpTp = (product.tier_prices && typeof product.tier_prices === 'object')
+                            ? (product.tier_prices[clubTierKey] || product.tier_prices['retail'] || {})
+                            : {};
+                        await supabase.from('club_products').insert({
+                            club_id:        selectedClubId,
+                            product_id:     product.id,
+                            custom_name:    `${club.name} ${product.item_name}`,
+                            variant_number: imgVariant,
+                            image_urls:     [imgEntry],
+                            web_price:      mpTp.adult || mpTp.one_size || product.adult_retail_price || null,
+                            partner_price:  mpTp.youth || product.youth_retail_price || null,
+                            non_partner_price: mpTp.women || null,
+                            is_active:      true
+                        });
+                    } else {
+                        const urls = Array.isArray(existingCP.image_urls) ? existingCP.image_urls : [];
+                        if (!urls.some(u => (typeof u === 'object' ? u.url : u) === publicUrl)) {
+                            urls.push(imgEntry);
+                            const _vOrd = { front:0, back:1, side:2, top:3, extra:4, extra2:5, extra3:6 };
+                            urls.sort((a, b) => {
+                                const sa = (typeof a === 'object' ? a.style : null) || '';
+                                const sb = (typeof b === 'object' ? b.style : null) || '';
+                                if (sa !== sb) return sa.localeCompare(sb);
+                                return (_vOrd[(typeof a === 'object' ? a.view : 'front')] ?? 99)
+                                     - (_vOrd[(typeof b === 'object' ? b.view : 'front')] ?? 99);
+                            });
+                            await supabase.from('club_products').update({ image_urls: urls }).eq('id', existingCP.id);
+                        }
                     }
-
-                    const { data: urlData } = supabase.storage
-                        .from('club-images')
-                        .getPublicUrl(storagePath);
-
-                    await supabase
-                        .from('club_images')
-                        .upsert({
-                            club_id: selectedClubId,
-                            product_id: product.id,
-                            file_name: file.name,
-                            storage_path: storagePath,
-                            public_url: urlData.publicUrl,
-                            uploaded_by: currentUser.id
-                        }, { onConflict: 'club_id,product_id' });
 
                     uploaded++;
                 } catch (err) {
@@ -9830,7 +9922,20 @@
                 const mp = cp.products;
                 if (!mp) continue;
 
-                const imageUrls = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                // Compatibility: image_urls may be plain strings (legacy) or {url,view,style} objects (new)
+                const rawImgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                const imageEntries = rawImgs.map(img =>
+                    typeof img === 'string' ? { url: img, view: 'front', style: null } : img
+                );
+                const imageUrls = imageEntries.map(e => e.url);
+
+                // Detect style variants — if any entry has a non-null style, use Style as Option1
+                const styleNames = [...new Set(imageEntries.map(e => e.style).filter(Boolean))];
+                const hasStyles = styleNames.length > 0;
+
+                // Human-readable view labels for alt text
+                const _viewLabel = { front:'Front', back:'Back', side:'Side', top:'Top',
+                                     extra:'Detail', extra2:'Detail 2', extra3:'Detail 3' };
                 const title  = cp.custom_name || `${club.name} ${mp.item_name}`;
                 const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
@@ -9885,18 +9990,50 @@
                 }
                 const womenSizes = (mp.women_sizes || '4,6,8,10,12,14,16,18,20,22,24').split(',').map(s => s.trim()).filter(Boolean);
 
-                let variantIndex = 0;
-                // First image is used on the first variant row; remaining images follow as image-only rows
+                // For style variants the first front image of each style becomes the variant image
+                // When hasStyles: Option1=Style, Option2=Fit/Size, Option3=Size (if multifit)
+                const _frontForStyle = (sName) => {
+                    const e = imageEntries.find(x => x.style === sName && x.view === 'front');
+                    return e ? e.url : (imageEntries.find(x => x.style === sName) || {}).url || '';
+                };
+                // When no styles, fall back to first image
                 const firstImg = imageUrls[0] || '';
 
-                const buildRow = (fit, size, price, compareAt) => {
+                let variantIndex = 0;
+
+                // buildRow: styleName is null when no style variants exist
+                const buildRow = (fit, size, price, compareAt, styleName = null) => {
                     const sku     = buildSku(mp, club, size);
                     const isFirst = variantIndex === 0;
                     variantIndex++;
                     const imgUrl  = isFirst ? firstImg : '';
+                    const variantImg = hasStyles ? _frontForStyle(styleName) : '';
                     const seoTitle = `${title} | Official ${club.name} Merchandise`;
                     const seoDesc  = description.replace(/<[^>]+>/g, '').substring(0, 160) || `Shop the official ${title}. Premium quality teamwear.`;
                     const tax = taxForFit(fit);
+
+                    // Option layout depends on whether style variants exist
+                    // hasStyles:  Option1=Style, Option2=Fit|Size, Option3=Size (if multifit)
+                    // no styles:  Option1=Fit|Size, Option2=Size (if multifit), Option3=''
+                    let opt1n, opt1v, opt2n, opt2v, opt3n, opt3v;
+                    if (hasStyles) {
+                        opt1n = 'Style';  opt1v = styleName || 'Default';
+                        if (isOneSize) {
+                            opt2n = 'Size'; opt2v = size; opt3n = ''; opt3v = '';
+                        } else if (multifit) {
+                            opt2n = 'Fit';  opt2v = fit; opt3n = 'Size'; opt3v = size;
+                        } else {
+                            opt2n = 'Size'; opt2v = size; opt3n = ''; opt3v = '';
+                        }
+                    } else {
+                        if (isOneSize) {
+                            opt1n = 'Size'; opt1v = size; opt2n = ''; opt2v = ''; opt3n = ''; opt3v = '';
+                        } else if (multifit) {
+                            opt1n = 'Fit';  opt1v = fit; opt2n = 'Size'; opt2v = size; opt3n = ''; opt3v = '';
+                        } else {
+                            opt1n = 'Size'; opt1v = size; opt2n = ''; opt2v = ''; opt3n = ''; opt3v = '';
+                        }
+                    }
 
                     return {
                         'Title':                  isFirst ? title : '',
@@ -9912,12 +10049,12 @@
                         'Collection':             isFirst ? club.name : '',
                         'SKU':                    sku,
                         'Barcode':                '',
-                        'Option1 name':           multifit ? 'Fit'  : 'Size',
-                        'Option1 value':          multifit ? fit    : size,
-                        'Option2 name':           multifit ? 'Size' : '',
-                        'Option2 value':          multifit ? size   : '',
-                        'Option3 name':           '',
-                        'Option3 value':          '',
+                        'Option1 name':           opt1n,
+                        'Option1 value':          opt1v,
+                        'Option2 name':           opt2n,
+                        'Option2 value':          opt2v,
+                        'Option3 name':           opt3n,
+                        'Option3 value':          opt3v,
                         'Price':                  price > 0 ? Number(price).toFixed(2) : '',
                         'Compare-at price':       compareAt || '',
                         'Cost per item':          cogs,
@@ -9933,14 +10070,14 @@
                         'Fulfillment service':    'manual',
                         'Product image URL':      imgUrl,
                         'Image position':         imgUrl ? '1' : '',
-                        'Image alt text':         imgUrl ? `${title} - Front` : '',
-                        'Variant image URL':      '',
+                        'Image alt text':         imgUrl ? `${title} - ${_viewLabel[(imageEntries[0] || {}).view] || 'Front'}` : '',
+                        'Variant image URL':      variantImg,
                         'Gift card':              'FALSE',
                         'SEO title':              isFirst ? seoTitle.substring(0, 70) : '',
                         'SEO description':        isFirst ? seoDesc : '',
                         'Google Shopping / Google product category': isFirst ? productCategory : '',
-                        'Google Shopping / Gender':    isFirst ? (fit === 'Youth' ? 'Unisex' : fit === "Women's" ? 'Female' : 'Unisex') : '',
-                        'Google Shopping / Age group': isFirst ? (fit === 'Youth' ? 'Kids' : 'Adult') : '',
+                        'Google Shopping / Gender':    isFirst ? (fit === 'Youth Unisex' ? 'Unisex' : fit === "Women's" ? 'Female' : 'Unisex') : '',
+                        'Google Shopping / Age group': isFirst ? (fit === 'Youth Unisex' ? 'Kids' : 'Adult') : '',
                         'Google Shopping / MPN':       sku,
                         'Google Shopping / Condition': isFirst ? 'new' : '',
                         'Google Shopping / Custom product': isFirst ? 'FALSE' : '',
@@ -9950,36 +10087,39 @@
                     };
                 };
 
-                if (isOneSize) {
-                    const price = derivePrice(cp, mp, 'Adult');
-                    rows.push(buildRow('One Size', 'OS', price, ''));
+                // Helper: emit all size/fit combinations for a given style (or null if no styles)
+                const pushFitRows = (styleName) => {
+                    if (isOneSize) {
+                        rows.push(buildRow('One Size', 'OS', derivePrice(cp, mp, 'Adult'), '', styleName));
+                    } else {
+                        // Order: Youth → Adult → Women's (keeps zero-rated variants grouped)
+                        if (hasYouth && youthSizes.length)
+                            youthSizes.forEach(sz => rows.push(buildRow('Youth Unisex', sz, derivePrice(cp, mp, 'Youth'), deriveCompareAt(mp, 'Youth'), styleName)));
+                        if (hasAdult && adultSizes.length)
+                            adultSizes.forEach(sz => rows.push(buildRow('Adult', sz, derivePrice(cp, mp, 'Adult'), deriveCompareAt(mp, 'Adult'), styleName)));
+                        if (hasWomen && womenSizes.length)
+                            womenSizes.forEach(sz => rows.push(buildRow("Women's", sz, derivePrice(cp, mp, "Women's"), deriveCompareAt(mp, "Women's"), styleName)));
+                    }
+                };
+
+                if (hasStyles) {
+                    // Emit variant rows for each style in alphabetical order
+                    [...styleNames].sort().forEach(sn => pushFitRows(sn));
                 } else {
-                    // Order: Youth → Adult → Women's (Youth first keeps zero-rated variants grouped)
-                    if (hasYouth && youthSizes.length) {
-                        youthSizes.forEach(size =>
-                            rows.push(buildRow('Youth Unisex', size, derivePrice(cp, mp, 'Youth'), deriveCompareAt(mp, 'Youth')))
-                        );
-                    }
-                    if (hasAdult && adultSizes.length) {
-                        adultSizes.forEach(size =>
-                            rows.push(buildRow('Adult', size, derivePrice(cp, mp, 'Adult'), deriveCompareAt(mp, 'Adult')))
-                        );
-                    }
-                    if (hasWomen && womenSizes.length) {
-                        womenSizes.forEach(size =>
-                            rows.push(buildRow("Women's", size, derivePrice(cp, mp, "Women's"), deriveCompareAt(mp, "Women's")))
-                        );
-                    }
+                    pushFitRows(null);
                 }
 
-                // Additional images (back, side, V2, V3…) — image-only rows sharing the same handle
-                imageUrls.slice(1).forEach((imgUrl, i) => {
+                // Additional images — image-only rows sharing the same URL handle
+                // Use view metadata for meaningful alt text
+                imageEntries.slice(1).forEach((entry, i) => {
+                    const viewLbl = _viewLabel[entry.view] || 'View';
+                    const altParts = [title, entry.style, viewLbl].filter(Boolean);
                     rows.push({
                         'URL handle':         handle,
                         'Status':             '',
-                        'Product image URL':  imgUrl,
+                        'Product image URL':  entry.url,
                         'Image position':     String(i + 2),
-                        'Image alt text':     `${title} - View ${i + 2}`
+                        'Image alt text':     altParts.join(' - ')
                     });
                 });
             }
