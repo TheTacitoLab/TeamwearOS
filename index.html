@@ -261,6 +261,19 @@
         .kanban-card-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: #0f172a; }
         .kanban-card-club  { font-size: 12px; color: #64748b; margin-bottom: 8px; }
         .kanban-card-meta  { display: flex; gap: 6px; flex-wrap: wrap; }
+        .kanban-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f1f5f9; }
+        .kanban-salesperson { font-size: 11px; color: #94a3b8; font-weight: 500; }
+        .kanban-shopify-link { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #059669; background: rgba(5,150,105,0.08); border: 1px solid rgba(5,150,105,0.2); border-radius: 6px; padding: 3px 8px; text-decoration: none; margin-top: 6px; transition: all 0.15s; }
+        .kanban-shopify-link:hover { background: rgba(5,150,105,0.15); color: #047857; }
+        .kanban-empty { color: #94a3b8; font-size: 12px; padding: 12px 0; text-align: center; font-style: italic; }
+
+        /* Sales stage tab bar */
+        .sales-stage-tabs { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; overflow-x: auto; }
+        .sales-stage-tab { display: flex; align-items: center; gap: 8px; padding: 10px 20px; font-size: 12px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; color: #94a3b8; border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+        .sales-stage-tab:hover { color: #475569; }
+        .sales-stage-tab.active { color: #6d28d9; border-bottom-color: #6d28d9; }
+        .tab-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; font-size: 11px; font-weight: 700; background: #e2e8f0; color: #64748b; }
+        .sales-stage-tab.active .tab-count { background: rgba(109,40,217,0.12); color: #6d28d9; }
 
         /* Toggle switch */
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -1287,29 +1300,19 @@
             <!-- Main Feature Grid -->
             <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3" id="feature-grid">
 
-                <!-- Prospecting -->
-                <div id="fc-prospecting" onclick="showTool('prospecting')" class="feature-card accent-teal">
-                    <span class="card-badge badge-new" id="badge-prospecting" style="display:none">Off</span>
-                    <div class="card-icon" style="background:#dbeafe"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="#1d4ed8"/></svg></div>
-                    <h3>Prospecting</h3>
-                    <p>Track leads, manage early conversations and monitor conversion pipeline</p>
-                    <div class="mt-4 flex items-center gap-2">
-                        <span id="stat-leads-nc" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#dbeafe;color:#1d4ed8">0 new leads</span>
-                        <span id="stat-leads-id" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 in discussion</span>
-                    </div>
-                </div>
-
-                <!-- Sales -->
+                <!-- Sales (unified — includes Leads + Jobs pipeline) -->
                 <div id="fc-sales" onclick="showTool('sales')" class="feature-card accent-purple">
                     <span class="card-badge badge-new" id="badge-sales" style="display:none">Off</span>
                     <div class="card-icon" style="background:#ede9fe"><svg class="w-7 h-7" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6v4m-3-2h6"/></svg></div>
                     <h3>Sales</h3>
-                    <p>Manage jobs, design briefs, club products and order pipeline</p>
+                    <p>Leads pipeline, jobs kanban, production and completed orders</p>
                     <div class="mt-4 flex items-center gap-2">
                         <span id="stat-jobs-live" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#ede9fe;color:#6d28d9">0 live jobs</span>
                         <span id="stat-jobs-done" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 completed</span>
                     </div>
                 </div>
+                <!-- Prospecting — merged into Sales LEADS tab -->
+                <div id="fc-prospecting" class="hide"></div>
 
                 <!-- Clubs -->
                 <div id="fc-clubs" onclick="showTool('clubs')" class="feature-card accent-purple">
@@ -2742,179 +2745,8 @@
             </div>
         </div>
 
-        <!-- ============================================================
-             TOOL: PROSPECTING
-             ============================================================ -->
-        <div id="tool-prospecting" class="hide w-full p-6 md:p-8 lg:px-12">
-            <!-- Page nav row -->
-            <div class="page-nav-row">
-                <button onclick="showLaunchpad()" class="nav-home-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg>
-                    Prospecting
-                </span>
-            </div>
-
-            <!-- Top actions row -->
-            <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <div class="prospect-metric-mini" style="border-left-color:#2563eb">
-                        <span id="pm-not-contacted" class="prospect-mini-count" style="color:#1d4ed8">0</span>
-                        <span class="prospect-mini-label">Not Contacted</span>
-                    </div>
-                    <div class="prospect-metric-mini" style="border-left-color:#6d28d9">
-                        <span id="pm-in-discussion" class="prospect-mini-count" style="color:#6d28d9">0</span>
-                        <span class="prospect-mini-label">In Discussion</span>
-                    </div>
-                    <div class="prospect-metric-mini" style="border-left-color:#16a34a">
-                        <span id="pm-converted" class="prospect-mini-count" style="color:#16a34a">0</span>
-                        <span class="prospect-mini-label">Converted</span>
-                    </div>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Lead
-                    </button>
-                    <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
-                    <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
-                </div>
-            </div>
-
-            <!-- 3-column pipeline cards (always visible, click to expand inline panel) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-                <!-- Not Contacted -->
-                <div id="prospect-card-nc" onclick="showProspectView('not-contacted')"
-                    class="prospect-card transition-all"
-                    style="cursor:pointer">
-                    <div class="flex items-center gap-4">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
-                            <svg class="w-5 h-5" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-sm">Not Contacted</h3>
-                                <span id="nc-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
-                            </div>
-                            <p class="text-gray-500 text-xs mt-0.5">New leads waiting to be contacted.</p>
-                        </div>
-                        <svg id="prospect-card-nc-arrow" class="w-4 h-4 flex-shrink-0 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                </div>
-
-                <!-- In Discussion -->
-                <div id="prospect-card-id" onclick="showProspectView('in-discussion')"
-                    class="prospect-card transition-all"
-                    style="cursor:pointer">
-                    <div class="flex items-center gap-4">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#ede9fe">
-                            <svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-sm">In Discussion</h3>
-                                <span id="id-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
-                            </div>
-                            <p class="text-gray-500 text-xs mt-0.5">Active conversations on a visual Kanban board.</p>
-                        </div>
-                        <svg id="prospect-card-id-arrow" class="w-4 h-4 flex-shrink-0 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                </div>
-
-                <!-- Converted -->
-                <div id="prospect-card-cv" onclick="showProspectView('converted')"
-                    class="prospect-card transition-all"
-                    style="cursor:pointer">
-                    <div class="flex items-center gap-4">
-                        <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dcfce7">
-                            <svg class="w-5 h-5" fill="none" stroke="#16a34a" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-sm">Converted</h3>
-                                <span id="cv-count-badge" class="text-xs font-bold px-2 py-0.5 rounded-full" style="background:#dcfce7;color:#16a34a">0</span>
-                            </div>
-                            <p class="text-gray-500 text-xs mt-0.5">Leads successfully converted to Sales Jobs.</p>
-                        </div>
-                        <svg id="prospect-card-cv-arrow" class="w-4 h-4 flex-shrink-0 text-gray-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                </div>
-            </div>
-
-            <!-- INLINE PANEL: Not Contacted List -->
-            <div id="prospect-not-contacted" class="hide">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <h3 class="text-base font-bold">Not Contacted</h3>
-                        <span id="nc-list-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
-                    </div>
-                    <button onclick="openLeadModal(null, 'not_contacted')" class="btn-primary text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Lead
-                    </button>
-                </div>
-                <div class="filter-bar mb-4">
-                    <input type="text" id="nc-search" placeholder="Search leads..." oninput="renderNotContacted()" style="min-width:200px">
-                    <select id="nc-filter-sport" onchange="renderNotContacted()">
-                        <option value="">All Sports</option>
-                        <option>Football</option><option>Rugby</option><option>Cricket</option>
-                        <option>Basketball</option><option>Netball</option><option>Hockey</option>
-                        <option>Athletics</option><option>Cycling</option><option>Swimming</option>
-                        <option>Tennis</option><option>Other</option>
-                    </select>
-                    <select id="nc-filter-county" onchange="renderNotContacted()">
-                        <option value="">All Counties</option>
-                    </select>
-                    <button onclick="exportLeadsCSV('not_contacted')" class="btn-secondary text-sm">Export CSV</button>
-                </div>
-                <div id="nc-list" class="space-y-2 xl:grid xl:grid-cols-2 xl:gap-3 xl:space-y-0 2xl:grid-cols-3">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-
-            <!-- INLINE PANEL: In Discussion Kanban -->
-            <div id="prospect-in-discussion" class="hide">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <h3 class="text-base font-bold">In Discussion</h3>
-                        <span id="id-board-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#ede9fe;color:#6d28d9">0</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="openStageConfig()" class="btn-secondary text-sm flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            Configure Stages
-                        </button>
-                        <button onclick="openLeadModal(null, 'in_discussion')" class="btn-primary text-sm flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Add Lead
-                        </button>
-                    </div>
-                </div>
-                <div id="kanban-board" class="kanban-board">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-
-            <!-- INLINE PANEL: Converted Leads -->
-            <div id="prospect-converted" class="hide">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center gap-3">
-                        <h3 class="text-base font-bold">Converted Leads</h3>
-                        <span id="cv-list-count" class="text-sm font-semibold px-3 py-1 rounded-full" style="background:#dcfce7;color:#16a34a">0</span>
-                    </div>
-                    <button onclick="exportLeadsCSV('converted')" class="btn-secondary text-sm">Export CSV</button>
-                </div>
-                <div class="filter-bar mb-4">
-                    <input type="text" id="cv-search" placeholder="Search converted leads..." oninput="renderConverted()" style="min-width:200px">
-                </div>
-                <div id="cv-list" class="space-y-2">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </div>
+        <!-- TOOL: PROSPECTING — merged into Sales LEADS tab (see #tool-sales) -->
+        <div id="tool-prospecting" class="hide"></div>
 
         <!-- MODAL: Lead Record -->
         <div id="lead-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)">
@@ -3080,7 +2912,7 @@
                     <button onclick="closeStageConfig()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-5">✕</button>
                 </div>
                 <div class="p-5">
-                    <p class="text-gray-500 text-sm mb-4">Create up to 3 stages for your In Discussion pipeline. Drag to reorder.</p>
+                    <p class="text-gray-500 text-sm mb-4">Customise your lead pipeline stages. Drag to reorder.</p>
                     <div id="stages-list" class="space-y-2 mb-4">
                         <!-- Populated by JS -->
                     </div>
@@ -3146,68 +2978,83 @@
                 </span>
             </div>
 
-            <!-- SALES HOME -->
-            <div id="sales-home">
-                <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mb-5">
-                    <div onclick="openNewJobModal()" class="feature-card accent-purple" style="cursor:pointer">
-                        <div class="card-icon" style="background:rgba(139,92,246,0.12)"><svg class="w-7 h-7" fill="none" stroke="#7c3aed" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg></div>
-                        <h3>Create New Job</h3>
-                        <p>Start a new job record and kick off the sales process</p>
-                    </div>
-                    <div onclick="showSalesView('live')" class="feature-card accent-teal" style="cursor:pointer">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="card-icon" style="background:#dbeafe;margin-bottom:0"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/></svg></div>
-                            <span id="sales-live-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:#dbeafe;color:#1d4ed8">0</span>
-                        </div>
-                        <h3>Live Jobs</h3>
-                        <p>Active jobs across all pipeline stages</p>
-                    </div>
-                    <div onclick="showSalesView('completed')" class="feature-card accent-green" style="cursor:pointer">
-                        <div class="flex items-start justify-between mb-4">
-                            <div class="card-icon" style="background:rgba(34,197,94,0.12);margin-bottom:0"><svg class="w-7 h-7" fill="none" stroke="#15803d" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-                            <span id="sales-done-badge" class="text-sm font-bold px-3 py-1 rounded-full" style="background:rgba(34,197,94,0.12);color:#15803d">0</span>
-                        </div>
-                        <h3>Completed</h3>
-                        <p>All finished jobs and historical records</p>
-                    </div>
-                </div>
-                <!-- Recent jobs preview -->
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Recent Jobs</h3>
-                    <div id="sales-recent-jobs" class="space-y-2"></div>
-                </div>
+            <!-- 4-STAGE TAB NAVIGATION -->
+            <div class="sales-stage-tabs" id="sales-stage-tabs">
+                <button id="stab-leads" onclick="showSalesTab('leads')" class="sales-stage-tab active">
+                    <span>LEADS</span>
+                    <span id="stab-leads-count" class="tab-count">0</span>
+                </button>
+                <button id="stab-jobs" onclick="showSalesTab('jobs')" class="sales-stage-tab">
+                    <span>JOBS</span>
+                    <span id="stab-jobs-count" class="tab-count">0</span>
+                </button>
+                <button id="stab-production" onclick="showSalesTab('production')" class="sales-stage-tab">
+                    <span>PRODUCTION</span>
+                </button>
+                <button id="stab-completed" onclick="showSalesTab('completed')" class="sales-stage-tab">
+                    <span>COMPLETED</span>
+                    <span id="stab-completed-count" class="tab-count">0</span>
+                </button>
             </div>
 
-            <!-- LIVE JOBS VIEW -->
-            <div id="sales-live-view" class="hide">
-                <div class="flex items-center gap-3 mb-6">
-                    <button onclick="showSalesView('home')" class="nav-back-btn">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        Sales
-                    </button>
-                    <h3 class="text-xl font-bold">Live Jobs</h3>
+            <!-- ── TAB: LEADS ── -->
+            <div id="sales-tab-leads">
+                <!-- Action bar -->
+                <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <!-- Filter: search -->
+                        <input type="text" id="leads-search" placeholder="Search name or club…"
+                            oninput="renderKanban()"
+                            class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800" style="min-width:180px">
+                        <!-- Filter: sport -->
+                        <select id="leads-sport-filter" onchange="renderKanban()"
+                            class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800">
+                            <option value="">All Sports</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Lead
+                        </button>
+                        <button onclick="openStageConfig()" class="btn-secondary text-sm">Stages</button>
+                        <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
+                        <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
+                    </div>
                 </div>
-                <!-- Stage filter grid -->
-                <div class="stage-nav-grid" id="stage-nav-grid"></div>
-                <!-- Jobs list -->
-                <div class="flex items-center justify-between mb-4">
-                    <p id="live-jobs-filter-label" class="text-sm text-gray-500">All stages</p>
+                <!-- Lead Kanban board -->
+                <div class="kanban-board" id="kanban-board"></div>
+            </div>
+
+            <!-- ── TAB: JOBS ── -->
+            <div id="sales-tab-jobs" class="hide">
+                <!-- Action bar -->
+                <div class="flex items-center justify-between mb-5">
+                    <p id="jobs-kanban-filter-label" class="text-sm text-gray-500">All active jobs</p>
                     <button onclick="openNewJobModal()" class="btn-primary text-sm flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                         New Job
                     </button>
                 </div>
-                <div id="live-jobs-list" class="space-y-3"></div>
+                <!-- Jobs Kanban board -->
+                <div class="kanban-board" id="jobs-kanban-board"></div>
             </div>
 
-            <!-- COMPLETED JOBS VIEW -->
-            <div id="sales-completed-view" class="hide">
-                <div class="flex items-center gap-3 mb-6">
-                    <button onclick="showSalesView('home')" class="nav-back-btn">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        Sales
-                    </button>
-                    <h3 class="text-xl font-bold">Completed Jobs</h3>
+            <!-- ── TAB: PRODUCTION ── -->
+            <div id="sales-tab-production" class="hide">
+                <div class="glass rounded-2xl p-8 text-center" style="max-width:560px;margin:40px auto">
+                    <div style="font-size:48px;margin-bottom:16px">🏭</div>
+                    <h3 class="text-xl font-bold mb-3">Production</h3>
+                    <p class="text-gray-500 mb-4">This section will display all <strong>paid Shopify orders</strong> fed directly into TeamwearOS.</p>
+                    <p class="text-gray-500 text-sm mb-6">From here you'll be able to batch weekly orders into a single Purchase Order, generate a complete PDF of all order details, and create a factory production sheet — ready for your factory to start straight away.</p>
+                    <span class="text-xs font-semibold px-3 py-1.5 rounded-full" style="background:rgba(251,191,36,0.15);color:#d97706;border:1px solid rgba(217,119,6,0.25)">Coming Soon — Shopify Integration</span>
+                </div>
+            </div>
+
+            <!-- ── TAB: COMPLETED ── -->
+            <div id="sales-tab-completed" class="hide">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-lg font-bold">Completed Jobs</h3>
                 </div>
                 <div id="completed-jobs-list" class="space-y-3"></div>
             </div>
@@ -3297,10 +3144,9 @@
                             <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
                                 <option value="discovery">Discovery</option>
                                 <option value="concepts">Concepts</option>
-                                <option value="awaiting_approval">Awaiting Approval</option>
-                                <option value="quote">Quote</option>
-                                <option value="paid">Paid</option>
-                                <option value="on_boarding">On-Boarding</option>
+                                <option value="final_mockups">Final Mock-ups</option>
+                                <option value="order_details">Order Details</option>
+                                <option value="quoted">Quoted</option>
                                 <option value="completed">Completed</option>
                             </select>
                         </div>
@@ -3315,9 +3161,9 @@
 
             <!-- TAB: Overview -->
             <div id="jt-content-overview">
-                <div class="glass rounded-2xl p-5">
-                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Job Details</h4>
-                    <div id="jr-overview-details" class="space-y-3"></div>
+                <div class="glass rounded-2xl p-4">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Job Details</h4>
+                    <div id="jr-overview-details"></div>
                     <!-- Assigned users (multi-user) -->
                     <div class="mt-4 pt-4 border-t border-gray-800">
                         <div class="flex items-center justify-between mb-2">
@@ -3526,10 +3372,9 @@
                                 <select id="job-stage" class="w-full px-3 py-2 rounded-lg text-sm">
                                     <option value="discovery">Discovery</option>
                                     <option value="concepts">Concepts</option>
-                                    <option value="awaiting_approval">Awaiting Approval</option>
-                                    <option value="quote">Quote</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="on_boarding">On-Boarding</option>
+                                    <option value="final_mockups">Final Mock-ups</option>
+                                    <option value="order_details">Order Details</option>
+                                    <option value="quoted">Quoted</option>
                                     <option value="completed">Completed</option>
                                 </select>
                             </div>
@@ -3539,6 +3384,10 @@
                             <select id="job-club-id" class="w-full px-3 py-2 rounded-lg text-sm">
                                 <option value="">— No club linked —</option>
                             </select>
+                        </div>
+                        <div class="mt-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Shopify Draft Order URL</label>
+                            <input type="url" id="job-shopify-url" placeholder="https://admin.shopify.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
                     </div>
                     <div class="flex gap-3">
@@ -5847,7 +5696,6 @@
 
         function applyFeatureToggles() {
             const featureMap = {
-                'prospecting':    { card: 'fc-prospecting', badge: 'badge-prospecting', onclick: "showTool('prospecting')" },
                 'sales':          { card: 'fc-sales',       badge: 'badge-sales',       onclick: "showTool('sales')" },
                 'clubs':          { card: 'fc-clubs',       badge: 'badge-clubs',       onclick: "showTool('clubs')" },
                 'production':     { card: 'fc-production',  badge: 'badge-production',  onclick: "showTool('po-tracker')" },
@@ -5873,6 +5721,9 @@
         }
 
         function showTool(tool) {
+            // Redirect prospecting to unified Sales LEADS tab
+            if (tool === 'prospecting') { tool = 'sales'; }
+
             // Check if admin tools and user is not super admin
             if ((tool === 'settings' || tool === 'users') && !isSuperAdmin) {
                 showToast('Access denied. Super admin only.', 'error');
@@ -5928,22 +5779,11 @@
                 case 'po-tracker':
                     loadPoTracker();
                     break;
-                case 'prospecting':
-                    // Reset to collapsed (no panel open) when navigating to Prospecting
-                    currentProspectView = null;
-                    ['nc','id','cv'].forEach(k => {
-                        const card = document.getElementById(`prospect-card-${k}`);
-                        const arrow = document.getElementById(`prospect-card-${k}-arrow`);
-                        if (card) card.style.borderColor = '';
-                        if (arrow) arrow.style.transform = '';
-                    });
-                    ['prospect-not-contacted','prospect-in-discussion','prospect-converted'].forEach(id => {
-                        document.getElementById(id)?.classList.add('hide');
-                    });
-                    updateStats();
-                    break;
                 case 'sales':
-                    showSalesView('home');
+                    Promise.all([loadLeads(), loadKanbanStages(), loadJobs()]).then(() => {
+                        showSalesTab('leads');
+                        updateSalesTabCounts();
+                    });
                     break;
             }
         }
@@ -10337,7 +10177,7 @@
                 if (!document.getElementById('tool-clubs').classList.contains('hide')) {
                     navStack.push({ type: 'tool', tool: 'clubs', label: 'Clubs' });
                 } else if (!document.getElementById('tool-sales').classList.contains('hide')) {
-                    navStack.push({ type: 'tool', tool: 'sales', view: 'live', label: 'Live Jobs' });
+                    navStack.push({ type: 'tool', tool: 'sales', view: 'jobs', label: 'Sales' });
                 }
             }
             // Build breadcrumb trail entry
@@ -12390,13 +12230,12 @@
         let currentJobTab = 'overview';
 
         const JOB_STAGES = [
-            { key: 'discovery',         label: 'Discovery',         colorClass: 'stage-discovery',  color: '#64748b', bg: 'rgba(100,116,139,0.12)' },
-            { key: 'concepts',          label: 'Concepts',          colorClass: 'stage-concepts',   color: '#2563eb', bg: 'rgba(37,99,235,0.1)'   },
-            { key: 'awaiting_approval', label: 'Awaiting Approval', colorClass: 'stage-awaiting',   color: '#d97706', bg: 'rgba(217,119,6,0.1)'   },
-            { key: 'quote',             label: 'Quote',             colorClass: 'stage-quote',      color: '#7c3aed', bg: 'rgba(124,58,237,0.1)'  },
-            { key: 'paid',              label: 'Paid',              colorClass: 'stage-paid',       color: '#15803d', bg: 'rgba(22,163,74,0.1)'   },
-            { key: 'on_boarding',       label: 'On-Boarding',       colorClass: 'stage-onboarding', color: '#0284c7', bg: 'rgba(14,165,233,0.1)'  },
-            { key: 'completed',         label: 'Completed ✓',       colorClass: 'stage-completed',  color: '#16a34a', bg: 'rgba(22,163,74,0.12)'  }
+            { key: 'discovery',     label: 'Discovery',      colorClass: 'stage-discovery',  color: '#64748b', bg: 'rgba(100,116,139,0.12)' },
+            { key: 'concepts',      label: 'Concepts',       colorClass: 'stage-concepts',   color: '#2563eb', bg: 'rgba(37,99,235,0.1)'   },
+            { key: 'final_mockups', label: 'Final Mock-ups', colorClass: 'stage-awaiting',   color: '#d97706', bg: 'rgba(217,119,6,0.1)'   },
+            { key: 'order_details', label: 'Order Details',  colorClass: 'stage-quote',      color: '#7c3aed', bg: 'rgba(124,58,237,0.1)'  },
+            { key: 'quoted',        label: 'Quoted',         colorClass: 'stage-paid',       color: '#059669', bg: 'rgba(5,150,105,0.1)'   },
+            { key: 'completed',     label: 'Completed ✓',    colorClass: 'stage-completed',  color: '#16a34a', bg: 'rgba(22,163,74,0.12)'  }
         ];
 
         const JOB_TYPE_LABELS = {
@@ -12422,39 +12261,49 @@
         // =============================================
         // SALES — NAVIGATION
         // =============================================
-        function showSalesView(view) {
-            document.getElementById('sales-home').classList.add('hide');
-            document.getElementById('sales-live-view').classList.add('hide');
-            document.getElementById('sales-completed-view').classList.add('hide');
+        function showSalesTab(tab) {
+            ['leads','jobs','production','completed'].forEach(t => {
+                const panel = document.getElementById(`sales-tab-${t}`);
+                const btn   = document.getElementById(`stab-${t}`);
+                if (panel) panel.classList.add('hide');
+                if (btn)   btn.classList.remove('active');
+            });
+            const activePanel = document.getElementById(`sales-tab-${tab}`);
+            const activeBtn   = document.getElementById(`stab-${tab}`);
+            if (activePanel) activePanel.classList.remove('hide');
+            if (activeBtn)   activeBtn.classList.add('active');
 
-            if (view === 'home') {
-                document.getElementById('sales-home').classList.remove('hide');
-                renderSalesRecentJobs();
-                updateSalesBadges();
-            } else if (view === 'live') {
-                document.getElementById('sales-live-view').classList.remove('hide');
-                salesViewStageFilter = null;
-                renderStageNavGrid();
-                renderLiveJobs();
-            } else if (view === 'completed') {
-                document.getElementById('sales-completed-view').classList.remove('hide');
-                renderCompletedJobs();
-            }
+            if (tab === 'leads')     renderKanban();
+            if (tab === 'jobs')      renderJobsKanban();
+            if (tab === 'completed') renderCompletedJobs();
+            updateSalesTabCounts();
         }
 
-        function updateSalesBadges() {
-            const liveCount = jobs.filter(j => j.stage !== 'completed').length;
-            const doneCount = jobs.filter(j => j.stage === 'completed').length;
-            const lbEl = document.getElementById('sales-live-badge');
-            const dbEl = document.getElementById('sales-done-badge');
-            if (lbEl) lbEl.textContent = liveCount;
-            if (dbEl) dbEl.textContent = doneCount;
-            // Launchpad
+        // Legacy shim — any old showSalesView() calls fall through gracefully
+        function showSalesView(view) {
+            if (view === 'completed') showSalesTab('completed');
+            else showSalesTab('leads');
+        }
+
+        function updateSalesTabCounts() {
+            const activeLeads = leads.filter(l => l.status !== 'converted' && l.status !== 'archived').length;
+            const activeJobs  = jobs.filter(j => j.stage !== 'completed').length;
+            const doneJobs    = jobs.filter(j => j.stage === 'completed').length;
+            const lcEl = document.getElementById('stab-leads-count');
+            const jcEl = document.getElementById('stab-jobs-count');
+            const ccEl = document.getElementById('stab-completed-count');
+            if (lcEl) lcEl.textContent = activeLeads;
+            if (jcEl) jcEl.textContent = activeJobs;
+            if (ccEl) ccEl.textContent = doneJobs;
+            // Launchpad stats
             const lpLive = document.getElementById('stat-jobs-live');
             const lpDone = document.getElementById('stat-jobs-done');
-            if (lpLive) lpLive.textContent = `${liveCount} live job${liveCount !== 1 ? 's' : ''}`;
-            if (lpDone) lpDone.textContent = `${doneCount} completed`;
+            if (lpLive) lpLive.textContent = `${activeJobs} live job${activeJobs !== 1 ? 's' : ''}`;
+            if (lpDone) lpDone.textContent = `${doneJobs} completed`;
         }
+
+        // Keep updateSalesBadges as shim for any other call sites
+        function updateSalesBadges() { updateSalesTabCounts(); }
 
         // =============================================
         // SALES — STAGE GRID
@@ -12579,6 +12428,7 @@
             document.getElementById('job-club-type').value = 'retail';
             document.getElementById('job-channel').value = 'direct';
             document.getElementById('job-stage').value = 'discovery';
+            document.getElementById('job-shopify-url').value = '';
             // Populate club dropdown
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
@@ -12605,6 +12455,7 @@
             document.getElementById('job-club-type').value = currentJob.club_type || 'retail';
             document.getElementById('job-channel').value = currentJob.channel || 'direct';
             document.getElementById('job-stage').value = currentJob.stage || 'discovery';
+            document.getElementById('job-shopify-url').value = currentJob.shopify_draft_order_url || '';
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
                 clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
@@ -12622,6 +12473,7 @@
             if (!jobName) { showToast('Job name is required', 'error'); return; }
             const jobId = document.getElementById('job-id').value;
             const clubId = document.getElementById('job-club-id').value || null;
+            const shopifyUrl = document.getElementById('job-shopify-url')?.value.trim() || null;
             const payload = {
                 brand_id: currentBrand.id,
                 job_name: jobName,
@@ -12630,7 +12482,8 @@
                 club_type: document.getElementById('job-club-type').value,
                 channel: document.getElementById('job-channel').value,
                 stage: document.getElementById('job-stage').value,
-                club_id: clubId
+                club_id: clubId,
+                shopify_draft_order_url: shopifyUrl
             };
 
             if (jobId) {
@@ -12659,9 +12512,7 @@
                     }).eq('id', convertLeadId);
                     await loadLeads();
                     updateStats();
-                    // If prospecting panel is open refresh it
-                    if (currentProspectView === 'not-contacted') renderNotContacted();
-                    else if (currentProspectView === 'in-discussion') renderKanban();
+                    renderKanban();
                     showToast('Lead successfully converted to Job!', 'success');
                 }
                 await loadJobs();
@@ -12672,13 +12523,13 @@
 
             closeJobModal();
             await loadJobs();
-            updateSalesBadges();
+            updateSalesTabCounts();
             if (currentJobId) {
                 currentJob = jobs.find(j => j.id === currentJobId);
                 renderJobHeader();
                 showJobTab(currentJobTab);
             } else {
-                showSalesView('home');
+                showSalesTab('jobs');
             }
             } catch (err) {
                 console.error('saveJob error:', err);
@@ -12700,8 +12551,8 @@
                     // Update job back label
                     setJobBackLabel('Back to ' + currentClub.name);
                 } else if (!document.getElementById('tool-sales').classList.contains('hide')) {
-                    navStack.push({ type: 'tool', tool: 'sales', view: 'live', label: 'Live Jobs' });
-                    setJobBackLabel('Live Jobs');
+                    navStack.push({ type: 'tool', tool: 'sales', view: 'jobs', label: 'Sales' });
+                    setJobBackLabel('Sales');
                 } else if (!document.getElementById('tool-design-studio').classList.contains('hide')) {
                     navStack.push({ type: 'tool', tool: 'design-studio', label: 'Design Studio' });
                     setJobBackLabel('Design Studio');
@@ -12767,13 +12618,13 @@
         }
 
         function closeJobRecord() {
-            // If we have a nav stack entry, use goBack; otherwise default to sales
+            // If we have a nav stack entry, use goBack; otherwise default to sales JOBS tab
             if (navStack.length > 0) {
                 goBack();
             } else {
                 document.getElementById('tool-job-record').classList.add('hide');
                 document.getElementById('tool-sales').classList.remove('hide');
-                showSalesView('live');
+                showSalesTab('jobs');
             }
         }
 
@@ -12970,18 +12821,32 @@
             const details = document.getElementById('jr-overview-details');
             if (!details) return;
             const rows = [
-                ['Job Name', currentJob.job_name],
-                ['Job Type', JOB_TYPE_LABELS[currentJob.job_type] || currentJob.job_type],
-                ['Club Type', CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type],
-                ['Channel', CHANNEL_LABELS[currentJob.channel] || currentJob.channel],
-                ['Stage', JOB_STAGES.find(s => s.key === currentJob.stage)?.label || currentJob.stage],
-                ['Linked Club', currentJob.clubs?.name || 'None'],
-                ['Owner', getUserDisplayName(currentJob.created_by)],
-                ['Range Approved', currentJob.range_approved ? 'Yes ✓' : 'No'],
+                ['Job Type',      JOB_TYPE_LABELS[currentJob.job_type]  || currentJob.job_type],
+                ['Club Type',     CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type],
+                ['Channel',       CHANNEL_LABELS[currentJob.channel]     || currentJob.channel],
+                ['Stage',         JOB_STAGES.find(s => s.key === currentJob.stage)?.label || currentJob.stage],
+                ['Linked Club',   currentJob.clubs?.name || 'None'],
+                ['Owner',         getUserDisplayName(currentJob.created_by)],
+                ['Range Approved',currentJob.range_approved ? 'Yes ✓' : 'No'],
             ];
-            details.innerHTML = rows.map(([k, v]) => `
-                <div class="info-row"><span class="info-label">${k}</span><span class="info-value">${escHtml(v || '—')}</span></div>
-            `).join('');
+            const shopifyUrl = currentJob.shopify_draft_order_url;
+            const shopifyBlock = shopifyUrl
+                ? `<div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
+                       <span class="text-xs text-gray-500 block mb-1">Shopify Draft Order</span>
+                       <a href="${escHtml(shopifyUrl)}" target="_blank" rel="noopener"
+                          class="text-sm font-semibold text-brand-400 flex items-center gap-1.5 hover:underline" style="word-break:break-all">
+                          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                          View Draft Order ↗
+                       </a>
+                   </div>`
+                : '';
+            details.innerHTML = `<div class="grid grid-cols-2 gap-x-6 gap-y-2">
+                ${rows.map(([k, v]) => `
+                    <div>
+                        <span class="text-xs text-gray-500">${k}</span>
+                        <p class="text-sm font-semibold mt-0.5">${escHtml(v || '—')}</p>
+                    </div>`).join('')}
+            </div>${shopifyBlock}`;
         }
 
         async function renderJobProducts() {
@@ -14451,7 +14316,7 @@
             viewScope = scope;
             localStorage.setItem('teamwear_view_scope', scope);
             renderClubsEnhanced();
-            renderLiveJobs();
+            renderJobsKanban();
             renderCompletedJobs();
         }
 
@@ -14774,21 +14639,46 @@
                 .eq('brand_id', currentBrand.id)
                 .order('position');
             kanbanStages = data || [];
-            // If no stages exist, seed defaults
+            // If no stages exist, seed defaults (also migrates unassigned leads)
             if (kanbanStages.length === 0) {
                 await seedDefaultStages();
+            } else {
+                // Migrate any unassigned active leads to the first stage
+                const firstStageId = kanbanStages[0].id;
+                const unstaged = leads.filter(l =>
+                    l.status !== 'converted' && l.status !== 'archived' && !l.kanban_stage_id
+                );
+                if (unstaged.length > 0) {
+                    await supabase.from('leads')
+                        .update({ kanban_stage_id: firstStageId })
+                        .in('id', unstaged.map(l => l.id));
+                    await loadLeads();
+                }
             }
         }
 
         async function seedDefaultStages() {
             if (!currentBrand) return;
             const defaults = [
-                { brand_id: currentBrand.id, name: 'Initial Contact', color: '#3b82f6', position: 0 },
-                { brand_id: currentBrand.id, name: 'Proposal Sent', color: '#8b5cf6', position: 1 },
-                { brand_id: currentBrand.id, name: 'Decision Pending', color: '#f97316', position: 2 }
+                { brand_id: currentBrand.id, name: 'Not Contacted',    color: '#2563eb', position: 0 },
+                { brand_id: currentBrand.id, name: 'Attempted Contact', color: '#d97706', position: 1 },
+                { brand_id: currentBrand.id, name: 'In Discussion',     color: '#7c3aed', position: 2 }
             ];
             const { data } = await supabase.from('kanban_stages').insert(defaults).select();
             kanbanStages = data || [];
+            // Assign any un-staged active leads to the first stage
+            if (kanbanStages.length > 0) {
+                const firstStageId = kanbanStages[0].id;
+                const unstaged = leads.filter(l =>
+                    l.status !== 'converted' && l.status !== 'archived' && !l.kanban_stage_id
+                );
+                if (unstaged.length > 0) {
+                    await supabase.from('leads')
+                        .update({ kanban_stage_id: firstStageId })
+                        .in('id', unstaged.map(l => l.id));
+                    await loadLeads();
+                }
+            }
         }
 
         // =============================================
@@ -14991,28 +14881,47 @@
         }
 
         // =============================================
-        // PROSPECTING — KANBAN BOARD
+        // SALES — LEADS KANBAN BOARD
         // =============================================
         function renderKanban() {
             const board = document.getElementById('kanban-board');
             if (!board) return;
 
-            const idLeads = leads.filter(l => l.status === 'in_discussion');
-            const countEl = document.getElementById('id-board-count');
-            if (countEl) countEl.textContent = idLeads.length;
+            // Build filtered list of all active (non-converted, non-archived) leads
+            const searchVal  = (document.getElementById('leads-search')?.value || '').toLowerCase();
+            const sportVal   = (document.getElementById('leads-sport-filter')?.value || '');
+            let activeLeads  = leads.filter(l => l.status !== 'converted' && l.status !== 'archived');
+            if (searchVal) activeLeads = activeLeads.filter(l =>
+                l.lead_name?.toLowerCase().includes(searchVal) ||
+                l.club_name?.toLowerCase().includes(searchVal)
+            );
+            if (sportVal) activeLeads = activeLeads.filter(l => l.sport === sportVal);
+
+            // Update tab count
+            updateSalesTabCounts();
+
+            // Populate sport filter dropdown from data
+            const sportSel = document.getElementById('leads-sport-filter');
+            if (sportSel) {
+                const sports = [...new Set(leads.filter(l => l.sport).map(l => l.sport))].sort();
+                const cur = sportSel.value;
+                sportSel.innerHTML = '<option value="">All Sports</option>' +
+                    sports.map(s => `<option value="${escHtml(s)}"${s === cur ? ' selected' : ''}>${escHtml(s)}</option>`).join('');
+            }
 
             if (kanbanStages.length === 0) {
-                board.innerHTML = `<div class="empty-state w-full"><div class="empty-icon">🏗️</div><p>No stages configured. Click "Configure Stages" to get started.</p></div>`;
+                board.innerHTML = `<div class="empty-state w-full"><div class="empty-icon">🏗️</div><p>No stages configured. Click "Stages" to get started.</p></div>`;
                 return;
             }
 
             board.innerHTML = kanbanStages.map(stage => {
-                const stageLeads = idLeads
+                const stageLeads = activeLeads
                     .filter(l => l.kanban_stage_id === stage.id)
                     .sort((a, b) => (a.kanban_order || 0) - (b.kanban_order || 0));
 
-                const cards = stageLeads.map(lead => `
-                    <div class="kanban-card"
+                const cards = stageLeads.map(lead => {
+                    const salesperson = lead.assigned_to ? escHtml(getUserDisplayName(lead.assigned_to)) : '';
+                    return `<div class="kanban-card"
                         draggable="true"
                         ondragstart="onKanbanDragStart(event,'${lead.id}')"
                         ondragend="onKanbanDragEnd(event)"
@@ -15020,31 +14929,74 @@
                         <div class="kanban-card-title">${escHtml(lead.lead_name)}</div>
                         <div class="kanban-card-club">${escHtml(lead.club_name)}</div>
                         <div class="kanban-card-meta">
-                            ${lead.sport ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>` : ''}
-                            ${lead.county ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
+                            ${lead.sport   ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>`   : ''}
+                            ${lead.county  ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
                         </div>
-                        <div class="mt-2 pt-2" style="border-top:1px solid #f1f5f9">
+                        <div class="kanban-card-footer">
+                            ${salesperson ? `<span class="kanban-salesperson">${salesperson}</span>` : '<span></span>'}
                             <button onclick="event.stopPropagation();convertLeadToJob('${lead.id}')"
-                                class="btn-convert w-full justify-center" style="font-size:11px;padding:5px 8px">
+                                class="btn-convert" style="font-size:11px;padding:4px 8px">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                Convert to Job
+                                Convert
                             </button>
                         </div>
-                    </div>
-                `).join('');
+                    </div>`;
+                }).join('');
 
-                return `
-                    <div class="kanban-column"
-                        ondragover="onKanbanDragOver(event)"
-                        ondrop="onKanbanDrop(event,'${stage.id}')"
-                        ondragleave="onKanbanDragLeave(event)">
-                        <div class="kanban-col-header">
-                            <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.name)}</span>
-                            <span class="kanban-count">${stageLeads.length}</span>
-                        </div>
-                        ${cards || `<div style="color:#94a3b8;font-size:13px;padding:8px 0;text-align:center">Drop leads here</div>`}
+                return `<div class="kanban-column"
+                    ondragover="onKanbanDragOver(event)"
+                    ondrop="onKanbanDrop(event,'${stage.id}')"
+                    ondragleave="onKanbanDragLeave(event)">
+                    <div class="kanban-col-header">
+                        <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.name)}</span>
+                        <span class="kanban-count">${stageLeads.length}</span>
                     </div>
-                `;
+                    ${cards || `<div class="kanban-empty">Drop leads here</div>`}
+                </div>`;
+            }).join('');
+        }
+
+        // =============================================
+        // SALES — JOBS KANBAN BOARD
+        // =============================================
+        function renderJobsKanban() {
+            const board = document.getElementById('jobs-kanban-board');
+            if (!board) return;
+
+            const activeStages = JOB_STAGES.filter(s => s.key !== 'completed');
+            const activeJobs   = jobs.filter(j => j.stage !== 'completed' &&
+                (viewScope !== 'mine' || !currentUser || j.created_by === currentUser.id));
+
+            const labelEl = document.getElementById('jobs-kanban-filter-label');
+            if (labelEl) labelEl.textContent = `${activeJobs.length} active job${activeJobs.length !== 1 ? 's' : ''}`;
+
+            board.innerHTML = activeStages.map(stage => {
+                const stageJobs = activeJobs.filter(j => j.stage === stage.key);
+                const cards = stageJobs.map(job => {
+                    const clubName  = escHtml(job.clubs?.name || '—');
+                    const shopifyHtml = job.shopify_draft_order_url
+                        ? `<a href="${escHtml(job.shopify_draft_order_url)}" target="_blank" rel="noopener"
+                               onclick="event.stopPropagation()"
+                               class="kanban-shopify-link">
+                               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                               Shopify Draft
+                           </a>`
+                        : '';
+                    return `<div class="kanban-card" onclick="openJobRecord('${job.id}')">
+                        <div class="kanban-card-title">${escHtml(job.job_name)}</div>
+                        <div class="kanban-card-club">${clubName}</div>
+                        ${job.job_number ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">${escHtml(job.job_number)}</div>` : ''}
+                        ${shopifyHtml}
+                    </div>`;
+                }).join('');
+
+                return `<div class="kanban-column">
+                    <div class="kanban-col-header">
+                        <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.label)}</span>
+                        <span class="kanban-count">${stageJobs.length}</span>
+                    </div>
+                    ${cards || `<div class="kanban-empty">No jobs</div>`}
+                </div>`;
             }).join('');
         }
 
