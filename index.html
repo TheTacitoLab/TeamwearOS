@@ -3747,6 +3747,10 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                             Bulk Add
                         </button>
+                        <button id="cp-dl-csv-btn" onclick="openCreateStoreModal('selected')" class="btn-secondary text-sm flex items-center gap-2 hide">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                            <span id="cp-dl-csv-label">Download CSV</span>
+                        </button>
                         <button onclick="showAddClubProductModal()" class="btn-primary text-sm flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                             Add Product
@@ -3759,10 +3763,6 @@
                     <span id="cp-selection-count" class="text-sm font-medium text-gray-700" style="flex:1"></span>
                     <button onclick="selectAllCpProducts()" class="btn-secondary text-xs px-3 py-1">Select All</button>
                     <button onclick="deselectAllCpProducts()" class="btn-secondary text-xs px-3 py-1">Deselect All</button>
-                    <button onclick="downloadSelectedCSV()" class="btn-primary text-xs px-3 py-1 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        Download CSV
-                    </button>
                 </div>
 
                 <!-- Inline Mock-Up Upload Section -->
@@ -7664,6 +7664,7 @@
         // STORE CREATOR: price list + CSV download
         // =============================================
         let _selectedPriceList = 'retail';
+        let _csvMode = 'all'; // 'all' or 'selected'
 
         function selectPriceList(type) {
             _selectedPriceList = type;
@@ -7671,13 +7672,19 @@
             if (radioEl) radioEl.checked = true;
         }
 
-        function openCreateStoreModal() {
+        function openCreateStoreModal(mode = 'all') {
             if (!currentClub) return;
-            const withImages = (currentClubProducts || []).filter(cp => (cp.image_urls || []).length > 0);
+            _csvMode = mode;
+            const sourceProducts = mode === 'selected'
+                ? (currentClubProducts || []).filter(cp => selectedCpIds.has(cp.id))
+                : (currentClubProducts || []);
+            const withImages = sourceProducts.filter(cp => (cp.image_urls || []).length > 0);
 
             // Store overview
             document.getElementById('cstore-club-name').textContent    = currentClub.name || '—';
-            document.getElementById('cstore-product-count').textContent = withImages.length;
+            document.getElementById('cstore-product-count').textContent = mode === 'selected'
+                ? `${withImages.length} (of ${selectedCpIds.size} selected)`
+                : withImages.length;
             document.getElementById('cstore-collection-name').textContent = currentClub.name || '—';
             const clubSlug = (currentClub.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
             const slugEl = document.getElementById('cstore-club-slug');
@@ -7720,7 +7727,15 @@
         async function downloadClubStoreCSV() {
             document.getElementById('create-store-modal').classList.add('hide');
             const status = document.querySelector('input[name="store-import-status"]:checked')?.value || 'draft';
-            await generateShopifyCSVForClub(null, _selectedPriceList, status);
+            if (_csvMode === 'selected' && selectedCpIds.size > 0) {
+                const selectedProducts = currentClubProducts.filter(cp => selectedCpIds.has(cp.id));
+                const origProds = currentClubProducts;
+                currentClubProducts = selectedProducts;
+                await generateShopifyCSVForClub(null, _selectedPriceList, status);
+                currentClubProducts = origProds;
+            } else {
+                await generateShopifyCSVForClub(null, _selectedPriceList, status);
+            }
         }
 
         // =============================================
@@ -10757,9 +10772,13 @@
         function updateCpSelectionBar() {
             const bar = document.getElementById('cp-selection-bar');
             const countEl = document.getElementById('cp-selection-count');
+            const dlBtn = document.getElementById('cp-dl-csv-btn');
+            const dlLabel = document.getElementById('cp-dl-csv-label');
             const n = selectedCpIds.size;
             if (bar) bar.classList.toggle('hide', n === 0);
             if (countEl) countEl.textContent = n === 0 ? '' : `${n} product${n !== 1 ? 's' : ''} selected`;
+            if (dlBtn) dlBtn.classList.toggle('hide', n === 0);
+            if (dlLabel) dlLabel.textContent = n > 0 ? `Download CSV (${n})` : 'Download CSV';
         }
 
         function selectAllCpProducts() {
@@ -10788,15 +10807,6 @@
             updateCpSelectionBar();
         }
 
-        async function downloadSelectedCSV() {
-            if (!selectedCpIds.size || !currentClub) return;
-            const tierKey = currentClub.club_status || (brandPricingTiers[0]?.tier_key) || 'retail';
-            const selectedProducts = currentClubProducts.filter(cp => selectedCpIds.has(cp.id));
-            const origProds = currentClubProducts;
-            currentClubProducts = selectedProducts;
-            await generateShopifyCSVForClub(null, tierKey, 'draft');
-            currentClubProducts = origProds;
-        }
 
         function enlargeProductImage(url) {
             const overlay = document.createElement('div');
