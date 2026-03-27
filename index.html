@@ -666,6 +666,32 @@
         /* Unread notification badge */
         .ds-notif-badge { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; padding:0 4px; border-radius:8px; font-size:10px; font-weight:700; background:#ef4444; color:#fff; margin-left:4px; }
 
+        /* ── Kanban Board ──────────────────────────────────────────── */
+        .ds-kanban-board { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding:20px 24px; align-items:start; }
+        @media(max-width:1200px) { .ds-kanban-board { grid-template-columns:repeat(2,1fr); } }
+        @media(max-width:700px)  { .ds-kanban-board { grid-template-columns:1fr; } }
+        .ds-kanban-col { background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; }
+        .dsk-col-header { display:flex; align-items:center; gap:8px; padding:12px 14px; border-bottom:1px solid #e2e8f0; background:#fff; }
+        .dsk-col-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+        .dsk-col-dot.new         { background:#3b82f6; }
+        .dsk-col-dot.in_progress { background:#f59e0b; }
+        .dsk-col-dot.delivered   { background:#00e5cc; }
+        .dsk-col-dot.completed   { background:#94a3b8; }
+        .dsk-col-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0f172a; flex:1; }
+        .dsk-col-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; padding:0 6px; border-radius:10px; background:rgba(15,23,42,0.08); font-size:11px; font-weight:800; color:#0f172a; }
+        .dsk-col-body { padding:10px; display:flex; flex-direction:column; gap:10px; max-height:calc(100vh - 180px); overflow-y:auto; }
+        .dsk-col-empty { padding:24px 16px; text-align:center; font-size:12px; color:#94a3b8; }
+        .ds-kanban-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:13px 14px; cursor:pointer; transition:all 0.18s; position:relative; }
+        .ds-kanban-card:hover { border-color:#94a3b8; box-shadow:0 4px 12px rgba(0,0,0,0.07); transform:translateY(-1px); }
+        .ds-kanban-card .tc-ref   { font-size:10px; font-family:monospace; color:#94a3b8; }
+        .ds-kanban-card .tc-title { font-size:13px; font-weight:700; color:#0f172a; margin:3px 0 2px; line-height:1.3; }
+        .ds-kanban-card .tc-sub   { font-size:11px; color:#64748b; margin-bottom:8px; }
+        .ds-kanban-card .tc-progress-bar  { height:5px; border-radius:3px; background:#e2e8f0; overflow:hidden; margin-bottom:8px; }
+        .ds-kanban-card .tc-progress-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#00e5cc,#22c55e); transition:width 0.4s ease; }
+        .ds-kanban-card .tc-footer { display:flex; align-items:center; justify-content:space-between; gap:6px; flex-wrap:wrap; }
+        .ds-revisions-pill { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; background:rgba(234,88,12,0.12); color:#c2410c; border:1px solid rgba(234,88,12,0.3); margin-bottom:6px; }
+        .ds-card-unread { position:absolute; top:10px; right:10px; display:inline-flex; align-items:center; justify-content:center; min-width:18px; height:18px; padding:0 5px; border-radius:9px; background:#ef4444; color:#fff; font-size:10px; font-weight:700; }
+
         /* ── Design Task View V2 ───────────────────────── */
 
         /* Slim task title bar (below nav row) */
@@ -1760,13 +1786,11 @@
                 </span>
                 <!-- Divider -->
                 <span style="width:1px;height:18px;background:#e2e8f0;margin:0 12px;flex-shrink:0"></span>
-                <!-- Filter chips inline -->
-                <span style="font-size:11px;font-weight:600;color:#94a3b8;margin-right:6px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.04em">Filter:</span>
-                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                    <button class="ds-filter-chip active" id="ds-filter-new" onclick="setDSFilter('new')">New <span id="ds-fcount-new" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
-                    <button class="ds-filter-chip" id="ds-filter-in_progress" onclick="setDSFilter('in_progress')">In Progress <span id="ds-fcount-in_progress" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
-                    <button class="ds-filter-chip" id="ds-filter-in_review" onclick="setDSFilter('in_review')">In Review <span id="ds-fcount-in_review" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
-                    <button class="ds-filter-chip" id="ds-filter-completed" onclick="setDSFilter('completed')">Completed <span id="ds-fcount-completed" style="display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 5px;background:rgba(15,23,42,0.08);color:#0f172a;border-radius:9px;font-size:10px;font-weight:800;margin-left:4px">0</span></button>
+                <!-- Feed shortcut with unread badge -->
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                    <button onclick="scrollToFeed()" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;padding:4px 12px;cursor:pointer;transition:all 0.15s">
+                        💬 Feed <span id="ds-unread-badge-hdr" class="ds-notif-badge hide" style="position:static;margin-left:2px">0</span>
+                    </button>
                 </div>
                 <!-- Push button to right -->
                 <div style="margin-left:auto">
@@ -1777,30 +1801,72 @@
                 </div>
             </div>
 
-            <!-- Two-column layout: task list + activity feed -->
-            <div class="ds-home-grid">
-                <!-- Task list (left) -->
-                <div>
-                    <div id="ds-task-list"></div>
-                    <div id="ds-task-list-empty" class="hide ds-empty-state" style="margin-top:40px">
-                        <div class="es-icon">🎨</div>
-                        <p>No design tasks yet</p>
-                        <span>Click "New Design Task" to get started</span>
+            <!-- Kanban board — 4 columns -->
+            <div class="ds-kanban-board" id="ds-kanban-board-v2">
+
+                <!-- NEW -->
+                <div class="ds-kanban-col">
+                    <div class="dsk-col-header">
+                        <span class="dsk-col-dot new"></span>
+                        <span class="dsk-col-title">New</span>
+                        <span class="dsk-col-count" id="dsk-count-v2-new">0</span>
                     </div>
+                    <div class="dsk-col-body" id="dsk-body-v2-new"></div>
+                    <div class="dsk-col-empty hide" id="dsk-empty-v2-new">No new tasks</div>
                 </div>
-                <!-- Activity feed (right) -->
-                <div class="ds-feed-panel">
-                    <div class="ds-feed-header">
-                        <h3>Activity Feed <span id="ds-unread-badge" class="ds-notif-badge hide">0</span></h3>
-                        <div style="display:flex;align-items:center;gap:8px">
-                            <button id="ds-feed-history-btn" onclick="toggleFeedHistory()" style="font-size:11px;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;padding:2px 8px;transition:all 0.15s">History</button>
-                            <button onclick="markAllFeedRead()" style="font-size:11px;color:#64748b;background:transparent;border:none;cursor:pointer;padding:0">Mark all read</button>
-                        </div>
+
+                <!-- IN PROGRESS -->
+                <div class="ds-kanban-col">
+                    <div class="dsk-col-header">
+                        <span class="dsk-col-dot in_progress"></span>
+                        <span class="dsk-col-title">In Progress</span>
+                        <span class="dsk-col-count" id="dsk-count-v2-in_progress">0</span>
                     </div>
-                    <div class="ds-feed-list" id="ds-feed-list">
-                        <div class="ds-empty-state" style="padding:30px 16px">
-                            <div class="es-icon">💬</div>
-                            <p>No activity yet</p>
+                    <div class="dsk-col-body" id="dsk-body-v2-in_progress"></div>
+                    <div class="dsk-col-empty hide" id="dsk-empty-v2-in_progress">No tasks in progress</div>
+                </div>
+
+                <!-- DELIVERED -->
+                <div class="ds-kanban-col">
+                    <div class="dsk-col-header">
+                        <span class="dsk-col-dot delivered"></span>
+                        <span class="dsk-col-title">Delivered</span>
+                        <span class="dsk-col-count" id="dsk-count-v2-delivered">0</span>
+                    </div>
+                    <div class="dsk-col-body" id="dsk-body-v2-delivered"></div>
+                    <div class="dsk-col-empty hide" id="dsk-empty-v2-delivered">No delivered tasks</div>
+                </div>
+
+                <!-- COMPLETED -->
+                <div class="ds-kanban-col">
+                    <div class="dsk-col-header">
+                        <span class="dsk-col-dot completed"></span>
+                        <span class="dsk-col-title">Completed</span>
+                        <span class="dsk-col-count" id="dsk-count-v2-completed">0</span>
+                    </div>
+                    <div class="dsk-col-body" id="dsk-body-v2-completed"></div>
+                    <div class="dsk-col-empty hide" id="dsk-empty-v2-completed">No completed tasks</div>
+                </div>
+
+            </div>
+
+            <!-- Activity Feed — collapsible section below kanban -->
+            <div style="padding:0 24px 24px">
+                <div style="border:1px solid #e2e8f0;border-radius:14px;overflow:hidden">
+                    <button onclick="toggleDSFeed()" style="width:100%;display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:none;cursor:pointer;text-align:left">
+                        <span style="font-size:13px;font-weight:700;color:#0f172a;flex:1">Activity Feed <span id="ds-unread-badge" class="ds-notif-badge hide">0</span></span>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <button onclick="event.stopPropagation();markAllFeedRead()" style="font-size:11px;color:#64748b;background:transparent;border:none;cursor:pointer;padding:0">Mark all read</button>
+                            <button id="ds-feed-history-btn" onclick="event.stopPropagation();toggleFeedHistory()" style="font-size:11px;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;padding:2px 8px;transition:all 0.15s">History</button>
+                            <svg id="ds-feed-chevron" style="width:16px;height:16px;color:#64748b;transition:transform 0.2s;transform:rotate(-90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </div>
+                    </button>
+                    <div id="ds-feed-panel-wrap" class="hide" style="background:#f8fafc;border-top:1px solid #e2e8f0">
+                        <div class="ds-feed-list" id="ds-feed-list" style="max-height:320px;overflow-y:auto">
+                            <div class="ds-empty-state" style="padding:30px 16px">
+                                <div class="es-icon">💬</div>
+                                <p>No activity yet</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -17118,9 +17184,120 @@
         }
 
         function renderDSHome() {
-            renderDSTaskList();
+            renderDSKanbanBoard();
             loadDSActivityFeed();
             subscribeToActivityFeed();
+        }
+
+        function renderDSKanbanBoard() {
+            const allTasks = allDesignTasks || [];
+
+            // Update launchpad stats
+            const elA = document.getElementById('stat-design-active');
+            const elR = document.getElementById('stat-design-review');
+            const activeTasks = allTasks.filter(t => !['completed','delivered'].includes(t.status));
+            const reviewTasks = allTasks.filter(t => ['in_review','awaiting_approval'].includes(t.status));
+            if (elA) elA.textContent = `${activeTasks.length} active`;
+            if (elR) elR.textContent = `${reviewTasks.length} in review`;
+
+            // Build unread-count-per-task from _feedAllItems
+            const unreadByTask = {};
+            (_feedAllItems || []).filter(f => !f.is_read && f.task_id).forEach(f => {
+                unreadByTask[f.task_id] = (unreadByTask[f.task_id] || 0) + 1;
+            });
+
+            const cols = {
+                new:         allTasks.filter(t => t.status === 'new'),
+                in_progress: allTasks.filter(t => ['in_progress','revisions','in_review','awaiting_approval'].includes(t.status)),
+                delivered:   allTasks.filter(t => t.status === 'delivered'),
+                completed:   allTasks.filter(t => t.status === 'completed'),
+            };
+
+            Object.entries(cols).forEach(([key, tasks]) => {
+                const body  = document.getElementById(`dsk-body-v2-${key}`);
+                const empty = document.getElementById(`dsk-empty-v2-${key}`);
+                const count = document.getElementById(`dsk-count-v2-${key}`);
+                if (count) count.textContent = tasks.length;
+                if (!body) return;
+                if (!tasks.length) {
+                    body.innerHTML = '';
+                    if (empty) empty.classList.remove('hide');
+                    return;
+                }
+                if (empty) empty.classList.add('hide');
+                body.innerHTML = tasks.map(t => renderDSKanbanCard(t, unreadByTask[t.id] || 0)).join('');
+            });
+        }
+
+        function renderDSKanbanCard(task, unreadCount = 0) {
+            const stages = task._stages || [];
+            const approvedCount = stages.filter(s => ['approved','skipped'].includes(s.status)).length;
+            const progressPct = Math.round((approvedCount / 4) * 100);
+
+            const activeStage = stages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status))
+                || stages.find(s => s.status === 'not_started');
+            const stageBadgeStatus = activeStage?.status || 'not_started';
+            const stageLabel = activeStage
+                ? `Stage ${activeStage.stage_number}: ${activeStage.stage_name}`
+                : (approvedCount === 4 ? 'Complete' : 'Not Started');
+
+            const due = task.due_date ? new Date(task.due_date) : null;
+            const dueInfo = due ? getDueInfo(due) : null;
+            const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : '';
+            const dueStyle = dueInfo
+                ? (dueInfo.urgency === 'overdue' ? 'color:#dc2626;font-weight:700' : dueInfo.urgency === 'soon' ? 'color:#ea580c;font-weight:700' : 'color:#64748b')
+                : 'color:#64748b';
+
+            const hasRevisions = task.status === 'revisions'
+                || stages.some(s => s.status === 'revisions_required');
+
+            const priorityBadge = task.priority && task.priority !== 'standard'
+                ? `<span class="ds-priority ds-priority-${task.priority}" style="font-size:10px;padding:2px 7px">${task.priority === 'urgent' ? '🔴' : '🟠'} ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>`
+                : '';
+
+            return `<div class="ds-kanban-card" onclick="showDesignTask('${task.id}')">
+                ${unreadCount > 0 ? `<span class="ds-card-unread">${unreadCount}</span>` : ''}
+                <div class="tc-ref">${escHtml(task.task_ref || '')}</div>
+                <div class="tc-title" style="padding-right:${unreadCount > 0 ? '26px' : '0'}">${escHtml(task.task_name || 'Untitled Task')}</div>
+                <div class="tc-sub">
+                    ${task.clubs?.name ? `🏟 ${escHtml(task.clubs.name)}` : ''}
+                    ${task.assigned_designer_name ? ` · 👤 ${escHtml(task.assigned_designer_name)}` : ''}
+                </div>
+                ${hasRevisions ? `<div class="ds-revisions-pill">🔄 Revisions Required</div>` : ''}
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px">
+                    <span class="ds-stage-badge ${stageBadgeStatus}" style="font-size:10px;padding:2px 7px">${escHtml(stageLabel)}</span>
+                    ${priorityBadge}
+                </div>
+                <div class="tc-progress-bar"><div class="tc-progress-fill" style="width:${progressPct}%"></div></div>
+                <div class="tc-footer">
+                    <span style="font-size:11px;${dueStyle}">
+                        ${dueLabel ? `📅 ${dueLabel}${dueInfo?.text ? ' · ' + dueInfo.text : ''}` : `<span style="color:#94a3b8">No due date</span>`}
+                    </span>
+                    <div style="display:flex;align-items:center;gap:6px">
+                        ${task._subtasks ? `<span style="font-size:10px;font-weight:700;color:${task._subtasks.done === task._subtasks.total ? '#16a34a' : '#c2410c'};background:${task._subtasks.done === task._subtasks.total ? 'rgba(34,197,94,0.08)' : 'rgba(194,65,12,0.08)'};border-radius:6px;padding:1px 6px">📋 ${task._subtasks.done}/${task._subtasks.total}</span>` : ''}
+                        <span style="font-size:10px;color:#94a3b8;font-weight:600">${approvedCount}/4</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function toggleDSFeed() {
+            const wrap = document.getElementById('ds-feed-panel-wrap');
+            const chevron = document.getElementById('ds-feed-chevron');
+            if (!wrap) return;
+            const isOpen = !wrap.classList.contains('hide');
+            wrap.classList.toggle('hide', isOpen);
+            if (chevron) chevron.style.transform = isOpen ? 'rotate(-90deg)' : 'rotate(0deg)';
+        }
+
+        function scrollToFeed() {
+            const wrap = document.getElementById('ds-feed-panel-wrap');
+            const chevron = document.getElementById('ds-feed-chevron');
+            if (wrap && wrap.classList.contains('hide')) {
+                wrap.classList.remove('hide');
+                if (chevron) chevron.style.transform = 'rotate(0deg)';
+            }
+            document.getElementById('ds-feed-panel-wrap')?.closest('div')?.scrollIntoView({ behavior:'smooth', block:'start' });
         }
 
         function renderDSTaskList() {
@@ -17222,6 +17399,10 @@
             const unread = _feedAllItems.filter(f => !f.is_read).length;
             const badge = document.getElementById('ds-unread-badge');
             if (badge) { badge.textContent = unread; badge.classList.toggle('hide', unread === 0); }
+            // Sync header badge and refresh per-card unread alerts on the kanban
+            const hdrBadge = document.getElementById('ds-unread-badge-hdr');
+            if (hdrBadge) { hdrBadge.textContent = unread; hdrBadge.classList.toggle('hide', unread === 0); }
+            renderDSKanbanBoard();
         }
 
         function toggleFeedHistory() {
