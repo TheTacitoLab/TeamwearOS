@@ -10716,6 +10716,7 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1 flex-wrap">
                                 <span class="font-semibold text-sm">${escHtml(cp.custom_name)}</span>
+                                ${cp.variant_number > 1 ? `<span class="px-1.5 py-0.5 rounded text-xs font-semibold" style="background:#fef3c7;color:#92400e">V${cp.variant_number}</span>` : ''}
                                 ${syncBadge}
                             </div>
                             <div class="flex items-center gap-2 flex-wrap mb-1.5">
@@ -10762,10 +10763,18 @@
                         return `<option value="${p.id}">${escHtml(p.product_code)} – ${escHtml(p.item_name)} (${escHtml(p.range_name)})${inCatalogue ? ' ✓ already in club' : ''}</option>`;
                     }).join('');
             } else {
-                // Club context: only show products not yet assigned to this club
-                const available = products.filter(p => !assignedIds.has(p.id));
+                // Club context: show all products; annotate those already assigned with existing variant(s)
                 select.innerHTML = '<option value="">Select from master catalogue...</option>' +
-                    available.map(p => `<option value="${p.id}">${escHtml(p.product_code)} – ${escHtml(p.item_name)} (${escHtml(p.range_name)})</option>`).join('');
+                    products.map(p => {
+                        const existingVariants = currentClubProducts
+                            .filter(cp => cp.product_id === p.id)
+                            .map(cp => `V${cp.variant_number || 1}`)
+                            .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+                        const annotation = existingVariants.length
+                            ? ` (${existingVariants.join(', ')} in catalogue — adding V${existingVariants.length + 1})`
+                            : '';
+                        return `<option value="${p.id}">${escHtml(p.product_code)} – ${escHtml(p.item_name)} (${escHtml(p.range_name)})${annotation}</option>`;
+                    }).join('');
             }
             select.disabled = false;
             document.getElementById('club-product-modal').classList.remove('hide');
@@ -11070,6 +11079,17 @@
                     .eq('id', cpId)
                     .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs)').single();
             } else {
+                // Determine the next variant_number for this (club_id, product_id) pair.
+                // Query ALL rows (including soft-deleted) to avoid unique constraint collisions.
+                const { data: existingVariants } = await supabase
+                    .from('club_products')
+                    .select('variant_number')
+                    .eq('club_id', currentClub.id)
+                    .eq('product_id', productId);
+                const maxVariant = existingVariants?.length
+                    ? Math.max(...existingVariants.map(r => r.variant_number || 1))
+                    : 0;
+                cpData.variant_number = maxVariant + 1;
                 result = await supabase.from('club_products').insert(cpData)
                     .select('*, products(product_code, item_name, category, range_name, fit_type, sizes, youth_sizes, women_sizes, available_fits, has_addons, weight_grams, description, tier_prices, cogs)').single();
             }
