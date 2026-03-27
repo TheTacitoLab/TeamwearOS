@@ -7633,14 +7633,19 @@
             btn.disabled = false;
             btn.textContent = 'Upload & Create Products';
 
+            // Refresh club products UI whenever at least one upload succeeded
+            if (successCount > 0) {
+                await loadCurrentClubProducts();
+                renderClubProducts();
+                renderOnboardingImageSummary();
+            }
+
             if (errors.length) {
                 showToast(`${successCount} uploaded, ${errors.length} failed`, 'error');
                 console.error('Mockup upload errors:', errors);
             } else {
                 showToast(`${successCount} mock-up${successCount !== 1 ? 's' : ''} uploaded and mapped!`);
                 hideMockupUploadModal();
-                await loadClubProducts();
-                renderOnboardingImageSummary();
             }
         }
 
