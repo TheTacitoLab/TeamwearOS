@@ -3786,7 +3786,7 @@
                 </div>
 
                 <!-- Products list -->
-                <div id="club-products-list" class="grid grid-cols-3 gap-3"></div>
+                <div id="club-products-list" class="grid grid-cols-5 gap-2"></div>
                 <div id="club-products-empty" class="hide text-center py-12">
                     <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-800 flex items-center justify-center">
                         <svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
@@ -10648,7 +10648,6 @@
             const emptyEl = document.getElementById('club-products-empty');
             const countEl = document.getElementById('cp-product-count');
 
-            // Partnership level warning + tier label
             const warningEl = document.getElementById('cp-partnership-warning');
             const tierInfoEl = document.getElementById('cp-tier-info');
             if (warningEl) warningEl.classList.toggle('hide', !!currentClub?.club_status);
@@ -10657,11 +10656,9 @@
                 tierInfoEl.textContent = activeTier ? `Pricing: ${activeTier.tier_name}` : '';
             } else if (tierInfoEl) { tierInfoEl.textContent = ''; }
 
-            // Product count in header
             if (countEl) {
-                countEl.textContent = currentClubProducts.length
-                    ? `— ${currentClubProducts.length} product${currentClubProducts.length !== 1 ? 's' : ''}`
-                    : '';
+                const n = currentClubProducts.length;
+                countEl.textContent = n ? `— ${n} product${n !== 1 ? 's' : ''}` : '';
             }
 
             if (!currentClubProducts.length) {
@@ -10673,56 +10670,53 @@
 
             container.innerHTML = currentClubProducts.map(cp => {
                 const imgUrls = Array.isArray(cp.image_urls) ? cp.image_urls : (cp.image_urls ? JSON.parse(cp.image_urls) : []);
-                const imgCount = imgUrls.length;
                 const mp = cp.products;
                 const availFits = (mp?.available_fits || 'adult').split(',').map(f => f.trim().toLowerCase());
                 const skuPreview = mp ? buildSku(mp, currentClub, availFits.includes('one_size') ? 'OS' : 'S') : '';
-                const fitBadges = [
-                    availFits.includes('adult')    ? '<span class="px-1 py-0.5 rounded text-xs" style="background:#dbeafe;color:#1d4ed8">Adult</span>'    : null,
-                    availFits.includes('youth')    ? '<span class="px-1 py-0.5 rounded text-xs" style="background:#dcfce7;color:#15803d">Youth</span>'    : null,
-                    availFits.includes('women')    ? '<span class="px-1 py-0.5 rounded text-xs" style="background:#f3e8ff;color:#7c3aed">Women\'s</span>' : null,
-                    availFits.includes('one_size') ? '<span class="px-1 py-0.5 rounded text-xs" style="background:#fef9c3;color:#854d0e">One Size</span>' : null,
-                ].filter(Boolean);
+                const displayCode = escHtml(skuPreview || mp?.product_code || '');
 
-                // Image area — placeholder with eye icon; image only loads on click
-                const imageArea = imgCount > 0
-                    ? `<div class="relative w-full rounded-lg overflow-hidden mb-2" style="aspect-ratio:1;background:#f1f5f9">
-                           <div id="img-ph-${cp.id}" class="absolute inset-0 flex flex-col items-center justify-center gap-1 cursor-pointer hover:bg-white/5 transition" onclick="revealProductImage('${cp.id}','${imgUrls[0]}')">
-                               <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                               <span class="text-xs text-gray-600">${imgCount} image${imgCount !== 1 ? 's' : ''}</span>
-                           </div>
-                           <img id="img-el-${cp.id}" src="" class="absolute inset-0 w-full h-full object-cover hide">
-                       </div>`
-                    : `<div class="w-full rounded-lg border-2 border-dashed border-gray-700 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-brand-500/50 transition mb-2" style="aspect-ratio:1" onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')" title="Click to upload image">
-                           <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
-                           <span class="text-gray-700 text-xs">Add image</span>
+                const imageArea = imgUrls.length > 0
+                    ? `<img src="${escHtml(imgUrls[0])}" alt="" data-src="${escHtml(imgUrls[0])}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in" onclick="enlargeProductImage(this.dataset.src)">`
+                    : `<div style="width:100%;aspect-ratio:1/1;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer" onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')">
+                           <svg style="width:18px;height:18px" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
+                           <span style="font-size:10px;color:#94a3b8">Add image</span>
                        </div>`;
 
+                const variantBadge = cp.variant_number > 1
+                    ? `<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:#fef3c7;color:#92400e;font-weight:700;flex-shrink:0">V${cp.variant_number}</span>`
+                    : '';
+                const shopifyBadge = cp.shopify_product_id
+                    ? `<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(34,197,94,0.12);color:#16a34a;font-weight:600;flex-shrink:0">✓</span>`
+                    : '';
+
                 return `
-                <div class="club-product-card" id="cp-card-${cp.id}" style="padding:12px">
+                <div class="club-product-card" id="cp-card-${cp.id}" style="padding:0;overflow:hidden">
                     ${imageArea}
-                    <p class="font-semibold text-xs leading-tight truncate mb-0.5" title="${escHtml(cp.custom_name)}">${escHtml(cp.custom_name)}</p>
-                    <p class="text-xs font-mono text-gray-500 truncate mb-1.5" title="${escHtml(skuPreview)}">${escHtml(skuPreview || mp?.product_code || '')}</p>
-                    <div class="flex gap-1 flex-wrap mb-2">
-                        ${cp.variant_number > 1 ? `<span class="px-1 py-0.5 rounded text-xs font-semibold" style="background:#fef3c7;color:#92400e">V${cp.variant_number}</span>` : ''}
-                        ${cp.shopify_product_id ? `<span class="px-1 py-0.5 rounded text-xs font-medium" style="background:rgba(34,197,94,0.1);color:#16a34a;border:1px solid rgba(34,197,94,0.2)">✓</span>` : ''}
-                        ${fitBadges.join('')}
-                    </div>
-                    <div class="flex gap-1 flex-wrap">
-                        <button onclick="editClubProduct('${cp.id}')" class="btn-secondary text-xs py-0.5 px-2">Edit</button>
-                        <button onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')" class="btn-secondary text-xs py-0.5 px-2">Img</button>
-                        <button onclick="downloadSingleProductCSV('${cp.id}')" class="btn-secondary text-xs py-0.5 px-2 text-brand-400">CSV</button>
-                        <button onclick="removeClubProduct('${cp.id}')" class="btn-secondary text-xs py-0.5 px-2 text-red-400">✕</button>
+                    <div style="padding:5px 7px 7px">
+                        <p style="font-size:11px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:2px" title="${escHtml(cp.custom_name)}">${escHtml(cp.custom_name)}</p>
+                        <p style="font-size:10px;font-family:monospace;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px" title="${displayCode}">${displayCode}</p>
+                        ${variantBadge || shopifyBadge ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px">${variantBadge}${shopifyBadge}</div>` : ''}
+                        <div style="display:flex;gap:2px">
+                            <button onclick="editClubProduct('${cp.id}')" class="btn-secondary" style="flex:1;font-size:10px;padding:2px 0">Edit</button>
+                            <button onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')" class="btn-secondary" style="flex:1;font-size:10px;padding:2px 0">Img</button>
+                            <button onclick="downloadSingleProductCSV('${cp.id}')" class="btn-secondary text-brand-400" style="flex:1;font-size:10px;padding:2px 0">CSV</button>
+                            <button onclick="removeClubProduct('${cp.id}')" class="btn-secondary text-red-400" style="flex:1;font-size:10px;padding:2px 0">✕</button>
+                        </div>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function revealProductImage(cpId, url) {
-            const ph = document.getElementById('img-ph-' + cpId);
-            const img = document.getElementById('img-el-' + cpId);
-            if (ph) ph.classList.add('hide');
-            if (img) { img.src = url; img.classList.remove('hide'); }
+        function enlargeProductImage(url) {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer';
+            overlay.title = 'Click to close';
+            overlay.onclick = () => overlay.remove();
+            const img = document.createElement('img');
+            img.src = url;
+            img.style.cssText = 'max-width:85vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 25px 50px rgba(0,0,0,0.5)';
+            overlay.appendChild(img);
+            document.body.appendChild(overlay);
         }
 
         function showAddClubProductModal() {
