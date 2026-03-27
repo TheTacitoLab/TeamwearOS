@@ -934,6 +934,137 @@
         .ds-s1-btn.needs-info { border-color:#fde68a; background:rgba(245,158,11,0.08); color:#b45309; }
         .ds-s1-btn.needs-info:hover { background:rgba(245,158,11,0.15); }
 
+        /* ── Design Task Record v3 — One-Page Split Layout ─────────────────── */
+        .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 155px); background:#f1f5f9; }
+
+        /* Left brief/info panel */
+        .dtr-left-panel { width:310px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:155px; max-height:calc(100vh - 155px); align-self:flex-start; }
+        .dtr-left-panel.collapsed { width:36px; }
+        .dtr-left-inner { width:310px; overflow-y:auto; flex:1; }
+        .dtr-left-toggle-row { display:flex; justify-content:flex-end; padding:7px 10px 5px; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
+        .dtr-col-toggle-btn { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#f8fafc; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; padding:0; }
+        .dtr-col-toggle-btn:hover { background:#e2e8f0; color:#0f172a; }
+        .dtr-left-collapsed { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:14px; flex:1; overflow:hidden; }
+
+        /* Brief card */
+        .dtr-brief-card { border-bottom:1px solid #e2e8f0; }
+        .dtr-brief-summary { padding:10px 12px; background:#f8fafc; display:flex; align-items:center; gap:8px; border-bottom:1px solid #e2e8f0; }
+
+        /* Accordions */
+        .dtr-accordion { border-bottom:1px solid #e2e8f0; }
+        .dtr-acc-hdr { width:100%; display:flex; align-items:center; gap:6px; padding:9px 12px; background:transparent; border:none; cursor:pointer; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; transition:background 0.12s; text-align:left; }
+        .dtr-acc-hdr:hover { background:#f8fafc; }
+        .dtr-acc-chevron { margin-left:auto; flex-shrink:0; color:#94a3b8; transition:transform 0.2s; }
+        .dtr-acc-chevron.closed { transform:rotate(-90deg); }
+        .dtr-acc-body { padding:10px 12px 14px; }
+
+        /* Product search */
+        .dtr-prod-search { width:100%; padding:6px 10px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:12px; color:#0f172a; outline:none; margin-bottom:8px; box-sizing:border-box; background:#fff; }
+        .dtr-prod-search:focus { border-color:#00e5cc; }
+        .dtr-source-toggle { display:flex; border:1.5px solid #e2e8f0; border-radius:8px; overflow:hidden; margin-bottom:8px; }
+        .dtr-source-btn { flex:1; padding:4px 8px; font-size:11px; font-weight:600; border:none; cursor:pointer; transition:all 0.12s; }
+        .dtr-source-btn.active { background:#0f172a; color:#fff; }
+        .dtr-source-btn:not(.active) { background:#fff; color:#64748b; }
+
+        /* Mini product grid (left panel) */
+        .dtr-mini-prod-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:5px; max-height:200px; overflow-y:auto; }
+        .dtr-mini-prod-card { border:2px solid #e2e8f0; border-radius:8px; overflow:hidden; cursor:pointer; transition:all 0.12s; background:#fff; position:relative; }
+        .dtr-mini-prod-card:hover { border-color:#94a3b8; }
+        .dtr-mini-prod-card.selected { border-color:#00e5cc; box-shadow:0 0 0 2px rgba(0,229,204,0.2); }
+        .dtr-mini-check { position:absolute; top:3px; right:3px; width:14px; height:14px; background:#00e5cc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; color:#fff; font-weight:900; opacity:0; transition:opacity 0.12s; }
+        .dtr-mini-prod-card.selected .dtr-mini-check { opacity:1; }
+        .dtr-mini-prod-img { height:52px; display:flex; align-items:center; justify-content:center; background:#f8fafc; padding:4px; }
+        .dtr-mini-prod-img img { max-width:100%; max-height:100%; object-fit:contain; }
+        .dtr-mini-prod-name { font-size:9px; font-weight:600; color:#0f172a; padding:2px 4px 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+        /* Selected products list */
+        .dtr-selected-products { margin-top:8px; padding-top:8px; border-top:1px solid #f1f5f9; }
+        .dtr-selected-list-item { display:flex; align-items:center; gap:6px; padding:4px 6px; border-radius:7px; background:#f8fafc; border:1px solid #f1f5f9; margin-bottom:3px; }
+        .dtr-sel-prod-name { flex:1; font-size:11px; color:#0f172a; font-weight:500; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .dtr-sel-prod-eye { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:11px; transition:all 0.12s; flex-shrink:0; padding:0; }
+        .dtr-sel-prod-eye:hover { background:#e0f2fe; color:#0369a1; border-color:#7dd3fc; }
+
+        /* Asset rows */
+        .dtr-asset-row { display:flex; align-items:center; gap:7px; padding:5px 6px; border-radius:7px; background:#f8fafc; border:1px solid #f1f5f9; margin-bottom:4px; }
+        .dtr-asset-thumb-sm { width:34px; height:34px; border-radius:5px; overflow:hidden; background:#e2e8f0; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .dtr-asset-thumb-sm img { width:100%; height:100%; object-fit:cover; }
+        .dtr-asset-info { flex:1; min-width:0; }
+        .dtr-asset-fname-sm { font-size:10px; font-weight:600; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .dtr-asset-meta-sm { font-size:9px; color:#94a3b8; }
+        .dtr-asset-dl-btn { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:11px; font-weight:700; flex-shrink:0; transition:all 0.12s; padding:0; }
+        .dtr-asset-dl-btn:hover { background:#e0fdf4; color:#065f46; border-color:#6ee7b7; }
+
+        /* Stages column */
+        .dtr-stages-col { flex:1; min-width:0; padding:14px 16px; overflow-y:auto; }
+
+        /* Stage section card */
+        .dtr-stage-section { border:1.5px solid #e2e8f0; border-radius:14px; background:#fff; margin-bottom:12px; overflow:hidden; }
+        .dtr-stage-section.stage-approved { border-color:#86efac; background:rgba(34,197,94,0.02); }
+        .dtr-stage-hdr { width:100%; display:flex; align-items:center; gap:10px; padding:12px 16px; border:none; background:transparent; cursor:pointer; text-align:left; }
+        .dtr-stage-hdr:hover { background:#f8fafc; }
+        .dtr-stage-section.stage-approved .dtr-stage-hdr:hover { background:rgba(34,197,94,0.04); }
+        .dtr-stage-icon-circle { width:24px; height:24px; border-radius:50%; border:2px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; color:#64748b; }
+        .dtr-stage-section.stage-approved .dtr-stage-icon-circle { background:#22c55e; border-color:#22c55e; color:#fff; }
+        .dtr-stage-title { font-size:13px; font-weight:700; color:#0f172a; }
+        .dtr-stage-chevron { margin-left:auto; color:#94a3b8; flex-shrink:0; transition:transform 0.2s; }
+        .dtr-stage-chevron.closed { transform:rotate(-90deg); }
+        .dtr-stage-body { padding:14px 16px; border-top:1px solid #f1f5f9; }
+
+        /* Concept tabs */
+        .dtr-concept-tabs { display:grid; grid-template-columns:repeat(3,1fr); border:1.5px solid #e2e8f0; border-radius:10px; overflow:hidden; margin-bottom:14px; }
+        .dtr-ctab { padding:8px 6px; font-size:12px; font-weight:600; border:none; border-right:1px solid #e2e8f0; cursor:pointer; background:#f8fafc; color:#64748b; transition:all 0.15s; text-align:center; }
+        .dtr-ctab:last-child { border-right:none; }
+        .dtr-ctab.active { background:#0f172a; color:#fff; }
+        .dtr-ctab.ct-approved { background:rgba(34,197,94,0.1); color:#16a34a; font-weight:700; }
+        .dtr-ctab.ct-approved.active { background:#16a34a; color:#fff; }
+        .dtr-ctab.ct-declined { background:rgba(239,68,68,0.07); color:#dc2626; }
+        .dtr-ctab.ct-declined.active { background:#dc2626; color:#fff; }
+
+        /* Concept image grid */
+        .dtr-concept-images { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:10px; margin-bottom:12px; }
+        .dtr-cimg-card { border:2px solid #e2e8f0; border-radius:10px; overflow:hidden; background:#f8fafc; transition:border-color 0.15s; }
+        .dtr-cimg-card.ci-approved { border-color:#22c55e; background:rgba(34,197,94,0.03); }
+        .dtr-cimg-card.ci-declined { border-color:#fca5a5; opacity:0.65; }
+        .dtr-cimg-thumb { width:100%; aspect-ratio:4/3; object-fit:contain; background:#f8fafc; display:block; cursor:pointer; }
+        .dtr-cimg-nothumb { width:100%; aspect-ratio:4/3; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:30px; cursor:pointer; }
+        .dtr-cimg-actions { display:flex; gap:4px; padding:5px 6px; background:#fff; border-top:1px solid #f1f5f9; }
+        .dtr-tick-btn { flex:1; padding:5px 0; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; transition:all 0.15s; }
+        .dtr-tick-btn:hover,.dtr-tick-btn.ticked { background:#16a34a; color:#fff; border-color:#16a34a; }
+        .dtr-x-btn { flex:1; padding:5px 0; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; transition:all 0.15s; }
+        .dtr-x-btn:hover,.dtr-x-btn.xed { background:#dc2626; color:#fff; border-color:#dc2626; }
+        .dtr-archive-btn { padding:5px 7px; border-radius:6px; font-size:11px; cursor:pointer; border:1px solid #e2e8f0; background:#f8fafc; color:#94a3b8; transition:all 0.15s; flex-shrink:0; }
+        .dtr-archive-btn:hover { border-color:#94a3b8; color:#64748b; }
+
+        /* Concept section approve/decline actions */
+        .dtr-concept-section-actions { display:flex; align-items:center; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid #f1f5f9; flex-wrap:wrap; }
+        .dtr-concept-approve-btn { padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; cursor:pointer; transition:all 0.15s; }
+        .dtr-concept-approve-btn:hover { background:#16a34a; color:#fff; border-color:#16a34a; }
+        .dtr-concept-approve-btn.approved { background:#16a34a; color:#fff; border-color:#16a34a; cursor:default; }
+        .dtr-concept-decline-btn { padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; cursor:pointer; transition:all 0.15s; }
+        .dtr-concept-decline-btn:hover { background:#dc2626; color:#fff; border-color:#dc2626; }
+
+        /* Concept upload zone */
+        .dtr-concept-upload { border:2px dashed #cbd5e1; border-radius:10px; padding:16px; text-align:center; cursor:pointer; transition:all 0.15s; background:#f8fafc; margin-top:8px; }
+        .dtr-concept-upload:hover,.dtr-concept-upload.drag-over { border-color:#00e5cc; background:rgba(0,229,204,0.04); }
+
+        /* Deliver/revisions/complete bar */
+        .dtr-deliver-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0; margin:14px -16px -14px; border-radius:0 0 12px 12px; }
+        .dtr-deliver-btn { padding:8px 18px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+        .dtr-deliver-btn.deliver { background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:#fff; border:none; }
+        .dtr-deliver-btn.deliver:hover { opacity:0.9; }
+        .dtr-deliver-btn.delivered { background:#e0fdf4; color:#065f46; border:1.5px solid #6ee7b7; cursor:default; }
+        .dtr-revisions-btn { padding:8px 14px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; background:rgba(245,158,11,0.08); border:1.5px solid #fde68a; color:#b45309; transition:all 0.15s; }
+        .dtr-revisions-btn:hover { background:rgba(245,158,11,0.18); }
+        .dtr-complete-btn { padding:8px 16px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; transition:opacity 0.15s; margin-left:auto; }
+        .dtr-complete-btn:hover { opacity:0.9; }
+
+        /* Placeholder stage body */
+        .dtr-stage-placeholder { padding:24px 16px; text-align:center; color:#94a3b8; }
+
+        /* Asset upload zone (left panel, compact) */
+        .dtr-asset-upload-zone { border:2px dashed #e2e8f0; border-radius:8px; padding:12px 8px; text-align:center; cursor:pointer; transition:all 0.15s; background:#fafbfc; margin-bottom:10px; }
+        .dtr-asset-upload-zone:hover,.dtr-asset-upload-zone.drag-over { border-color:#00e5cc; background:rgba(0,229,204,0.03); }
+
         /* Stage action footer */
         .ds-stage-footer { margin-top:24px; padding-top:20px; border-top:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
         .ds-submit-review-btn { padding:10px 24px; background:linear-gradient(135deg,#1d4ed8,#2563eb); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; }
@@ -17630,47 +17761,17 @@
             const deleteBtn = document.getElementById('dt-delete-btn');
             if (deleteBtn) deleteBtn.classList.toggle('hide', !isSuperAdmin && currentUserProfile?.role !== 'admin');
 
-            // Brief collapse state
-            const body = document.getElementById('dt-brief-body');
-            const chevron = document.getElementById('dt-brief-chevron');
-            const savedOpen = localStorage.getItem(`ds_brief_open_${task.id}`);
-            const isOpen = savedOpen !== '0'; // default open
-            if (body) body.classList.toggle('hide', !isOpen);
-            if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(-90deg)';
-
-            // Fill brief form fields
-            dtFillOverviewForm(task);
-            const setV = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-            setV('dt-sport', task.sport);
-            setV('dt-product-type', task.product_type);
-            setV('dt-colour-palette', task.colour_palette);
-            setV('dt-key-notes', task.key_notes);
-            renderDtJobTypeGrid(task.job_type);
-            renderDtDesignTypesGrid(task.design_types || []);
-            dtUpdateCountdown();
-            renderDtProductsList(task);
-
-            // Meta
-            const metaCreated = document.getElementById('dt-meta-created');
-            const metaUpdated = document.getElementById('dt-meta-updated');
-            if (metaCreated) metaCreated.textContent = task.created_at ? new Date(task.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
-            if (metaUpdated) metaUpdated.textContent = task.updated_at ? new Date(task.updated_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
-            renderDtStatusButtons(task.status);
-
-            // Progress bar
+            // Progress bar (stages 2-4; stage 1 is the brief column)
             const approvedCount = currentStages.filter(s => ['approved','skipped'].includes(s.status)).length;
             const fill = document.getElementById('dt-progress-fill');
             if (fill) fill.style.width = `${(approvedCount / 4) * 100}%`;
 
-            // Stage tabs
-            renderStageTabs();
+            // Hide legacy stage tabs — new layout has inline collapsable stage sections
+            const stageTabs = document.getElementById('dt-stage-tabs');
+            if (stageTabs) stageTabs.style.display = 'none';
 
-            // Show first unlocked/active stage
-            const firstActive = currentStages.find(s => s.status !== 'not_started' && s.status !== 'approved' && s.status !== 'skipped')
-                || currentStages.find(s => s.status === 'not_started')
-                || currentStages[0];
-            currentActiveStageNum = firstActive?.stage_number || 1;
-            renderStagePanel(currentActiveStageNum);
+            // Render new one-page split layout
+            renderNewDTRLayout();
         }
 
         function renderStageTabs() {
@@ -18054,6 +18155,264 @@
                     ${buildDTActivitySidebarHTML()}
                 </div>
             </div>`;
+        }
+
+        // ════════════════════════════════════════════════════════════════════
+        // ── Design Task Record v3 — One-Page Split Layout ────────────────────
+        // ════════════════════════════════════════════════════════════════════
+
+        let _dtrConceptTab = 1;           // active concept tab (1, 2, 3)
+        let _dtrMasterProdsLoaded = false;
+        let _dtrMasterProdsData = [];
+        let _dtrProdSearchTerm = '';
+
+        async function renderNewDTRLayout() {
+            const panel = document.getElementById('dt-stage-panel');
+            if (!panel) return;
+            const task = currentDesignTaskRecord;
+            if (!task) return;
+            const club = task.clubs || {};
+
+            panel.innerHTML = '<div style="padding:48px;text-align:center"><div class="spinner"></div></div>';
+
+            const stage2 = currentStages.find(s => s.stage_number === 2);
+            const stage3 = currentStages.find(s => s.stage_number === 3);
+            const stage4 = currentStages.find(s => s.stage_number === 4);
+
+            // Parallel data loads
+            const [assetsRes, clubProdsRes, conceptUploadsRes] = await Promise.all([
+                supabase.from('design_task_assets').select('*').eq('design_task_id', task.id).order('created_at'),
+                task.club_id
+                    ? supabase.from('club_products')
+                        .select('id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category)')
+                        .eq('club_id', task.club_id).eq('is_active', true).order('created_at')
+                    : Promise.resolve({ data: [] }),
+                stage2
+                    ? supabase.from('stage_uploads').select('*').eq('stage_id', stage2.id).order('uploaded_at')
+                    : Promise.resolve({ data: [] }),
+            ]);
+
+            const assets = assetsRes.data || [];
+            const clubProds = clubProdsRes.data || [];
+            // Filter archived images (is_archived flag or __archived__ review_comment sentinel)
+            const conceptUploads = (conceptUploadsRes.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
+
+            const leftOpen = localStorage.getItem('dtr_left_open') !== '0';
+
+            panel.innerHTML = `
+                <div class="dtr-body">
+                    <div class="dtr-left-panel${leftOpen ? '' : ' collapsed'}" id="dtr-left-panel">
+                        <div class="dtr-left-inner" id="dtr-left-inner"${leftOpen ? '' : ' style="display:none"'}>
+                            <div class="dtr-left-toggle-row">
+                                <button class="dtr-col-toggle-btn" onclick="toggleDTRLeft()" title="Collapse brief">
+                                    <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                                </button>
+                            </div>
+                            ${buildDTRLeftColumn(task, club, assets, clubProds)}
+                        </div>
+                        <div class="dtr-left-collapsed" id="dtr-left-collapsed"${leftOpen ? ' style="display:none"' : ''}>
+                            <button onclick="toggleDTRLeft()" title="Expand brief" style="writing-mode:vertical-lr;text-orientation:mixed;transform:rotate(180deg);padding:14px 8px;border:none;background:transparent;color:#64748b;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.8px;text-transform:uppercase">Brief ▶</button>
+                        </div>
+                    </div>
+                    <div class="dtr-stages-col" id="dtr-stages-col">
+                        ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads)}
+                    </div>
+                </div>`;
+
+            _dtrMasterProdsLoaded = false;
+            _dtrMasterProdsData = [];
+            _dtrProdSearchTerm = '';
+            if (currentDesignTaskRecord?.id) loadDesignTaskActivity(currentDesignTaskRecord.id);
+        }
+
+        // ── Left column ────────────────────────────────────────────────────────
+        function buildDTRLeftColumn(task, club, assets, clubProds) {
+            const selectedIds = new Set(task.products_required || []);
+            const logoUrl = club.club_crest_url || club.logo_url || '';
+            const useClub = task.use_club_colours !== false;
+            const cc = task.custom_colours || {};
+            const PRI = { standard:{ label:'Standard', dot:'⚪' }, high:{ label:'High', dot:'🟠' }, urgent:{ label:'Urgent', dot:'🔴' } };
+            const pri = PRI[task.priority || 'standard'] || PRI.standard;
+            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+            const daysLeft = task.due_date ? Math.ceil((new Date(task.due_date) - new Date()) / 86400000) : null;
+            const dueExtra = daysLeft !== null
+                ? daysLeft < 0 ? ` <span style="color:#dc2626;font-size:9px;font-weight:700">(${Math.abs(daysLeft)}d overdue)</span>`
+                : daysLeft <= 7 ? ` <span style="color:#c2410c;font-size:9px;font-weight:700">(${daysLeft}d left)</span>` : '' : '';
+            const briefText = task.design_brief || task.design_summary || '';
+            const JTL = typeof JOB_TYPE_LABELS !== 'undefined' ? JOB_TYPE_LABELS : {};
+
+            // Colour swatches
+            const colPairs = [
+                { label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+            ];
+
+            // Mini product cards
+            const miniProdCards = !task.club_id
+                ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0">Link a club to see products.</p>`
+                : !clubProds.length
+                    ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0">No products in club catalogue.</p>`
+                    : clubProds.map(cp => {
+                        const sel = selectedIds.has(cp.id);
+                        const nm = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                        const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                        const img = imgs[0] || cp.image_url || '';
+                        return `<div class="dtr-mini-prod-card${sel ? ' selected' : ''}" onclick="dtrToggleProd('${cp.id}',this)" title="${nm}">
+                            <div class="dtr-mini-check">✓</div>
+                            <div class="dtr-mini-prod-img">
+                                ${img
+                                    ? `<img src="${escHtml(img)}" alt="" loading="lazy">`
+                                    : `<svg width="20" height="20" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
+                            </div>
+                            <div class="dtr-mini-prod-name">${nm}</div>
+                        </div>`;
+                    }).join('');
+
+            // Selected products list
+            const selectedProds = clubProds.filter(cp => selectedIds.has(cp.id));
+            const selProdsHtml = selectedProds.length
+                ? selectedProds.map(cp => {
+                    const nm = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                    const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                    const img = imgs[0] || cp.image_url || '';
+                    return `<div class="dtr-selected-list-item">
+                        <div class="dtr-sel-prod-name" title="${nm}">${nm}</div>
+                        ${img ? `<button class="dtr-sel-prod-eye" onclick="dtrPreviewProdImage('${escHtml(img)}','${nm}')" title="Preview image">
+                            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>` : ''}
+                    </div>`;
+                }).join('')
+                : `<p style="font-size:11px;color:#94a3b8;margin:0;padding:2px 0">No products selected yet.</p>`;
+
+            // Assets list
+            const assetsHtml = assets.length
+                ? assets.map(a => {
+                    const isImg = a.file_type?.startsWith('image/');
+                    const ext = (a.file_name || '').split('.').pop().toUpperCase();
+                    return `<div class="dtr-asset-row">
+                        <div class="dtr-asset-thumb-sm">
+                            ${isImg
+                                ? `<img src="${escHtml(a.file_url)}" alt="" loading="lazy">`
+                                : `<span style="font-size:8px;font-weight:800;color:#475569;text-align:center">${escHtml(ext)}</span>`}
+                        </div>
+                        <div class="dtr-asset-info">
+                            <div class="dtr-asset-fname-sm" title="${escHtml(a.file_name||'')}">${escHtml(a.file_name||'File')}</div>
+                            <div class="dtr-asset-meta-sm">${dsRelativeTime(a.created_at)}</div>
+                        </div>
+                        <button class="dtr-asset-dl-btn" onclick="downloadFile('${escHtml(a.file_url)}','${escHtml(a.file_name||'file')}')" title="Download">↓</button>
+                    </div>`;
+                }).join('')
+                : `<p style="font-size:11px;color:#94a3b8;margin:0;padding:2px 0">No assets uploaded yet.</p>`;
+
+            return `
+                <!-- ── BRIEF CARD ─────────────────────────────────────────── -->
+                <div class="dtr-brief-card">
+                    <div class="dtr-brief-summary">
+                        ${logoUrl
+                            ? `<img src="${escHtml(logoUrl)}" alt="" style="width:30px;height:30px;object-fit:contain;border-radius:5px;background:#fff;border:1px solid #e2e8f0;flex-shrink:0">`
+                            : `<div style="width:30px;height:30px;border-radius:5px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>`}
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled')}</div>
+                            <div style="font-size:10px;color:#64748b">${escHtml(club.name||'')}${task.task_ref ? ` · <span style="font-family:monospace;color:#94a3b8">${escHtml(task.task_ref)}</span>` : ''}</div>
+                        </div>
+                        <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 6px;flex-shrink:0">${pri.dot} ${pri.label}</span>
+                    </div>
+
+                    <!-- Details grid -->
+                    <div style="padding:10px 12px;border-bottom:1px solid #f1f5f9">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
+                            ${[
+                                { label:'Sport', val: task.sport || '—' },
+                                { label:'Deadline', val: dueDate + (dueExtra||'') },
+                                { label:'Job Type', val: JTL[task.jobs?.job_type] || (task.jobs?.job_type ? task.jobs.job_type.replace(/_/g,' ') : '—') },
+                                { label:'Designer', val: escHtml(task.assigned_designer_name || '—') },
+                            ].map(c => `<div style="padding:5px 8px;background:#f8fafc;border-radius:6px;border:1px solid #f1f5f9">
+                                <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:2px">${c.label}</div>
+                                <div style="font-size:11px;font-weight:600;color:#0f172a">${c.val}</div>
+                            </div>`).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Brief description -->
+                    ${briefText ? `<div style="padding:10px 12px;border-bottom:1px solid #f1f5f9">
+                        <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:5px">Design Brief</div>
+                        <p style="font-size:12px;color:#334155;line-height:1.55;margin:0">${escHtml(briefText)}</p>
+                    </div>` : ''}
+                    ${task.key_notes ? `<div style="padding:8px 12px;background:#fffbeb;border-bottom:1px solid #fde68a">
+                        <p style="font-size:11px;color:#78350f;line-height:1.4;margin:0"><span style="font-weight:700">📌 </span>${escHtml(task.key_notes)}</p>
+                    </div>` : ''}
+
+                    <!-- Colour swatches -->
+                    <div style="padding:10px 12px">
+                        <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Colours</div>
+                        <div style="display:flex;gap:5px">
+                            ${colPairs.map(c => `<div style="flex:1;text-align:center">
+                                <div style="height:26px;border-radius:5px;background:${c.hex||'#e2e8f0'};border:1px solid rgba(0,0,0,0.07);margin-bottom:3px"></div>
+                                <div style="font-size:8px;color:#94a3b8;font-weight:600">${c.label}</div>
+                                ${c.pantone ? `<div style="font-size:8px;color:#64748b;font-family:monospace">${escHtml(c.pantone)}</div>` : ''}
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── PRODUCTS ACCORDION ──────────────────────────────────── -->
+                <div class="dtr-accordion" id="dtr-acc-products">
+                    <button class="dtr-acc-hdr" onclick="toggleDTRAcc('products')">
+                        <span>Products Required</span>
+                        ${selectedIds.size ? `<span style="background:#e0fdf4;color:#065f46;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${selectedIds.size}</span>` : ''}
+                        <svg class="dtr-acc-chevron" id="dtr-acc-chev-products" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="dtr-acc-body" id="dtr-acc-body-products">
+                        <input class="dtr-prod-search" id="dtr-prod-search" placeholder="Search products…" oninput="dtrFilterProds(this.value)">
+                        <div class="dtr-source-toggle">
+                            <button class="dtr-source-btn active" id="dtr-src-club" onclick="dtrSwitchProdSource('club')">Club Catalogue</button>
+                            <button class="dtr-source-btn" id="dtr-src-master" onclick="dtrSwitchProdSource('master')">All Products</button>
+                        </div>
+                        <div id="dtr-prod-grid-club">
+                            <div class="dtr-mini-prod-grid" id="dtr-mini-grid-club">${miniProdCards}</div>
+                        </div>
+                        <div id="dtr-prod-grid-master" style="display:none">
+                            <div class="dtr-mini-prod-grid" id="dtr-mini-grid-master">
+                                <div style="grid-column:1/-1;font-size:11px;color:#94a3b8;padding:6px 0">Switch to "All Products" to browse master catalogue</div>
+                            </div>
+                        </div>
+                        <div class="dtr-selected-products">
+                            <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:5px">Selected (${selectedIds.size})</div>
+                            <div id="dtr-sel-prod-list">${selProdsHtml}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── ASSETS ACCORDION ────────────────────────────────────── -->
+                <div class="dtr-accordion" id="dtr-acc-assets">
+                    <button class="dtr-acc-hdr" onclick="toggleDTRAcc('assets')">
+                        <span>Assets for Design</span>
+                        ${assets.length ? `<span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${assets.length}</span>` : ''}
+                        <svg class="dtr-acc-chevron" id="dtr-acc-chev-assets" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="dtr-acc-body" id="dtr-acc-body-assets">
+                        <div class="dtr-asset-upload-zone"
+                            onclick="document.getElementById('dtr-asset-finput').click()"
+                            ondragover="event.preventDefault();this.classList.add('drag-over')"
+                            ondragleave="this.classList.remove('drag-over')"
+                            ondrop="dtrAssetDrop(event)">
+                            <svg width="15" height="15" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 4px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            <p style="font-size:10px;color:#94a3b8;margin:0">Drop files or click to upload</p>
+                        </div>
+                        <input type="file" id="dtr-asset-finput" class="hide" multiple accept=".ai,.svg,image/*,.pdf" onchange="dtrAssetSelect(event)">
+                        <div id="dtr-asset-list">${assetsHtml}</div>
+                    </div>
+                </div>`;
+        }
+
+        // ── Stages column ──────────────────────────────────────────────────────
+        function buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads) {
+            return [
+                stage2 ? buildDTRConceptsStage(stage2, conceptUploads) : '',
+                stage3 ? buildDTRFullRangeStage(stage3) : '',
+                stage4 ? buildDTRFinalArtworkStage(stage4) : '',
+            ].join('');
         }
 
         // ── Brief Overview helpers ──────────────────────────────────────────
