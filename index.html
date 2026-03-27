@@ -9676,7 +9676,10 @@
                 if (!mp) continue;
 
                 const imageUrls = Array.isArray(cp.image_urls) ? cp.image_urls : [];
-                const title  = cp.custom_name || `${club.name} ${mp.item_name}`;
+                // Variant suffix: V2+ products need a distinct title & handle so Shopify treats
+                // them as separate products rather than merging their rows into V1.
+                const variantSuffix = (cp.variant_number > 1) ? ` – Style ${cp.variant_number}` : '';
+                const title  = (cp.custom_name || `${club.name} ${mp.item_name}`) + variantSuffix;
                 const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
                 // Resolve description — replace all placeholder variants
