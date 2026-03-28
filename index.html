@@ -5872,6 +5872,7 @@
             if (typeof navTrail !== 'undefined') { navTrail = []; renderBreadcrumb(); }
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('launchpad').classList.remove('hide');
+            window.scrollTo(0, 0);
 
             // Show admin tools in Settings modal only for super admins (admin-section moved to settings)
             const settingsAdminSection = document.getElementById('settings-admin-section');
@@ -5929,6 +5930,7 @@
         }
 
         function showTool(tool) {
+            window.scrollTo(0, 0);
             // Redirect prospecting to unified Sales LEADS tab
             if (tool === 'prospecting') { tool = 'sales'; }
 
@@ -16590,6 +16592,7 @@
         }
 
         function showToolRaw(toolId) {
+            window.scrollTo(0, 0);
             document.querySelectorAll('[id^="tool-"]').forEach(el => el.classList.add('hide'));
             document.getElementById('launchpad')?.classList.add('hide');
             const el = document.getElementById(`tool-${toolId}`);
