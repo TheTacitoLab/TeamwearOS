@@ -935,10 +935,10 @@
         .ds-s1-btn.needs-info:hover { background:rgba(245,158,11,0.15); }
 
         /* ── Design Task Record v3 — One-Page Split Layout ─────────────────── */
-        .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 155px); background:#f1f5f9; }
+        .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 98px); background:#f1f5f9; }
 
         /* Left brief/info panel */
-        .dtr-left-panel { width:310px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:155px; max-height:calc(100vh - 155px); align-self:flex-start; }
+        .dtr-left-panel { width:310px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:98px; max-height:calc(100vh - 98px); align-self:flex-start; }
         .dtr-left-panel.collapsed { width:36px; }
         .dtr-left-inner { width:310px; overflow-y:auto; flex:1; }
         .dtr-left-toggle-row { display:flex; justify-content:flex-end; padding:7px 10px 5px; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
@@ -17766,9 +17766,11 @@
             const fill = document.getElementById('dt-progress-fill');
             if (fill) fill.style.width = `${(approvedCount / 4) * 100}%`;
 
-            // Hide legacy stage tabs — new layout has inline collapsable stage sections
+            // Hide legacy stage tabs + progress bar — new layout has inline collapsable stage sections
             const stageTabs = document.getElementById('dt-stage-tabs');
             if (stageTabs) stageTabs.style.display = 'none';
+            const progressWrap = document.querySelector('.dt-stage-progress-wrap');
+            if (progressWrap) progressWrap.style.display = 'none';
 
             // Render new one-page split layout
             renderNewDTRLayout();
