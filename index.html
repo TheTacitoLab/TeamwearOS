@@ -667,9 +667,19 @@
         .ds-notif-badge { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; padding:0 4px; border-radius:8px; font-size:10px; font-weight:700; background:#ef4444; color:#fff; margin-left:4px; }
 
         /* ── Kanban Board ──────────────────────────────────────────── */
-        .ds-kanban-board { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; padding:20px 24px; align-items:start; }
+        .ds-kanban-board { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:20px 24px; align-items:start; }
         @media(max-width:1200px) { .ds-kanban-board { grid-template-columns:repeat(2,1fr); } }
         @media(max-width:700px)  { .ds-kanban-board { grid-template-columns:1fr; } }
+        /* Completed designs panel */
+        .ds-completed-panel { padding:0 24px 24px; }
+        .ds-completed-panel-inner { border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; }
+        .ds-completed-panel-hdr { display:flex; align-items:center; gap:8px; padding:12px 16px; background:#fff; border-bottom:1px solid #e2e8f0; }
+        .ds-completed-panel-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; padding:12px 16px; background:#f8fafc; }
+        /* Kanban card preview button */
+        .dsk-card-preview-btn { position:absolute; bottom:10px; right:10px; width:26px; height:26px; border-radius:7px; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; padding:0; z-index:2; }
+        .dsk-card-preview-btn:hover { background:#e0f2fe; color:#0369a1; border-color:#7dd3fc; }
+        /* Task preview popup */
+        .ds-task-preview-popup { position:fixed; z-index:9999; background:#fff; border:1px solid #e2e8f0; border-radius:16px; box-shadow:0 20px 60px rgba(0,0,0,0.18); width:340px; max-height:80vh; overflow-y:auto; }
         .ds-kanban-col { background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; overflow:hidden; }
         .dsk-col-header { display:flex; align-items:center; gap:8px; padding:12px 14px; border-bottom:1px solid #e2e8f0; background:#fff; }
         .dsk-col-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
@@ -938,9 +948,9 @@
         .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 98px); background:#f1f5f9; }
 
         /* Left brief/info panel */
-        .dtr-left-panel { width:310px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:98px; max-height:calc(100vh - 98px); align-self:flex-start; }
+        .dtr-left-panel { width:380px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:98px; max-height:calc(100vh - 98px); align-self:flex-start; }
         .dtr-left-panel.collapsed { width:36px; }
-        .dtr-left-inner { width:310px; overflow-y:auto; flex:1; }
+        .dtr-left-inner { width:380px; overflow-y:auto; flex:1; }
         .dtr-left-toggle-row { display:flex; justify-content:flex-end; padding:7px 10px 5px; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
         .dtr-col-toggle-btn { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#f8fafc; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; padding:0; }
         .dtr-col-toggle-btn:hover { background:#e2e8f0; color:#0f172a; }
@@ -996,6 +1006,12 @@
 
         /* Stages column */
         .dtr-stages-col { flex:1; min-width:0; padding:14px 16px; overflow-y:auto; }
+
+        /* Activity column (right) */
+        .dtr-activity-col { width:300px; flex-shrink:0; background:#fff; border-left:1px solid #e2e8f0; display:flex; flex-direction:column; position:sticky; top:98px; max-height:calc(100vh - 98px); align-self:flex-start; overflow:hidden; }
+        .dtr-activity-inner { overflow-y:auto; flex:1; padding:14px 16px; }
+        .dtr-activity-inner h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#94a3b8; margin:0 0 12px; }
+        .dtr-activity-divider { height:1px; background:#f1f5f9; margin:12px 0; }
 
         /* Stage section card */
         .dtr-stage-section { border:1.5px solid #e2e8f0; border-radius:14px; background:#fff; margin-bottom:12px; overflow:hidden; }
@@ -1918,10 +1934,13 @@
                 </span>
                 <!-- Divider -->
                 <span style="width:1px;height:18px;background:#e2e8f0;margin:0 12px;flex-shrink:0"></span>
-                <!-- Feed shortcut with unread badge -->
+                <!-- Feed shortcut + Completed Designs tab -->
                 <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
                     <button onclick="scrollToFeed()" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;padding:4px 12px;cursor:pointer;transition:all 0.15s">
                         💬 Feed <span id="ds-unread-badge-hdr" class="ds-notif-badge hide" style="position:static;margin-left:2px">0</span>
+                    </button>
+                    <button id="ds-completed-tab-btn" onclick="toggleDSCompletedPanel()" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;padding:4px 12px;cursor:pointer;transition:all 0.15s">
+                        ✅ Completed Designs <span id="ds-completed-tab-count" class="ds-notif-badge hide" style="position:static;margin-left:2px;background:#94a3b8">0</span>
                     </button>
                 </div>
                 <!-- Push button to right -->
@@ -1969,17 +1988,21 @@
                     <div class="dsk-col-empty hide" id="dsk-empty-v2-delivered">No delivered tasks</div>
                 </div>
 
-                <!-- COMPLETED -->
-                <div class="ds-kanban-col">
-                    <div class="dsk-col-header">
-                        <span class="dsk-col-dot completed"></span>
-                        <span class="dsk-col-title">Completed</span>
-                        <span class="dsk-col-count" id="dsk-count-v2-completed">0</span>
-                    </div>
-                    <div class="dsk-col-body" id="dsk-body-v2-completed"></div>
-                    <div class="dsk-col-empty hide" id="dsk-empty-v2-completed">No completed tasks</div>
-                </div>
+            </div>
 
+            <!-- Completed Designs panel (hidden by default) -->
+            <div id="ds-completed-panel" class="ds-completed-panel hide">
+                <div class="ds-completed-panel-inner">
+                    <div class="ds-completed-panel-hdr">
+                        <span class="dsk-col-dot completed"></span>
+                        <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#0f172a;flex:1">Completed Designs</span>
+                        <span id="dsk-count-v2-completed" style="font-size:12px;font-weight:700;color:#64748b">0</span>
+                        <button onclick="toggleDSCompletedPanel()" style="margin-left:12px;width:24px;height:24px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#64748b;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">×</button>
+                    </div>
+                    <div class="ds-completed-panel-grid" id="dsk-body-v2-completed">
+                        <div id="dsk-empty-v2-completed" style="grid-column:1/-1;padding:24px 16px;text-align:center;font-size:12px;color:#94a3b8">No completed tasks</div>
+                    </div>
+                </div>
             </div>
 
             <!-- Activity Feed — collapsible section below kanban -->
@@ -17359,13 +17382,21 @@
                 if (count) count.textContent = tasks.length;
                 if (!body) return;
                 if (!tasks.length) {
-                    body.innerHTML = '';
+                    if (key !== 'completed') body.innerHTML = '';
                     if (empty) empty.classList.remove('hide');
                     return;
                 }
                 if (empty) empty.classList.add('hide');
                 body.innerHTML = tasks.map(t => renderDSKanbanCard(t, unreadByTask[t.id] || 0)).join('');
             });
+
+            // Update Completed Designs tab badge
+            const completedCount = cols.completed.length;
+            const tabBadge = document.getElementById('ds-completed-tab-count');
+            if (tabBadge) {
+                tabBadge.textContent = completedCount;
+                tabBadge.classList.toggle('hide', completedCount === 0);
+            }
         }
 
         function renderDSKanbanCard(task, unreadCount = 0) {
@@ -17394,30 +17425,135 @@
                 ? `<span class="ds-priority ds-priority-${task.priority}" style="font-size:10px;padding:2px 7px">${task.priority === 'urgent' ? '🔴' : '🟠'} ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>`
                 : '';
 
-            return `<div class="ds-kanban-card" onclick="showDesignTask('${task.id}')">
+            return `<div class="ds-kanban-card" onclick="showDesignTask('${task.id}')" style="padding:10px 12px;padding-bottom:32px">
                 ${unreadCount > 0 ? `<span class="ds-card-unread">${unreadCount}</span>` : ''}
-                <div class="tc-ref">${escHtml(task.task_ref || '')}</div>
-                <div class="tc-title" style="padding-right:${unreadCount > 0 ? '26px' : '0'}">${escHtml(task.task_name || 'Untitled Task')}</div>
-                <div class="tc-sub">
-                    ${task.clubs?.name ? `🏟 ${escHtml(task.clubs.name)}` : ''}
-                    ${task.assigned_designer_name ? ` · 👤 ${escHtml(task.assigned_designer_name)}` : ''}
+                <div class="tc-ref" style="font-size:9px">${escHtml(task.task_ref || '')}</div>
+                <div class="tc-title" style="font-size:12px;padding-right:${unreadCount > 0 ? '26px' : '0'}">${escHtml(task.task_name || 'Untitled Task')}</div>
+                ${task.clubs?.name ? `<div class="tc-sub" style="font-size:10px;margin-bottom:6px">🏟 ${escHtml(task.clubs.name)}</div>` : '<div style="margin-bottom:6px"></div>'}
+                ${hasRevisions ? `<div class="ds-revisions-pill" style="font-size:10px;padding:2px 7px;margin-bottom:5px">🔄 Revisions</div>` : ''}
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:5px;flex-wrap:wrap">
+                    <span class="ds-stage-badge ${stageBadgeStatus}" style="font-size:9px;padding:2px 6px">${escHtml(stageLabel)}</span>
+                    ${priorityBadge ? `<span class="ds-priority ds-priority-${task.priority}" style="font-size:9px;padding:2px 5px">${task.priority === 'urgent' ? '🔴' : '🟠'}</span>` : ''}
                 </div>
-                ${hasRevisions ? `<div class="ds-revisions-pill">🔄 Revisions Required</div>` : ''}
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px">
-                    <span class="ds-stage-badge ${stageBadgeStatus}" style="font-size:10px;padding:2px 7px">${escHtml(stageLabel)}</span>
-                    ${priorityBadge}
-                </div>
-                <div class="tc-progress-bar"><div class="tc-progress-fill" style="width:${progressPct}%"></div></div>
-                <div class="tc-footer">
-                    <span style="font-size:11px;${dueStyle}">
-                        ${dueLabel ? `📅 ${dueLabel}${dueInfo?.text ? ' · ' + dueInfo.text : ''}` : `<span style="color:#94a3b8">No due date</span>`}
+                <div class="tc-progress-bar" style="margin-bottom:5px"><div class="tc-progress-fill" style="width:${progressPct}%"></div></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:4px">
+                    <span style="font-size:10px;${dueStyle}">
+                        ${dueLabel ? `📅 ${dueLabel}` : `<span style="color:#94a3b8;font-size:9px">No due date</span>`}
                     </span>
-                    <div style="display:flex;align-items:center;gap:6px">
-                        ${task._subtasks ? `<span style="font-size:10px;font-weight:700;color:${task._subtasks.done === task._subtasks.total ? '#16a34a' : '#c2410c'};background:${task._subtasks.done === task._subtasks.total ? 'rgba(34,197,94,0.08)' : 'rgba(194,65,12,0.08)'};border-radius:6px;padding:1px 6px">📋 ${task._subtasks.done}/${task._subtasks.total}</span>` : ''}
-                        <span style="font-size:10px;color:#94a3b8;font-weight:600">${approvedCount}/4</span>
+                    <div style="display:flex;align-items:center;gap:5px">
+                        ${task._subtasks ? `<span style="font-size:9px;font-weight:700;color:${task._subtasks.done === task._subtasks.total ? '#16a34a' : '#c2410c'};background:${task._subtasks.done === task._subtasks.total ? 'rgba(34,197,94,0.08)' : 'rgba(194,65,12,0.08)'};border-radius:5px;padding:1px 5px">📋 ${task._subtasks.done}/${task._subtasks.total}</span>` : ''}
+                        <span style="font-size:9px;color:#94a3b8;font-weight:600">${approvedCount}/4</span>
                     </div>
                 </div>
+                <button class="dsk-card-preview-btn" onclick="event.stopPropagation();dtrPreviewKanbanCard('${task.id}',event)" title="Quick preview">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </button>
             </div>`;
+        }
+
+        function toggleDSCompletedPanel() {
+            const panel = document.getElementById('ds-completed-panel');
+            const btn   = document.getElementById('ds-completed-tab-btn');
+            if (!panel) return;
+            const nowVisible = panel.classList.toggle('hide') === false;
+            // Flip: toggle() returns true if class was added (i.e., hidden), false if removed (visible)
+            const isVisible = !panel.classList.contains('hide');
+            if (btn) {
+                btn.style.background    = isVisible ? 'rgba(148,163,184,0.12)' : 'transparent';
+                btn.style.borderColor   = isVisible ? '#94a3b8' : '#e2e8f0';
+                btn.style.color         = isVisible ? '#0f172a' : '#64748b';
+            }
+            if (isVisible) panel.scrollIntoView({ behavior:'smooth', block:'start' });
+        }
+
+        function dtrPreviewKanbanCard(taskId, evt) {
+            // Remove any existing popup
+            document.getElementById('ds-task-preview-popup')?.remove();
+
+            const task = (allDesignTasks || []).find(t => t.id === taskId);
+            if (!task) return;
+
+            const stages = task._stages || [];
+            const approvedCount = stages.filter(s => ['approved','skipped'].includes(s.status)).length;
+            const progressPct   = Math.round((approvedCount / 4) * 100);
+            const activeStage   = stages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status))
+                || stages.find(s => s.status === 'not_started');
+            const stageLabel    = activeStage
+                ? `Stage ${activeStage.stage_number}: ${activeStage.stage_name}`
+                : (approvedCount === 4 ? 'Complete' : 'Not Started');
+            const due = task.due_date ? new Date(task.due_date) : null;
+            const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) : '—';
+            const daysLeft = due ? Math.ceil((due - new Date()) / 86400000) : null;
+            const dueExtra = daysLeft !== null
+                ? daysLeft < 0  ? `<span style="color:#dc2626;font-weight:700"> (${Math.abs(daysLeft)}d overdue)</span>`
+                : daysLeft <= 7 ? `<span style="color:#c2410c;font-weight:700"> (${daysLeft}d left)</span>` : ''
+                : '';
+
+            const stageRows = stages.map(s => {
+                const statusStyleMap = {
+                    not_started:'color:#94a3b8', in_progress:'color:#1d4ed8;font-weight:700',
+                    in_review:'color:#b45309;font-weight:700', revisions_required:'color:#dc2626;font-weight:700',
+                    approved:'color:#16a34a;font-weight:700', skipped:'color:#16a34a',
+                };
+                const icons = { not_started:'○', in_progress:'◑', in_review:'◕', revisions_required:'✕', approved:'✓', skipped:'↷' };
+                return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+                    <span style="font-size:11px;${statusStyleMap[s.status]||'color:#94a3b8'}">${icons[s.status]||'○'}</span>
+                    <span style="font-size:11px;color:#374151;flex:1">Stage ${s.stage_number}: ${escHtml(s.stage_name||'')}</span>
+                    <span style="font-size:10px;${statusStyleMap[s.status]||'color:#94a3b8'}">${dsStageStatusLabel(s.status)}</span>
+                </div>`;
+            }).join('');
+
+            const popup = document.createElement('div');
+            popup.id = 'ds-task-preview-popup';
+            popup.className = 'ds-task-preview-popup';
+            popup.innerHTML = `
+                <div style="padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:flex-start;gap:10px">
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:9px;font-family:monospace;color:#94a3b8;margin-bottom:3px">${escHtml(task.task_ref||'')}</div>
+                        <div style="font-size:13px;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:3px">${escHtml(task.task_name||'Untitled')}</div>
+                        ${task.clubs?.name ? `<div style="font-size:11px;color:#64748b">🏟 ${escHtml(task.clubs.name)}</div>` : ''}
+                    </div>
+                    <button onclick="document.getElementById('ds-task-preview-popup').remove()" style="width:24px;height:24px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#64748b;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>
+                </div>
+                <div style="padding:12px 16px;border-bottom:1px solid #f1f5f9">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">
+                        <span class="ds-stage-badge ${activeStage?.status||'not_started'}" style="font-size:11px;padding:3px 9px">${escHtml(stageLabel)}</span>
+                        <span style="font-size:11px;color:#64748b">📅 ${dueLabel}${dueExtra}</span>
+                    </div>
+                    <div style="height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;margin-bottom:4px">
+                        <div style="height:100%;background:linear-gradient(90deg,#00e5cc,#22c55e);width:${progressPct}%;border-radius:3px;transition:width 0.4s"></div>
+                    </div>
+                    <div style="font-size:10px;color:#94a3b8;text-align:right">${approvedCount}/4 stages complete</div>
+                </div>
+                <div style="padding:10px 16px;border-bottom:1px solid #f1f5f9">
+                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Stage Progress</div>
+                    ${stageRows}
+                </div>
+                ${task.assigned_designer_name ? `<div style="padding:10px 16px;border-bottom:1px solid #f1f5f9">
+                    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Designer</span>
+                    <div style="font-size:12px;color:#0f172a;margin-top:3px">👤 ${escHtml(task.assigned_designer_name)}</div>
+                </div>` : ''}
+                <div style="padding:10px 16px;display:flex;justify-content:flex-end">
+                    <button onclick="document.getElementById('ds-task-preview-popup').remove();showDesignTask('${taskId}')" style="padding:7px 16px;border-radius:8px;background:#0f172a;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">Open Full Record →</button>
+                </div>`;
+
+            // Position near the click event
+            document.body.appendChild(popup);
+            const rect = evt.target.closest('.ds-kanban-card')?.getBoundingClientRect() || { right: evt.clientX, top: evt.clientY };
+            const popupW = 340, popupH = popup.offsetHeight || 420;
+            let left = rect.right + 8;
+            let top  = rect.top;
+            if (left + popupW > window.innerWidth - 8) left = rect.left - popupW - 8;
+            if (top + popupH > window.innerHeight - 8) top = window.innerHeight - popupH - 8;
+            if (top < 8) top = 8;
+            popup.style.left = left + 'px';
+            popup.style.top  = (top + window.scrollY) + 'px';
+
+            // Close on outside click
+            const closePopup = (e) => {
+                if (!popup.contains(e.target)) { popup.remove(); document.removeEventListener('click', closePopup); }
+            };
+            setTimeout(() => document.addEventListener('click', closePopup), 0);
         }
 
         function toggleDSFeed() {
@@ -18233,6 +18369,26 @@
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
                         ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads)}
+                    </div>
+                    <div class="dtr-activity-col" id="dtr-activity-col">
+                        <div class="dtr-activity-inner">
+                            <h4>Activity</h4>
+                            <div style="display:flex;gap:4px;margin-bottom:10px">
+                                <button id="dt-act-comment-btn" onclick="setDTInputType('comment')" class="act-tab-btn active" style="flex:1;font-size:11px">+ Comment</button>
+                                <button id="dt-act-task-btn" onclick="setDTInputType('sub_task')" class="act-tab-btn task-tab" style="flex:1;font-size:11px">+ Sub-Task</button>
+                            </div>
+                            <div id="dt-act-list" style="margin-bottom:12px">
+                                <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
+                            </div>
+                            <div style="display:flex;gap:6px">
+                                <input type="text" id="dt-act-input" placeholder="Add a comment…"
+                                    style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;transition:border-color 0.15s"
+                                    onfocus="this.style.borderColor='#00e5cc'"
+                                    onblur="this.style.borderColor='#e2e8f0'"
+                                    onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
+                                <button onclick="addDesignTaskActivity()" style="padding:7px 12px;border-radius:8px;background:#0f172a;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">Post</button>
+                            </div>
+                        </div>
                     </div>
                 </div>`;
 
