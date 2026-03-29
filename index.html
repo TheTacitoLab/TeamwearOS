@@ -20300,10 +20300,32 @@
                 const isRevisionReq = entry.activity_type === 'revision_request';
                 const done   = entry.task_completed;
                 if (isRevisionReq) {
-                    return `<div class="dt-act-revision">
+                    const resolved = entry.task_completed;
+                    const resolution = entry.review_comment; // 'accepted' | 'dismissed'
+                    if (resolved) {
+                        // Resolved — show as plain small entry (no orange tag)
+                        const icon = resolution === 'accepted' ? '✓' : resolution === 'dismissed' ? '✗' : '·';
+                        const label = resolution === 'accepted' ? 'Revisions Accepted' : resolution === 'dismissed' ? 'Revisions Dismissed' : 'Revisions Resolved';
+                        const color = resolution === 'accepted' ? '#16a34a' : '#64748b';
+                        return `<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:8px;padding:6px 8px;border-radius:8px;background:#f8fafc;border:1px solid #f1f5f9">
+                            <span style="font-size:11px;color:${color};font-weight:700;flex-shrink:0;margin-top:1px">${icon}</span>
+                            <div style="flex:1;min-width:0">
+                                <div style="font-size:10px;font-weight:700;color:${color}">${label}</div>
+                                <div style="font-size:11px;color:#94a3b8;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(entry.message)}</div>
+                                <div style="font-size:10px;color:#b0bec5;margin-top:1px">${escHtml(entry.user_name||'Unknown')} · ${ts}</div>
+                            </div>
+                        </div>`;
+                    }
+                    return `<div class="dt-act-revision" id="dt-rev-${entry.id}">
                         <div class="dt-act-revision-label">🔄 Revision Request</div>
                         <div class="dt-act-revision-msg">${escHtml(entry.message)}</div>
-                        <div class="dt-act-revision-meta">${escHtml(entry.user_name||'Unknown')} · ${ts}</div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
+                            <div class="dt-act-revision-meta">${escHtml(entry.user_name||'Unknown')} · ${ts}</div>
+                            <div style="display:flex;gap:5px;flex-shrink:0">
+                                <button onclick="resolveRevisionRequest('${entry.id}','accepted')" title="Accept revisions" style="width:26px;height:26px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='#16a34a';this.style.color='#fff'" onmouseout="this.style.background='#f0fdf4';this.style.color='#16a34a'">✓</button>
+                                <button onclick="resolveRevisionRequest('${entry.id}','dismissed')" title="Dismiss revision request" style="width:26px;height:26px;border-radius:7px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s" onmouseover="this.style.background='#dc2626';this.style.color='#fff'" onmouseout="this.style.background='#fef2f2';this.style.color='#dc2626'">✗</button>
+                            </div>
+                        </div>
                     </div>`;
                 }
                 if (isTask) {
@@ -20392,6 +20414,22 @@
                     t._subtasks.total++;
                     renderDSTaskList();
                 }
+            }
+        }
+
+        async function resolveRevisionRequest(entryId, action) {
+            // Optimistic local update first
+            const entry = _dtActivityLog.find(e => e.id === entryId);
+            if (entry) { entry.task_completed = true; entry.review_comment = action; }
+            renderDesignTaskActivity();
+
+            const { error } = await supabase.from('design_task_activity')
+                .update({ task_completed: true, review_comment: action }).eq('id', entryId);
+            if (error) {
+                // Rollback on failure
+                if (entry) { entry.task_completed = false; entry.review_comment = null; }
+                renderDesignTaskActivity();
+                showToast('Error updating revision request', 'error');
             }
         }
 
