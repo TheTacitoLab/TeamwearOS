@@ -667,6 +667,10 @@
         .ds-notif-badge { display:inline-flex; align-items:center; justify-content:center; min-width:16px; height:16px; padding:0 4px; border-radius:8px; font-size:10px; font-weight:700; background:#ef4444; color:#fff; margin-left:4px; }
 
         /* ── Kanban Board ──────────────────────────────────────────── */
+        .ds-kanban-sort-bar { display:flex; align-items:center; gap:8px; padding:10px 24px 0; }
+        .ds-kanban-sort-bar span { font-size:11px; font-weight:600; color:#94a3b8; }
+        .ds-sort-btn { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; border:1.5px solid #e2e8f0; background:#fff; color:#64748b; cursor:pointer; transition:all 0.15s; }
+        .ds-sort-btn.active { background:#0f172a; color:#fff; border-color:#0f172a; }
         .ds-kanban-board { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:20px 24px; align-items:start; }
         @media(max-width:1200px) { .ds-kanban-board { grid-template-columns:repeat(2,1fr); } }
         @media(max-width:700px)  { .ds-kanban-board { grid-template-columns:1fr; } }
@@ -977,7 +981,7 @@
         .dtr-source-btn:not(.active) { background:#fff; color:#64748b; }
 
         /* Mini product grid (left panel) */
-        .dtr-mini-prod-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(70px,1fr)); gap:5px; max-height:200px; overflow-y:auto; }
+        .dtr-mini-prod-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(85px,1fr)); gap:6px; max-height:240px; overflow-y:auto; }
         .dtr-mini-prod-card { border:2px solid #e2e8f0; border-radius:8px; overflow:hidden; cursor:pointer; transition:all 0.12s; background:#fff; position:relative; }
         .dtr-mini-prod-card:hover { border-color:#94a3b8; }
         .dtr-mini-prod-card.selected { border-color:#00e5cc; box-shadow:0 0 0 2px rgba(0,229,204,0.2); }
@@ -1012,6 +1016,16 @@
         .dtr-activity-inner { overflow-y:auto; flex:1; padding:14px 16px; }
         .dtr-activity-inner h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#94a3b8; margin:0 0 12px; }
         .dtr-activity-divider { height:1px; background:#f1f5f9; margin:12px 0; }
+
+        /* Left panel editable fields */
+        .dtr-edit-field { width:100%; box-sizing:border-box; padding:5px 8px; border:1.5px solid #e2e8f0; border-radius:7px; font-size:12px; color:#0f172a; background:#fff; outline:none; transition:border-color 0.15s; font-family:inherit; }
+        .dtr-edit-field:focus { border-color:#00e5cc; }
+        .dtr-edit-field.textarea { resize:vertical; min-height:64px; }
+        .dtr-edit-label { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:3px; display:block; }
+        .dtr-edit-row { margin-bottom:8px; }
+        .dtr-save-bar { padding:10px 12px; background:#fff; border-top:1px solid #f1f5f9; position:sticky; bottom:0; }
+        .dtr-save-btn { width:100%; padding:8px; border-radius:8px; background:#0f172a; color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.15s; }
+        .dtr-save-btn:hover { opacity:0.85; }
 
         /* Stage section card */
         .dtr-stage-section { border:1.5px solid #e2e8f0; border-radius:14px; background:#fff; margin-bottom:12px; overflow:hidden; }
@@ -1073,6 +1087,16 @@
         .dtr-revisions-btn:hover { background:rgba(245,158,11,0.18); }
         .dtr-complete-btn { padding:8px 16px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; transition:opacity 0.15s; margin-left:auto; }
         .dtr-complete-btn:hover { opacity:0.9; }
+        /* Inline revisions feedback box */
+        .dtr-revision-form { background:rgba(245,158,11,0.07); border:2px solid #fde68a; border-radius:10px; padding:12px 14px; margin:0 -16px; }
+        .dtr-revision-form textarea { width:100%; box-sizing:border-box; padding:8px 10px; border:1.5px solid #fde68a; border-radius:8px; font-size:12px; color:#0f172a; background:#fff; resize:vertical; min-height:72px; outline:none; font-family:inherit; }
+        .dtr-revision-form textarea:focus { border-color:#f59e0b; }
+        .dtr-revision-form-footer { display:flex; gap:8px; margin-top:8px; align-items:center; }
+        /* Orange activity feed entry */
+        .dt-act-revision { background:rgba(245,158,11,0.09); border:1.5px solid #fde68a; border-radius:10px; padding:9px 12px; margin-bottom:8px; }
+        .dt-act-revision-label { font-size:11px; font-weight:700; color:#b45309; margin-bottom:3px; }
+        .dt-act-revision-msg { font-size:12px; color:#374151; line-height:1.4; }
+        .dt-act-revision-meta { font-size:10px; color:#9ca3af; margin-top:3px; }
 
         /* Placeholder stage body */
         .dtr-stage-placeholder { padding:24px 16px; text-align:center; color:#94a3b8; }
@@ -1952,7 +1976,15 @@
                 </div>
             </div>
 
-            <!-- Kanban board — 4 columns -->
+            <!-- Sort bar -->
+            <div class="ds-kanban-sort-bar">
+                <span>Sort:</span>
+                <button class="ds-sort-btn active" id="ds-sort-default" onclick="setDSKanbanSort('default')">Default</button>
+                <button class="ds-sort-btn" id="ds-sort-overdue" onclick="setDSKanbanSort('overdue')">Overdue First</button>
+                <button class="ds-sort-btn" id="ds-sort-due" onclick="setDSKanbanSort('due')">Closest Due Date</button>
+            </div>
+
+            <!-- Kanban board — 3 columns -->
             <div class="ds-kanban-board" id="ds-kanban-board-v2">
 
                 <!-- NEW -->
@@ -4988,16 +5020,14 @@
                         </div>
                     </div>
 
-                    <!-- Products Required (shown after club is selected) -->
-                    <div id="cdt-products-section" class="hide" style="margin-top:18px;padding-top:16px;border-top:1px solid #f1f5f9">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-                            <div>
-                                <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#64748b">Products Required</span>
-                                <span id="cdt-prod-count" style="margin-left:8px;font-size:11px;color:#94a3b8"></span>
-                            </div>
-                            <span style="font-size:11px;color:#94a3b8">Click to select from the club catalogue</span>
+                    <!-- Products Required -->
+                    <div id="cdt-products-section" style="margin-top:18px;padding-top:16px;border-top:1px solid #f1f5f9">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+                            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#64748b">Products Required</span>
+                            <span id="cdt-prod-count" style="font-size:11px;color:#00b89f;font-weight:700"></span>
+                            <input id="cdt-prod-search" type="text" placeholder="Search products…" oninput="cdtFilterProducts(this.value)" style="flex:1;min-width:140px;padding:5px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;outline:none">
                         </div>
-                        <div id="cdt-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">
+                        <div id="cdt-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;max-height:240px;overflow-y:auto">
                             <div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading products…</div>
                         </div>
                     </div>
@@ -16368,7 +16398,10 @@
                 document.getElementById('cdt-priority').value = 'standard';
                 document.getElementById('cdt-job-type').value = '';
                 _cdtSelectedProducts = [];
-                document.getElementById('cdt-products-section')?.classList.add('hide');
+                _cdtAllProducts = [];
+                _cdtClubFilter = null;
+                const prodSearch = document.getElementById('cdt-prod-search');
+                if (prodSearch) prodSearch.value = '';
 
                 // Populate club dropdown
                 const clubSel = document.getElementById('cdt-club-id');
@@ -16413,6 +16446,8 @@
 
                 modal.classList.remove('hide');
                 setTimeout(() => document.getElementById('cdt-name')?.focus(), 100);
+                // Load all products upfront (non-blocking)
+                _cdtLoadAndRenderProducts(null);
             } catch (err) {
                 console.error('openCreateDesignTaskModal error:', err);
                 showToast('Could not open design task form — please try again', 'error');
@@ -16422,6 +16457,8 @@
         async function cdtClubChanged(preselectJobId) {
             const clubId = document.getElementById('cdt-club-id')?.value;
             _cdtSelectedProducts = [];
+            const countEl = document.getElementById('cdt-prod-count');
+            if (countEl) countEl.textContent = '';
 
             // Reset job dropdown
             const jobSel = document.getElementById('cdt-job-id');
@@ -16439,46 +16476,67 @@
                 }
             }
 
-            if (!clubId) {
-                document.getElementById('cdt-products-section')?.classList.add('hide');
-                return;
-            }
+            // Load products (cached after first load) and filter by club if selected
+            await _cdtLoadAndRenderProducts(clubId || null);
+        }
 
-            // Load club products
+        let _cdtAllProducts = [];   // all loaded products for create modal
+        let _cdtClubFilter = null;  // currently selected club id for filtering
+
+        async function _cdtLoadAndRenderProducts(clubId) {
             const grid = document.getElementById('cdt-products-grid');
-            const section = document.getElementById('cdt-products-section');
-            if (grid) grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading…</div>';
-            if (section) section.classList.remove('hide');
-
-            const { data: prods } = await supabase
-                .from('club_products')
-                .select('id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category)')
-                .eq('club_id', clubId)
-                .eq('is_active', true)
-                .order('created_at');
-
             if (!grid) return;
-            if (!prods || !prods.length) {
-                grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">No products in this club\'s catalogue.</div>';
+            _cdtClubFilter = clubId || null;
+
+            // Load all brand club_products once
+            if (!_cdtAllProducts.length) {
+                grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading…</div>';
+                const { data: cpRows } = await supabase.from('club_products')
+                    .select('id, club_id, custom_name, image_url, image_urls, products(product_code, item_name)')
+                    .in('club_id', (clubs || []).map(c => c.id))
+                    .order('created_at');
+                _cdtAllProducts = (cpRows || []).map(cp => ({
+                    id: cp.id,
+                    club_id: cp.club_id,
+                    nm: cp.custom_name || cp.products?.item_name || 'Product',
+                    img: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
+                    code: cp.products?.product_code || '',
+                }));
+            }
+            _cdtRenderProducts(clubId);
+        }
+
+        function _cdtRenderProducts(clubId) {
+            const grid = document.getElementById('cdt-products-grid');
+            if (!grid) return;
+            _cdtClubFilter = clubId || null;
+            const search = (document.getElementById('cdt-prod-search')?.value || '').toLowerCase();
+            let list = _cdtAllProducts;
+            if (clubId) list = list.filter(p => p.club_id === clubId);
+            if (search) list = list.filter(p => p.nm.toLowerCase().includes(search));
+            if (!list.length) {
+                grid.innerHTML = `<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">${_cdtAllProducts.length ? 'No products match your search.' : 'No products found for this brand.'}</div>`;
                 return;
             }
-
-            grid.innerHTML = prods.map(cp => {
-                const nm  = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
-                const cod = cp.products?.product_code || '';
-                const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
-                const img  = imgs[0] || cp.image_url || '';
-                return `<div class="ds-prod-card" id="cdtprod-${cp.id}" onclick="cdtToggleProduct('${cp.id}',this)" style="cursor:pointer">
+            grid.innerHTML = list.map(cp => {
+                const nm  = escHtml(cp.nm);
+                const img = cp.img;
+                const sel = _cdtSelectedProducts.includes(cp.id);
+                return `<div class="ds-prod-card${sel?' selected':''}" id="cdtprod-${cp.id}" onclick="cdtToggleProduct('${cp.id}',this)" style="cursor:pointer">
                     <div class="ds-prod-check">✓</div>
                     <div class="ds-prod-img">
                         ${img ? `<img src="${escHtml(img)}" alt="${nm}" loading="lazy">` : `<svg width="24" height="24" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
                     </div>
                     <div class="ds-prod-info">
                         <div class="ds-prod-name" title="${nm}">${nm}</div>
-                        ${cod ? `<div class="ds-prod-code">${escHtml(cod)}</div>` : ''}
+                        ${cp.code ? `<div class="ds-prod-code">${escHtml(cp.code)}</div>` : ''}
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function cdtFilterProducts(search) {
+            _cdtRenderProducts(_cdtClubFilter);
         }
 
         function cdtToggleProduct(id, el) {
@@ -16486,7 +16544,7 @@
             if (idx === -1) { _cdtSelectedProducts.push(id); el.classList.add('selected'); }
             else { _cdtSelectedProducts.splice(idx, 1); el.classList.remove('selected'); }
             const countEl = document.getElementById('cdt-prod-count');
-            if (countEl) countEl.textContent = _cdtSelectedProducts.length ? `(${_cdtSelectedProducts.length} selected)` : '';
+            if (countEl) countEl.textContent = _cdtSelectedProducts.length ? `${_cdtSelectedProducts.length} selected` : '';
         }
 
         function hideCreateDesignTaskModal() {
@@ -17345,6 +17403,33 @@
             renderDSTaskList();
         }
 
+        let _dsKanbanSort = 'default';
+
+        function setDSKanbanSort(mode) {
+            _dsKanbanSort = mode;
+            ['default','overdue','due'].forEach(m => {
+                document.getElementById(`ds-sort-${m}`)?.classList.toggle('active', m === mode);
+            });
+            renderDSKanbanBoard();
+        }
+
+        function _sortTasksForKanban(tasks) {
+            if (_dsKanbanSort === 'default') return tasks;
+            return [...tasks].sort((a, b) => {
+                const dA = a.due_date ? new Date(a.due_date) : null;
+                const dB = b.due_date ? new Date(b.due_date) : null;
+                if (!dA && !dB) return 0;
+                if (!dA) return 1;
+                if (!dB) return -1;
+                if (_dsKanbanSort === 'overdue') {
+                    // Overdue first (most overdue = earliest date), then non-overdue by soonest
+                    return dA - dB;
+                }
+                // 'due': closest due date first (soonest deadline at top)
+                return dA - dB;
+            });
+        }
+
         function renderDSHome() {
             renderDSKanbanBoard();
             loadDSActivityFeed();
@@ -17369,10 +17454,10 @@
             });
 
             const cols = {
-                new:         allTasks.filter(t => t.status === 'new'),
-                in_progress: allTasks.filter(t => ['in_progress','revisions','in_review','awaiting_approval'].includes(t.status)),
-                delivered:   allTasks.filter(t => t.status === 'delivered'),
-                completed:   allTasks.filter(t => t.status === 'completed'),
+                new:         _sortTasksForKanban(allTasks.filter(t => t.status === 'new')),
+                in_progress: _sortTasksForKanban(allTasks.filter(t => ['in_progress','revisions','in_review','awaiting_approval'].includes(t.status))),
+                delivered:   _sortTasksForKanban(allTasks.filter(t => t.status === 'delivered')),
+                completed:   _sortTasksForKanban(allTasks.filter(t => t.status === 'completed')),
             };
 
             Object.entries(cols).forEach(([key, tasks]) => {
@@ -17529,6 +17614,10 @@
                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Stage Progress</div>
                     ${stageRows}
                 </div>
+                ${(task.design_brief || task.design_summary) ? `<div style="padding:10px 16px;border-bottom:1px solid #f1f5f9">
+                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:5px">Design Brief</div>
+                    <p style="font-size:11px;color:#374151;line-height:1.5;margin:0;max-height:80px;overflow:hidden">${escHtml((task.design_brief||task.design_summary).substring(0,220))}${(task.design_brief||task.design_summary||'').length>220?'…':''}</p>
+                </div>` : ''}
                 ${task.assigned_designer_name ? `<div style="padding:10px 16px;border-bottom:1px solid #f1f5f9">
                     <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Designer</span>
                     <div style="font-size:12px;color:#0f172a;margin-top:3px">👤 ${escHtml(task.assigned_designer_name)}</div>
@@ -18333,7 +18422,7 @@
                 task.club_id
                     ? supabase.from('club_products')
                         .select('id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category)')
-                        .eq('club_id', task.club_id).eq('is_active', true).order('created_at')
+                        .eq('club_id', task.club_id).order('created_at')
                     : Promise.resolve({ data: [] }),
                 stage2
                     ? supabase.from('stage_uploads').select('*').eq('stage_id', stage2.id).order('uploaded_at')
@@ -18478,42 +18567,72 @@
                 }).join('')
                 : `<p style="font-size:11px;color:#94a3b8;margin:0;padding:2px 0">No assets uploaded yet.</p>`;
 
+            // Designer options for select
+            const designerOpts = `<option value="">— Unassigned —</option>` +
+                (typeof brandUsers !== 'undefined' && brandUsers?.length
+                    ? brandUsers.map(u => {
+                        const n = typeof userDisplayName === 'function' ? userDisplayName(u) : `${u.first_name||''} ${u.last_name||''}`.trim() || u.email || u.id;
+                        const sel = task.assigned_designer_id === u.id ? ' selected' : '';
+                        return `<option value="${u.id}" data-name="${escHtml(n)}"${sel}>${escHtml(n)}</option>`;
+                    }).join('')
+                    : (task.assigned_designer_id ? `<option value="${task.assigned_designer_id}" selected>${escHtml(task.assigned_designer_name||'Current Designer')}</option>` : ''));
+
             return `
-                <!-- ── BRIEF CARD ─────────────────────────────────────────── -->
+                <!-- ── EDITABLE BRIEF CARD ────────────────────────────────── -->
                 <div class="dtr-brief-card">
+                    <!-- Header: logo + ref + priority -->
                     <div class="dtr-brief-summary">
                         ${logoUrl
                             ? `<img src="${escHtml(logoUrl)}" alt="" style="width:30px;height:30px;object-fit:contain;border-radius:5px;background:#fff;border:1px solid #e2e8f0;flex-shrink:0">`
                             : `<div style="width:30px;height:30px;border-radius:5px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>`}
                         <div style="flex:1;min-width:0">
-                            <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled')}</div>
                             <div style="font-size:10px;color:#64748b">${escHtml(club.name||'')}${task.task_ref ? ` · <span style="font-family:monospace;color:#94a3b8">${escHtml(task.task_ref)}</span>` : ''}</div>
                         </div>
                         <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 6px;flex-shrink:0">${pri.dot} ${pri.label}</span>
                     </div>
 
-                    <!-- Details grid -->
+                    <!-- Editable fields -->
                     <div style="padding:10px 12px;border-bottom:1px solid #f1f5f9">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">
-                            ${[
-                                { label:'Sport', val: task.sport || '—' },
-                                { label:'Deadline', val: dueDate + (dueExtra||'') },
-                                { label:'Job Type', val: JTL[task.jobs?.job_type] || (task.jobs?.job_type ? task.jobs.job_type.replace(/_/g,' ') : '—') },
-                                { label:'Designer', val: escHtml(task.assigned_designer_name || '—') },
-                            ].map(c => `<div style="padding:5px 8px;background:#f8fafc;border-radius:6px;border:1px solid #f1f5f9">
-                                <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:2px">${c.label}</div>
-                                <div style="font-size:11px;font-weight:600;color:#0f172a">${c.val}</div>
-                            </div>`).join('')}
+                        <div class="dtr-edit-row">
+                            <label class="dtr-edit-label" for="dtr-ln-task-name">Task Name</label>
+                            <input class="dtr-edit-field" id="dtr-ln-task-name" type="text" value="${escHtml(task.task_name||'')}" placeholder="Task name…">
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                            <div class="dtr-edit-row">
+                                <label class="dtr-edit-label" for="dtr-ln-sport">Sport</label>
+                                <input class="dtr-edit-field" id="dtr-ln-sport" type="text" value="${escHtml(task.sport||'')}" placeholder="e.g. Football">
+                            </div>
+                            <div class="dtr-edit-row">
+                                <label class="dtr-edit-label" for="dtr-ln-due-date">Deadline${dueExtra ? ` ${dueExtra}` : ''}</label>
+                                <input class="dtr-edit-field" id="dtr-ln-due-date" type="date" value="${task.due_date ? task.due_date.substring(0,10) : ''}">
+                            </div>
+                        </div>
+                        <div class="dtr-edit-row">
+                            <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
+                            <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
+                        </div>
+                        <div class="dtr-edit-row">
+                            <label class="dtr-edit-label" for="dtr-ln-priority">Priority</label>
+                            <select class="dtr-edit-field" id="dtr-ln-priority">
+                                <option value="standard"${(task.priority||'standard')==='standard'?' selected':''}>⚪ Standard</option>
+                                <option value="high"${task.priority==='high'?' selected':''}>🟠 High</option>
+                                <option value="urgent"${task.priority==='urgent'?' selected':''}>🔴 Urgent</option>
+                            </select>
+                        </div>
+                        <div class="dtr-edit-row">
+                            <label class="dtr-edit-label" for="dtr-ln-brief">Design Brief</label>
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design requirements…">${escHtml(briefText)}</textarea>
+                        </div>
+                        <div class="dtr-edit-row" style="margin-bottom:0">
+                            <label class="dtr-edit-label" for="dtr-ln-key-notes">📌 Key Notes</label>
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Important notes or reminders…" style="min-height:48px">${escHtml(task.key_notes||'')}</textarea>
                         </div>
                     </div>
 
-                    <!-- Brief description -->
-                    ${briefText ? `<div style="padding:10px 12px;border-bottom:1px solid #f1f5f9">
-                        <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:5px">Design Brief</div>
-                        <p style="font-size:12px;color:#334155;line-height:1.55;margin:0">${escHtml(briefText)}</p>
-                    </div>` : ''}
-                    ${task.key_notes ? `<div style="padding:8px 12px;background:#fffbeb;border-bottom:1px solid #fde68a">
-                        <p style="font-size:11px;color:#78350f;line-height:1.4;margin:0"><span style="font-weight:700">📌 </span>${escHtml(task.key_notes)}</p>
+                    <!-- Job type (read-only) -->
+                    ${task.jobs?.job_type ? `<div style="padding:6px 12px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
+                        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Job Type</span>
+                        <span style="font-size:11px;font-weight:600;color:#0f172a">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
                     </div>` : ''}
 
                     <!-- Colour swatches -->
@@ -18526,6 +18645,11 @@
                                 ${c.pantone ? `<div style="font-size:8px;color:#64748b;font-family:monospace">${escHtml(c.pantone)}</div>` : ''}
                             </div>`).join('')}
                         </div>
+                    </div>
+
+                    <!-- Save bar -->
+                    <div class="dtr-save-bar">
+                        <button class="dtr-save-btn" onclick="saveDTRLeftPanel()">Save Changes</button>
                     </div>
                 </div>
 
@@ -18577,6 +18701,47 @@
                         <div id="dtr-asset-list">${assetsHtml}</div>
                     </div>
                 </div>`;
+        }
+
+        // ── Save left panel editable fields ───────────────────────────────────
+        async function saveDTRLeftPanel() {
+            if (!currentDesignTaskRecord?.id) return;
+            const btn = document.querySelector('.dtr-save-btn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
+            try {
+                const dsnSel = document.getElementById('dtr-ln-designer');
+                const designerId   = dsnSel?.value || null;
+                const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+                const payload = {
+                    task_name:   document.getElementById('dtr-ln-task-name')?.value?.trim() || currentDesignTaskRecord.task_name,
+                    sport:       document.getElementById('dtr-ln-sport')?.value?.trim() || null,
+                    due_date:    document.getElementById('dtr-ln-due-date')?.value || null,
+                    design_brief: document.getElementById('dtr-ln-brief')?.value?.trim() || '',
+                    key_notes:   document.getElementById('dtr-ln-key-notes')?.value?.trim() || null,
+                    priority:    document.getElementById('dtr-ln-priority')?.value || 'standard',
+                    assigned_designer_id:   designerId,
+                    assigned_designer_name: designerName,
+                };
+                if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
+                const { data, error } = await supabase.from('design_tasks')
+                    .update(payload).eq('id', currentDesignTaskRecord.id)
+                    .select('*, clubs(id,name,logo_url,club_crest_url,sport,pantone_main,pantone_secondary,pantone_accent,hex_main,hex_secondary,hex_accent), jobs(id,job_name,job_number,job_type)').single();
+                if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
+                currentDesignTaskRecord = data;
+                currentDesignTask = data;
+                allDesignTasks = (allDesignTasks || []).map(t => t.id === data.id ? { ...t, ...data } : t);
+                // Update header display elements
+                const nameDisp = document.getElementById('dt-task-name-display');
+                if (nameDisp) nameDisp.textContent = data.task_name || 'Untitled Task';
+                const designerDisp = document.getElementById('dt-designer-display');
+                if (designerDisp) designerDisp.textContent = data.assigned_designer_name ? `👤 ${data.assigned_designer_name}` : '';
+                showToast('Saved ✓');
+            } catch(err) {
+                console.error('saveDTRLeftPanel error:', err);
+                showToast('Unexpected error saving', 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+            }
         }
 
         // ── Stages column ──────────────────────────────────────────────────────
@@ -18712,11 +18877,9 @@
                 ? `<button class="dtr-deliver-btn delivered" disabled>✓ Concepts Delivered</button>`
                 : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Concepts</button>`;
 
-            const revisionsBtn = isInReview
-                ? `<button class="dtr-revisions-btn" onclick="dtrConceptRevisions('${stage.id}')">↩ Request Revisions</button>`
-                : isRevisions
-                    ? `<span style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(239,68,68,0.08);color:#dc2626;border:1.5px solid #fca5a5">⚠ Revisions Requested</span>`
-                    : '';
+            const revisionsBtn = isRevisions
+                ? `<span style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a">🔄 Revisions Requested</span>`
+                : `<button class="dtr-revisions-btn" onclick="dtrToggleRevisionForm('${stage.id}')">↩ Request Revisions</button>`;
 
             const completeBtn = hasApprovedConcept
                 ? `<button class="dtr-complete-btn" onclick="dtrCompleteConceptsStage('${stage.id}')">✓ Complete Section</button>`
@@ -18736,6 +18899,14 @@
                         ${deliverBtn}
                         ${revisionsBtn}
                         ${completeBtn}
+                    </div>
+                    <div id="dtr-revision-form-${stage.id}" class="dtr-revision-form hide">
+                        <div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:8px">📝 Request Revisions — Feedback</div>
+                        <textarea id="dtr-revision-text-${stage.id}" placeholder="Describe exactly what revisions are needed…"></textarea>
+                        <div class="dtr-revision-form-footer">
+                            <button onclick="dtrSubmitRevisionFeedback('${stage.id}')" style="padding:7px 16px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">Send Revision Request</button>
+                            <button onclick="dtrToggleRevisionForm('${stage.id}')" style="padding:7px 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:12px;color:#64748b;cursor:pointer">Cancel</button>
+                        </div>
                     </div>
                 </div>
             </div>`;
@@ -18951,6 +19122,56 @@
             });
         }
 
+        function dtrToggleRevisionForm(stageId) {
+            const form = document.getElementById(`dtr-revision-form-${stageId}`);
+            if (!form) return;
+            form.classList.toggle('hide');
+            if (!form.classList.contains('hide')) {
+                document.getElementById(`dtr-revision-text-${stageId}`)?.focus();
+            }
+        }
+
+        async function dtrSubmitRevisionFeedback(stageId) {
+            const textarea = document.getElementById(`dtr-revision-text-${stageId}`);
+            const msg = textarea?.value?.trim();
+            if (!msg) { showToast('Please describe the revisions needed', 'warning'); return; }
+
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage || !currentDesignTaskRecord?.id || !currentBrand?.id) return;
+
+            const actor = await supabase.auth.getUser();
+            const actorId   = actor?.data?.user?.id || null;
+            const userName  = currentUserProfile
+                ? `${currentUserProfile.first_name||''} ${currentUserProfile.last_name||''}`.trim()
+                : actor?.data?.user?.email || 'Unknown';
+
+            // Post to design_task_activity with revision_request type
+            await supabase.from('design_task_activity').insert({
+                design_task_id: currentDesignTaskRecord.id,
+                brand_id: currentBrand.id,
+                user_id: actorId,
+                user_name: userName,
+                message: msg,
+                activity_type: 'revision_request',
+                task_completed: false
+            });
+
+            // Update stage status to revisions_required
+            const ok = await updateStageStatus(stage, 'revisions_required', msg);
+            if (!ok) return;
+            await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
+            await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: stage.stage_name, comment: msg });
+
+            showToast('Revision request sent ✓');
+            if (textarea) textarea.value = '';
+            document.getElementById(`dtr-revision-form-${stageId}`)?.classList.add('hide');
+
+            // Reload activity
+            if (currentDesignTaskRecord.id) loadDesignTaskActivity(currentDesignTaskRecord.id);
+            await _dtrRefreshConceptsStage();
+        }
+
         async function dtrCompleteConceptsStage(stageId) {
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage) return;
@@ -19065,10 +19286,25 @@
                 _dtrMasterProdsLoaded = true;
                 const masterInner = document.getElementById('dtr-mini-grid-master');
                 if (masterInner) masterInner.innerHTML = '<div style="grid-column:1/-1;font-size:11px;color:#94a3b8;padding:6px 0">Loading…</div>';
-                const { data: prods } = await supabase.from('products')
-                    .select('id, product_code, item_name, range_name, category, image_url')
-                    .eq('brand_id', currentBrand.id).order('range_name').order('item_name');
-                _dtrMasterProdsData = prods || [];
+                // Load all club_products across all clubs for this brand
+                const { data: cpRows } = await supabase.from('club_products')
+                    .select('id, custom_name, image_url, image_urls, products(id, product_code, item_name, range_name, category)')
+                    .in('club_id', (clubs || []).map(c => c.id))
+                    .eq('is_active', true)
+                    .order('created_at');
+                // Deduplicate by product name
+                const seen = new Set();
+                _dtrMasterProdsData = (cpRows || []).filter(cp => {
+                    const nm = cp.custom_name || cp.products?.item_name || '';
+                    if (seen.has(nm)) return false;
+                    seen.add(nm);
+                    return true;
+                }).map(cp => ({
+                    id: cp.id,
+                    item_name: cp.custom_name || cp.products?.item_name || 'Product',
+                    image_url: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
+                    product_code: cp.products?.product_code || '',
+                }));
                 _dtrRenderMasterGrid(masterInner);
             }
         }
@@ -20061,7 +20297,15 @@
                 const initials = (entry.user_name || '?').charAt(0).toUpperCase();
                 const ts = dsRelativeTime(entry.created_at);
                 const isTask = entry.activity_type === 'sub_task';
+                const isRevisionReq = entry.activity_type === 'revision_request';
                 const done   = entry.task_completed;
+                if (isRevisionReq) {
+                    return `<div class="dt-act-revision">
+                        <div class="dt-act-revision-label">🔄 Revision Request</div>
+                        <div class="dt-act-revision-msg">${escHtml(entry.message)}</div>
+                        <div class="dt-act-revision-meta">${escHtml(entry.user_name||'Unknown')} · ${ts}</div>
+                    </div>`;
+                }
                 if (isTask) {
                     return `<div class="task-item${done ? ' task-done' : ''}" style="margin-bottom:8px;background:#fff7ed;border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:8px 10px">
                         <div style="display:flex;align-items:flex-start;gap:8px">
