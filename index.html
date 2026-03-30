@@ -574,6 +574,13 @@
         .ds-row-badge.review   { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
         .ds-row-meta-right { display:flex; align-items:center; gap:5px; }
         .ds-row-unread { font-size:9px; font-weight:700; background:#ef4444; color:#fff; border-radius:10px; padding:1px 5px; }
+        .ds-row-act-counts { display:flex; align-items:center; gap:6px; margin-top:3px; }
+        .ds-act-pill { display:inline-flex; align-items:center; gap:2px; font-size:9px; font-weight:700; padding:1px 5px; border-radius:8px; }
+        .ds-act-pill.comments  { background:#eff6ff; color:#2563eb; }
+        .ds-act-pill.subtasks  { background:#f0fdf4; color:#16a34a; }
+        .ds-act-pill.revisions { background:#fef2f2; color:#dc2626; }
+        .ds-task-row.ds-notif { background:#fffef0; }
+        .ds-task-row.ds-notif::after { content:''; position:absolute; right:0; top:0; bottom:0; width:3px; background:#f59e0b; border-radius:0 2px 2px 0; }
         .ds-row-avatar-sm { width:18px; height:18px; border-radius:50%; background:#e2e8f0; font-size:8px; font-weight:700; color:#64748b; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 
         /* Preview panel */
@@ -1244,9 +1251,9 @@
         .dtr-activity-composer { padding:12px 16px; border-top:1px solid #f1f5f9; background:#fff; flex-shrink:0; }
         .dtr-composer-tabs { display:flex; gap:4px; margin-bottom:8px; }
         .act-tab-btn { flex:1; padding:5px 8px; font-size:11px; font-weight:600; border:1.5px solid #e2e8f0; border-radius:8px; background:#f8fafc; color:#64748b; cursor:pointer; transition:all 0.12s; }
-        .act-tab-btn:hover { background:#f1f5f9; }
-        .act-tab-btn.active { background:#0f172a; color:#fff; border-color:#0f172a; }
-        .act-tab-btn.task-tab.active { background:#c2410c; border-color:#c2410c; }
+        .act-tab-btn:hover { background:#f1f5f9; box-shadow:0 1px 3px rgba(0,0,0,0.07); }
+        .act-tab-btn.active { background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe; box-shadow:0 1px 4px rgba(37,99,235,0.12); }
+        .act-tab-btn.task-tab.active { background:#fff7ed; color:#c2410c; border-color:rgba(234,179,8,0.5); box-shadow:0 1px 4px rgba(194,65,12,0.1); }
         .dtr-composer-input { width:100%; box-sizing:border-box; padding:8px 10px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:12px; color:#0f172a; outline:none; transition:border-color 0.15s; font-family:inherit; background:#f8fafc; }
         .dtr-composer-input:focus { border-color:#00e5cc; background:#fff; }
         .dtr-composer-post-btn { width:100%; margin-top:6px; padding:8px; border-radius:9px; background:#0f172a; color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.15s; }
@@ -16444,6 +16451,25 @@
                 .order('updated_at', { ascending: false });
             const legacy = (legacyTasks || []).filter(t => t.jobs?.brand_id === currentBrand.id);
             allDesignTasks = [...(brandTasks || []), ...legacy];
+
+            // Load pending activity counts per task (comments, sub-tasks, revisions)
+            const taskIds = allDesignTasks.map(t => t.id).filter(Boolean);
+            if (taskIds.length > 0) {
+                const { data: actData } = await supabase
+                    .from('design_task_activity')
+                    .select('design_task_id, activity_type, task_completed')
+                    .in('design_task_id', taskIds)
+                    .eq('task_completed', false);
+                const countsByTask = {};
+                (actData || []).forEach(a => {
+                    if (!countsByTask[a.design_task_id]) countsByTask[a.design_task_id] = { comments:0, subtasks:0, revisions:0 };
+                    if (a.activity_type === 'comment') countsByTask[a.design_task_id].comments++;
+                    else if (a.activity_type === 'sub_task') countsByTask[a.design_task_id].subtasks++;
+                    else if (a.activity_type === 'revision_request') countsByTask[a.design_task_id].revisions++;
+                });
+                allDesignTasks.forEach(t => { t._actCounts = countsByTask[t.id] || { comments:0, subtasks:0, revisions:0 }; });
+            }
+
             renderDesignStudio();
         }
 
@@ -17782,10 +17808,18 @@
                 ? `<span class="ds-row-dot">·</span><span class="ds-row-due ${dueCls}">${dueInfo?.urgency === 'overdue' ? dueInfo.text : dueLabel}</span>`
                 : '';
 
+            const ac = task._actCounts || { comments:0, subtasks:0, revisions:0 };
+            const hasNotif = ac.comments > 0 || ac.subtasks > 0 || ac.revisions > 0;
+            const countPills = [
+                ac.comments  > 0 ? `<span class="ds-act-pill comments"><svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>${ac.comments}</span>` : '',
+                ac.subtasks  > 0 ? `<span class="ds-act-pill subtasks"><svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${ac.subtasks}</span>` : '',
+                ac.revisions > 0 ? `<span class="ds-act-pill revisions"><svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>${ac.revisions}</span>` : '',
+            ].filter(Boolean).join('');
+
             const startBtn = task.status === 'new'
                 ? `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #6366f1;color:#6366f1;background:#eef2ff;cursor:pointer;white-space:nowrap">▶ Start</button>`
                 : '';
-            return `<div class="ds-task-row ${urg}${isSelected ? ' ds-selected' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')">
+            return `<div class="ds-task-row ${urg}${isSelected ? ' ds-selected' : ''}${hasNotif ? ' ds-notif' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')">
                 <div class="ds-row-main">
                     <div class="ds-row-title">${escHtml(task.task_name || 'Untitled Task')}</div>
                     <div class="ds-row-meta">
@@ -17794,12 +17828,12 @@
                         <span class="ds-row-stage">${escHtml(stageLabel)}</span>
                         ${dueHtml}
                     </div>
+                    ${countPills ? `<div class="ds-row-act-counts">${countPills}</div>` : ''}
                 </div>
                 <div class="ds-row-right">
                     ${startBtn}
                     ${badgeHtml}
                     <div class="ds-row-meta-right">
-                        ${unreadCount > 0 ? `<span class="ds-row-unread">${unreadCount}</span>` : ''}
                         ${initials ? `<div class="ds-row-avatar-sm">${initials}</div>` : ''}
                     </div>
                 </div>
@@ -18002,9 +18036,6 @@
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
                         Open Full Task
                     </button>
-                    ${task.status !== 'new' ? `<button onclick="openAddCommentFromDashboard('${task.id}')" style="padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap">
-                        Add Comment
-                    </button>` : ''}
                 </div>`;
 
             // Load activity for this task into the preview panel
@@ -18109,15 +18140,46 @@
                     </div>`;
                 }
 
-                return `<div class="ds-comment-row" style="margin-bottom:8px">
+                // Comment — show thumbs-up to acknowledge if not yet done
+                const ackBtn = !done
+                    ? `<button onclick="acknowledgeDSPreviewComment('${entry.id}')" title="Mark as read" style="margin-left:6px;padding:2px 7px;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;font-size:11px;cursor:pointer;color:#94a3b8;transition:all 0.12s;flex-shrink:0" onmouseover="this.style.color='#16a34a';this.style.borderColor='#86efac'" onmouseout="this.style.color='#94a3b8';this.style.borderColor='#e2e8f0'">👍</button>`
+                    : '';
+                return `<div class="ds-comment-row" style="margin-bottom:8px;${!done ? 'background:#fffef0;border-radius:8px;padding:6px 8px;border:1px solid #fde68a' : ''}">
                     <div class="ds-actor-pill" style="width:24px;height:24px;font-size:10px;flex-shrink:0">${initials}</div>
                     <div style="flex:1;min-width:0">
                         <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:2px">${escHtml(entry.user_name||'Unknown')}</div>
                         <div style="font-size:12px;color:#374151;line-height:1.4">${escHtml(entry.message)}</div>
-                        <div class="ds-comment-time">${ts}</div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:2px">
+                            <span class="ds-comment-time">${ts}</span>
+                            ${ackBtn}
+                        </div>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        // Recalculate _actCounts for a task from the preview log and re-render the row
+        function _syncTaskRowCounts(taskId) {
+            const task = (allDesignTasks || []).find(t => t.id === taskId);
+            if (!task) return;
+            const log = taskId === _dsPreviewTaskId ? _dsPreviewActivityLog : [];
+            task._actCounts = {
+                comments:  log.filter(e => e.activity_type === 'comment'          && !e.task_completed).length,
+                subtasks:  log.filter(e => e.activity_type === 'sub_task'         && !e.task_completed).length,
+                revisions: log.filter(e => e.activity_type === 'revision_request' && !e.task_completed).length,
+            };
+            // Re-render just this row in-place
+            const row = document.querySelector(`.ds-task-row[data-task-id="${taskId}"]`);
+            if (row) {
+                const group = Object.keys({ new:'new', active:'active', review:'review' })
+                    .find(k => row.classList.contains(`urgency-${k}`)) || 'active';
+                const unread = 0;
+                row.outerHTML = _renderDSTaskRow(task, unread, getDSTaskGroup(task));
+                // Re-attach selected state
+                if (taskId === _dsSelectedTaskId) {
+                    document.querySelector(`.ds-task-row[data-task-id="${taskId}"]`)?.classList.add('ds-selected');
+                }
+            }
         }
 
         async function addDSPreviewActivity() {
@@ -18151,6 +18213,7 @@
             _dsPreviewActivityLog.unshift(data);
             if (input) input.value = '';
             renderDSPreviewActivity();
+            _syncTaskRowCounts(_dsPreviewTaskId);
 
             await supabase.from('design_activity_feed').insert({
                 task_id: _dsPreviewTaskId,
@@ -18164,7 +18227,20 @@
             if (actType === 'sub_task') {
                 if (!task._subtasks) task._subtasks = { total: 0, done: 0 };
                 task._subtasks.total++;
-                renderDSTaskList();
+            }
+        }
+
+        async function acknowledgeDSPreviewComment(entryId) {
+            const entry = _dsPreviewActivityLog.find(e => e.id === entryId);
+            if (entry) entry.task_completed = true;
+            renderDSPreviewActivity();
+            _syncTaskRowCounts(_dsPreviewTaskId);
+            const { error } = await supabase.from('design_task_activity')
+                .update({ task_completed: true }).eq('id', entryId);
+            if (error) {
+                if (entry) entry.task_completed = false;
+                renderDSPreviewActivity();
+                _syncTaskRowCounts(_dsPreviewTaskId);
             }
         }
 
@@ -18175,11 +18251,7 @@
             const entry = _dsPreviewActivityLog.find(e => e.id === id);
             if (entry) entry.task_completed = completed;
             renderDSPreviewActivity();
-            const task = (allDesignTasks || []).find(t => t.id === _dsPreviewTaskId);
-            if (task?._subtasks) {
-                task._subtasks.done = _dsPreviewActivityLog.filter(e => e.activity_type === 'sub_task' && e.task_completed).length;
-                renderDSTaskList();
-            }
+            _syncTaskRowCounts(_dsPreviewTaskId);
             showToast(completed ? 'Sub-task complete ✓' : 'Sub-task reopened');
         }
 
@@ -18187,11 +18259,13 @@
             const entry = _dsPreviewActivityLog.find(e => e.id === entryId);
             if (entry) { entry.task_completed = true; }
             renderDSPreviewActivity();
+            _syncTaskRowCounts(_dsPreviewTaskId);
             const { error } = await supabase.from('design_task_activity')
                 .update({ task_completed: true }).eq('id', entryId);
             if (error) {
                 if (entry) { entry.task_completed = false; }
                 renderDSPreviewActivity();
+                _syncTaskRowCounts(_dsPreviewTaskId);
                 showToast('Error updating revision request', 'error');
             }
         }
