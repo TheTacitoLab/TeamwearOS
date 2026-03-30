@@ -2193,7 +2193,7 @@
                 <!-- Stage tabs -->
                 <div style="display:flex;gap:2px;background:#f1f5f9;border-radius:8px;padding:3px;flex-shrink:0">
                     <button class="ds-stage-tab active" id="dstab-all" onclick="switchDSStageTab('all')">All</button>
-                    <button class="ds-stage-tab" id="dstab-presentation" onclick="switchDSStageTab('presentation')">Presentation</button>
+                    <button class="ds-stage-tab" id="dstab-presentation" onclick="switchDSStageTab('presentation')">Concepts</button>
                     <button class="ds-stage-tab" id="dstab-range" onclick="switchDSStageTab('range')">Range</button>
                     <button class="ds-stage-tab" id="dstab-finalise" onclick="switchDSStageTab('finalise')">Finalise</button>
                 </div>
@@ -2228,9 +2228,18 @@
 
                 <!-- LEFT: grouped smart task list -->
                 <div class="ds-task-list-panel" id="ds-task-list-wrap">
-                    <!-- Scrollable list (shown when expanded) -->
+                    <!-- Tab switcher: Tasks | Updates -->
+                    <div id="ds-left-tabs" style="display:flex;gap:2px;padding:8px 10px 0;flex-shrink:0;background:#f8fafc;border-bottom:1px solid #e8ecf0">
+                        <button id="dsleft-tasks" onclick="switchDSLeftTab('tasks')" style="flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:700;cursor:pointer;background:#fff;color:#1d4ed8;box-shadow:0 1px 3px rgba(0,0,0,0.1)">Tasks</button>
+                        <button id="dsleft-updates" onclick="switchDSLeftTab('updates')" style="flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:#64748b">Updates</button>
+                    </div>
+                    <!-- Scrollable task list (shown when Tasks tab active) -->
                     <div class="ds-task-list-inner" id="ds-task-list-panel">
                         <div class="ds-group-empty" style="padding:20px 16px;color:#94a3b8">Loading tasks…</div>
+                    </div>
+                    <!-- Updates feed (shown when Updates tab active) -->
+                    <div id="ds-updates-panel" style="display:none;flex:1;overflow-y:auto;flex-direction:column">
+                        <div style="padding:20px 16px;color:#94a3b8;font-size:12px">Loading updates…</div>
                     </div>
                     <!-- Thin strip shown when collapsed -->
                     <div class="ds-task-list-collapsed">
@@ -17755,6 +17764,8 @@
 
         let _dsSelectedTaskId = null;
         let _dsActiveStageTab = 'all';
+        let _dsLeftTab = 'tasks';
+        let _dsAllUpdates = [];
         let _dtrPanelEl = null;
 
         function getDSTaskGroup(task) {
@@ -17819,7 +17830,7 @@
             });
 
             const stageGroups = [
-                { key: 'presentation', label: 'Presentation', color: '#6366f1' },
+                { key: 'presentation', label: 'Concepts', color: '#6366f1' },
                 { key: 'range',        label: 'Range',        color: '#2563eb' },
                 { key: 'finalise',     label: 'Finalise',     color: '#0891b2' },
             ];
@@ -17976,6 +17987,70 @@
                 document.getElementById(`dstab-${t}`)?.classList.toggle('active', t === tab);
             });
             renderDSDashboard();
+        }
+
+        function switchDSLeftTab(tab) {
+            _dsLeftTab = tab;
+            const taskPanel = document.getElementById('ds-task-list-panel');
+            const updatesPanel = document.getElementById('ds-updates-panel');
+            const tabTasks = document.getElementById('dsleft-tasks');
+            const tabUpdates = document.getElementById('dsleft-updates');
+            const activeStyle = 'background:#fff;color:#1d4ed8;box-shadow:0 1px 3px rgba(0,0,0,0.1)';
+            const inactiveStyle = 'background:transparent;color:#64748b;box-shadow:none';
+            if (tabTasks) tabTasks.style.cssText = `flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:${tab==='tasks'?'700':'600'};cursor:pointer;${tab==='tasks'?activeStyle:inactiveStyle}`;
+            if (tabUpdates) tabUpdates.style.cssText = `flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:${tab==='updates'?'700':'600'};cursor:pointer;${tab==='updates'?activeStyle:inactiveStyle}`;
+            if (taskPanel) taskPanel.style.display = tab === 'tasks' ? '' : 'none';
+            if (updatesPanel) updatesPanel.style.display = tab === 'updates' ? 'flex' : 'none';
+            if (tab === 'updates') loadDSUpdates();
+        }
+
+        async function loadDSUpdates() {
+            if (!currentBrand?.id) return;
+            const panel = document.getElementById('ds-updates-panel');
+            if (!panel) return;
+            panel.innerHTML = '<div style="padding:20px 16px;color:#94a3b8;font-size:12px">Loading…</div>';
+            const { data } = await supabase.from('design_task_activity')
+                .select('*, design_tasks(id, task_name, clubs(name))')
+                .eq('brand_id', currentBrand.id)
+                .order('created_at', { ascending: false })
+                .limit(100);
+            _dsAllUpdates = data || [];
+            renderDSUpdates();
+        }
+
+        function renderDSUpdates() {
+            const panel = document.getElementById('ds-updates-panel');
+            if (!panel) return;
+            if (!_dsAllUpdates.length) {
+                panel.innerHTML = '<div style="padding:24px 16px;text-align:center;color:#94a3b8;font-size:12px">No activity yet.</div>';
+                return;
+            }
+            const typeIcon = { comment: '💬', sub_task: '📋', revision_request: '🔄', stage_update: '🎯' };
+            panel.innerHTML = `<div style="padding:8px 10px 4px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;flex-shrink:0">All Activity</div>` +
+                _dsAllUpdates.map(entry => {
+                    const done = entry.task_completed;
+                    const icon = typeIcon[entry.activity_type] || '📌';
+                    const ts = dsRelativeTime(entry.created_at);
+                    const taskName = entry.design_tasks?.task_name || 'Design Task';
+                    const clubName = entry.design_tasks?.clubs?.name || '';
+                    const taskId = entry.design_tasks?.id || entry.design_task_id;
+                    return `<div onclick="switchDSLeftTab('tasks');selectDSTask('${taskId}',true)" style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer;${done?'opacity:0.55':''};transition:background 0.12s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+                        <span style="font-size:15px;flex-shrink:0;margin-top:1px">${icon}</span>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:11px;color:#374151;line-height:1.35;${done?'text-decoration:line-through;color:#9ca3af':''}">${escHtml(entry.message)}</div>
+                            <div style="font-size:10px;color:#94a3b8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(taskName)}${clubName ? ' · ' + escHtml(clubName) : ''}</div>
+                            <div style="font-size:10px;color:#b0bec5;margin-top:1px">${ts}</div>
+                        </div>
+                        ${!done ? `<button onclick="event.stopPropagation();dsDoneUpdate('${entry.id}')" title="Mark done" style="width:20px;height:20px;border-radius:5px;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s" onmouseover="this.style.background='#1d4ed8';this.style.color='#fff'" onmouseout="this.style.background='#eff6ff';this.style.color='#1d4ed8'">✓</button>` : ''}
+                    </div>`;
+                }).join('');
+        }
+
+        async function dsDoneUpdate(entryId) {
+            await supabase.from('design_task_activity').update({ task_completed: true }).eq('id', entryId);
+            const entry = _dsAllUpdates.find(e => e.id === entryId);
+            if (entry) entry.task_completed = true;
+            renderDSUpdates();
         }
 
         async function loadTaskInPreview(taskId) {
@@ -19413,6 +19488,8 @@
         let _dtrConceptTab = 1;           // active concept tab (1, 2, 3)
         let _dtrConceptUploads = [];      // concept uploads cached for tab-switching
         let _dtrConceptStage = null;      // stage 2 object cached
+        let _dtrRangeUploads = [];        // range uploads cached (stage 3)
+        let _dtrFinaliseUploads = [];     // finalise uploads cached (stage 4)
         let _dtrMasterProdsLoaded = false;
         let _dtrMasterProdsData = [];
         let _dtrProdSearchTerm = '';
@@ -19434,7 +19511,7 @@
             const stage4 = currentStages.find(s => s.stage_number === 4);
 
             // Parallel data loads
-            const [assetsRes, clubProdsRes, jobProdsRes, conceptUploadsRes] = await Promise.all([
+            const [assetsRes, clubProdsRes, jobProdsRes, conceptUploadsRes, rangeUploadsRes, finaliseUploadsRes] = await Promise.all([
                 supabase.from('design_task_assets').select('*').eq('design_task_id', task.id).order('created_at'),
                 task.club_id
                     ? supabase.from('club_products')
@@ -19449,6 +19526,12 @@
                 stage2
                     ? supabase.from('stage_uploads').select('*').eq('stage_id', stage2.id).order('uploaded_at')
                     : Promise.resolve({ data: [] }),
+                stage3
+                    ? supabase.from('stage_uploads').select('*').eq('stage_id', stage3.id).order('uploaded_at')
+                    : Promise.resolve({ data: [] }),
+                stage4
+                    ? supabase.from('stage_uploads').select('*').eq('stage_id', stage4.id).order('uploaded_at')
+                    : Promise.resolve({ data: [] }),
             ]);
 
             const assets = assetsRes.data || [];
@@ -19456,10 +19539,14 @@
             const jobProds = (jobProdsRes.data || []).map(jp => jp.club_products).filter(Boolean);
             // Filter archived images (is_archived flag or __archived__ review_comment sentinel)
             const conceptUploads = (conceptUploadsRes.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
+            const rangeUploads = (rangeUploadsRes.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
+            const finaliseUploads = (finaliseUploadsRes.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
 
             // Cache for tab-switching and edit mode without re-fetch
             _dtrConceptUploads = conceptUploads;
             _dtrConceptStage = stage2;
+            _dtrRangeUploads = rangeUploads;
+            _dtrFinaliseUploads = finaliseUploads;
             _dtrConceptTab = 1;
             _dtrCachedAssets = assets;
             _dtrCachedClubProds = clubProds;
@@ -19486,11 +19573,14 @@
                             </div>
                         </div>
                         <div class="dtr-left-collapsed" id="dtr-left-collapsed"${leftOpen ? ' style="display:none"' : ''}>
-                            <button onclick="toggleDTRLeft()" title="Expand brief" style="writing-mode:vertical-lr;text-orientation:mixed;transform:rotate(180deg);padding:14px 8px;border:none;background:transparent;color:#64748b;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.8px;text-transform:uppercase">Brief ▶</button>
+                            <button class="dtr-col-toggle-btn" onclick="toggleDTRLeft()" title="Expand brief" style="margin:10px auto 0;flex-shrink:0">
+                                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                            <span style="writing-mode:vertical-lr;transform:rotate(180deg);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-top:12px;user-select:none">Brief</span>
                         </div>
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
-                        ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads)}
+                        ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads, rangeUploads, finaliseUploads)}
                     </div>
                     <div class="dtr-activity-col" id="dtr-activity-col">
                         <div class="dtr-activity-header">
@@ -19499,6 +19589,7 @@
                                 <button class="dtr-act-filter-btn active" onclick="filterDTRActivity(this,'all')">All</button>
                                 <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'comment')">Comments</button>
                                 <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'sub_task')">Sub-Tasks</button>
+                                <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'revision_request')">Revisions</button>
                             </div>
                         </div>
                         <div class="dtr-activity-inner">
@@ -19971,16 +20062,75 @@
         }
 
         // ── Stages column ──────────────────────────────────────────────────────
-        function buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads) {
+        function buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads, rangeUploads, finaliseUploads) {
             return [
                 stage2 ? buildDTRConceptsStage(stage2, conceptUploads) : '',
-                stage3 ? buildDTRFullRangeStage(stage3) : '',
-                stage4 ? buildDTRFinalArtworkStage(stage4) : '',
+                stage3 ? buildDTRFullRangeStage(stage3, rangeUploads || []) : '',
+                stage4 ? buildDTRFinalArtworkStage(stage4, finaliseUploads || []) : '',
             ].join('');
         }
 
-        // ── STAGE 3: FULL RANGE (placeholder) ────────────────────────────────
-        function buildDTRFullRangeStage(stage) {
+        // ── Shared upload-stage body builder (Range + Finalise) ──────────────
+        function _buildUploadStageBody(stage, uploads, stageNum, sectionLabel, deliverLabel, completeLabel) {
+            const stageId = stage.id;
+            const isApproved = stage.status === 'approved';
+            const isInReview = stage.status === 'in_review';
+            const isRevisions = stage.status === 'revisions_required';
+            const hasUploads = uploads.length > 0;
+            const allApproved = hasUploads && uploads.every(u => u.status === 'approved');
+
+            // Image grid
+            const imagesHtml = uploads.length ? `<div class="dtr-concept-images" id="dtr-${sectionLabel}-images">
+                ${uploads.map(u => {
+                    const isImg = /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url || '');
+                    const thumb = isImg
+                        ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0" loading="lazy" onclick="dtrPreviewImg('${escHtml(u.file_url)}')" />`
+                        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:default">📄</div>`;
+                    const fname = (u.file_url || '').split('/').pop().split('?')[0];
+                    return `<div class="dtr-cimg-card">
+                        <div class="dtr-cimg-thumb">${thumb}</div>
+                        <div class="dtr-cimg-actions">
+                            ${isApproved
+                                ? `<a href="${escHtml(u.file_url)}" download target="_blank" title="Download" style="padding:5px 8px;border-radius:7px;font-size:11px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;text-decoration:none;display:inline-flex;align-items:center;gap:3px"><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> DL</a>`
+                                : `<button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickStageImg('${u.id}','${stageId}',${stageNum})" title="Approve">✓</button>
+                                   <button class="dtr-x-btn${u.status==='declined'?' xed':''}" onclick="dtrXStageImg('${u.id}','${stageId}',${stageNum})" title="Decline">✕</button>
+                                   <button class="dtr-archive-btn" onclick="dtrArchiveStageImg('${u.id}','${stageId}',${stageNum})" title="Remove">⊘</button>`}
+                        </div>
+                        <div style="padding:3px 6px 5px;font-size:9px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(fname)}">${escHtml(fname)}</div>
+                    </div>`;
+                }).join('')}
+            </div>` : '';
+
+            // Upload zone (hidden when approved)
+            const uploadZone = isApproved ? '' : `<div class="dtr-concept-upload" id="dtr-${sectionLabel}-upload"
+                ondragover="event.preventDefault();this.classList.add('drag-over')"
+                ondragleave="this.classList.remove('drag-over')"
+                ondrop="this.classList.remove('drag-over');dtrStageImgDrop(event,'${stageId}',${stageNum},'${sectionLabel}')">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#94a3b8;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                <span style="font-size:11px;color:#94a3b8">Drop files or <label style="color:#2563eb;cursor:pointer;font-weight:600"><input type="file" multiple accept="image/*,.pdf,.ai,.eps,.svg" style="display:none" onchange="dtrStageImgSelect(event,'${stageId}',${stageNum},'${sectionLabel}')">browse</label></span>
+            </div>`;
+
+            // Deliver bar
+            const isDelivered = isInReview;
+            const deliverBtn = isDelivered
+                ? `<button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered</button>`
+                : `<button onclick="dtrDeliverStage('${stageId}',${stageNum},'${deliverLabel}')" ${!hasUploads ? 'disabled' : ''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasUploads?'#eff6ff':'#f8fafc'};color:${hasUploads?'#1d4ed8':'#b0bec5'};cursor:${hasUploads?'pointer':'not-allowed'}">${deliverLabel}</button>`;
+            const revisionsBtn = isDelivered
+                ? `<button onclick="dtrStageRevisions('${stageId}',${stageNum})" style="padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
+                : (isRevisions ? `<span style="padding:4px 10px;border-radius:8px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
+            const completeBtn = (allApproved && !isApproved)
+                ? `<button onclick="dtrCompleteStage('${stageId}',${stageNum},'${completeLabel}')" style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer;margin-left:auto">✓ ${completeLabel}</button>`
+                : '';
+
+            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
+                ${deliverBtn}${revisionsBtn}${completeBtn}
+            </div>`;
+
+            return `${imagesHtml}${uploadZone}${deliverBar}`;
+        }
+
+        // ── STAGE 3: FULL RANGE ───────────────────────────────────────────────
+        function buildDTRFullRangeStage(stage, uploads) {
             const isApproved = stage.status === 'approved';
             const statusLabel = dsStageStatusLabel(stage.status);
             const statusStyleMap = {
@@ -19993,7 +20143,7 @@
                 : stage.status === 'revisions_required' ? ' stage-active stage-revisions'
                 : ['in_progress','in_review'].includes(stage.status) ? ' stage-active'
                 : ' stage-inactive';
-            const isOpen3 = ['in_progress','in_review','revisions_required'].includes(stage.status);
+            const isOpen3 = ['in_progress','in_review','revisions_required'].includes(stage.status) || (isApproved && uploads.length > 0);
             return `<div class="dtr-stage-section${stageClass3}" id="dtr-stage-3">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(3)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '3'}</div>
@@ -20002,17 +20152,13 @@
                     <svg class="dtr-stage-chevron${isOpen3 ? '' : ' closed'}" id="dtr-stage-chev-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-3"${isOpen3 ? '' : ' style="display:none"'}>
-                    <div class="dtr-stage-placeholder">
-                        <div style="font-size:30px;margin-bottom:8px">🎨</div>
-                        <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Range</div>
-                        <div style="font-size:12px;color:#94a3b8;max-width:320px;margin:0 auto">Upload the full range design — one image per garment with a simple tick or ✕ on each. Coming in the next phase.</div>
-                    </div>
+                    ${_buildUploadStageBody(stage, uploads, 3, 'range', 'Deliver Range', 'Complete Range')}
                 </div>
             </div>`;
         }
 
-        // ── STAGE 4: FINAL ARTWORK (placeholder) ──────────────────────────────
-        function buildDTRFinalArtworkStage(stage) {
+        // ── STAGE 4: FINAL ARTWORK ────────────────────────────────────────────
+        function buildDTRFinalArtworkStage(stage, uploads) {
             const isApproved = stage.status === 'approved';
             const statusLabel = dsStageStatusLabel(stage.status);
             const statusStyleMap = {
@@ -20025,7 +20171,7 @@
                 : stage.status === 'revisions_required' ? ' stage-active stage-revisions'
                 : ['in_progress','in_review'].includes(stage.status) ? ' stage-active'
                 : ' stage-inactive';
-            const isOpen4 = ['in_progress','in_review','revisions_required'].includes(stage.status);
+            const isOpen4 = ['in_progress','in_review','revisions_required'].includes(stage.status) || (isApproved && uploads.length > 0);
             return `<div class="dtr-stage-section${stageClass4}" id="dtr-stage-4">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(4)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '4'}</div>
@@ -20034,11 +20180,7 @@
                     <svg class="dtr-stage-chevron${isOpen4 ? '' : ' closed'}" id="dtr-stage-chev-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-4"${isOpen4 ? '' : ' style="display:none"'}>
-                    <div class="dtr-stage-placeholder">
-                        <div style="font-size:30px;margin-bottom:8px">🖨️</div>
-                        <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Finalise</div>
-                        <div style="font-size:12px;color:#94a3b8;max-width:320px;margin:0 auto">Final deliverables: Print Files, Full Range PDF, Tech Pack, Website Imagery. Coming in the next phase.</div>
-                    </div>
+                    ${_buildUploadStageBody(stage, uploads, 4, 'finalise', 'Deliver Final Artwork', 'Complete Finalise')}
                 </div>
             </div>`;
         }
@@ -20205,8 +20347,8 @@
                         placeholder="Describe what needs to change…">${escHtml(feedback)}</textarea>
                 </div>` : '';
 
-            // Section-level approve / decline
-            const sectionActions = stageApproved ? '' : `
+            // Section-level approve / decline — only show when there are uploads AND stage not yet approved
+            const sectionActions = (stageApproved || uploads.length === 0) ? '' : `
                 <div class="dtr-concept-section-actions">
                     <button class="dtr-concept-approve-btn${conceptStatus==='approved'?' approved':''}"
                         onclick="dtrApproveConceptSection('${stageId}',${conceptNum})">
@@ -20451,7 +20593,99 @@
             _dtrConceptStage   = s2;
             // Re-render just the stages column
             const stagesCol = document.getElementById('dtr-stages-col');
-            if (stagesCol) stagesCol.innerHTML = buildDTRStagesColumn(s2, stage3, stage4, _dtrConceptUploads);
+            if (stagesCol) stagesCol.innerHTML = buildDTRStagesColumn(s2, stage3, stage4, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
+        }
+
+        // ── Generic stage refresh ──────────────────────────────────────────────
+        async function _dtrRefreshStagesCol() {
+            const stage2 = currentStages.find(s => s.stage_number === 2);
+            const stage3 = currentStages.find(s => s.stage_number === 3);
+            const stage4 = currentStages.find(s => s.stage_number === 4);
+            const [r2, r3, r4] = await Promise.all([
+                stage2 ? supabase.from('design_stages').select('*').eq('id', stage2.id).single() : { data: null },
+                stage3 ? supabase.from('design_stages').select('*').eq('id', stage3.id).single() : { data: null },
+                stage4 ? supabase.from('design_stages').select('*').eq('id', stage4.id).single() : { data: null },
+            ]);
+            if (r2.data) { const i = currentStages.findIndex(s => s.id === r2.data.id); if (i !== -1) currentStages[i] = r2.data; _dtrConceptStage = r2.data; }
+            if (r3.data) { const i = currentStages.findIndex(s => s.id === r3.data.id); if (i !== -1) currentStages[i] = r3.data; }
+            if (r4.data) { const i = currentStages.findIndex(s => s.id === r4.data.id); if (i !== -1) currentStages[i] = r4.data; }
+            const s2 = r2.data || stage2;
+            const s3 = r3.data || stage3;
+            const s4 = r4.data || stage4;
+            const [u2, u3, u4] = await Promise.all([
+                stage2 ? supabase.from('stage_uploads').select('*').eq('stage_id', stage2.id).order('uploaded_at') : { data: [] },
+                stage3 ? supabase.from('stage_uploads').select('*').eq('stage_id', stage3.id).order('uploaded_at') : { data: [] },
+                stage4 ? supabase.from('stage_uploads').select('*').eq('stage_id', stage4.id).order('uploaded_at') : { data: [] },
+            ]);
+            _dtrConceptUploads = (u2.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
+            _dtrRangeUploads = (u3.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
+            _dtrFinaliseUploads = (u4.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
+            const stagesCol = document.getElementById('dtr-stages-col');
+            if (stagesCol) stagesCol.innerHTML = buildDTRStagesColumn(s2, s3, s4, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
+        }
+
+        // ── Stage 3 / 4 upload actions ────────────────────────────────────────
+        function dtrStageImgDrop(event, stageId, stageNum, sectionLabel) {
+            event.preventDefault();
+            const file = event.dataTransfer?.files?.[0];
+            if (file) dtrUploadStageImage(stageId, stageNum, sectionLabel, file);
+        }
+        function dtrStageImgSelect(event, stageId, stageNum, sectionLabel) {
+            const files = Array.from(event.target.files || []);
+            files.forEach(f => dtrUploadStageImage(stageId, stageNum, sectionLabel, f));
+        }
+        async function dtrUploadStageImage(stageId, stageNum, sectionLabel, file) {
+            if (!currentBrand?.id || !file) return;
+            const ext = file.name.split('.').pop();
+            const path = `${currentBrand.id}/design-stages/${stageId}/${sectionLabel}-${Date.now()}.${ext}`;
+            const { data: up, error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
+            if (upErr) { showToast('Upload failed', 'error'); return; }
+            const { data: { publicUrl } } = supabase.storage.from('design-uploads').getPublicUrl(path);
+            const label = stageNum === 3 ? 'Range' : 'Finalise';
+            await supabase.from('stage_uploads').insert({
+                stage_id: stageId, design_task_id: currentDesignTaskRecord?.id, brand_id: currentBrand.id,
+                section_label: sectionLabel, version_label: label, file_url: publicUrl,
+                status: 'pending', is_archived: false
+            });
+            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'upload', { label });
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrTickStageImg(uploadId, stageId, stageNum) {
+            await supabase.from('stage_uploads').update({ status: 'approved' }).eq('id', uploadId);
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrXStageImg(uploadId, stageId, stageNum) {
+            await supabase.from('stage_uploads').update({ status: 'declined' }).eq('id', uploadId);
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrArchiveStageImg(uploadId, stageId, stageNum) {
+            await supabase.from('stage_uploads').update({ is_archived: true }).eq('id', uploadId);
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrDeliverStage(stageId, stageNum, label) {
+            await supabase.from('design_stages').update({ status: 'in_review' }).eq('id', stageId);
+            if (currentDesignTaskRecord?.id) {
+                await supabase.from('design_tasks').update({ status: 'in_review' }).eq('id', currentDesignTaskRecord.id);
+                dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_delivered', { label });
+            }
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrStageRevisions(stageId, stageNum) {
+            await supabase.from('design_stages').update({ status: 'revisions_required' }).eq('id', stageId);
+            if (currentDesignTaskRecord?.id) {
+                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', currentDesignTaskRecord.id);
+                dsLogActivity(currentDesignTaskRecord.id, stageId, 'revisions_requested', {});
+            }
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrCompleteStage(stageId, stageNum, label) {
+            await supabase.from('design_stages').update({ status: 'approved' }).eq('id', stageId);
+            const nextStage = currentStages.find(s => s.stage_number === stageNum + 1);
+            if (nextStage && nextStage.status === 'not_started') {
+                await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', nextStage.id);
+            }
+            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_approved', { label });
+            await _dtrRefreshStagesCol();
         }
 
         // ── DTR Left Panel Controls ────────────────────────────────────────────
@@ -21578,15 +21812,26 @@
                         </div>
                     </div>`;
                 }
-                return `<div class="ds-comment-row" style="margin-bottom:8px">
+                const unread = !entry.task_completed;
+                return `<div class="ds-comment-row" style="margin-bottom:8px;${unread ? 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 10px;' : ''}">
                     <div class="ds-actor-pill" style="width:24px;height:24px;font-size:10px;flex-shrink:0">${initials}</div>
                     <div style="flex:1;min-width:0">
                         <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:2px">${escHtml(entry.user_name||'Unknown')}</div>
                         <div style="font-size:12px;color:#374151;line-height:1.4">${escHtml(entry.message)}</div>
-                        <div class="ds-comment-time">${ts}</div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px">
+                            <div class="ds-comment-time">${ts}</div>
+                            ${unread ? `<button onclick="dtrAcknowledgeActivity('${entry.id}')" title="Mark as seen" style="width:22px;height:22px;border-radius:6px;border:1.5px solid #93c5fd;background:#dbeafe;color:#1d4ed8;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.background='#1d4ed8';this.style.color='#fff'" onmouseout="this.style.background='#dbeafe';this.style.color='#1d4ed8'">👍</button>` : ''}
+                        </div>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        async function dtrAcknowledgeActivity(entryId) {
+            await supabase.from('design_task_activity').update({ task_completed: true }).eq('id', entryId);
+            const entry = _dtActivityLog.find(e => e.id === entryId);
+            if (entry) entry.task_completed = true;
+            renderDesignTaskActivity();
         }
 
         async function addDesignTaskActivity() {
