@@ -2228,18 +2228,9 @@
 
                 <!-- LEFT: grouped smart task list -->
                 <div class="ds-task-list-panel" id="ds-task-list-wrap">
-                    <!-- Tab switcher: Tasks | Updates -->
-                    <div id="ds-left-tabs" style="display:flex;gap:2px;padding:8px 10px 0;flex-shrink:0;background:#f8fafc;border-bottom:1px solid #e8ecf0">
-                        <button id="dsleft-tasks" onclick="switchDSLeftTab('tasks')" style="flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:700;cursor:pointer;background:#fff;color:#1d4ed8;box-shadow:0 1px 3px rgba(0,0,0,0.1)">Tasks</button>
-                        <button id="dsleft-updates" onclick="switchDSLeftTab('updates')" style="flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:600;cursor:pointer;background:transparent;color:#64748b">Updates</button>
-                    </div>
-                    <!-- Scrollable task list (shown when Tasks tab active) -->
+                    <!-- Scrollable list (shown when expanded) -->
                     <div class="ds-task-list-inner" id="ds-task-list-panel">
                         <div class="ds-group-empty" style="padding:20px 16px;color:#94a3b8">Loading tasks…</div>
-                    </div>
-                    <!-- Updates feed (shown when Updates tab active) -->
-                    <div id="ds-updates-panel" style="display:none;flex:1;overflow-y:auto;flex-direction:column">
-                        <div style="padding:20px 16px;color:#94a3b8;font-size:12px">Loading updates…</div>
                     </div>
                     <!-- Thin strip shown when collapsed -->
                     <div class="ds-task-list-collapsed">
@@ -17764,8 +17755,7 @@
 
         let _dsSelectedTaskId = null;
         let _dsActiveStageTab = 'all';
-        let _dsLeftTab = 'tasks';
-        let _dsAllUpdates = [];
+        let _dsUnreadByTask = {};   // task_id → count of unread activities
         let _dtrPanelEl = null;
 
         function getDSTaskGroup(task) {
@@ -17921,12 +17911,16 @@
                 ac.revisions > 0 ? `<span class="ds-act-pill revisions"><svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>${ac.revisions}</span>` : '',
             ].filter(Boolean).join('');
 
+            const unreadCount = _dsUnreadByTask[task.id] || 0;
+            const unreadDot = unreadCount > 0
+                ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:0 4px;margin-left:5px;flex-shrink:0">${unreadCount}</span>`
+                : '';
             const startBtn = task.status === 'new'
                 ? `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #6366f1;color:#6366f1;background:#eef2ff;cursor:pointer;white-space:nowrap">▶ Start</button>`
                 : '';
             return `<div class="ds-task-row ${urg}${isSelected ? ' ds-selected' : ''}${hasNotif ? ' ds-notif' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')">
                 <div class="ds-row-main">
-                    <div class="ds-row-title">${escHtml(task.task_name || 'Untitled Task')}</div>
+                    <div class="ds-row-title" style="display:flex;align-items:center">${escHtml(task.task_name || 'Untitled Task')}${unreadDot}</div>
                     <div class="ds-row-meta">
                         ${task.clubs?.name ? `<span class="ds-row-club">${escHtml(task.clubs.name)}</span>` : ''}
                         ${task.clubs?.name ? `<span class="ds-row-dot">·</span>` : ''}
@@ -17987,70 +17981,6 @@
                 document.getElementById(`dstab-${t}`)?.classList.toggle('active', t === tab);
             });
             renderDSDashboard();
-        }
-
-        function switchDSLeftTab(tab) {
-            _dsLeftTab = tab;
-            const taskPanel = document.getElementById('ds-task-list-panel');
-            const updatesPanel = document.getElementById('ds-updates-panel');
-            const tabTasks = document.getElementById('dsleft-tasks');
-            const tabUpdates = document.getElementById('dsleft-updates');
-            const activeStyle = 'background:#fff;color:#1d4ed8;box-shadow:0 1px 3px rgba(0,0,0,0.1)';
-            const inactiveStyle = 'background:transparent;color:#64748b;box-shadow:none';
-            if (tabTasks) tabTasks.style.cssText = `flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:${tab==='tasks'?'700':'600'};cursor:pointer;${tab==='tasks'?activeStyle:inactiveStyle}`;
-            if (tabUpdates) tabUpdates.style.cssText = `flex:1;padding:5px 0;border-radius:6px;border:none;font-size:11px;font-weight:${tab==='updates'?'700':'600'};cursor:pointer;${tab==='updates'?activeStyle:inactiveStyle}`;
-            if (taskPanel) taskPanel.style.display = tab === 'tasks' ? '' : 'none';
-            if (updatesPanel) updatesPanel.style.display = tab === 'updates' ? 'flex' : 'none';
-            if (tab === 'updates') loadDSUpdates();
-        }
-
-        async function loadDSUpdates() {
-            if (!currentBrand?.id) return;
-            const panel = document.getElementById('ds-updates-panel');
-            if (!panel) return;
-            panel.innerHTML = '<div style="padding:20px 16px;color:#94a3b8;font-size:12px">Loading…</div>';
-            const { data } = await supabase.from('design_task_activity')
-                .select('*, design_tasks(id, task_name, clubs(name))')
-                .eq('brand_id', currentBrand.id)
-                .order('created_at', { ascending: false })
-                .limit(100);
-            _dsAllUpdates = data || [];
-            renderDSUpdates();
-        }
-
-        function renderDSUpdates() {
-            const panel = document.getElementById('ds-updates-panel');
-            if (!panel) return;
-            if (!_dsAllUpdates.length) {
-                panel.innerHTML = '<div style="padding:24px 16px;text-align:center;color:#94a3b8;font-size:12px">No activity yet.</div>';
-                return;
-            }
-            const typeIcon = { comment: '💬', sub_task: '📋', revision_request: '🔄', stage_update: '🎯' };
-            panel.innerHTML = `<div style="padding:8px 10px 4px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;flex-shrink:0">All Activity</div>` +
-                _dsAllUpdates.map(entry => {
-                    const done = entry.task_completed;
-                    const icon = typeIcon[entry.activity_type] || '📌';
-                    const ts = dsRelativeTime(entry.created_at);
-                    const taskName = entry.design_tasks?.task_name || 'Design Task';
-                    const clubName = entry.design_tasks?.clubs?.name || '';
-                    const taskId = entry.design_tasks?.id || entry.design_task_id;
-                    return `<div onclick="switchDSLeftTab('tasks');selectDSTask('${taskId}',true)" style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-bottom:1px solid #f1f5f9;cursor:pointer;${done?'opacity:0.55':''};transition:background 0.12s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
-                        <span style="font-size:15px;flex-shrink:0;margin-top:1px">${icon}</span>
-                        <div style="flex:1;min-width:0">
-                            <div style="font-size:11px;color:#374151;line-height:1.35;${done?'text-decoration:line-through;color:#9ca3af':''}">${escHtml(entry.message)}</div>
-                            <div style="font-size:10px;color:#94a3b8;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(taskName)}${clubName ? ' · ' + escHtml(clubName) : ''}</div>
-                            <div style="font-size:10px;color:#b0bec5;margin-top:1px">${ts}</div>
-                        </div>
-                        ${!done ? `<button onclick="event.stopPropagation();dsDoneUpdate('${entry.id}')" title="Mark done" style="width:20px;height:20px;border-radius:5px;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.12s" onmouseover="this.style.background='#1d4ed8';this.style.color='#fff'" onmouseout="this.style.background='#eff6ff';this.style.color='#1d4ed8'">✓</button>` : ''}
-                    </div>`;
-                }).join('');
-        }
-
-        async function dsDoneUpdate(entryId) {
-            await supabase.from('design_task_activity').update({ task_completed: true }).eq('id', entryId);
-            const entry = _dsAllUpdates.find(e => e.id === entryId);
-            if (entry) entry.task_completed = true;
-            renderDSUpdates();
         }
 
         async function loadTaskInPreview(taskId) {
@@ -18975,12 +18905,13 @@
             const legacy = (legacyTasks||[]).filter(t => t.jobs?.brand_id === currentBrand.id);
             allDesignTasks = [...(brandTasks||[]), ...legacy];
 
-            // Load all stages and sub-task counts for this brand's tasks in parallel
+            // Load all stages, sub-task counts, and unread activity counts in parallel
             const taskIds = allDesignTasks.map(t => t.id);
             if (taskIds.length) {
-                const [stagesRes, subtaskRes] = await Promise.all([
+                const [stagesRes, subtaskRes, unreadRes] = await Promise.all([
                     supabase.from('design_stages').select('*').in('task_id', taskIds).order('stage_number'),
-                    supabase.from('design_task_activity').select('design_task_id, task_completed').in('design_task_id', taskIds).eq('activity_type', 'sub_task')
+                    supabase.from('design_task_activity').select('design_task_id, task_completed').in('design_task_id', taskIds).eq('activity_type', 'sub_task'),
+                    supabase.from('design_task_activity').select('design_task_id').in('design_task_id', taskIds).eq('task_completed', false),
                 ]);
                 const stagesByTask = {};
                 (stagesRes.data||[]).forEach(s => {
@@ -18992,6 +18923,10 @@
                     if (!subtasksByTask[r.design_task_id]) subtasksByTask[r.design_task_id] = { total: 0, done: 0 };
                     subtasksByTask[r.design_task_id].total++;
                     if (r.task_completed) subtasksByTask[r.design_task_id].done++;
+                });
+                _dsUnreadByTask = {};
+                (unreadRes.data||[]).forEach(r => {
+                    _dsUnreadByTask[r.design_task_id] = (_dsUnreadByTask[r.design_task_id] || 0) + 1;
                 });
                 allDesignTasks.forEach(t => {
                     t._stages = stagesByTask[t.id] || [];
@@ -19590,6 +19525,7 @@
                                 <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'comment')">Comments</button>
                                 <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'sub_task')">Sub-Tasks</button>
                                 <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'revision_request')">Revisions</button>
+                                <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'history')">History</button>
                             </div>
                         </div>
                         <div class="dtr-activity-inner">
@@ -21759,10 +21695,19 @@
         function renderDesignTaskActivity() {
             const list = document.getElementById('dt-act-list');
             if (!list) return;
-            const filtered = _dtrActivityFilter === 'all' ? _dtActivityLog
-                : _dtActivityLog.filter(e => e.activity_type === _dtrActivityFilter);
+            const isHistory = _dtrActivityFilter === 'history';
+            let filtered;
+            if (isHistory) {
+                // History: all completed/acknowledged entries
+                filtered = _dtActivityLog.filter(e => e.task_completed);
+            } else if (_dtrActivityFilter === 'all') {
+                // Active: all non-completed entries
+                filtered = _dtActivityLog.filter(e => !e.task_completed);
+            } else {
+                filtered = _dtActivityLog.filter(e => e.activity_type === _dtrActivityFilter && !e.task_completed);
+            }
             if (!filtered.length) {
-                list.innerHTML = '<p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">No activity yet.</p>';
+                list.innerHTML = `<p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">${isHistory ? 'No history yet.' : 'No active activity.'}</p>`;
                 return;
             }
             list.innerHTML = filtered.map(entry => {
@@ -21812,25 +21757,38 @@
                         </div>
                     </div>`;
                 }
-                const unread = !entry.task_completed;
-                return `<div class="ds-comment-row" style="margin-bottom:8px;${unread ? 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 10px;' : ''}">
+                return `<div class="ds-comment-row" style="margin-bottom:8px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:8px 10px;">
                     <div class="ds-actor-pill" style="width:24px;height:24px;font-size:10px;flex-shrink:0">${initials}</div>
                     <div style="flex:1;min-width:0">
                         <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:2px">${escHtml(entry.user_name||'Unknown')}</div>
                         <div style="font-size:12px;color:#374151;line-height:1.4">${escHtml(entry.message)}</div>
                         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:3px">
                             <div class="ds-comment-time">${ts}</div>
-                            ${unread ? `<button onclick="dtrAcknowledgeActivity('${entry.id}')" title="Mark as seen" style="width:22px;height:22px;border-radius:6px;border:1.5px solid #93c5fd;background:#dbeafe;color:#1d4ed8;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.background='#1d4ed8';this.style.color='#fff'" onmouseout="this.style.background='#dbeafe';this.style.color='#1d4ed8'">👍</button>` : ''}
+                            <button onclick="dtrAcknowledgeActivity('${entry.id}')" title="Mark as seen" style="border:none;background:none;padding:0;color:#93c5fd;font-size:14px;cursor:pointer;line-height:1;opacity:0.8;transition:opacity 0.12s" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">👍</button>
                         </div>
                     </div>
                 </div>`;
             }).join('');
         }
 
+        function _dsDotDecrement(taskId) {
+            if (!taskId || !_dsUnreadByTask[taskId]) return;
+            _dsUnreadByTask[taskId] = Math.max(0, (_dsUnreadByTask[taskId] || 1) - 1);
+            if (_dsUnreadByTask[taskId] === 0) delete _dsUnreadByTask[taskId];
+            const row = document.querySelector(`.ds-task-row[data-task-id="${taskId}"]`);
+            if (!row) return;
+            const titleEl = row.querySelector('.ds-row-title');
+            if (!titleEl) return;
+            const dot = titleEl.querySelector('span[style*="2563eb"]');
+            const newCount = _dsUnreadByTask[taskId] || 0;
+            if (dot) { if (newCount > 0) dot.textContent = newCount; else dot.remove(); }
+        }
+
         async function dtrAcknowledgeActivity(entryId) {
             await supabase.from('design_task_activity').update({ task_completed: true }).eq('id', entryId);
             const entry = _dtActivityLog.find(e => e.id === entryId);
             if (entry) entry.task_completed = true;
+            _dsDotDecrement(currentDesignTaskRecord?.id);
             renderDesignTaskActivity();
         }
 
@@ -21863,6 +21821,21 @@
             // Prepend to local log and re-render
             _dtActivityLog.unshift(data);
             if (input) input.value = '';
+            // Increment unread dot for this task (newly added activity starts unread)
+            const tid = currentDesignTaskRecord?.id;
+            if (tid) {
+                _dsUnreadByTask[tid] = (_dsUnreadByTask[tid] || 0) + 1;
+                const row = document.querySelector(`.ds-task-row[data-task-id="${tid}"]`);
+                if (row) {
+                    const titleEl = row.querySelector('.ds-row-title');
+                    if (titleEl) {
+                        const dot = titleEl.querySelector('span[style*="2563eb"]');
+                        const count = _dsUnreadByTask[tid];
+                        if (dot) dot.textContent = count;
+                        else titleEl.insertAdjacentHTML('beforeend', `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:0 4px;margin-left:5px;flex-shrink:0">${count}</span>`);
+                    }
+                }
+            }
             renderDesignTaskActivity();
 
             // Push to DS Studio activity feed
@@ -21904,13 +21877,14 @@
             // Optimistic local update first
             const entry = _dtActivityLog.find(e => e.id === entryId);
             if (entry) { entry.task_completed = true; }
+            _dsDotDecrement(currentDesignTaskRecord?.id);
             renderDesignTaskActivity();
 
             const { error } = await supabase.from('design_task_activity')
                 .update({ task_completed: true }).eq('id', entryId);
             if (error) {
-                // Rollback on failure
                 if (entry) { entry.task_completed = false; }
+                if (currentDesignTaskRecord?.id) _dsUnreadByTask[currentDesignTaskRecord.id] = (_dsUnreadByTask[currentDesignTaskRecord.id] || 0) + 1;
                 renderDesignTaskActivity();
                 showToast('Error updating revision request', 'error');
             }
@@ -21922,6 +21896,7 @@
             if (error) { showToast('Error updating sub-task', 'error'); return; }
             const entry = _dtActivityLog.find(e => e.id === id);
             if (entry) entry.task_completed = completed;
+            if (completed) _dsDotDecrement(currentDesignTaskRecord?.id);
             renderDesignTaskActivity();
             // Update sub-task count in task list
             const t = allDesignTasks?.find(x => x.id === currentDesignTaskRecord?.id);
