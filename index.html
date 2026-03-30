@@ -1032,29 +1032,38 @@
         .ds-s1-btn.needs-info { border-color:#fde68a; background:rgba(245,158,11,0.08); color:#b45309; }
         .ds-s1-btn.needs-info:hover { background:rgba(245,158,11,0.15); }
 
-        /* ── Design Task Record v3 — One-Page Split Layout ─────────────────── */
-        .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 98px); background:#f1f5f9; }
+        /* ── Design Task Record v3 — Refined Split Layout ──────────────────── */
+        .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 138px); background:#f4f6f9; }
 
-        /* Left brief/info panel */
-        .dtr-left-panel { width:380px; flex-shrink:0; background:#fff; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; }
+        /* ── Left brief/info panel ── */
+        .dtr-left-panel { width:320px; flex-shrink:0; background:#fff; border-right:1px solid #e8ecf0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; }
         .dtr-left-panel.collapsed { width:36px; }
-        .dtr-left-inner { width:380px; overflow-y:auto; flex:1; }
-        .dtr-left-toggle-row { display:flex; justify-content:flex-end; padding:7px 10px 5px; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
+        .dtr-left-inner { width:320px; overflow-y:auto; flex:1; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+        .dtr-left-inner::-webkit-scrollbar { width:4px; }
+        .dtr-left-inner::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
+        .dtr-left-toggle-row { display:flex; justify-content:flex-end; padding:8px 10px 6px; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
         .dtr-col-toggle-btn { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#f8fafc; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; padding:0; }
         .dtr-col-toggle-btn:hover { background:#e2e8f0; color:#0f172a; }
         .dtr-left-collapsed { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:14px; flex:1; overflow:hidden; }
 
-        /* Brief card */
-        .dtr-brief-card { border-bottom:1px solid #e2e8f0; }
-        .dtr-brief-summary { padding:10px 12px; background:#f8fafc; display:flex; align-items:center; gap:8px; border-bottom:1px solid #e2e8f0; }
+        /* ── Left panel — refined brief card ── */
+        .dtr-brief-card { }
+        .dtr-brief-summary { padding:12px 14px; background:#f8fafc; display:flex; align-items:center; gap:9px; border-bottom:1px solid #e8ecf0; }
+        .dtr-brief-section { padding:14px 14px 12px; border-bottom:1px solid #f1f5f9; }
+        .dtr-brief-section-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#94a3b8; margin-bottom:10px; }
+        /* Info rows for read-only + click-to-edit fields */
+        .dtr-info-row { display:flex; align-items:baseline; justify-content:space-between; padding:5px 0; border-bottom:1px solid #f8fafc; }
+        .dtr-info-row:last-child { border-bottom:none; }
+        .dtr-info-label { font-size:10px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; flex-shrink:0; }
+        .dtr-info-val { font-size:12px; font-weight:600; color:#0f172a; text-align:right; max-width:170px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
         /* Accordions */
-        .dtr-accordion { border-bottom:1px solid #e2e8f0; }
-        .dtr-acc-hdr { width:100%; display:flex; align-items:center; gap:6px; padding:9px 12px; background:transparent; border:none; cursor:pointer; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#64748b; transition:background 0.12s; text-align:left; }
+        .dtr-accordion { border-top:1px solid #f1f5f9; }
+        .dtr-acc-hdr { width:100%; display:flex; align-items:center; gap:6px; padding:10px 14px; background:transparent; border:none; cursor:pointer; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; transition:background 0.12s; text-align:left; }
         .dtr-acc-hdr:hover { background:#f8fafc; }
         .dtr-acc-chevron { margin-left:auto; flex-shrink:0; color:#94a3b8; transition:transform 0.2s; }
         .dtr-acc-chevron.closed { transform:rotate(-90deg); }
-        .dtr-acc-body { padding:10px 12px 14px; }
+        .dtr-acc-body { padding:10px 14px 14px; }
 
         /* Product search */
         .dtr-prod-search { width:100%; padding:6px 10px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:12px; color:#0f172a; outline:none; margin-bottom:8px; box-sizing:border-box; background:#fff; }
@@ -1064,14 +1073,14 @@
         .dtr-source-btn.active { background:#0f172a; color:#fff; }
         .dtr-source-btn:not(.active) { background:#fff; color:#64748b; }
 
-        /* Mini product grid (left panel) */
-        .dtr-mini-prod-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(85px,1fr)); gap:6px; max-height:240px; overflow-y:auto; }
+        /* Mini product grid */
+        .dtr-mini-prod-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:6px; max-height:220px; overflow-y:auto; }
         .dtr-mini-prod-card { border:2px solid #e2e8f0; border-radius:8px; overflow:hidden; cursor:pointer; transition:all 0.12s; background:#fff; position:relative; }
         .dtr-mini-prod-card:hover { border-color:#94a3b8; }
         .dtr-mini-prod-card.selected { border-color:#00e5cc; box-shadow:0 0 0 2px rgba(0,229,204,0.2); }
         .dtr-mini-check { position:absolute; top:3px; right:3px; width:14px; height:14px; background:#00e5cc; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; color:#fff; font-weight:900; opacity:0; transition:opacity 0.12s; }
         .dtr-mini-prod-card.selected .dtr-mini-check { opacity:1; }
-        .dtr-mini-prod-img { height:52px; display:flex; align-items:center; justify-content:center; background:#f8fafc; padding:4px; }
+        .dtr-mini-prod-img { height:48px; display:flex; align-items:center; justify-content:center; background:#f8fafc; padding:4px; }
         .dtr-mini-prod-img img { max-width:100%; max-height:100%; object-fit:contain; }
         .dtr-mini-prod-name { font-size:9px; font-weight:600; color:#0f172a; padding:2px 4px 3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
@@ -1084,7 +1093,7 @@
 
         /* Asset rows */
         .dtr-asset-row { display:flex; align-items:center; gap:7px; padding:5px 6px; border-radius:7px; background:#f8fafc; border:1px solid #f1f5f9; margin-bottom:4px; }
-        .dtr-asset-thumb-sm { width:34px; height:34px; border-radius:5px; overflow:hidden; background:#e2e8f0; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .dtr-asset-thumb-sm { width:32px; height:32px; border-radius:5px; overflow:hidden; background:#e2e8f0; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
         .dtr-asset-thumb-sm img { width:100%; height:100%; object-fit:cover; }
         .dtr-asset-info { flex:1; min-width:0; }
         .dtr-asset-fname-sm { font-size:10px; font-weight:600; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1092,120 +1101,164 @@
         .dtr-asset-dl-btn { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#64748b; font-size:11px; font-weight:700; flex-shrink:0; transition:all 0.12s; padding:0; }
         .dtr-asset-dl-btn:hover { background:#e0fdf4; color:#065f46; border-color:#6ee7b7; }
 
-        /* Stages column */
-        .dtr-stages-col { flex:1; min-width:0; padding:14px 16px; overflow-y:auto; }
-
-        /* Activity column (right) */
-        .dtr-activity-col { width:340px; flex-shrink:0; background:#fff; border-left:1px solid #e2e8f0; display:flex; flex-direction:column; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; overflow:hidden; }
-        .dtr-activity-inner { overflow-y:auto; flex:1; padding:14px 16px; }
-        .dtr-activity-inner h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#94a3b8; margin:0 0 12px; }
-        .dtr-activity-divider { height:1px; background:#f1f5f9; margin:12px 0; }
-
-        /* Left panel editable fields */
-        .dtr-edit-field { width:100%; box-sizing:border-box; padding:5px 8px; border:1.5px solid #e2e8f0; border-radius:7px; font-size:12px; color:#0f172a; background:#fff; outline:none; transition:border-color 0.15s; font-family:inherit; }
-        .dtr-edit-field:focus { border-color:#00e5cc; }
-        .dtr-edit-field.textarea { resize:vertical; min-height:64px; }
-        .dtr-edit-label { font-size:8px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#94a3b8; margin-bottom:3px; display:block; }
-        .dtr-edit-row { margin-bottom:8px; }
-        .dtr-save-bar { padding:10px 12px; background:#fff; border-top:1px solid #f1f5f9; position:sticky; bottom:0; }
-        .dtr-save-btn { width:100%; padding:8px; border-radius:8px; background:#0f172a; color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.15s; }
+        /* Left panel editable fields (minimal, clean) */
+        .dtr-edit-field { width:100%; box-sizing:border-box; padding:6px 9px; border:1.5px solid #e8ecf0; border-radius:8px; font-size:12px; color:#0f172a; background:#fff; outline:none; transition:border-color 0.15s; font-family:inherit; }
+        .dtr-edit-field:focus { border-color:#00e5cc; background:#fff; }
+        .dtr-edit-field.textarea { resize:vertical; min-height:72px; line-height:1.55; }
+        .dtr-edit-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#94a3b8; margin-bottom:3px; display:block; }
+        .dtr-edit-row { margin-bottom:9px; }
+        .dtr-save-bar { padding:10px 14px; background:#fff; border-top:1px solid #f1f5f9; position:sticky; bottom:0; }
+        .dtr-save-btn { width:100%; padding:9px; border-radius:9px; background:#0f172a; color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.15s; }
         .dtr-save-btn:hover { opacity:0.85; }
 
-        /* Stage section card */
-        .dtr-stage-section { border:1.5px solid #e2e8f0; border-radius:14px; background:#fff; margin-bottom:12px; overflow:hidden; }
-        .dtr-stage-section.stage-approved { border-color:#86efac; background:rgba(34,197,94,0.02); }
-        .dtr-stage-hdr { width:100%; display:flex; align-items:center; gap:10px; padding:12px 16px; border:none; background:transparent; cursor:pointer; text-align:left; }
+        /* ── Stage section cards ── */
+        .dtr-stages-col { flex:1; min-width:0; padding:14px 16px; overflow-y:auto; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+        .dtr-stages-col::-webkit-scrollbar { width:4px; }
+        .dtr-stages-col::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
+
+        .dtr-stage-section { border:1.5px solid #e4e8ef; border-radius:14px; background:#fff; margin-bottom:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:border-color 0.2s, box-shadow 0.2s; }
+        .dtr-stage-section.stage-approved { border-color:#86efac; background:rgba(34,197,94,0.01); }
+        .dtr-stage-section.stage-inactive { background:#fafbfc; border-color:#edf0f4; }
+        .dtr-stage-section.stage-active { border-color:#bfdbfe; box-shadow:0 2px 12px rgba(37,99,235,0.09); position:relative; }
+        .dtr-stage-section.stage-active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:#2563eb; border-radius:3px 0 0 3px; }
+        .dtr-stage-section.stage-revisions { border-color:#fca5a5; box-shadow:0 2px 12px rgba(239,68,68,0.08); }
+        .dtr-stage-section.stage-revisions::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:#dc2626; border-radius:3px 0 0 3px; }
+        .dtr-stage-hdr { width:100%; display:flex; align-items:center; gap:12px; padding:14px 18px; border:none; background:transparent; cursor:pointer; text-align:left; transition:background 0.12s; }
         .dtr-stage-hdr:hover { background:#f8fafc; }
-        .dtr-stage-section.stage-approved .dtr-stage-hdr:hover { background:rgba(34,197,94,0.04); }
-        .dtr-stage-icon-circle { width:24px; height:24px; border-radius:50%; border:2px solid #e2e8f0; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; color:#64748b; }
+        .dtr-stage-section.stage-approved .dtr-stage-hdr:hover { background:rgba(34,197,94,0.03); }
+        .dtr-stage-section.stage-inactive .dtr-stage-hdr { cursor:default; opacity:0.7; }
+        .dtr-stage-icon-circle { width:26px; height:26px; border-radius:50%; border:2px solid #dde3ea; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; color:#64748b; background:#f8fafc; }
+        .dtr-stage-section.stage-active .dtr-stage-icon-circle { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; }
         .dtr-stage-section.stage-approved .dtr-stage-icon-circle { background:#22c55e; border-color:#22c55e; color:#fff; }
-        .dtr-stage-title { font-size:13px; font-weight:700; color:#0f172a; }
+        .dtr-stage-section.stage-revisions .dtr-stage-icon-circle { background:#fef2f2; border-color:#fca5a5; color:#dc2626; }
+        .dtr-stage-title { font-size:14px; font-weight:700; color:#0f172a; }
+        .dtr-stage-section.stage-inactive .dtr-stage-title { color:#64748b; }
         .dtr-stage-chevron { margin-left:auto; color:#94a3b8; flex-shrink:0; transition:transform 0.2s; }
         .dtr-stage-chevron.closed { transform:rotate(-90deg); }
-        .dtr-stage-body { padding:14px 16px; border-top:1px solid #f1f5f9; }
+        .dtr-stage-body { padding:16px 18px; border-top:1px solid #f1f5f9; }
 
-        /* Concept tabs */
-        .dtr-concept-tabs { display:grid; grid-template-columns:repeat(3,1fr); border:1.5px solid #e2e8f0; border-radius:10px; overflow:hidden; margin-bottom:14px; }
-        .dtr-ctab { padding:8px 6px; font-size:12px; font-weight:600; border:none; border-right:1px solid #e2e8f0; cursor:pointer; background:#f8fafc; color:#64748b; transition:all 0.15s; text-align:center; }
+        /* ── Concept tabs ── */
+        .dtr-concept-tabs { display:grid; grid-template-columns:repeat(3,1fr); border:1.5px solid #e4e8ef; border-radius:10px; overflow:hidden; margin-bottom:16px; }
+        .dtr-ctab { padding:9px 6px; font-size:12px; font-weight:600; border:none; border-right:1px solid #e4e8ef; cursor:pointer; background:#f8fafc; color:#64748b; transition:all 0.15s; text-align:center; }
         .dtr-ctab:last-child { border-right:none; }
+        .dtr-ctab:hover:not(.active) { background:#f1f5f9; }
         .dtr-ctab.active { background:#0f172a; color:#fff; }
-        .dtr-ctab.ct-approved { background:rgba(34,197,94,0.1); color:#16a34a; font-weight:700; }
+        .dtr-ctab.ct-approved { background:rgba(34,197,94,0.08); color:#16a34a; }
         .dtr-ctab.ct-approved.active { background:#16a34a; color:#fff; }
-        .dtr-ctab.ct-declined { background:rgba(239,68,68,0.07); color:#dc2626; }
+        .dtr-ctab.ct-declined { background:rgba(239,68,68,0.06); color:#dc2626; }
         .dtr-ctab.ct-declined.active { background:#dc2626; color:#fff; }
 
-        /* Concept image grid */
-        .dtr-concept-images { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:10px; margin-bottom:12px; }
-        .dtr-cimg-card { border:2px solid #e2e8f0; border-radius:10px; overflow:hidden; background:#f8fafc; transition:border-color 0.15s; }
-        .dtr-cimg-card.ci-approved { border-color:#22c55e; background:rgba(34,197,94,0.03); }
+        /* ── Concept image grid ── */
+        .dtr-concept-images { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
+        .dtr-cimg-card { border:2px solid #e4e8ef; border-radius:10px; overflow:hidden; background:#f8fafc; transition:border-color 0.15s; }
+        .dtr-cimg-card.ci-approved { border-color:#22c55e; background:rgba(34,197,94,0.02); }
         .dtr-cimg-card.ci-declined { border-color:#fca5a5; opacity:0.65; }
         .dtr-cimg-thumb { width:100%; aspect-ratio:4/3; object-fit:contain; background:#f8fafc; display:block; cursor:pointer; }
         .dtr-cimg-nothumb { width:100%; aspect-ratio:4/3; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:30px; cursor:pointer; }
-        .dtr-cimg-actions { display:flex; gap:4px; padding:5px 6px; background:#fff; border-top:1px solid #f1f5f9; }
-        .dtr-tick-btn { flex:1; padding:5px 0; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; transition:all 0.15s; }
+        .dtr-cimg-actions { display:flex; gap:4px; padding:6px 6px; background:#fff; border-top:1px solid #f1f5f9; }
+        .dtr-tick-btn { flex:1; padding:6px 0; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; transition:all 0.15s; }
         .dtr-tick-btn:hover,.dtr-tick-btn.ticked { background:#16a34a; color:#fff; border-color:#16a34a; }
-        .dtr-x-btn { flex:1; padding:5px 0; border-radius:6px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; transition:all 0.15s; }
+        .dtr-x-btn { flex:1; padding:6px 0; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; transition:all 0.15s; }
         .dtr-x-btn:hover,.dtr-x-btn.xed { background:#dc2626; color:#fff; border-color:#dc2626; }
-        .dtr-archive-btn { padding:5px 7px; border-radius:6px; font-size:11px; cursor:pointer; border:1px solid #e2e8f0; background:#f8fafc; color:#94a3b8; transition:all 0.15s; flex-shrink:0; }
+        .dtr-archive-btn { padding:6px 8px; border-radius:7px; font-size:11px; cursor:pointer; border:1px solid #e4e8ef; background:#f8fafc; color:#94a3b8; transition:all 0.15s; flex-shrink:0; }
         .dtr-archive-btn:hover { border-color:#94a3b8; color:#64748b; }
 
-        /* Concept section approve/decline actions */
-        .dtr-concept-section-actions { display:flex; align-items:center; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid #f1f5f9; flex-wrap:wrap; }
-        .dtr-concept-approve-btn { padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; cursor:pointer; transition:all 0.15s; }
+        /* ── Concept section approve/decline ── */
+        .dtr-concept-section-actions { display:flex; align-items:center; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid #f1f5f9; flex-wrap:wrap; }
+        .dtr-concept-approve-btn { padding:8px 16px; border-radius:9px; font-size:12px; font-weight:700; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; cursor:pointer; transition:all 0.15s; }
         .dtr-concept-approve-btn:hover { background:#16a34a; color:#fff; border-color:#16a34a; }
         .dtr-concept-approve-btn.approved { background:#16a34a; color:#fff; border-color:#16a34a; cursor:default; }
-        .dtr-concept-decline-btn { padding:7px 14px; border-radius:8px; font-size:12px; font-weight:700; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; cursor:pointer; transition:all 0.15s; }
+        .dtr-concept-decline-btn { padding:8px 16px; border-radius:9px; font-size:12px; font-weight:700; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; cursor:pointer; transition:all 0.15s; }
         .dtr-concept-decline-btn:hover { background:#dc2626; color:#fff; border-color:#dc2626; }
 
-        /* Concept upload zone */
-        .dtr-concept-upload { border:2px dashed #cbd5e1; border-radius:10px; padding:16px; text-align:center; cursor:pointer; transition:all 0.15s; background:#f8fafc; margin-top:8px; }
-        .dtr-concept-upload:hover,.dtr-concept-upload.drag-over { border-color:#00e5cc; background:rgba(0,229,204,0.04); }
+        /* ── Concept upload zone ── */
+        .dtr-concept-upload { border:1.5px dashed #c7d2dd; border-radius:12px; padding:22px 16px; text-align:center; cursor:pointer; transition:all 0.15s; background:#fafbfc; margin-top:10px; }
+        .dtr-concept-upload:hover,.dtr-concept-upload.drag-over { border-color:#2563eb; background:rgba(37,99,235,0.03); }
 
-        /* Deliver/revisions/complete bar */
-        .dtr-deliver-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 14px; background:#f8fafc; border-top:1px solid #e2e8f0; margin:14px -16px -14px; border-radius:0 0 12px 12px; }
-        .dtr-deliver-btn { padding:8px 18px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
-        .dtr-deliver-btn.deliver { background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:#fff; border:none; }
-        .dtr-deliver-btn.deliver:hover { opacity:0.9; }
+        /* ── Deliver / revision / complete action bar ── */
+        .dtr-deliver-bar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:12px 16px; background:#f8fafc; border-top:1px solid #e8ecf0; margin:14px -18px -16px; border-radius:0 0 12px 12px; }
+        .dtr-deliver-btn { padding:9px 20px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+        .dtr-deliver-btn.deliver { background:linear-gradient(135deg,#1d4ed8,#3b82f6); color:#fff; border:none; box-shadow:0 2px 8px rgba(29,78,216,0.25); }
+        .dtr-deliver-btn.deliver:hover { opacity:0.9; transform:translateY(-1px); box-shadow:0 3px 10px rgba(29,78,216,0.3); }
         .dtr-deliver-btn.delivered { background:#e0fdf4; color:#065f46; border:1.5px solid #6ee7b7; cursor:default; }
-        .dtr-revisions-btn { padding:8px 14px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; background:rgba(245,158,11,0.08); border:1.5px solid #fde68a; color:#b45309; transition:all 0.15s; }
-        .dtr-revisions-btn:hover { background:rgba(245,158,11,0.18); }
-        .dtr-complete-btn { padding:8px 16px; border-radius:9px; font-size:13px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; transition:opacity 0.15s; margin-left:auto; }
+        .dtr-revisions-btn { padding:9px 16px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; background:#fff; border:1.5px solid #fde68a; color:#b45309; transition:all 0.15s; }
+        .dtr-revisions-btn:hover { background:rgba(245,158,11,0.1); }
+        .dtr-complete-btn { padding:9px 18px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; transition:opacity 0.15s; margin-left:auto; box-shadow:0 2px 6px rgba(22,163,74,0.2); }
         .dtr-complete-btn:hover { opacity:0.9; }
-        /* Inline revisions feedback box */
-        .dtr-revision-form { background:rgba(245,158,11,0.07); border:2px solid #fde68a; border-radius:10px; padding:12px 14px; margin:0 -16px; }
-        .dtr-revision-form textarea { width:100%; box-sizing:border-box; padding:8px 10px; border:1.5px solid #fde68a; border-radius:8px; font-size:12px; color:#0f172a; background:#fff; resize:vertical; min-height:72px; outline:none; font-family:inherit; }
+        .dtr-revision-form { background:#fffbeb; border:1.5px solid #fde68a; border-radius:10px; padding:14px 16px; margin-top:12px; }
+        .dtr-revision-form textarea { width:100%; box-sizing:border-box; padding:9px 11px; border:1.5px solid #fde68a; border-radius:8px; font-size:12px; color:#0f172a; background:#fff; resize:vertical; min-height:72px; outline:none; font-family:inherit; }
         .dtr-revision-form textarea:focus { border-color:#f59e0b; }
-        .dtr-revision-form-footer { display:flex; gap:8px; margin-top:8px; align-items:center; }
-        /* Orange activity feed entry */
-        .dt-act-revision { background:rgba(245,158,11,0.09); border:1.5px solid #fde68a; border-radius:10px; padding:9px 12px; margin-bottom:8px; }
-        .dt-act-revision-label { font-size:11px; font-weight:700; color:#b45309; margin-bottom:3px; }
-        .dt-act-revision-msg { font-size:12px; color:#374151; line-height:1.4; }
+        .dtr-revision-form-footer { display:flex; gap:8px; margin-top:10px; align-items:center; }
+        .dt-act-revision { background:rgba(245,158,11,0.07); border:1.5px solid #fde68a; border-radius:10px; padding:10px 12px; margin-bottom:8px; }
+        .dt-act-revision-label { font-size:11px; font-weight:700; color:#b45309; margin-bottom:4px; }
+        .dt-act-revision-msg { font-size:12px; color:#374151; line-height:1.45; }
         .dt-act-revision-meta { font-size:10px; color:#9ca3af; margin-top:3px; }
 
-        /* Placeholder stage body */
-        .dtr-stage-placeholder { padding:24px 16px; text-align:center; color:#94a3b8; }
+        /* ── Placeholder stage body ── */
+        .dtr-stage-placeholder { padding:28px 16px; text-align:center; color:#94a3b8; }
 
-        /* Asset upload zone (left panel, compact) */
-        .dtr-asset-upload-zone { border:2px dashed #e2e8f0; border-radius:8px; padding:12px 8px; text-align:center; cursor:pointer; transition:all 0.15s; background:#fafbfc; margin-bottom:10px; }
+        /* ── Asset upload zone (left panel) ── */
+        .dtr-asset-upload-zone { border:1.5px dashed #dde3ea; border-radius:9px; padding:12px 8px; text-align:center; cursor:pointer; transition:all 0.15s; background:#fafbfc; margin-bottom:10px; }
         .dtr-asset-upload-zone:hover,.dtr-asset-upload-zone.drag-over { border-color:#00e5cc; background:rgba(0,229,204,0.03); }
 
         /* Stage action footer */
-        .ds-stage-footer { margin-top:24px; padding-top:20px; border-top:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+        .ds-stage-footer { margin-top:24px; padding-top:20px; border-top:1px solid #e8ecf0; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
         .ds-submit-review-btn { padding:10px 24px; background:linear-gradient(135deg,#1d4ed8,#2563eb); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; }
         .ds-submit-review-btn:hover { opacity:0.88; }
         .ds-submit-review-btn:disabled { opacity:0.4; cursor:not-allowed; }
         .ds-approve-stage-btn { padding:10px 24px; background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:opacity 0.15s; }
         .ds-approve-stage-btn:hover { opacity:0.88; }
-        .ds-req-revisions-btn { padding:10px 20px; background:rgba(239,68,68,0.1); border:1.5px solid #fca5a5; color:#dc2626; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
-        .ds-req-revisions-btn:hover { background:rgba(239,68,68,0.17); }
+        .ds-req-revisions-btn { padding:10px 20px; background:rgba(239,68,68,0.08); border:1.5px solid #fca5a5; color:#dc2626; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.15s; }
+        .ds-req-revisions-btn:hover { background:rgba(239,68,68,0.14); }
         .ds-skip-stage-btn { padding:8px 16px; background:transparent; border:1.5px dashed #cbd5e1; color:#94a3b8; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s; }
         .ds-skip-stage-btn:hover { border-color:#94a3b8; color:#64748b; }
 
-        /* Section empty state */
+        /* ── Activity column (right) ── */
+        .dtr-activity-col { width:320px; flex-shrink:0; background:#fff; border-left:1px solid #e8ecf0; display:flex; flex-direction:column; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; overflow:hidden; }
+        .dtr-activity-header { padding:14px 16px 0; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
+        .dtr-activity-header h4 { font-size:13px; font-weight:700; color:#0f172a; margin:0 0 10px; }
+        .dtr-act-filter-row { display:flex; gap:3px; padding-bottom:1px; }
+        .dtr-act-filter-btn { padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600; border:1.5px solid transparent; cursor:pointer; color:#64748b; background:transparent; transition:all 0.12s; }
+        .dtr-act-filter-btn:hover { background:#f1f5f9; }
+        .dtr-act-filter-btn.active { background:#f1f5f9; color:#0f172a; border-color:#e2e8f0; }
+        .dtr-activity-inner { overflow-y:auto; flex:1; padding:12px 16px; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+        .dtr-activity-inner::-webkit-scrollbar { width:4px; }
+        .dtr-activity-inner::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
+        .dtr-activity-composer { padding:12px 16px; border-top:1px solid #f1f5f9; background:#fff; flex-shrink:0; }
+        .dtr-composer-tabs { display:flex; gap:4px; margin-bottom:8px; }
+        .act-tab-btn { flex:1; padding:5px 8px; font-size:11px; font-weight:600; border:1.5px solid #e2e8f0; border-radius:8px; background:#f8fafc; color:#64748b; cursor:pointer; transition:all 0.12s; }
+        .act-tab-btn:hover { background:#f1f5f9; }
+        .act-tab-btn.active { background:#0f172a; color:#fff; border-color:#0f172a; }
+        .act-tab-btn.task-tab.active { background:#c2410c; border-color:#c2410c; }
+        .dtr-composer-input { width:100%; box-sizing:border-box; padding:8px 10px; border:1.5px solid #e2e8f0; border-radius:9px; font-size:12px; color:#0f172a; outline:none; transition:border-color 0.15s; font-family:inherit; background:#f8fafc; }
+        .dtr-composer-input:focus { border-color:#00e5cc; background:#fff; }
+        .dtr-composer-post-btn { width:100%; margin-top:6px; padding:8px; border-radius:9px; background:#0f172a; color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; transition:opacity 0.15s; }
+        .dtr-composer-post-btn:hover { opacity:0.85; }
+
+        /* ── Activity feed items ── */
+        .dtr-act-comment { display:flex; align-items:flex-start; gap:8px; margin-bottom:10px; }
+        .dtr-act-avatar { width:26px; height:26px; border-radius:50%; background:#e2e8f0; font-size:10px; font-weight:700; color:#64748b; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .dtr-act-comment-body { flex:1; min-width:0; }
+        .dtr-act-comment-name { font-size:12px; font-weight:600; color:#0f172a; }
+        .dtr-act-comment-text { font-size:12px; color:#374151; line-height:1.45; margin-top:2px; }
+        .dtr-act-comment-time { font-size:10px; color:#94a3b8; margin-top:3px; }
+        .dtr-act-subtask { padding:8px 10px; background:#fff7ed; border:1px solid rgba(234,179,8,0.25); border-radius:10px; margin-bottom:8px; }
+        .dtr-act-system { display:flex; align-items:flex-start; gap:6px; margin-bottom:7px; padding:5px 0; border-bottom:1px solid #f8fafc; }
+        .dtr-act-system:last-child { border-bottom:none; }
+        .dtr-act-system-dot { width:6px; height:6px; border-radius:50%; background:#e2e8f0; flex-shrink:0; margin-top:5px; }
+        .dtr-act-system-text { font-size:11px; color:#64748b; line-height:1.4; flex:1; }
+        .dtr-act-system-time { font-size:10px; color:#b0b8c4; }
+
+        /* ── Section empty state ── */
         .ds-empty-state { text-align:center; padding:40px 20px; }
         .ds-empty-state .es-icon { font-size:40px; margin-bottom:10px; }
         .ds-empty-state p { color:#64748b; font-size:14px; font-weight:500; margin:0 0 4px; }
         .ds-empty-state span { color:#94a3b8; font-size:12px; }
+        .dtr-col-toggle-btn { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#f8fafc; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; padding:0; }
+        .dtr-col-toggle-btn:hover { background:#e2e8f0; color:#0f172a; }
+        .dtr-left-collapsed { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:14px; flex:1; overflow:hidden; }
+
+
 
         /* Filter chips for activity feed */
         .ds-filter-chip { padding:5px 12px; border-radius:20px; font-size:12px; font-weight:600; cursor:pointer; border:1.5px solid #e2e8f0; color:#64748b; background:#fff; transition:all 0.15s; }
@@ -2179,28 +2232,32 @@
             <!-- Sticky header: single slim bar + progress + stage tabs -->
             <div class="dt-top-nav" style="position:sticky;top:96px;z-index:30;background:#fff;">
 
-                <!-- Single slim combined nav + meta bar -->
-                <div style="display:flex;align-items:center;gap:0;padding:0 24px;min-height:42px;border-bottom:1px solid #e2e8f0;background:#fff;">
+                <!-- Page header: richer context bar -->
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 24px 10px;border-bottom:1px solid #e8ecf0;background:#fff;min-height:54px;">
                     <button id="dt-back-btn" onclick="goBack()" class="nav-back-btn hide" style="flex-shrink:0">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span id="dt-back-label">Back</span>
                     </button>
-                    <span class="font-semibold" style="color:#0f172a;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;margin:0 8px 0 4px" id="dt-task-name-display">Design Task</span>
-                    <!-- Divider -->
-                    <span style="width:1px;height:16px;background:#e2e8f0;margin:0 10px;flex-shrink:0"></span>
-                    <!-- Meta inline: club · designer · countdown -->
-                    <span id="dt-club-display" style="font-size:12px;color:#475569;flex-shrink:0"></span>
-                    <span style="margin:0 6px;color:#cbd5e1;flex-shrink:0">·</span>
-                    <span id="dt-designer-display" style="font-size:12px;color:#be185d;flex-shrink:0"></span>
-                    <div id="dt-countdown" class="dt-countdown hide" style="margin-left:8px;flex-shrink:0"></div>
-                    <!-- Push to right -->
-                    <div style="margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0">
+                    <!-- Primary identity -->
+                    <div style="flex:1;min-width:0">
+                        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+                            <span id="dt-task-name-display" style="font-size:15px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px">Design Task</span>
+                            <span id="dt-ref-display" style="font-family:monospace;font-size:11px;color:#94a3b8;font-weight:600;flex-shrink:0"></span>
+                            <span id="dt-status-badge" class="badge design-status-new text-xs" style="flex-shrink:0">New</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+                            <span id="dt-club-display" style="font-size:12px;color:#475569;flex-shrink:0"></span>
+                            <span style="color:#d1d5db;font-size:10px;flex-shrink:0" id="dt-club-dot">·</span>
+                            <span id="dt-designer-display" style="font-size:12px;color:#be185d;flex-shrink:0"></span>
+                            <div id="dt-countdown" class="dt-countdown hide" style="margin-left:2px;flex-shrink:0"></div>
+                        </div>
+                    </div>
+                    <!-- Right: meta + actions -->
+                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
                         <span id="dt-meta-created" style="font-size:11px;color:#94a3b8"></span>
-                        <span id="dt-ref-display" class="text-xs font-mono font-semibold text-gray-500"></span>
-                        <span id="dt-status-badge" class="badge design-status-new text-xs">New</span>
                         <button id="dt-delete-btn" class="hide" onclick="deleteDesignTask()"
-                            style="padding:4px 10px;border:1.5px solid #fca5a5;border-radius:6px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer">
-                            🗑 Delete
+                            style="padding:5px 11px;border:1.5px solid #fca5a5;border-radius:7px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer">
+                            Delete
                         </button>
                     </div>
                 </div>
@@ -18952,23 +19009,27 @@
                         ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads)}
                     </div>
                     <div class="dtr-activity-col" id="dtr-activity-col">
-                        <div class="dtr-activity-inner">
+                        <div class="dtr-activity-header">
                             <h4>Activity</h4>
-                            <div style="display:flex;gap:4px;margin-bottom:10px">
-                                <button id="dt-act-comment-btn" onclick="setDTInputType('comment')" class="act-tab-btn active" style="flex:1;font-size:11px">+ Comment</button>
-                                <button id="dt-act-task-btn" onclick="setDTInputType('sub_task')" class="act-tab-btn task-tab" style="flex:1;font-size:11px">+ Sub-Task</button>
+                            <div class="dtr-act-filter-row">
+                                <button class="dtr-act-filter-btn active" onclick="filterDTRActivity(this,'all')">All</button>
+                                <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'comment')">Comments</button>
+                                <button class="dtr-act-filter-btn" onclick="filterDTRActivity(this,'sub_task')">Sub-Tasks</button>
                             </div>
-                            <div id="dt-act-list" style="margin-bottom:12px">
+                        </div>
+                        <div class="dtr-activity-inner">
+                            <div id="dt-act-list">
                                 <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
                             </div>
-                            <div style="display:flex;gap:6px">
-                                <input type="text" id="dt-act-input" placeholder="Add a comment…"
-                                    style="flex:1;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;color:#0f172a;background:#fff;outline:none;transition:border-color 0.15s"
-                                    onfocus="this.style.borderColor='#00e5cc'"
-                                    onblur="this.style.borderColor='#e2e8f0'"
-                                    onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
-                                <button onclick="addDesignTaskActivity()" style="padding:7px 12px;border-radius:8px;background:#0f172a;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">Post</button>
+                        </div>
+                        <div class="dtr-activity-composer">
+                            <div class="dtr-composer-tabs">
+                                <button id="dt-act-comment-btn" onclick="setDTInputType('comment')" class="act-tab-btn active">+ Comment</button>
+                                <button id="dt-act-task-btn" onclick="setDTInputType('sub_task')" class="act-tab-btn task-tab">+ Sub-Task</button>
                             </div>
+                            <input type="text" id="dt-act-input" class="dtr-composer-input" placeholder="Add a comment…"
+                                onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
+                            <button onclick="addDesignTaskActivity()" class="dtr-composer-post-btn">Post</button>
                         </div>
                     </div>
                 </div>`;
@@ -18976,6 +19037,7 @@
             _dtrMasterProdsLoaded = false;
             _dtrMasterProdsData = [];
             _dtrProdSearchTerm = '';
+            _dtrActivityFilter = 'all';
             if (currentDesignTaskRecord?.id) loadDesignTaskActivity(currentDesignTaskRecord.id);
         }
 
@@ -19070,71 +19132,85 @@
                     : (task.assigned_designer_id ? `<option value="${task.assigned_designer_id}" selected>${escHtml(task.assigned_designer_name||'Current Designer')}</option>` : ''));
 
             return `
-                <!-- ── EDITABLE BRIEF CARD ────────────────────────────────── -->
+                <!-- ── BRIEF CARD ─────────────────────────────────────────── -->
                 <div class="dtr-brief-card">
-                    <!-- Header: logo + ref + priority -->
+
+                    <!-- Club identity header -->
                     <div class="dtr-brief-summary">
                         ${logoUrl
-                            ? `<img src="${escHtml(logoUrl)}" alt="" style="width:30px;height:30px;object-fit:contain;border-radius:5px;background:#fff;border:1px solid #e2e8f0;flex-shrink:0">`
-                            : `<div style="width:30px;height:30px;border-radius:5px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>`}
+                            ? `<img src="${escHtml(logoUrl)}" alt="" style="width:32px;height:32px;object-fit:contain;border-radius:6px;background:#fff;border:1px solid #e2e8f0;flex-shrink:0;padding:2px">`
+                            : `<div style="width:32px;height:32px;border-radius:6px;background:#e8ecf0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>`}
                         <div style="flex:1;min-width:0">
-                            <div style="font-size:10px;color:#64748b">${escHtml(club.name||'')}${task.task_ref ? ` · <span style="font-family:monospace;color:#94a3b8">${escHtml(task.task_ref)}</span>` : ''}</div>
+                            <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled Task')}</div>
+                            <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                         </div>
-                        <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 6px;flex-shrink:0">${pri.dot} ${pri.label}</span>
+                        <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 7px;flex-shrink:0">${pri.dot} ${pri.label}</span>
                     </div>
 
-                    <!-- Editable fields -->
-                    <div style="padding:10px 12px;border-bottom:1px solid #f1f5f9">
+                    <!-- § Job Details ─────────────────────────────────────── -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Job Details</div>
                         <div class="dtr-edit-row">
                             <label class="dtr-edit-label" for="dtr-ln-task-name">Task Name</label>
                             <input class="dtr-edit-field" id="dtr-ln-task-name" type="text" value="${escHtml(task.task_name||'')}" placeholder="Task name…">
                         </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-                            <div class="dtr-edit-row">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                            <div class="dtr-edit-row" style="margin-bottom:0">
                                 <label class="dtr-edit-label" for="dtr-ln-sport">Sport</label>
-                                <input class="dtr-edit-field" id="dtr-ln-sport" type="text" value="${escHtml(task.sport||'')}" placeholder="e.g. Football">
+                                <input class="dtr-edit-field" id="dtr-ln-sport" type="text" value="${escHtml(task.sport||'')}" placeholder="Football…">
                             </div>
-                            <div class="dtr-edit-row">
+                            <div class="dtr-edit-row" style="margin-bottom:0">
+                                <label class="dtr-edit-label" for="dtr-ln-priority">Priority</label>
+                                <select class="dtr-edit-field" id="dtr-ln-priority">
+                                    <option value="standard"${(task.priority||'standard')==='standard'?' selected':''}>⚪ Standard</option>
+                                    <option value="high"${task.priority==='high'?' selected':''}>🟠 High</option>
+                                    <option value="urgent"${task.priority==='urgent'?' selected':''}>🔴 Urgent</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                            <div class="dtr-edit-row" style="margin-bottom:0">
                                 <label class="dtr-edit-label" for="dtr-ln-due-date">Deadline${dueExtra ? ` ${dueExtra}` : ''}</label>
                                 <input class="dtr-edit-field" id="dtr-ln-due-date" type="date" value="${task.due_date ? task.due_date.substring(0,10) : ''}">
                             </div>
+                            <div class="dtr-edit-row" style="margin-bottom:0">
+                                <label class="dtr-edit-label">Due</label>
+                                <div style="font-size:12px;font-weight:600;color:${daysLeft !== null && daysLeft < 0 ? '#dc2626' : daysLeft !== null && daysLeft <= 7 ? '#c2410c' : '#0f172a'};padding:6px 0 5px">${dueDate}</div>
+                            </div>
                         </div>
-                        <div class="dtr-edit-row">
+                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
                             <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
                             <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
                         </div>
+                        ${task.jobs?.job_type ? `<div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding:6px 0">
+                            <span class="dtr-info-label" style="font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8">Job Type</span>
+                            <span style="font-size:11px;font-weight:600;color:#475569">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
+                        </div>` : ''}
+                    </div>
+
+                    <!-- § Design Brief ────────────────────────────────────── -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Design Brief</div>
                         <div class="dtr-edit-row">
-                            <label class="dtr-edit-label" for="dtr-ln-priority">Priority</label>
-                            <select class="dtr-edit-field" id="dtr-ln-priority">
-                                <option value="standard"${(task.priority||'standard')==='standard'?' selected':''}>⚪ Standard</option>
-                                <option value="high"${task.priority==='high'?' selected':''}>🟠 High</option>
-                                <option value="urgent"${task.priority==='urgent'?' selected':''}>🔴 Urgent</option>
-                            </select>
-                        </div>
-                        <div class="dtr-edit-row">
-                            <label class="dtr-edit-label" for="dtr-ln-brief">Design Brief</label>
-                            <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design requirements…">${escHtml(briefText)}</textarea>
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design vision, colours, and key requirements…" style="min-height:90px">${escHtml(briefText)}</textarea>
                         </div>
                         <div class="dtr-edit-row" style="margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-key-notes">📌 Key Notes</label>
-                            <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Important notes or reminders…" style="min-height:48px">${escHtml(task.key_notes||'')}</textarea>
+                            <label class="dtr-edit-label" for="dtr-ln-key-notes">Key Notes</label>
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Important reminders or constraints…" style="min-height:54px">${escHtml(task.key_notes||'')}</textarea>
                         </div>
                     </div>
 
-                    <!-- Job type (read-only) -->
-                    ${task.jobs?.job_type ? `<div style="padding:6px 12px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between">
-                        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Job Type</span>
-                        <span style="font-size:11px;font-weight:600;color:#0f172a">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
-                    </div>` : ''}
-
-                    <!-- Colour swatches -->
-                    <div style="padding:10px 12px">
-                        <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Colours</div>
-                        <div style="display:flex;gap:5px">
-                            ${colPairs.map(c => `<div style="flex:1;text-align:center">
-                                <div style="height:26px;border-radius:5px;background:${c.hex||'#e2e8f0'};border:1px solid rgba(0,0,0,0.07);margin-bottom:3px"></div>
-                                <div style="font-size:8px;color:#94a3b8;font-weight:600">${c.label}</div>
-                                ${c.pantone ? `<div style="font-size:8px;color:#64748b;font-family:monospace">${escHtml(c.pantone)}</div>` : ''}
+                    <!-- § Colours ─────────────────────────────────────────── -->
+                    <div class="dtr-brief-section" style="border-bottom:none">
+                        <div class="dtr-brief-section-title">Brand Colours</div>
+                        <div style="display:flex;gap:8px">
+                            ${colPairs.map(c => `<div style="flex:1">
+                                <div style="height:36px;border-radius:8px;background:${c.hex||'#e8ecf0'};border:1px solid rgba(0,0,0,0.06);margin-bottom:5px;position:relative;overflow:hidden">
+                                    ${!c.hex ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8">—</div>` : ''}
+                                </div>
+                                <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:1px">${c.label}</div>
+                                ${c.hex ? `<div style="font-size:9px;color:#94a3b8;font-family:monospace">${escHtml(c.hex)}</div>` : ''}
+                                ${c.pantone ? `<div style="font-size:8px;color:#94a3b8;font-family:monospace">${escHtml(c.pantone)}</div>` : ''}
                             </div>`).join('')}
                         </div>
                     </div>
@@ -19255,14 +19331,19 @@
                 approved:'background:rgba(34,197,94,0.1);color:#16a34a', skipped:'background:rgba(34,197,94,0.08);color:#16a34a',
             };
             const statusStyle = statusStyleMap[stage.status] || statusStyleMap.not_started;
-            return `<div class="dtr-stage-section${isApproved ? ' stage-approved' : ''}" id="dtr-stage-3">
+            const stageClass3 = isApproved ? ' stage-approved'
+                : stage.status === 'revisions_required' ? ' stage-active stage-revisions'
+                : ['in_progress','in_review'].includes(stage.status) ? ' stage-active'
+                : ' stage-inactive';
+            const isOpen3 = ['in_progress','in_review','revisions_required'].includes(stage.status);
+            return `<div class="dtr-stage-section${stageClass3}" id="dtr-stage-3">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(3)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '3'}</div>
                     <span class="dtr-stage-title">Full Range</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
-                    <svg class="dtr-stage-chevron closed" id="dtr-stage-chev-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    <svg class="dtr-stage-chevron${isOpen3 ? '' : ' closed'}" id="dtr-stage-chev-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div class="dtr-stage-body" id="dtr-stage-body-3" style="display:none">
+                <div class="dtr-stage-body" id="dtr-stage-body-3"${isOpen3 ? '' : ' style="display:none"'}>
                     <div class="dtr-stage-placeholder">
                         <div style="font-size:30px;margin-bottom:8px">🎨</div>
                         <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Full Range</div>
@@ -19282,14 +19363,19 @@
                 approved:'background:rgba(34,197,94,0.1);color:#16a34a', skipped:'background:rgba(34,197,94,0.08);color:#16a34a',
             };
             const statusStyle = statusStyleMap[stage.status] || statusStyleMap.not_started;
-            return `<div class="dtr-stage-section${isApproved ? ' stage-approved' : ''}" id="dtr-stage-4">
+            const stageClass4 = isApproved ? ' stage-approved'
+                : stage.status === 'revisions_required' ? ' stage-active stage-revisions'
+                : ['in_progress','in_review'].includes(stage.status) ? ' stage-active'
+                : ' stage-inactive';
+            const isOpen4 = ['in_progress','in_review','revisions_required'].includes(stage.status);
+            return `<div class="dtr-stage-section${stageClass4}" id="dtr-stage-4">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(4)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '4'}</div>
                     <span class="dtr-stage-title">Final Artwork</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
-                    <svg class="dtr-stage-chevron closed" id="dtr-stage-chev-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    <svg class="dtr-stage-chevron${isOpen4 ? '' : ' closed'}" id="dtr-stage-chev-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
-                <div class="dtr-stage-body" id="dtr-stage-body-4" style="display:none">
+                <div class="dtr-stage-body" id="dtr-stage-body-4"${isOpen4 ? '' : ' style="display:none"'}>
                     <div class="dtr-stage-placeholder">
                         <div style="font-size:30px;margin-bottom:8px">🖨️</div>
                         <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Final Artwork</div>
@@ -19377,14 +19463,19 @@
                 ? `<button class="dtr-complete-btn" onclick="dtrCompleteConceptsStage('${stage.id}')">✓ Complete Section</button>`
                 : '';
 
-            return `<div class="dtr-stage-section" id="dtr-stage-2">
+            const activeStatuses = ['in_progress','in_review','revisions_required'];
+            const stageStateClass = isRevisions ? ' stage-active stage-revisions'
+                : activeStatuses.includes(stage.status) ? ' stage-active'
+                : stage.status === 'not_started' ? ' stage-inactive' : '';
+
+            return `<div class="dtr-stage-section${stageStateClass}" id="dtr-stage-2">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
                     <div class="dtr-stage-icon-circle">2</div>
                     <span class="dtr-stage-title">Concepts</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
-                    ${chevronSvg('dtr-stage-chev-2', false)}
+                    ${chevronSvg('dtr-stage-chev-2', stage.status === 'not_started')}
                 </button>
-                <div class="dtr-stage-body" id="dtr-stage-body-2">
+                <div class="dtr-stage-body" id="dtr-stage-body-2"${stage.status === 'not_started' ? ' style="display:none"' : ''}>
                     <div class="dtr-concept-tabs">${tabs}</div>
                     <div id="dtr-concept-tab-content">${tabContent}</div>
                     <div class="dtr-deliver-bar">
@@ -20759,6 +20850,14 @@
 
         let _dtActivityLog = [];
         let _dtActivityInputType = 'comment'; // 'comment' | 'sub_task'
+        let _dtrActivityFilter = 'all'; // 'all' | 'comment' | 'sub_task'
+
+        function filterDTRActivity(btn, filter) {
+            _dtrActivityFilter = filter;
+            document.querySelectorAll('.dtr-act-filter-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderDesignTaskActivity();
+        }
 
         function setDTInputType(type) {
             _dtActivityInputType = type;
@@ -20781,11 +20880,13 @@
         function renderDesignTaskActivity() {
             const list = document.getElementById('dt-act-list');
             if (!list) return;
-            if (!_dtActivityLog.length) {
+            const filtered = _dtrActivityFilter === 'all' ? _dtActivityLog
+                : _dtActivityLog.filter(e => e.activity_type === _dtrActivityFilter);
+            if (!filtered.length) {
                 list.innerHTML = '<p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">No activity yet.</p>';
                 return;
             }
-            list.innerHTML = _dtActivityLog.map(entry => {
+            list.innerHTML = filtered.map(entry => {
                 const initials = (entry.user_name || '?').charAt(0).toUpperCase();
                 const ts = dsRelativeTime(entry.created_at);
                 const isTask = entry.activity_type === 'sub_task';
