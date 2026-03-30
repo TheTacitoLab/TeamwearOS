@@ -17959,7 +17959,7 @@
                 <!-- Full-width interactive activity section -->
                 <div style="padding:16px 24px 20px">
                     <div class="ds-preview-block" style="margin:0">
-                        <!-- Header with filter pills -->
+                        <!-- Header -->
                         <div class="ds-block-header" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px">
                             <span>Activity</span>
                             <div style="display:flex;gap:3px">
@@ -17968,19 +17968,23 @@
                                 <button id="dsp-filter-sub_task" onclick="filterDSPreviewActivity('sub_task')" class="dtr-act-filter-btn" style="padding:2px 8px;font-size:10px">Sub-Tasks</button>
                             </div>
                         </div>
-                        <!-- Composer: type tabs + input -->
-                        <div style="padding:10px 14px;border-bottom:1px solid #f1f5f9">
-                            <div class="dtr-composer-tabs">
-                                <button id="dsp-act-comment-btn" onclick="setDSPreviewInputType('comment')" class="act-tab-btn active">+ Comment</button>
-                                <button id="dsp-act-task-btn" onclick="setDSPreviewInputType('sub_task')" class="act-tab-btn task-tab">+ Sub-Task</button>
+                        <!-- Two-column body: 70% list / 30% composer -->
+                        <div style="display:grid;grid-template-columns:70% 30%;min-height:200px">
+                            <!-- Activity list -->
+                            <div id="dsp-act-list" style="padding:10px 14px;max-height:360px;overflow-y:auto;border-right:1px solid #f1f5f9">
+                                <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
                             </div>
-                            <input type="text" id="dsp-act-input" class="dtr-composer-input" placeholder="Add a comment…"
-                                onkeydown="if(event.key==='Enter')addDSPreviewActivity()">
-                            <button onclick="addDSPreviewActivity()" class="dtr-composer-post-btn">Post</button>
-                        </div>
-                        <!-- Activity list -->
-                        <div id="dsp-act-list" style="padding:10px 14px;max-height:320px;overflow-y:auto">
-                            <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
+                            <!-- Composer: type tabs + input + post -->
+                            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;background:#f8fafc;border-radius:0 0 12px 0">
+                                <div style="display:flex;flex-direction:column;gap:4px">
+                                    <button id="dsp-act-comment-btn" onclick="setDSPreviewInputType('comment')" class="act-tab-btn active" style="width:100%;justify-content:center">+ Comment</button>
+                                    <button id="dsp-act-task-btn" onclick="setDSPreviewInputType('sub_task')" class="act-tab-btn task-tab" style="width:100%;justify-content:center">+ Sub-Task</button>
+                                </div>
+                                <textarea id="dsp-act-input" class="dtr-composer-input" placeholder="Add a comment…" rows="4"
+                                    style="resize:none;flex:1"
+                                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addDSPreviewActivity()}"></textarea>
+                                <button onclick="addDSPreviewActivity()" class="dtr-composer-post-btn" style="margin-top:0">Post</button>
+                            </div>
                         </div>
                     </div>
                 </div>
