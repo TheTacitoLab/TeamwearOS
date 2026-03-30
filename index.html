@@ -609,6 +609,10 @@
         .ds-toolbar-search:focus { border-color:#cbd5e1; background:#fff; }
         .ds-toolbar-filter { padding:5px 10px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; background:#f8fafc; color:#0f172a; cursor:pointer; outline:none; }
         .ds-toolbar-filter:focus { border-color:#cbd5e1; }
+        /* Stage tab pills in DS toolbar */
+        .ds-stage-tab { padding:4px 12px; border-radius:6px; font-size:12px; font-weight:600; color:#64748b; background:transparent; border:none; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+        .ds-stage-tab:hover { color:#0f172a; background:#e2e8f0; }
+        .ds-stage-tab.active { background:#fff; color:#1d4ed8; box-shadow:0 1px 4px rgba(0,0,0,0.12); }
 
         /* 3-view tabs: Pending / Delivered / Completed */
         .ds-view-tabs { display:flex; gap:0; border-top:1px solid #e2e8f0; }
@@ -2173,22 +2177,21 @@
                     <input id="ds-search" class="ds-toolbar-search" placeholder="Search tasks or clubs…" oninput="renderDSDashboard()">
                 </div>
 
-                <!-- Filters -->
-                <select id="ds-filter-group" class="ds-toolbar-filter" onchange="renderDSDashboard()">
-                    <option value="">All Groups</option>
-                    <option value="new">New</option>
-                    <option value="active">In Progress</option>
-                    <option value="review">In Review</option>
-                </select>
-                <select id="ds-filter-stage" class="ds-toolbar-filter" onchange="renderDSDashboard()">
-                    <option value="">All Stages</option>
-                    <option value="concepts">Concepts</option>
-                    <option value="full range">Full Range</option>
-                    <option value="final artwork">Final Artwork</option>
-                </select>
+                <!-- Stage tabs -->
+                <div style="display:flex;gap:2px;background:#f1f5f9;border-radius:8px;padding:3px;flex-shrink:0">
+                    <button class="ds-stage-tab active" id="dstab-all" onclick="switchDSStageTab('all')">All</button>
+                    <button class="ds-stage-tab" id="dstab-presentation" onclick="switchDSStageTab('presentation')">Presentation</button>
+                    <button class="ds-stage-tab" id="dstab-range" onclick="switchDSStageTab('range')">Range</button>
+                    <button class="ds-stage-tab" id="dstab-finalise" onclick="switchDSStageTab('finalise')">Finalise</button>
+                </div>
+
+                <!-- Status filter -->
                 <select id="ds-filter-label" class="ds-toolbar-filter" onchange="renderDSDashboard()">
-                    <option value="">All Labels</option>
-                    <option value="revisions">Revisions Required</option>
+                    <option value="">All Status</option>
+                    <option value="new">Not Started</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="in_review">In Review</option>
+                    <option value="revisions">Revisions</option>
                 </select>
 
                 <!-- Right actions -->
@@ -2215,13 +2218,28 @@
                     <div class="ds-group-empty" style="padding:20px 16px;color:#94a3b8">Loading tasks…</div>
                 </div>
 
-                <!-- RIGHT: selected task preview -->
-                <div class="ds-preview-panel" id="ds-preview-panel">
-                    <div class="ds-preview-empty">
-                        <svg width="40" height="40" fill="none" stroke="#e2e8f0" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h6M9 12h6M9 15h4"/></svg>
-                        <p style="font-size:13px;font-weight:600;color:#94a3b8">Select a task to preview</p>
-                        <p style="font-size:11px;color:#b0b8c4">Click any task in the list to see its details</p>
+                <!-- RIGHT: embedded DTR panel -->
+                <div class="ds-preview-panel" id="ds-preview-panel" style="display:flex;flex-direction:column;overflow:hidden">
+                    <!-- Compact DTR header (shown when a task is loaded) -->
+                    <div id="dsp-dtr-header" class="hide" style="display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid #e8ecf0;background:#fff;height:48px;flex-shrink:0">
+                        <span id="dsp-task-name" style="font-size:14px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px"></span>
+                        <span id="dsp-ref" style="font-family:monospace;font-size:11px;color:#94a3b8;flex-shrink:0"></span>
+                        <span id="dsp-status-badge" class="badge design-status-new text-xs" style="flex-shrink:0"></span>
+                        <span style="color:#e2e8f0;flex-shrink:0">|</span>
+                        <span id="dsp-club" style="font-size:12px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1"></span>
+                        <div style="margin-left:auto;display:flex;gap:6px;flex-shrink:0">
+                            <button id="dsp-edit-btn" class="dt-edit-btn" onclick="toggleDTREditMode()" style="font-size:11px;padding:4px 10px">Edit</button>
+                            <button onclick="showDesignTask(currentDesignTaskRecord?.id)" style="font-size:11px;padding:4px 10px;border-radius:6px;font-weight:600;border:1.5px solid #e2e8f0;color:#475569;background:#f8fafc;cursor:pointer">Open Full ↗</button>
+                        </div>
                     </div>
+                    <!-- Empty state -->
+                    <div id="dsp-empty" class="ds-preview-empty">
+                        <svg width="40" height="40" fill="none" stroke="#e2e8f0" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h6M9 12h6M9 15h4"/></svg>
+                        <p style="font-size:13px;font-weight:600;color:#94a3b8">Select a task to open it</p>
+                        <p style="font-size:11px;color:#b0b8c4">Click any task in the list to work on it here</p>
+                    </div>
+                    <!-- DTR render target -->
+                    <div id="dsp-stage-panel" class="hide" style="flex:1;min-height:0;overflow-y:auto;overflow-x:hidden"></div>
                 </div>
             </div>
 
@@ -17725,6 +17743,8 @@
         // ── Design Studio Split Dashboard ─────────────────────────────────────
 
         let _dsSelectedTaskId = null;
+        let _dsActiveStageTab = 'all';
+        let _dtrPanelEl = null;
 
         function getDSTaskGroup(task) {
             if (task.status === 'new') return 'new';
@@ -17762,10 +17782,8 @@
             const tabBadge = document.getElementById('ds-completed-tab-count');
             if (tabBadge) { tabBadge.textContent = completedTasks.length; tabBadge.classList.toggle('hide', completedTasks.length === 0); }
 
-            const query    = (document.getElementById('ds-search')?.value || '').toLowerCase();
-            const fGroup   = document.getElementById('ds-filter-group')?.value || '';
-            const fStage   = document.getElementById('ds-filter-stage')?.value || '';
-            const fLabel   = document.getElementById('ds-filter-label')?.value || '';
+            const query  = (document.getElementById('ds-search')?.value || '').toLowerCase();
+            const fLabel = document.getElementById('ds-filter-label')?.value || '';
 
             let filtered = allTasks.filter(t => {
                 if (query) {
@@ -17774,71 +17792,54 @@
                     const ref  = (t.task_ref  || '').toLowerCase();
                     if (!name.includes(query) && !club.includes(query) && !ref.includes(query)) return false;
                 }
-                if (fGroup && getDSTaskGroup(t) !== fGroup) return false;
-                if (fStage) {
-                    const activeStage = (t._stages||[]).find(s => ['in_progress','in_review','revisions_required'].includes(s.status));
-                    if (!activeStage || !(activeStage.stage_name||'').toLowerCase().includes(fStage.toLowerCase())) return false;
+                if (_dsActiveStageTab !== 'all' && getDSTaskStageGroup(t) !== _dsActiveStageTab) return false;
+                if (fLabel) {
+                    const statusLabel = getDSTaskStatusLabel(t);
+                    if (fLabel === 'revisions' && statusLabel !== 'revisions') return false;
+                    else if (fLabel !== 'revisions' && statusLabel !== fLabel) return false;
                 }
-                if (fLabel === 'revisions' && !(t._stages||[]).some(s => s.status === 'revisions_required')) return false;
                 return true;
             });
-
-            const groups = {
-                new:    { label: 'New',         color: '#6366f1', tasks: [] },
-                active: { label: 'In Progress', color: '#2563eb', tasks: [] },
-                review: { label: 'In Review',   color: '#b45309', tasks: [] },
-            };
-            const groupOrder = ['new', 'active', 'review'];
-            filtered.forEach(t => { const g = getDSTaskGroup(t); if (groups[g]) groups[g].tasks.push(t); });
 
             const unreadByTask = {};
             (_feedAllItems || []).filter(f => !f.is_read && f.task_id).forEach(f => {
                 unreadByTask[f.task_id] = (unreadByTask[f.task_id] || 0) + 1;
             });
 
-            const emptyMsgs = {
-                new: 'No new tasks', active: 'No tasks in progress', review: 'Nothing in review',
-            };
+            // Stage tab group labels
+            const stageTabLabels = { all: 'Tasks', presentation: 'Presentation Tasks', range: 'Range Tasks', finalise: 'Finalise Tasks' };
+            const groupLabel = stageTabLabels[_dsActiveStageTab] || 'Tasks';
+            const groupColor = { all: '#64748b', presentation: '#6366f1', range: '#2563eb', finalise: '#0891b2' }[_dsActiveStageTab] || '#64748b';
 
             const panel = document.getElementById('ds-task-list-panel');
             if (panel) {
                 if (filtered.length === 0) {
                     panel.innerHTML = `<div class="ds-preview-empty" style="padding:40px 20px;text-align:center"><p style="font-size:13px;font-weight:600;color:#94a3b8">No tasks match your filters</p><p style="font-size:11px;color:#b0b8c4;margin-top:4px">Try clearing the search or filters</p></div>`;
                 } else {
-                    panel.innerHTML = groupOrder.map(key => {
-                        const { label, color, tasks } = groups[key];
-                        return `<div class="ds-group">
-                            <div class="ds-group-header">
-                                <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
-                                <span class="ds-group-label" style="color:${color}">${label}</span>
-                                <span class="ds-group-count">${tasks.length}</span>
-                            </div>
-                            ${tasks.length === 0
-                                ? `<div class="ds-group-empty">${emptyMsgs[key]}</div>`
-                                : tasks.map(t => _renderDSTaskRow(t, unreadByTask[t.id] || 0, key)).join('')}
-                        </div>`;
-                    }).join('');
+                    panel.innerHTML = `<div class="ds-group">
+                        <div class="ds-group-header">
+                            <span style="width:7px;height:7px;border-radius:50%;background:${groupColor};flex-shrink:0;display:inline-block"></span>
+                            <span class="ds-group-label" style="color:${groupColor}">${groupLabel}</span>
+                            <span class="ds-group-count">${filtered.length}</span>
+                        </div>
+                        ${filtered.map(t => _renderDSTaskRow(t, unreadByTask[t.id] || 0, getDSTaskStatusLabel(t))).join('')}
+                    </div>`;
                 }
             }
 
             // Auto-select first task
-            if (!_dsSelectedTaskId) {
-                for (const key of groupOrder) {
-                    if (groups[key].tasks.length > 0) { selectDSTask(groups[key].tasks[0].id, false); break; }
-                }
+            if (!_dsSelectedTaskId && filtered.length > 0) {
+                selectDSTask(filtered[0].id, false);
             }
             if (_dsSelectedTaskId) {
                 document.querySelector(`.ds-task-row[data-task-id="${_dsSelectedTaskId}"]`)?.classList.add('ds-selected');
-                renderDSPreviewPanel(_dsSelectedTaskId);
-            } else {
-                renderDSPreviewPanel(null);
             }
 
             // Keep legacy kanban board data in sync
             renderDSKanbanBoard();
         }
 
-        function _renderDSTaskRow(task, unreadCount, groupKey) {
+        function _renderDSTaskRow(task, unreadCount, statusLabel) {
             const stages = task._stages || [];
             const activeStage = stages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status))
                              || stages.find(s => s.status === 'not_started');
@@ -17849,16 +17850,15 @@
             const dueInfo = due ? getDueInfo(due) : null;
             const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : null;
             const dueCls = dueInfo ? (dueInfo.urgency === 'overdue' ? 'overdue' : dueInfo.urgency === 'soon' ? 'soon' : 'ok') : 'ok';
-            const urgMap = { new:'urgency-new', active:'urgency-active', review:'urgency-review' };
-            const urg = urgMap[groupKey] || 'urgency-active';
+            const urgMap = { new:'urgency-new', in_progress:'urgency-active', in_review:'urgency-review', revisions:'urgency-active' };
+            const urg = urgMap[statusLabel] || 'urgency-active';
             const isSelected = task.id === _dsSelectedTaskId;
-            const hasRevisions = (task._stages||[]).some(s => s.status === 'revisions_required');
 
-            // Badge logic — only show one, priority order
+            // Badge logic — reflect per-task status
             let badgeHtml = '';
-            if (hasRevisions)               badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
-            else if (groupKey === 'review') badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
-            else if (groupKey === 'new')    badgeHtml = `<span class="ds-row-badge new">New</span>`;
+            if (statusLabel === 'revisions')  badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
+            else if (statusLabel === 'in_review') badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
+            else if (statusLabel === 'new')    badgeHtml = `<span class="ds-row-badge new">Not Started</span>`;
 
             const dName = task.designers?.full_name || task._designerName || '';
             const initials = dName ? dName.split(' ').map(w => w[0]||'').join('').substring(0,2).toUpperCase() : '';
@@ -17903,7 +17903,89 @@
             const row = document.querySelector(`.ds-task-row[data-task-id="${taskId}"]`);
             if (row) row.classList.add('ds-selected');
             _dsSelectedTaskId = taskId;
-            if (render) renderDSPreviewPanel(taskId);
+            if (render) loadTaskInPreview(taskId);
+        }
+
+        function getDSTaskStageGroup(task) {
+            if (task.status === 'new') return 'presentation';
+            const stages = task._stages || [];
+            const activeStage = stages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status));
+            if (!activeStage) return 'presentation';
+            if (activeStage.stage_number === 2) return 'presentation';
+            if (activeStage.stage_number === 3) return 'range';
+            if (activeStage.stage_number === 4) return 'finalise';
+            return 'presentation';
+        }
+
+        function getDSTaskStatusLabel(task) {
+            if (task.status === 'new') return 'new';
+            const stages = task._stages || [];
+            if (stages.some(s => s.status === 'revisions_required')) return 'revisions';
+            const activeStage = stages.find(s => ['in_progress','in_review'].includes(s.status));
+            if (!activeStage) return 'in_progress';
+            return activeStage.status;
+        }
+
+        function switchDSStageTab(tab) {
+            _dsActiveStageTab = tab;
+            ['all','presentation','range','finalise'].forEach(t => {
+                document.getElementById(`dstab-${t}`)?.classList.toggle('active', t === tab);
+            });
+            renderDSDashboard();
+        }
+
+        async function loadTaskInPreview(taskId) {
+            const panel = document.getElementById('dsp-stage-panel');
+            const header = document.getElementById('dsp-dtr-header');
+            const empty = document.getElementById('dsp-empty');
+            if (!panel) { renderDSPreviewPanel(taskId); return; }
+
+            if (!taskId) {
+                panel.classList.add('hide');
+                if (header) header.classList.add('hide');
+                if (empty) empty.classList.remove('hide');
+                return;
+            }
+
+            // Show loading
+            if (empty) empty.classList.add('hide');
+            panel.classList.remove('hide');
+            panel.style.display = '';
+            if (header) { header.classList.remove('hide'); header.style.display = 'flex'; }
+            panel.innerHTML = '<div style="padding:48px;text-align:center"><div class="spinner"></div></div>';
+
+            const { data: task } = await supabase.from('design_tasks')
+                .select('*, clubs(id,name,brand_id), designers:assigned_designer(id,full_name)')
+                .eq('id', taskId).single();
+            if (!task) return;
+
+            currentDesignTaskRecord = task;
+            currentDesignTask = task;
+            currentJobId = task.job_id;
+            _masterProdsLoaded = false;
+            _masterProdsData = [];
+
+            // Update compact header
+            const nameEl = document.getElementById('dsp-task-name');
+            const refEl  = document.getElementById('dsp-ref');
+            const badge  = document.getElementById('dsp-status-badge');
+            const clubEl = document.getElementById('dsp-club');
+            if (nameEl) nameEl.textContent = task.task_name || 'Untitled Task';
+            if (refEl)  refEl.textContent  = task.task_ref  || '';
+            if (badge)  { badge.textContent = (DS_STATUS_LABELS||{})[task.status] || task.status; badge.className = `badge design-status-${task.status} text-xs`; }
+            if (clubEl) clubEl.textContent  = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
+
+            // Load stages
+            const { data: stages } = await supabase.from('design_stages')
+                .select('*').eq('task_id', taskId).order('stage_number');
+            currentStages = stages || [];
+
+            // Render DTR into preview panel
+            _dtrPanelEl = panel;
+            await renderNewDTRLayout();
+
+            // Load preview activity
+            loadDSPreviewActivity(taskId);
         }
 
         function renderDSPreviewPanel(taskId) {
@@ -19322,7 +19404,8 @@
         let _dtrCachedJobProds = [];
 
         async function renderNewDTRLayout() {
-            const panel = document.getElementById('dt-stage-panel');
+            const panel = _dtrPanelEl || document.getElementById('dt-stage-panel');
+            _dtrPanelEl = null;
             if (!panel) return;
             const task = currentDesignTaskRecord;
             if (!task) return;
