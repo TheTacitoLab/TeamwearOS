@@ -348,7 +348,7 @@
         .home-feed-panel {
             background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px;
             display: flex; flex-direction: column; overflow: hidden;
-            max-height: calc(100vh - 160px); min-height: 420px;
+            max-height: calc(100vh - 160px); min-height: 420px; align-self: stretch;
         }
         .home-feed-header { padding: 16px 20px 12px; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
         .home-feed-body { flex: 1; overflow-y: auto; padding: 10px 12px; }
@@ -372,7 +372,7 @@
             display: grid;
             grid-template-columns: 1fr 360px;
             gap: 20px;
-            align-items: start;
+            align-items: stretch;
         }
         @media (max-width: 1280px) { .launchpad-main-grid { grid-template-columns: 1fr 300px; } }
         @media (max-width: 960px) { .launchpad-main-grid { grid-template-columns: 1fr; } .home-feed-panel { max-height: 400px; } }
@@ -1564,7 +1564,7 @@
             <div>
 
             <!-- Main Feature Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3" id="feature-grid">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3" id="feature-grid">
 
                 <!-- Sales (unified — includes Leads + Jobs pipeline) -->
                 <div id="fc-sales" onclick="showTool('sales')" class="feature-card accent-purple">
@@ -3227,6 +3227,39 @@
              ============================================================ -->
         <div id="tool-sales" class="hide w-full p-6 md:p-8 lg:px-12">
 
+            <!-- CONTEXT-SENSITIVE ACTION BAR (above stage tabs) -->
+            <div id="sales-action-bar-leads" class="flex items-center justify-between flex-wrap gap-3 mb-4">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <input type="text" id="leads-search" placeholder="Search name or club…"
+                        oninput="renderKanban()"
+                        class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800" style="min-width:180px">
+                    <select id="leads-sport-filter" onchange="renderKanban()"
+                        class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800">
+                        <option value="">All Sports</option>
+                    </select>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Lead
+                    </button>
+                    <button onclick="openStageConfig()" class="btn-secondary text-sm">Stages</button>
+                    <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
+                    <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
+                </div>
+            </div>
+            <div id="sales-action-bar-jobs" class="hide flex items-center justify-between mb-4">
+                <p id="jobs-kanban-filter-label" class="text-sm text-gray-500">All active jobs</p>
+                <button onclick="openNewJobModal()" class="btn-primary text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    New Job
+                </button>
+            </div>
+            <div id="sales-action-bar-production" class="hide"></div>
+            <div id="sales-action-bar-completed" class="hide flex items-center mb-4">
+                <h3 class="text-lg font-bold">Completed Jobs</h3>
+            </div>
+
             <!-- 4-STAGE TAB NAVIGATION -->
             <div class="sales-stage-tabs" id="sales-stage-tabs">
                 <button id="stab-leads" onclick="showSalesTab('leads')" class="sales-stage-tab active">
@@ -3248,44 +3281,11 @@
 
             <!-- ── TAB: LEADS ── -->
             <div id="sales-tab-leads">
-                <!-- Action bar -->
-                <div class="flex items-center justify-between flex-wrap gap-3 mb-5">
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <!-- Filter: search -->
-                        <input type="text" id="leads-search" placeholder="Search name or club…"
-                            oninput="renderKanban()"
-                            class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800" style="min-width:180px">
-                        <!-- Filter: sport -->
-                        <select id="leads-sport-filter" onchange="renderKanban()"
-                            class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800">
-                            <option value="">All Sports</option>
-                        </select>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Add Lead
-                        </button>
-                        <button onclick="openStageConfig()" class="btn-secondary text-sm">Stages</button>
-                        <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
-                        <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
-                    </div>
-                </div>
-                <!-- Lead Kanban board -->
                 <div class="kanban-board" id="kanban-board"></div>
             </div>
 
             <!-- ── TAB: JOBS ── -->
             <div id="sales-tab-jobs" class="hide">
-                <!-- Action bar -->
-                <div class="flex items-center justify-between mb-5">
-                    <p id="jobs-kanban-filter-label" class="text-sm text-gray-500">All active jobs</p>
-                    <button onclick="openNewJobModal()" class="btn-primary text-sm flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        New Job
-                    </button>
-                </div>
-                <!-- Jobs Kanban board -->
                 <div class="kanban-board" id="jobs-kanban-board"></div>
             </div>
 
@@ -3302,9 +3302,6 @@
 
             <!-- ── TAB: COMPLETED ── -->
             <div id="sales-tab-completed" class="hide">
-                <div class="flex items-center justify-between mb-5">
-                    <h3 class="text-lg font-bold">Completed Jobs</h3>
-                </div>
                 <div id="completed-jobs-list" class="space-y-3"></div>
             </div>
         </div>
@@ -3728,16 +3725,10 @@
              TOOL: CLUBS (Enhanced)
              ============================================================ -->
         <div id="tool-clubs" class="hide w-full p-6 md:p-8 lg:px-12">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-                <button onclick="showCreateClubModal()" class="btn-primary text-xs px-4 py-2" style="display:flex;align-items:center;gap:6px">
-                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                    New Club
-                </button>
-            </div>
 
             <!-- Club search area (always visible) -->
             <div id="club-search-area">
-                <div class="glass rounded-xl p-4 mb-5 flex flex-wrap gap-4">
+                <div class="glass rounded-xl p-4 mb-5 flex flex-wrap items-center gap-3">
                     <input type="text" id="clubs-search" placeholder="Search clubs by name..." class="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm" oninput="renderClubsEnhanced()">
                     <select id="clubs-filter-sport" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
                         <option value="">All Sports</option>
@@ -3752,6 +3743,10 @@
                         <option value="partner">Partner</option>
                         <option value="partner_plus">Partner+</option>
                     </select>
+                    <button onclick="showCreateClubModal()" class="btn-primary text-xs px-4 py-2" style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                        New Club
+                    </button>
                 </div>
                 <div id="clubs-enhanced-list" class="space-y-3"></div>
                 <div id="clubs-enhanced-empty" class="hide text-center py-16">
@@ -12705,13 +12700,17 @@
             ['leads','jobs','production','completed'].forEach(t => {
                 const panel = document.getElementById(`sales-tab-${t}`);
                 const btn   = document.getElementById(`stab-${t}`);
+                const bar   = document.getElementById(`sales-action-bar-${t}`);
                 if (panel) panel.classList.add('hide');
                 if (btn)   btn.classList.remove('active');
+                if (bar)   bar.classList.add('hide');
             });
             const activePanel = document.getElementById(`sales-tab-${tab}`);
             const activeBtn   = document.getElementById(`stab-${tab}`);
+            const activeBar   = document.getElementById(`sales-action-bar-${tab}`);
             if (activePanel) activePanel.classList.remove('hide');
             if (activeBtn)   activeBtn.classList.add('active');
+            if (activeBar)   activeBar.classList.remove('hide');
 
             if (tab === 'leads')     renderKanban();
             if (tab === 'jobs')      renderJobsKanban();
