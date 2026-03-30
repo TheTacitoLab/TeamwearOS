@@ -1009,15 +1009,15 @@
         /* Full-screen preview modal */
         #ds-preview-modal { position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,0.92); display:flex; align-items:stretch; }
         #ds-preview-modal.hide { display:none; }
-        #ds-preview-main { flex:1; overflow-y:auto; overflow-x:hidden; display:flex; align-items:flex-start; justify-content:center; padding:24px; position:relative; }
+        #ds-preview-main { flex:1; overflow-y:auto; overflow-x:hidden; display:flex; align-items:center; justify-content:center; padding:24px; position:relative; }
         #ds-preview-sidebar { width:300px; background:#1a1a1a; border-left:1px solid #333; display:flex; flex-direction:column; overflow:hidden; }
         @media(max-width:768px) { #ds-preview-sidebar { display:none; } }
         #ds-preview-close { position:fixed; top:16px; right:316px; z-index:10000; width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.15s; }
         #ds-preview-close:hover { background:rgba(255,255,255,0.22); }
         /* img-wrap is the pin canvas — sized to content so pins scroll with it */
         #ds-preview-img-wrap { position:relative; display:inline-block; }
-        #ds-preview-img { max-width:calc(100vw - 380px); display:block; border-radius:8px; }
-        @media(max-width:768px) { #ds-preview-img { max-width:95vw; } }
+        #ds-preview-img { max-width:min(calc(100vw - 380px), 860px); max-height:82vh; object-fit:contain; display:block; border-radius:8px; }
+        @media(max-width:768px) { #ds-preview-img { max-width:95vw; max-height:70vh; } }
         #ds-preview-iframe { width:calc(100vw - 380px); height:85vh; border:none; border-radius:8px; background:#fff; display:block; }
         @media(max-width:768px) { #ds-preview-iframe { width:95vw; } }
         #ann-overlay-v2 { position:absolute; inset:0; cursor:crosshair; border-radius:8px; }
@@ -17659,6 +17659,8 @@
         let pendingAnnPin = null;
         let currentPreviewUploadId = null;
         let currentAnnUploadId = null;
+        let currentPreviewUploadNum = null; // position number (1,2,3…) of open upload
+        let _taskAnnCounter = 0; // global pin counter for current design task (never resets within a task)
 
         // ── Helpers ────────────────────────────────────────────────────────────
         function dsRelativeTime(ts) {
@@ -18447,6 +18449,24 @@
             _dsSelectedTaskId = taskId;
             renderDSDashboard();
             loadTaskInPreview(taskId);
+        }
+
+        async function completeDesignTask() {
+            if (!currentDesignTaskRecord?.id) return;
+            if (!confirm('Mark this design task as complete? It will be moved to the Completed list.')) return;
+            const { error } = await supabase.from('design_tasks').update({ status: 'completed' }).eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error completing task: ' + error.message, 'error'); return; }
+            currentDesignTaskRecord.status = 'completed';
+            const task = (allDesignTasks || []).find(t => t.id === currentDesignTaskRecord.id);
+            if (task) task.status = 'completed';
+            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, null, 'task_completed', {});
+            showToast('Task completed! ✓');
+            _dsSelectedTaskId = null;
+            renderDSDashboard();
+            const panel = document.getElementById('dsp-stage-panel');
+            const empty = document.getElementById('dsp-empty');
+            if (panel) { panel.innerHTML = ''; panel.classList.add('hide'); }
+            if (empty) empty.classList.remove('hide');
         }
 
         async function deleteDesignTask(taskId) {
@@ -19508,6 +19528,15 @@
             _dtrEditMode = false;
             _dtrCurrentLeftTab = 'brief';
 
+            // Initialize global annotation counter from all task uploads
+            const _allUploadIds = [...conceptUploads, ...rangeUploads, ...finaliseUploads].map(u => u.id);
+            _taskAnnCounter = 0;
+            if (_allUploadIds.length > 0) {
+                const { data: _annData } = await supabase.from('upload_annotations')
+                    .select('pin_number').in('upload_id', _allUploadIds);
+                if (_annData?.length > 0) _taskAnnCounter = Math.max(..._annData.map(a => a.pin_number || 0));
+            }
+
             // In embedded mode always start brief open so two collapsed strips never sit side-by-side
             const leftOpen = isEmbedded ? true : localStorage.getItem('dtr_left_open') !== '0';
 
@@ -20048,10 +20077,18 @@
 
         // ── Stages column ──────────────────────────────────────────────────────
         function buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads, rangeUploads, finaliseUploads) {
+            const allApproved = stage2?.status === 'approved' && stage3?.status === 'approved' && stage4?.status === 'approved';
+            const taskAlreadyDone = currentDesignTaskRecord?.status === 'completed';
+            const completeTaskBtn = (allApproved && !taskAlreadyDone) ? `
+                <div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:14px;text-align:center">
+                    <div style="font-size:12px;font-weight:700;color:#15803d;margin-bottom:10px">🎉 All stages complete!</div>
+                    <button onclick="completeDesignTask()" style="width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:700;border:none;background:#16a34a;color:#fff;cursor:pointer;transition:opacity 0.15s" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Complete Task</button>
+                </div>` : (taskAlreadyDone ? `<div style="margin-top:16px;padding:12px 16px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;text-align:center;font-size:12px;font-weight:700;color:#16a34a">✓ Task Completed</div>` : '');
             return [
                 stage2 ? buildDTRConceptsStage(stage2, conceptUploads) : '',
                 stage3 ? buildDTRFullRangeStage(stage3, rangeUploads || []) : '',
                 stage4 ? buildDTRFinalArtworkStage(stage4, finaliseUploads || []) : '',
+                completeTaskBtn,
             ].join('');
         }
 
@@ -20066,13 +20103,14 @@
 
             // Image grid
             const imagesHtml = uploads.length ? `<div class="dtr-concept-images" id="dtr-${sectionLabel}-images">
-                ${uploads.map(u => {
+                ${uploads.map((u, idx) => {
                     const isImg = (u.file_type || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url || '');
                     const thumb = isImg
-                        ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()" />`
-                        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()">📄</div>`;
+                        ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()" />`
+                        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">📄</div>`;
                     const fname = (u.file_url || '').split('/').pop().split('?')[0];
-                    return `<div class="dtr-cimg-card">
+                    return `<div class="dtr-cimg-card" id="dtr-cimg-${u.id}" style="position:relative">
+                        <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
                         <div class="dtr-cimg-thumb">${thumb}</div>
                         <div class="dtr-cimg-actions">
                             <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:13px">⬇</button>
@@ -20116,6 +20154,77 @@
             return `${imagesHtml}${uploadZone}${deliverBar}`;
         }
 
+        // ── STAGE 4 body: 3 sub-sections ──────────────────────────────────────
+        function _buildFinaliseStageBody(stage, allUploads) {
+            const stageId   = stage.id;
+            const isApproved  = stage.status === 'approved';
+            const isInReview  = stage.status === 'in_review';
+            const isRevisions = stage.status === 'revisions_required';
+            const subSections = [
+                { key: 'finalise_web',  label: 'Web Images (PNG)', accept: 'image/*,.png,.jpg,.webp' },
+                { key: 'finalise_tech', label: 'Tech Packs',       accept: 'image/*,.pdf,.ai,.eps,.svg' },
+                { key: 'finalise_art',  label: 'Artwork',          accept: 'image/*,.pdf,.ai,.eps,.svg,.psd' },
+            ];
+
+            const sectionsHtml = subSections.map(sec => {
+                // Support legacy uploads that have section_label='finalise' — show in Artwork
+                const uploads = allUploads.filter(u =>
+                    u.section_label === sec.key ||
+                    (sec.key === 'finalise_art' && (u.section_label === 'finalise' || !u.section_label || !u.section_label.startsWith('finalise_')))
+                );
+
+                const imagesHtml = uploads.length ? `<div class="dtr-concept-images" style="margin-bottom:6px">
+                    ${uploads.map((u, idx) => {
+                        const isImg = (u.file_type || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url || '');
+                        const fname = (u.file_url || '').split('/').pop().split('?')[0];
+                        return `<div class="dtr-cimg-card" id="dtr-cimg-${u.id}" style="position:relative">
+                            <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
+                            ${isImg
+                                ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()" />`
+                                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">📄</div>`}
+                            <div class="dtr-cimg-actions">
+                                <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:13px">⬇</button>
+                                ${isApproved ? '' : `<button class="dtr-archive-btn" onclick="dtrArchiveStageImg('${u.id}','${stageId}',4)" title="Remove">⊘</button>`}
+                            </div>
+                            <div style="padding:3px 6px 5px;font-size:9px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(fname)}">${escHtml(fname)}</div>
+                        </div>`;
+                    }).join('')}
+                </div>` : '';
+
+                const uploadZone = isApproved ? '' : `<div class="dtr-concept-upload" style="cursor:pointer;margin-bottom:10px"
+                    onclick="document.getElementById('dtr-${sec.key}-input').click()"
+                    ondragover="event.preventDefault();this.classList.add('drag-over')"
+                    ondragleave="this.classList.remove('drag-over')"
+                    ondrop="this.classList.remove('drag-over');dtrStageImgDrop(event,'${stageId}',4,'${sec.key}')">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#94a3b8;flex-shrink:0;pointer-events:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <span style="font-size:11px;color:#94a3b8;pointer-events:none">Drop or <span style="color:#2563eb;font-weight:600">browse</span></span>
+                    <input id="dtr-${sec.key}-input" type="file" multiple accept="${sec.accept}" style="display:none" onchange="dtrStageImgSelect(event,'${stageId}',4,'${sec.key}')">
+                </div>`;
+
+                return `<div style="margin-bottom:14px">
+                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">${sec.label}</div>
+                    ${imagesHtml}${uploadZone}
+                </div>`;
+            }).join('');
+
+            const hasAnyUpload = allUploads.length > 0;
+            const deliverBtn = isInReview
+                ? `<button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered for Review</button>`
+                : `<button onclick="dtrDeliverStage('${stageId}',4,'Deliver Final Design')" ${!hasAnyUpload?'disabled':''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasAnyUpload?'#eff6ff':'#f8fafc'};color:${hasAnyUpload?'#1d4ed8':'#b0bec5'};cursor:${hasAnyUpload?'pointer':'not-allowed'}">Deliver Final Design</button>`;
+            const revisionsBtn = isInReview
+                ? `<button onclick="dtrStageRevisions('${stageId}',4)" style="padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
+                : (isRevisions ? `<span style="padding:4px 10px;border-radius:8px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
+            const completeBtn = isInReview
+                ? `<button onclick="dtrCompleteStage('${stageId}',4,'Approve Final Design')" style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer;margin-left:auto">✓ Approve Final Design</button>`
+                : '';
+
+            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:12px;border-top:1px solid #f1f5f9">
+                ${deliverBtn}${revisionsBtn}${completeBtn}
+            </div>`;
+
+            return sectionsHtml + deliverBar;
+        }
+
         // ── STAGE 3: FULL RANGE ───────────────────────────────────────────────
         function buildDTRFullRangeStage(stage, uploads) {
             const isApproved = stage.status === 'approved';
@@ -20144,7 +20253,7 @@
             </div>`;
         }
 
-        // ── STAGE 4: FINAL ARTWORK ────────────────────────────────────────────
+        // ── STAGE 4: FINALISE (3 sub-sections) ────────────────────────────────
         function buildDTRFinalArtworkStage(stage, uploads) {
             const isApproved = stage.status === 'approved';
             const statusLabel = dsStageStatusLabel(stage.status);
@@ -20167,7 +20276,7 @@
                     <svg class="dtr-stage-chevron${isOpen4 ? '' : ' closed'}" id="dtr-stage-chev-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-4"${isOpen4 ? '' : ' style="display:none"'}>
-                    ${_buildUploadStageBody(stage, uploads, 4, 'finalise', 'Deliver Final Artwork', 'Complete Finalise')}
+                    ${_buildFinaliseStageBody(stage, uploads)}
                 </div>
             </div>`;
         }
@@ -20291,14 +20400,15 @@
 
             // Image grid
             const imagesHtml = uploads.length
-                ? `<div class="dtr-concept-images">${uploads.map(u => {
+                ? `<div class="dtr-concept-images">${uploads.map((u, idx) => {
                     const isImg = u.file_type?.startsWith('image/');
                     const isPdf = u.file_type === 'application/pdf' || u.file_name?.toLowerCase().endsWith('.pdf');
                     const cls   = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : '';
-                    return `<div class="dtr-cimg-card${cls}" id="dtr-cimg-${u.id}">
+                    return `<div class="dtr-cimg-card${cls}" id="dtr-cimg-${u.id}" style="position:relative">
+                        <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
                         ${isImg
-                            ? `<img class="dtr-cimg-thumb" src="${escHtml(u.file_url)}" alt="" loading="lazy" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()">`
-                            : `<div class="dtr-cimg-nothumb" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()">${isPdf ? '📄' : '📁'}</div>`}
+                            ? `<img class="dtr-cimg-thumb" src="${escHtml(u.file_url)}" alt="" loading="lazy" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">`
+                            : `<div class="dtr-cimg-nothumb" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">${isPdf ? '📄' : '📁'}</div>`}
                         <div class="dtr-cimg-actions">
                             <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(u.file_name||'download')}')" title="Download" style="font-size:13px">⬇</button>
                             <button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickConceptImg('${u.id}','${stageId}',${conceptNum})" title="Approve">✓</button>
@@ -22108,9 +22218,10 @@
 
         // ── Preview Modal ───────────────────────────────────────────────────────
 
-        async function openPreviewModal(uploadId, fileUrl, fileType, startAnnotating = false) {
+        async function openPreviewModal(uploadId, fileUrl, fileType, startAnnotating = false, uploadNum = null) {
             currentPreviewUploadId = uploadId;
             currentAnnUploadId = uploadId;
+            currentPreviewUploadNum = uploadNum;
             annMode = false;
             pendingAnnPin = null;
 
@@ -22223,10 +22334,21 @@
             const y = ((event.clientY - rect.top) / rect.height) * 100;
             pendingAnnPin = { x, y };
 
+            // Show ghost pin at click position immediately
+            const existing = document.getElementById('ann-ghost-pin');
+            if (existing) existing.remove();
+            const nextNum = _taskAnnCounter + 1;
+            const nextLabel = String.fromCharCode(64 + ((nextNum - 1) % 26 + 1));
+            const pinColor = ANN_COLOURS[(nextNum - 1) % ANN_COLOURS.length];
+            const ghost = document.createElement('div');
+            ghost.id = 'ann-ghost-pin';
+            ghost.className = 'ann-pin';
+            ghost.style.cssText = `left:${x}%;top:${y}%;background:${pinColor};color:#fff;border:2px dashed rgba(255,255,255,0.8);opacity:0.8;pointer-events:none`;
+            ghost.textContent = nextLabel;
+            wrap.appendChild(ghost);
+
             // Show form
             const form = document.getElementById('ds-ann-new-form');
-            const posLabel = document.getElementById('ds-ann-pos-label');
-            if (posLabel) posLabel.textContent = `${Math.round(x)}%, ${Math.round(y)}%`;
             if (form) form.classList.remove('hide');
 
             const textarea = document.getElementById('ds-ann-comment');
@@ -22235,6 +22357,8 @@
 
         function cancelAnnotation() {
             pendingAnnPin = null;
+            const ghost = document.getElementById('ann-ghost-pin');
+            if (ghost) ghost.remove();
             const form = document.getElementById('ds-ann-new-form');
             if (form) form.classList.add('hide');
         }
@@ -22247,8 +22371,10 @@
             const actorId = actor?.data?.user?.id || null;
             const actorName = currentUserProfile ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim() : null;
 
-            // Count existing pins
-            const pinNum = currentAnnotations.length + 1;
+            // Use global task counter so letters never repeat across images
+            _taskAnnCounter++;
+            const pinNum = _taskAnnCounter;
+            const pinLabel = String.fromCharCode(64 + ((pinNum - 1) % 26 + 1));
 
             const { error } = await supabase.from('upload_annotations').insert({
                 upload_id: currentAnnUploadId, brand_id: currentBrand?.id,
@@ -22256,11 +22382,11 @@
                 x_position: pendingAnnPin.x, y_position: pendingAnnPin.y,
                 comment, pin_number: pinNum
             });
-            if (error) { showToast('Error saving annotation', 'error'); return; }
+            if (error) { _taskAnnCounter--; showToast('Error saving annotation', 'error'); return; }
 
-            // Log annotation as a Revision Request in design task activity
+            // Log as a Revision Request in design task activity — include upload number
             if (currentDesignTaskRecord?.id && currentBrand?.id) {
-                const pinLabel = String.fromCharCode(64 + ((pinNum - 1) % 26 + 1));
+                const uploadRef = currentPreviewUploadNum ? ` Upload #${currentPreviewUploadNum}` : '';
                 const userName = currentUserProfile
                     ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim() || currentUserProfile.email?.split('@')[0] || 'Unknown'
                     : 'Unknown';
@@ -22269,20 +22395,23 @@
                     brand_id: currentBrand.id,
                     user_id: actorId,
                     user_name: userName,
-                    message: `[Annotation ${pinLabel}] ${comment}`,
+                    message: `[Annotation ${pinLabel}${uploadRef}] ${comment}`,
                     activity_type: 'revision_request',
                     task_completed: false
                 });
-                // Refresh activity list if it's visible
-                if (typeof loadDesignTaskActivity === 'function' && currentDesignTaskRecord.id) {
+                if (typeof loadDesignTaskActivity === 'function') {
                     loadDesignTaskActivity(currentDesignTaskRecord.id);
                 }
             }
 
+            // Remove ghost pin
+            const ghost = document.getElementById('ann-ghost-pin');
+            if (ghost) ghost.remove();
+
             pendingAnnPin = null;
             const form = document.getElementById('ds-ann-new-form');
             if (form) form.classList.add('hide');
-            showToast('Annotation saved ✓');
+            showToast(`Annotation ${pinLabel} saved ✓`);
             await loadAnnotations(currentAnnUploadId);
         }
 
@@ -22290,21 +22419,43 @@
             const { data } = await supabase.from('upload_annotations')
                 .select('*').eq('upload_id', uploadId).order('created_at');
             currentAnnotations = data || [];
+            // Keep global counter in sync
+            if (currentAnnotations.length > 0) {
+                const maxPin = Math.max(...currentAnnotations.map(a => a.pin_number || 0));
+                if (maxPin > _taskAnnCounter) _taskAnnCounter = maxPin;
+            }
             renderAnnotationPins();
             renderAnnotationList();
+            // Update annotation badge on the upload card
+            _updateUploadAnnBadge(uploadId, currentAnnotations.length);
+        }
+
+        function _updateUploadAnnBadge(uploadId, count) {
+            const card = document.getElementById(`dtr-cimg-${uploadId}`);
+            if (!card) return;
+            let badge = card.querySelector('.upload-ann-badge');
+            if (count === 0) { if (badge) badge.remove(); return; }
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'upload-ann-badge';
+                badge.style.cssText = 'position:absolute;top:4px;right:4px;background:#dc2626;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:8px;z-index:3;pointer-events:none;line-height:16px';
+                card.appendChild(badge);
+            }
+            badge.textContent = `✎${count}`;
         }
 
         function renderAnnotationPins() {
             const wrap = document.getElementById('ds-preview-img-wrap');
             if (!wrap) return;
-            // Remove old pins
-            wrap.querySelectorAll('.ann-pin').forEach(p => p.remove());
+            wrap.querySelectorAll('.ann-pin:not(#ann-ghost-pin)').forEach(p => p.remove());
             currentAnnotations.forEach((ann, idx) => {
+                const pinNum = ann.pin_number || (idx + 1);
+                const label  = String.fromCharCode(64 + ((pinNum - 1) % 26 + 1));
+                const color  = ANN_COLOURS[(pinNum - 1) % ANN_COLOURS.length];
                 const pin = document.createElement('div');
-                pin.className = `ann-pin ${ann.actor_id ? 'designer' : 'manager'}`;
-                pin.style.left = `${ann.x_position}%`;
-                pin.style.top  = `${ann.y_position}%`;
-                pin.textContent = ann.pin_number ? String.fromCharCode(64 + ((ann.pin_number - 1) % 26 + 1)) : String.fromCharCode(65 + idx % 26);
+                pin.className = 'ann-pin';
+                pin.style.cssText = `left:${ann.x_position}%;top:${ann.y_position}%;background:${color};color:#fff;border-color:rgba(255,255,255,0.8)`;
+                pin.textContent = label;
                 pin.title = ann.comment;
                 pin.onclick = (e) => { e.stopPropagation(); highlightAnnotation(ann.id); };
                 wrap.appendChild(pin);
@@ -22318,15 +22469,19 @@
                 list.innerHTML = '<div style="padding:16px;text-align:center;color:#6b7280;font-size:12px">No annotations yet.<br>Enable annotate mode and click to add pins.</div>';
                 return;
             }
-            list.innerHTML = currentAnnotations.map((ann, idx) => `
-                <div class="ds-ann-item" id="ann-item-${ann.id}" onclick="highlightAnnotation('${ann.id}')">
+            list.innerHTML = currentAnnotations.map((ann, idx) => {
+                const pinNum = ann.pin_number || (idx + 1);
+                const label  = String.fromCharCode(64 + ((pinNum - 1) % 26 + 1));
+                const color  = ANN_COLOURS[(pinNum - 1) % ANN_COLOURS.length];
+                return `<div class="ds-ann-item" id="ann-item-${ann.id}" onclick="highlightAnnotation('${ann.id}')">
                     <div class="ds-ann-item-header">
-                        <div class="ann-pin designer" style="position:static;transform:none;width:18px;height:18px;font-size:10px">${ann.pin_number ? String.fromCharCode(64 + ((ann.pin_number - 1) % 26 + 1)) : String.fromCharCode(65 + idx % 26)}</div>
+                        <div class="ann-pin" style="position:static;transform:none;width:20px;height:20px;font-size:11px;background:${color};color:#fff;border-color:rgba(255,255,255,0.5);flex-shrink:0">${label}</div>
                         <span style="font-size:11px;font-weight:600;color:#e5e7eb">${escHtml(ann.actor_name||'Unknown')}</span>
                     </div>
                     <div class="ds-ann-item-text">${escHtml(ann.comment)}</div>
                     <div class="ds-ann-item-time">${dsRelativeTime(ann.created_at)}</div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
 
         function highlightAnnotation(annId) {
