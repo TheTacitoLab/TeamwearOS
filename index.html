@@ -17965,42 +17965,31 @@
                 return;
             }
 
-            // Show loading
+            // Show loading state
             if (empty) empty.classList.add('hide');
             panel.classList.remove('hide');
             panel.style.display = '';
             if (header) { header.classList.remove('hide'); header.style.display = 'flex'; }
             panel.innerHTML = '<div style="padding:48px;text-align:center"><div class="spinner"></div></div>';
 
-            const { data: task } = await supabase.from('design_tasks')
-                .select('*, clubs(id,name,brand_id), designers:assigned_designer(id,full_name)')
-                .eq('id', taskId).single();
-            if (!task) return;
-
-            currentDesignTaskRecord = task;
-            currentDesignTask = task;
-            currentJobId = task.job_id;
-            _masterProdsLoaded = false;
-            _masterProdsData = [];
-
-            // Update compact header
-            const nameEl = document.getElementById('dsp-task-name');
-            const refEl  = document.getElementById('dsp-ref');
-            const badge  = document.getElementById('dsp-status-badge');
-            const clubEl = document.getElementById('dsp-club');
-            if (nameEl) nameEl.textContent = task.task_name || 'Untitled Task';
-            if (refEl)  refEl.textContent  = task.task_ref  || '';
-            if (badge)  { badge.textContent = (DS_STATUS_LABELS||{})[task.status] || task.status; badge.className = `badge design-status-${task.status} text-xs`; }
-            if (clubEl) clubEl.textContent  = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
-
-            // Load stages
-            const { data: stages } = await supabase.from('design_stages')
-                .select('*').eq('task_id', taskId).order('stage_number');
-            currentStages = stages || [];
-
-            // Render DTR into preview panel
+            // Point the DTR render target at the preview panel BEFORE loading
+            // loadDesignTaskRecordV2 → renderDesignTaskRecordV2 → renderNewDTRLayout
+            // renderNewDTRLayout reads _dtrPanelEl first thing and resets it
             _dtrPanelEl = panel;
-            await renderNewDTRLayout();
+            await loadDesignTaskRecordV2(taskId);
+
+            // Update compact preview header from the now-loaded currentDesignTaskRecord
+            const task = currentDesignTaskRecord;
+            if (task) {
+                const nameEl = document.getElementById('dsp-task-name');
+                const refEl  = document.getElementById('dsp-ref');
+                const badge  = document.getElementById('dsp-status-badge');
+                const clubEl = document.getElementById('dsp-club');
+                if (nameEl) nameEl.textContent = task.task_name || 'Untitled Task';
+                if (refEl)  refEl.textContent  = task.task_ref  || '';
+                if (badge)  { badge.textContent = (DS_STATUS_LABELS||{})[task.status] || task.status; badge.className = `badge design-status-${task.status} text-xs`; }
+                if (clubEl) clubEl.textContent  = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
+            }
 
             // Load preview activity
             loadDSPreviewActivity(taskId);
@@ -18977,7 +18966,7 @@
             if (!currentStages.length) {
                 await supabase.from('design_stages').insert([
                     { task_id: taskId, brand_id: task.brand_id, stage_number: 1, stage_name: 'Brief', status: 'not_started' },
-                    { task_id: taskId, brand_id: task.brand_id, stage_number: 2, stage_name: 'Presentation', status: 'not_started' },
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 2, stage_name: 'Concepts', status: 'not_started' },
                     { task_id: taskId, brand_id: task.brand_id, stage_number: 3, stage_name: 'Range', status: 'not_started' },
                     { task_id: taskId, brand_id: task.brand_id, stage_number: 4, stage_name: 'Finalise', status: 'not_started' }
                 ]);
@@ -20076,12 +20065,12 @@
                 return `<div class="dtr-stage-section stage-approved" id="dtr-stage-2">
                     <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
                         <div class="dtr-stage-icon-circle">✓</div>
-                        <span class="dtr-stage-title">Presentation</span>
+                        <span class="dtr-stage-title">Concepts</span>
                         <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(34,197,94,0.1);color:#16a34a;margin-left:4px">Approved</span>
                         ${chevronSvg('dtr-stage-chev-2', true)}
                     </button>
                     <div class="dtr-stage-body" id="dtr-stage-body-2" style="display:none">
-                        <p style="color:#16a34a;font-size:12px;font-weight:600;margin:0">✓ Presentation stage complete.</p>
+                        <p style="color:#16a34a;font-size:12px;font-weight:600;margin:0">✓ Concepts stage complete.</p>
                     </div>
                 </div>`;
             }
@@ -20111,8 +20100,8 @@
 
             // ── Deliver bar ──
             const deliverBtn = isInReview
-                ? `<button class="dtr-deliver-btn delivered" disabled>✓ Presentation Delivered</button>`
-                : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Presentation</button>`;
+                ? `<button class="dtr-deliver-btn delivered" disabled>✓ Concepts Delivered</button>`
+                : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Concepts</button>`;
 
             const revisionsBtn = isRevisions
                 ? `<span style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a">🔄 Revisions Requested</span>`
@@ -20130,7 +20119,7 @@
             return `<div class="dtr-stage-section${stageStateClass}" id="dtr-stage-2">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
                     <div class="dtr-stage-icon-circle">2</div>
-                    <span class="dtr-stage-title">Presentation</span>
+                    <span class="dtr-stage-title">Concepts</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     ${chevronSvg('dtr-stage-chev-2', stage.status === 'not_started')}
                 </button>
@@ -20272,7 +20261,7 @@
                     uploaded_by: actor?.data?.user?.id || null, uploaded_by_name: actorName
                 });
                 if (dbErr) throw dbErr;
-                await dsLogActivity(stage.task_id, stageId, 'version_uploaded', { stage_name: 'Presentation', version_label: `Concept ${conceptNum}` });
+                await dsLogActivity(stage.task_id, stageId, 'version_uploaded', { stage_name: 'Concepts', version_label: `Concept ${conceptNum}` });
                 showToast(`Concept ${conceptNum} image uploaded ✓`);
                 await _dtrRefreshConceptsStage();
             } catch(err) {
@@ -20344,7 +20333,7 @@
             if (!ok) return;
             await supabase.from('design_tasks').update({ status: 'in_review' }).eq('id', stage.task_id);
             if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_review';
-            await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Presentation' });
+            await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Concepts' });
             showToast('Concepts delivered for review ✓');
             await _dtrRefreshConceptsStage();
         }
@@ -20358,7 +20347,7 @@
                 if (!ok) return;
                 await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
                 if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
-                await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: 'Presentation', comment });
+                await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: 'Concepts', comment });
                 showToast('Revisions requested');
                 await _dtrRefreshConceptsStage();
             });
@@ -20422,7 +20411,7 @@
             if (!hasApproved) { showToast('At least one concept must be approved first', 'warning'); return; }
             const ok = await updateStageStatus(stage, 'approved', 'Concepts stage completed');
             if (!ok) return;
-            await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: 'Presentation' });
+            await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: 'Concepts' });
             // Auto-advance stage 3
             const stage3 = currentStages.find(s => s.stage_number === 3);
             if (stage3 && stage3.status === 'not_started') {
