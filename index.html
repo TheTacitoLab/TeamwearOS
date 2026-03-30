@@ -17862,9 +17862,6 @@
             if (task.status === 'awaiting_approval') blockers.push({ icon: '⏳', text: 'Waiting for customer approval before work can continue' });
             if (!brief && task.status === 'new') blockers.push({ icon: '📄', text: 'Design brief not yet filled in' });
 
-            // Activity feed for this task
-            const feedItems = (_feedAllItems || []).filter(f => f.task_id === taskId).slice(0, 5);
-
             // Stage status styling
             const stageStyleMap = {
                 not_started:        { color:'#94a3b8', bg:'#f1f5f9', icon:'○', label:'Not started' },
@@ -17959,26 +17956,31 @@
                     </div>
                 </div>
 
-                <!-- Full-width activity section -->
+                <!-- Full-width interactive activity section -->
                 <div style="padding:16px 24px 20px">
                     <div class="ds-preview-block" style="margin:0">
-                        <div class="ds-block-header">Recent Activity</div>
-                        <div class="ds-block-body">
-                            ${feedItems.length > 0
-                                ? feedItems.map(item => {
-                                    const ini = dsActorInitials(item.actor_name || '');
-                                    const det = item.action_detail || {};
-                                    const lbl = dsActivityLabel(item.action_type, det);
-                                    const ago = item.created_at ? formatTimeAgo(item.created_at) : '';
-                                    return `<div class="ds-activity-item">
-                                        <div class="ds-activity-avatar-sm">${ini}</div>
-                                        <div style="flex:1;min-width:0">
-                                            <div style="font-size:11px;color:#374151;line-height:1.4">${lbl}</div>
-                                            <div style="font-size:10px;color:#94a3b8;margin-top:1px">${ago}</div>
-                                        </div>
-                                    </div>`;
-                                }).join('')
-                                : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No recent activity on this task.</p>`}
+                        <!-- Header with filter pills -->
+                        <div class="ds-block-header" style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px">
+                            <span>Activity</span>
+                            <div style="display:flex;gap:3px">
+                                <button id="dsp-filter-all" onclick="filterDSPreviewActivity('all')" class="dtr-act-filter-btn active" style="padding:2px 8px;font-size:10px">All</button>
+                                <button id="dsp-filter-comment" onclick="filterDSPreviewActivity('comment')" class="dtr-act-filter-btn" style="padding:2px 8px;font-size:10px">Comments</button>
+                                <button id="dsp-filter-sub_task" onclick="filterDSPreviewActivity('sub_task')" class="dtr-act-filter-btn" style="padding:2px 8px;font-size:10px">Sub-Tasks</button>
+                            </div>
+                        </div>
+                        <!-- Composer: type tabs + input -->
+                        <div style="padding:10px 14px;border-bottom:1px solid #f1f5f9">
+                            <div class="dtr-composer-tabs">
+                                <button id="dsp-act-comment-btn" onclick="setDSPreviewInputType('comment')" class="act-tab-btn active">+ Comment</button>
+                                <button id="dsp-act-task-btn" onclick="setDSPreviewInputType('sub_task')" class="act-tab-btn task-tab">+ Sub-Task</button>
+                            </div>
+                            <input type="text" id="dsp-act-input" class="dtr-composer-input" placeholder="Add a comment…"
+                                onkeydown="if(event.key==='Enter')addDSPreviewActivity()">
+                            <button onclick="addDSPreviewActivity()" class="dtr-composer-post-btn">Post</button>
+                        </div>
+                        <!-- Activity list -->
+                        <div id="dsp-act-list" style="padding:10px 14px;max-height:320px;overflow-y:auto">
+                            <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
                         </div>
                     </div>
                 </div>
@@ -18000,11 +18002,194 @@
                         Add Comment
                     </button>` : ''}
                 </div>`;
+
+            // Load activity for this task into the preview panel
+            loadDSPreviewActivity(taskId);
         }
 
         function openAddCommentFromDashboard(taskId) {
-            // Navigate to full task page and open comment box
             showDesignTask(taskId);
+        }
+
+        // ── Preview Panel Activity ──────────────────────────────────────────────
+
+        let _dsPreviewActivityLog = [];
+        let _dsPreviewActivityInputType = 'comment';
+        let _dsPreviewActivityFilter = 'all';
+        let _dsPreviewTaskId = null;
+
+        function setDSPreviewInputType(type) {
+            _dsPreviewActivityInputType = type;
+            const cBtn = document.getElementById('dsp-act-comment-btn');
+            const tBtn = document.getElementById('dsp-act-task-btn');
+            const inp  = document.getElementById('dsp-act-input');
+            if (cBtn) cBtn.classList.toggle('active', type === 'comment');
+            if (tBtn) tBtn.classList.toggle('active', type === 'sub_task');
+            if (inp)  inp.placeholder = type === 'sub_task' ? 'Add a sub-task…' : 'Add a comment…';
+        }
+
+        function filterDSPreviewActivity(filter) {
+            _dsPreviewActivityFilter = filter;
+            ['all','comment','sub_task'].forEach(f => {
+                const btn = document.getElementById(`dsp-filter-${f}`);
+                if (btn) btn.classList.toggle('active', f === filter);
+            });
+            renderDSPreviewActivity();
+        }
+
+        async function loadDSPreviewActivity(taskId) {
+            _dsPreviewTaskId = taskId;
+            _dsPreviewActivityLog = [];
+            renderDSPreviewActivity(); // show loading
+            const { data } = await supabase.from('design_task_activity')
+                .select('*').eq('design_task_id', taskId).order('created_at', { ascending: false });
+            if (_dsPreviewTaskId !== taskId) return; // task changed while loading
+            _dsPreviewActivityLog = data || [];
+            renderDSPreviewActivity();
+        }
+
+        function renderDSPreviewActivity() {
+            const list = document.getElementById('dsp-act-list');
+            if (!list) return;
+            const filtered = _dsPreviewActivityFilter === 'all'
+                ? _dsPreviewActivityLog
+                : _dsPreviewActivityLog.filter(e => e.activity_type === _dsPreviewActivityFilter);
+            if (!filtered.length) {
+                list.innerHTML = '<p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">No activity yet.</p>';
+                return;
+            }
+            list.innerHTML = filtered.map(entry => {
+                const initials = (entry.user_name || '?').charAt(0).toUpperCase();
+                const ts = dsRelativeTime(entry.created_at);
+                const isTask = entry.activity_type === 'sub_task';
+                const isRevision = entry.activity_type === 'revision_request';
+                const done = entry.task_completed;
+
+                if (isRevision) {
+                    if (done) {
+                        const icon = entry.review_comment === 'accepted' ? '✓' : '✗';
+                        const label = entry.review_comment === 'accepted' ? 'Revisions Accepted' : 'Revisions Dismissed';
+                        const color = entry.review_comment === 'accepted' ? '#16a34a' : '#64748b';
+                        return `<div style="display:flex;align-items:flex-start;gap:6px;margin-bottom:8px;padding:6px 8px;border-radius:8px;background:#f8fafc;border:1px solid #f1f5f9">
+                            <span style="font-size:11px;color:${color};font-weight:700;flex-shrink:0;margin-top:1px">${icon}</span>
+                            <div style="flex:1;min-width:0">
+                                <div style="font-size:10px;font-weight:700;color:${color}">${label}</div>
+                                <div style="font-size:11px;color:#94a3b8;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(entry.message)}</div>
+                                <div style="font-size:10px;color:#b0bec5;margin-top:1px">${escHtml(entry.user_name||'Unknown')} · ${ts}</div>
+                            </div>
+                        </div>`;
+                    }
+                    return `<div class="dt-act-revision" id="dsp-rev-${entry.id}">
+                        <div class="dt-act-revision-label">🔄 Revision Request</div>
+                        <div class="dt-act-revision-msg">${escHtml(entry.message)}</div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:7px">
+                            <div class="dt-act-revision-meta">${escHtml(entry.user_name||'Unknown')} · ${ts}</div>
+                            <div style="display:flex;gap:5px;flex-shrink:0">
+                                <button onclick="resolveDSPreviewRevision('${entry.id}','accepted')" title="Accept" style="width:26px;height:26px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#16a34a';this.style.color='#fff'" onmouseout="this.style.background='#f0fdf4';this.style.color='#16a34a'">✓</button>
+                                <button onclick="resolveDSPreviewRevision('${entry.id}','dismissed')" title="Dismiss" style="width:26px;height:26px;border-radius:7px;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center" onmouseover="this.style.background='#dc2626';this.style.color='#fff'" onmouseout="this.style.background='#fef2f2';this.style.color='#dc2626'">✗</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+
+                if (isTask) {
+                    return `<div class="task-item${done ? ' task-done' : ''}" style="margin-bottom:8px;background:#fff7ed;border:1px solid rgba(234,179,8,0.3);border-radius:10px;padding:8px 10px">
+                        <div style="display:flex;align-items:flex-start;gap:8px">
+                            <input type="checkbox" style="margin-top:2px;width:14px;height:14px;accent-color:#16a34a;flex-shrink:0;cursor:pointer" ${done ? 'checked' : ''} onchange="toggleDSPreviewSubtask('${entry.id}',this.checked)">
+                            <div style="flex:1;min-width:0">
+                                <p style="font-size:11px;font-weight:700;color:#c2410c;margin:0 0 2px">📋 Sub-Task</p>
+                                <p style="font-size:12px;color:#374151;margin:0;${done ? 'text-decoration:line-through;color:#9ca3af' : ''}">${escHtml(entry.message)}</p>
+                                <p style="font-size:10px;color:#9ca3af;margin:3px 0 0">${escHtml(entry.user_name||'Unknown')} · ${ts}</p>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+
+                return `<div class="ds-comment-row" style="margin-bottom:8px">
+                    <div class="ds-actor-pill" style="width:24px;height:24px;font-size:10px;flex-shrink:0">${initials}</div>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12px;font-weight:600;color:#0f172a;margin-bottom:2px">${escHtml(entry.user_name||'Unknown')}</div>
+                        <div style="font-size:12px;color:#374151;line-height:1.4">${escHtml(entry.message)}</div>
+                        <div class="ds-comment-time">${ts}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function addDSPreviewActivity() {
+            const input = document.getElementById('dsp-act-input');
+            const msg = input?.value?.trim();
+            if (!msg || !_dsPreviewTaskId) return;
+
+            const task = (allDesignTasks || []).find(t => t.id === _dsPreviewTaskId);
+            if (!task || !currentBrand?.id) return;
+
+            const actor = await supabase.auth.getUser();
+            const actorId = actor?.data?.user?.id || null;
+            const userName = currentUserProfile
+                ? ((currentUserProfile.first_name || '') + ' ' + (currentUserProfile.last_name || '')).trim() || currentUserProfile.email?.split('@')[0] || 'Unknown'
+                : 'Unknown';
+
+            const actType = _dsPreviewActivityInputType;
+
+            const { data, error } = await supabase.from('design_task_activity').insert({
+                design_task_id: _dsPreviewTaskId,
+                brand_id: currentBrand.id,
+                user_id: actorId,
+                user_name: userName,
+                message: msg,
+                activity_type: actType,
+                task_completed: false
+            }).select().single();
+
+            if (error) { showToast('Error adding activity', 'error'); return; }
+
+            _dsPreviewActivityLog.unshift(data);
+            if (input) input.value = '';
+            renderDSPreviewActivity();
+
+            await supabase.from('design_activity_feed').insert({
+                task_id: _dsPreviewTaskId,
+                brand_id: currentBrand.id,
+                actor_id: actorId,
+                actor_name: userName,
+                action_type: actType === 'sub_task' ? 'sub_task_added' : 'comment_added',
+                action_detail: { message: msg, task_name: task.task_name }
+            });
+
+            if (actType === 'sub_task') {
+                if (!task._subtasks) task._subtasks = { total: 0, done: 0 };
+                task._subtasks.total++;
+                renderDSTaskList();
+            }
+        }
+
+        async function toggleDSPreviewSubtask(id, completed) {
+            const { error } = await supabase.from('design_task_activity')
+                .update({ task_completed: completed }).eq('id', id);
+            if (error) { showToast('Error updating sub-task', 'error'); return; }
+            const entry = _dsPreviewActivityLog.find(e => e.id === id);
+            if (entry) entry.task_completed = completed;
+            renderDSPreviewActivity();
+            const task = (allDesignTasks || []).find(t => t.id === _dsPreviewTaskId);
+            if (task?._subtasks) {
+                task._subtasks.done = _dsPreviewActivityLog.filter(e => e.activity_type === 'sub_task' && e.task_completed).length;
+                renderDSTaskList();
+            }
+            showToast(completed ? 'Sub-task complete ✓' : 'Sub-task reopened');
+        }
+
+        async function resolveDSPreviewRevision(entryId, action) {
+            const entry = _dsPreviewActivityLog.find(e => e.id === entryId);
+            if (entry) { entry.task_completed = true; }
+            renderDSPreviewActivity();
+            const { error } = await supabase.from('design_task_activity')
+                .update({ task_completed: true }).eq('id', entryId);
+            if (error) {
+                if (entry) { entry.task_completed = false; }
+                renderDSPreviewActivity();
+                showToast('Error updating revision request', 'error');
+            }
         }
 
         // ── End Design Studio Split Dashboard ─────────────────────────────────
