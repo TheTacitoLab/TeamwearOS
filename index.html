@@ -577,10 +577,11 @@
         .ds-row-badge { font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
         .ds-row-badge.urgent   { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
         .ds-row-badge.high     { background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; }
-        .ds-row-badge.revisions{ background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
-        .ds-row-badge.waiting  { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
-        .ds-row-badge.new      { background:#eef2ff; color:#6366f1; border:1px solid #c7d2fe; }
-        .ds-row-badge.review   { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
+        .ds-row-badge.revisions   { background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; }
+        .ds-row-badge.waiting     { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
+        .ds-row-badge.new         { background:#f1f5f9; color:#64748b; border:1px solid #e2e8f0; }
+        .ds-row-badge.review      { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
+        .ds-row-badge.in_progress { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
         .ds-row-meta-right { display:flex; align-items:center; gap:5px; }
         .ds-row-unread { font-size:9px; font-weight:700; background:#ef4444; color:#fff; border-radius:10px; padding:1px 5px; }
         .ds-row-act-counts { display:flex; align-items:center; gap:6px; margin-top:3px; }
@@ -1168,7 +1169,7 @@
         .dtr-stage-hdr { width:100%; display:flex; align-items:center; gap:12px; padding:14px 18px; border:none; background:transparent; cursor:pointer; text-align:left; transition:background 0.12s; }
         .dtr-stage-hdr:hover { background:#f8fafc; }
         .dtr-stage-section.stage-approved .dtr-stage-hdr:hover { background:rgba(34,197,94,0.03); }
-        .dtr-stage-section.stage-inactive .dtr-stage-hdr { cursor:default; opacity:0.7; }
+        .dtr-stage-section.stage-inactive .dtr-stage-hdr { cursor:pointer; opacity:0.85; }
         .dtr-stage-icon-circle { width:26px; height:26px; border-radius:50%; border:2px solid #dde3ea; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; flex-shrink:0; color:#64748b; background:#f8fafc; }
         .dtr-stage-section.stage-active .dtr-stage-icon-circle { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; }
         .dtr-stage-section.stage-approved .dtr-stage-icon-circle { background:#22c55e; border-color:#22c55e; color:#fff; }
@@ -17887,11 +17888,12 @@
             const urg = urgMap[statusLabel] || 'urgency-active';
             const isSelected = task.id === _dsSelectedTaskId;
 
-            // Badge logic — reflect per-task status
+            // Badge logic — always show a status
             let badgeHtml = '';
-            if (statusLabel === 'revisions')  badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
-            else if (statusLabel === 'in_review') badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
-            else if (statusLabel === 'new')    badgeHtml = `<span class="ds-row-badge new">Not Started</span>`;
+            if (statusLabel === 'revisions')       badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
+            else if (statusLabel === 'in_review')  badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
+            else if (statusLabel === 'new')        badgeHtml = `<span class="ds-row-badge new">Not Started</span>`;
+            else if (statusLabel === 'in_progress') badgeHtml = `<span class="ds-row-badge in_progress">In Progress</span>`;
 
             const dName = task.designers?.full_name || task._designerName || '';
             const initials = dName ? dName.split(' ').map(w => w[0]||'').join('').substring(0,2).toUpperCase() : '';
@@ -17911,9 +17913,7 @@
             const unreadDot = _unread > 0
                 ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:0 4px;margin-left:5px;flex-shrink:0">${_unread}</span>`
                 : '';
-            const startBtn = task.status === 'new'
-                ? `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #6366f1;color:#6366f1;background:#eef2ff;cursor:pointer;white-space:nowrap">▶ Start</button>`
-                : '';
+            const isNew = task.status === 'new';
             return `<div class="ds-task-row ${urg}${isSelected ? ' ds-selected' : ''}${hasNotif ? ' ds-notif' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')">
                 <div class="ds-row-main">
                     <div class="ds-row-title" style="display:flex;align-items:center">${escHtml(task.task_name || 'Untitled Task')}${unreadDot}</div>
@@ -17923,10 +17923,10 @@
                         <span class="ds-row-stage">${escHtml(stageLabel)}</span>
                         ${dueHtml}
                     </div>
+                    ${isNew ? `<div style="margin-top:5px"><button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #6366f1;color:#6366f1;background:#eef2ff;cursor:pointer;white-space:nowrap">▶ Start Task</button></div>` : ''}
                     ${countPills ? `<div class="ds-row-act-counts">${countPills}</div>` : ''}
                 </div>
                 <div class="ds-row-right">
-                    ${startBtn}
                     ${badgeHtml}
                     <div class="ds-row-meta-right">
                         ${initials ? `<div class="ds-row-avatar-sm">${initials}</div>` : ''}
@@ -18440,6 +18440,7 @@
             showToast('Task started — Concepts stage now active');
             _dsSelectedTaskId = taskId;
             renderDSDashboard();
+            loadTaskInPreview(taskId);
         }
 
         function renderDSHome() {
@@ -20035,11 +20036,14 @@
 
             // Upload zone (hidden when approved)
             const uploadZone = isApproved ? '' : `<div class="dtr-concept-upload" id="dtr-${sectionLabel}-upload"
+                style="cursor:pointer"
+                onclick="document.getElementById('dtr-${sectionLabel}-file-input').click()"
                 ondragover="event.preventDefault();this.classList.add('drag-over')"
                 ondragleave="this.classList.remove('drag-over')"
                 ondrop="this.classList.remove('drag-over');dtrStageImgDrop(event,'${stageId}',${stageNum},'${sectionLabel}')">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#94a3b8;flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                <span style="font-size:11px;color:#94a3b8">Drop files or <label style="color:#2563eb;cursor:pointer;font-weight:600"><input type="file" multiple accept="image/*,.pdf,.ai,.eps,.svg" style="display:none" onchange="dtrStageImgSelect(event,'${stageId}',${stageNum},'${sectionLabel}')">browse</label></span>
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#94a3b8;flex-shrink:0;pointer-events:none"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                <span style="font-size:11px;color:#94a3b8;pointer-events:none">Drop files or <span style="color:#2563eb;font-weight:600">browse</span></span>
+                <input id="dtr-${sectionLabel}-file-input" type="file" multiple accept="image/*,.pdf,.ai,.eps,.svg" style="display:none" onchange="dtrStageImgSelect(event,'${stageId}',${stageNum},'${sectionLabel}')">
             </div>`;
 
             // Deliver bar
@@ -20078,7 +20082,7 @@
             const isOpen3 = ['in_progress','in_review','revisions_required'].includes(stage.status) || (isApproved && uploads.length > 0);
             return `<div class="dtr-stage-section${stageClass3}" id="dtr-stage-3">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(3)">
-                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '3'}</div>
+                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '2'}</div>
                     <span class="dtr-stage-title">Range</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     <svg class="dtr-stage-chevron${isOpen3 ? '' : ' closed'}" id="dtr-stage-chev-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
@@ -20106,7 +20110,7 @@
             const isOpen4 = ['in_progress','in_review','revisions_required'].includes(stage.status) || (isApproved && uploads.length > 0);
             return `<div class="dtr-stage-section${stageClass4}" id="dtr-stage-4">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(4)">
-                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '4'}</div>
+                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '3'}</div>
                     <span class="dtr-stage-title">Finalise</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     <svg class="dtr-stage-chevron${isOpen4 ? '' : ' closed'}" id="dtr-stage-chev-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
@@ -20202,7 +20206,7 @@
 
             return `<div class="dtr-stage-section${stageStateClass}" id="dtr-stage-2">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
-                    <div class="dtr-stage-icon-circle">2</div>
+                    <div class="dtr-stage-icon-circle">1</div>
                     <span class="dtr-stage-title">Concepts</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     ${chevronSvg('dtr-stage-chev-2', stage.status === 'not_started')}
