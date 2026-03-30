@@ -1690,17 +1690,6 @@
 
         <!-- TOOL: Product Database -->
         <div id="tool-products" class="hide w-full p-6 md:p-8 lg:px-12">
-            <!-- Page nav row -->
-            <div class="page-nav-row">
-                <button onclick="showLaunchpad()" class="nav-home-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>
-                    Products
-                </span>
-            </div>
 
             <!-- Action Bar -->
             <div class="flex flex-wrap gap-4 mb-6">
@@ -2016,14 +2005,6 @@
 
             <!-- Sticky header — single compact row -->
             <div class="ds-header" style="padding:0 24px;display:flex;align-items:center;gap:0;min-height:44px;border-bottom:1px solid #e2e8f0;background:#fff;">
-                <button onclick="showLaunchpad()" class="nav-home-btn" style="flex-shrink:0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn" style="flex-shrink:0">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"/></svg>
-                    Design Studio
-                </span>
                 <!-- Divider -->
                 <span style="width:1px;height:18px;background:#e2e8f0;margin:0 12px;flex-shrink:0"></span>
                 <!-- Feed shortcut + Completed Designs tab -->
@@ -2144,16 +2125,10 @@
 
                 <!-- Single slim combined nav + meta bar -->
                 <div style="display:flex;align-items:center;gap:0;padding:0 24px;min-height:42px;border-bottom:1px solid #e2e8f0;background:#fff;">
-                    <button onclick="showLaunchpad()" class="nav-home-btn" style="flex-shrink:0;padding:4px 8px 4px 0">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Launchpad
-                    </button>
                     <button id="dt-back-btn" onclick="goBack()" class="nav-back-btn hide" style="flex-shrink:0">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                         <span id="dt-back-label">Back</span>
                     </button>
-                    <button onclick="showTool('design-studio')" class="nav-page-btn" style="cursor:pointer;background:transparent;border:none;flex-shrink:0;padding:4px 6px">Design Studio</button>
-                    <svg class="w-3 h-3 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     <span class="font-semibold" style="color:#0f172a;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;margin:0 8px 0 4px" id="dt-task-name-display">Design Task</span>
                     <!-- Divider -->
                     <span style="width:1px;height:16px;background:#e2e8f0;margin:0 10px;flex-shrink:0"></span>
@@ -2244,11 +2219,6 @@
         </div>
 
         <div id="tool-mockups" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
-            
             <div class="flex items-center justify-between mb-8">
                 <div>
                     <h2 class="text-2xl font-bold">Club Mock-Ups</h2>
@@ -2428,11 +2398,7 @@
         <div id="tool-generator" class="hide w-full">
             <!-- Sticky header -->
             <div style="position:sticky;top:96px;z-index:30;background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;min-height:44px;display:flex;align-items:center;gap:12px">
-                <button onclick="showLaunchpad()" class="nav-home-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn" style="font-size:13px;font-weight:600;color:#0f172a">Store Generator</span>
+                <span style="font-size:13px;font-weight:700;color:#0f172a">Store Generator</span>
                 <div style="margin-left:auto;display:flex;gap:8px">
                     <button onclick="resetStoreGenerator()" style="padding:5px 14px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;font-size:12px;font-weight:600;cursor:pointer">Reset</button>
                 </div>
@@ -2574,10 +2540,6 @@
 
         <!-- TOOL: Factory Orders -->
         <div id="tool-orders" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
             <h2 class="text-2xl font-bold mb-6">Factory Order Form</h2>
 
             <div class="glass rounded-2xl p-6 mb-6">
@@ -2639,17 +2601,8 @@
 
         <!-- TOOL: PO Tracker V2 -->
         <div id="tool-po-tracker" class="hide w-full p-6 md:p-8 lg:px-12">
-            <!-- Page nav row -->
-            <div class="page-nav-row">
-                <button onclick="showLaunchpad()" class="nav-home-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
-                    Production
-                </span>
-                <button onclick="openCreatePoModal()" class="btn-primary text-sm flex items-center gap-2 ml-auto">
+            <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+                <button onclick="openCreatePoModal()" class="btn-primary text-sm flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     New PO
                 </button>
@@ -2788,10 +2741,6 @@
 
         <!-- TOOL: Brand Settings (Super Admin Only) -->
         <div id="tool-settings" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
             <h2 class="text-2xl font-bold mb-6">Brand Settings</h2>
             <p class="text-purple-400 mb-6">Managing: <span id="settings-brand-name" class="font-semibold"></span></p>
 
@@ -2931,10 +2880,6 @@
 
         <!-- TOOL: User Management (Super Admin Only) -->
         <div id="tool-users" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
             <div class="flex items-center justify-between mb-2">
                 <div>
                     <h2 class="text-2xl font-bold">User Management</h2>
@@ -3287,17 +3232,6 @@
              TOOL: SALES
              ============================================================ -->
         <div id="tool-sales" class="hide w-full p-6 md:p-8 lg:px-12">
-            <!-- Page nav row -->
-            <div class="page-nav-row">
-                <button onclick="showLaunchpad()" class="nav-home-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><rect x="2" y="7" width="20" height="14" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6v4m-3-2h6"/></svg>
-                    Sales
-                </span>
-            </div>
 
             <!-- 4-STAGE TAB NAVIGATION -->
             <div class="sales-stage-tabs" id="sales-stage-tabs">
@@ -3800,18 +3734,7 @@
              TOOL: CLUBS (Enhanced)
              ============================================================ -->
         <div id="tool-clubs" class="hide w-full p-6 md:p-8 lg:px-12">
-            <!-- Page nav row -->
-            <div class="page-nav-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-                <div style="display:flex;align-items:center;gap:8px">
-                    <button onclick="showLaunchpad()" class="nav-home-btn">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                        Launchpad
-                    </button>
-                    <span class="nav-page-btn">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M9 21V5.25A2.25 2.25 0 0111.25 3h1.5A2.25 2.25 0 0115 5.25V21m-6 0h6M3.75 21V10.5A2.25 2.25 0 016 8.25h.75M20.25 21V10.5a2.25 2.25 0 00-2.25-2.25H17.25"/></svg>
-                        Clubs
-                    </span>
-                </div>
+            <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
                 <button onclick="showCreateClubModal()" class="btn-primary text-xs px-4 py-2" style="display:flex;align-items:center;gap:6px">
                     <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                     New Club
@@ -4386,10 +4309,6 @@
              TOOL: ORDER FORMS (Global view - all submissions)
              ============================================================ -->
         <div id="tool-order-forms" class="hide w-full p-6 md:p-8 lg:px-12">
-            <button onclick="showLaunchpad()" class="nav-home-btn mb-6">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                Launchpad
-            </button>
 
             <div class="flex items-center justify-between mb-6">
                 <div>
