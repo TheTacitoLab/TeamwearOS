@@ -1012,7 +1012,7 @@
         .dtr-stages-col { flex:1; min-width:0; padding:14px 16px; overflow-y:auto; }
 
         /* Activity column (right) */
-        .dtr-activity-col { width:300px; flex-shrink:0; background:#fff; border-left:1px solid #e2e8f0; display:flex; flex-direction:column; position:sticky; top:98px; max-height:calc(100vh - 98px); align-self:flex-start; overflow:hidden; }
+        .dtr-activity-col { width:340px; flex-shrink:0; background:#fff; border-left:1px solid #e2e8f0; display:flex; flex-direction:column; position:sticky; top:98px; max-height:calc(100vh - 98px); align-self:flex-start; overflow:hidden; }
         .dtr-activity-inner { overflow-y:auto; flex:1; padding:14px 16px; }
         .dtr-activity-inner h4 { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:#94a3b8; margin:0 0 12px; }
         .dtr-activity-divider { height:1px; background:#f1f5f9; margin:12px 0; }
@@ -1147,12 +1147,40 @@
         /* ── Job Record: unified 3-column layout ── */
         .jr-three-col {
             display: grid;
-            grid-template-columns: 240px 1fr 280px;
+            grid-template-columns: var(--jr-left-width, 280px) 1fr 280px;
             gap: 20px;
             align-items: start;
+            transition: grid-template-columns 0.22s ease;
         }
-        @media (max-width: 1200px) { .jr-three-col { grid-template-columns: 220px 1fr; } .jr-activity-sidebar { display: none !important; } }
+        .jr-three-col.left-collapsed { --jr-left-width: 48px; }
+        @media (max-width: 1200px) { .jr-three-col { grid-template-columns: var(--jr-left-width, 260px) 1fr; } .jr-activity-sidebar { display: none !important; } }
         @media (max-width: 767px) { .jr-three-col { grid-template-columns: 1fr; } }
+
+        /* Left col collapse toggle */
+        .jr-left-collapse-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 28px; height: 28px; border-radius: 8px;
+            border: 1.5px solid #e2e8f0; background: #fff; cursor: pointer;
+            color: #64748b; flex-shrink: 0; transition: all 0.15s;
+        }
+        .jr-left-collapse-btn:hover { background: #f1f5f9; color: #0f172a; }
+        .jr-left-col.collapsed > *:not(.jr-left-col-inner) { display: none; }
+        .jr-left-col-inner { overflow: hidden; }
+        .jr-left-col.collapsed .jr-left-col-inner .glass,
+        .jr-left-col.collapsed .jr-left-col-inner .record-side-nav { display: none; }
+        .jr-left-col.collapsed .jr-left-col-inner .jr-left-icon-nav { display: flex !important; }
+        .jr-left-icon-nav {
+            display: none; flex-direction: column; align-items: center; gap: 4px;
+            padding: 8px 0;
+        }
+        .jr-left-icon-nav button {
+            width: 36px; height: 36px; border-radius: 8px; border: none;
+            background: transparent; cursor: pointer; color: #64748b;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s;
+        }
+        .jr-left-icon-nav button:hover { background: #f1f5f9; color: #0f172a; }
+        .jr-left-icon-nav button.active { background: #0f172a; color: #fff; }
 
         /* Left column: job info card + sticky nav */
         .jr-left-col {
@@ -3756,20 +3784,10 @@
                     </div>
                     <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </div>
-                <div onclick="showClubSearch()" class="split-action-card">
-                    <div class="split-action-icon" style="background:#dbeafe">
-                        <svg class="w-5 h-5" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803 7.5 7.5 0 0015.803 15.803z"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-sm">Search Clubs</h3>
-                        <p class="text-gray-500 text-xs mt-0.5">Find and manage existing clubs</p>
-                    </div>
-                    <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                </div>
             </div>
 
-            <!-- Club search area (hidden until Search clicked) -->
-            <div id="club-search-area" class="hide">
+            <!-- Club search area (always visible) -->
+            <div id="club-search-area">
                 <div class="glass rounded-xl p-4 mb-5 flex flex-wrap gap-4">
                     <input type="text" id="clubs-search" placeholder="Search clubs by name..." class="flex-1 min-w-48 px-3 py-2 rounded-lg text-sm" oninput="renderClubsEnhanced()">
                     <select id="clubs-filter-sport" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
@@ -3817,12 +3835,38 @@
             <div class="jr-three-col">
 
                 <!-- ── Column 1: Compact club info card + sticky nav menu ── -->
-                <div class="jr-left-col">
+                <div class="jr-left-col" id="jr-left-col">
+                    <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+                        <button class="jr-left-collapse-btn" onclick="toggleClubLeftCol()" id="jr-left-collapse-btn" title="Collapse navigation">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                    </div>
+                    <div class="jr-left-col-inner">
+                    <!-- Icon nav shown when collapsed -->
+                    <div class="jr-left-icon-nav" id="jr-left-icon-nav">
+                        <button onclick="showClubTab('overview')" id="icon-tab-overview" title="Overview">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                        </button>
+                        <button onclick="showClubTab('teams')" id="icon-tab-teams" title="Teams">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </button>
+                        <button onclick="showClubTab('products')" id="icon-tab-products" title="Products">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        </button>
+                        <button onclick="showClubTab('orderforms')" id="icon-tab-orderforms" title="Order Forms">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </button>
+                        <button onclick="showClubTab('jobs')" id="icon-tab-jobs" title="Jobs">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                        </button>
+                        <button onclick="showClubTab('onboarding')" id="icon-tab-onboarding" title="Onboarding">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        </button>
+                    </div>
                     <!-- Compact club info card -->
-                    <div class="glass rounded-2xl p-4">
                         <div class="flex items-start justify-between gap-3 mb-3">
                             <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
+                                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#dbeafe">
                                     <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
                                 </div>
                                 <div class="min-w-0">
@@ -3867,6 +3911,7 @@
                             Onboarding
                         </button>
                     </div>
+                    </div><!-- end jr-left-col-inner -->
                 </div>
 
                 <!-- ── Column 2: Timeline at top + tab content ── -->
@@ -3923,15 +3968,29 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Pantone colours -->
+                        <!-- Pantone colours — inline editable -->
                         <div class="mb-4">
-                            <p class="text-xs text-gray-500 mb-2">Pantone Colours</p>
-                            <div class="flex gap-2 items-center">
-                                <div id="pantone-main-swatch" class="pantone-swatch" title="Main"></div>
-                                <div id="pantone-sec-swatch" class="pantone-swatch" title="Secondary"></div>
-                                <div id="pantone-acc-swatch" class="pantone-swatch" title="Accent"></div>
-                                <span id="pantone-labels" class="text-xs text-gray-600">—</span>
+                            <p class="text-xs text-gray-500 mb-2">Club Colours</p>
+                            <div style="display:flex;flex-direction:column;gap:8px">
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <input type="color" id="pantone-main-swatch" value="#3b82f6" title="Primary colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-main').value=this.value">
+                                    <input type="text" id="inline-hex-main" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-main-swatch')">
+                                    <input type="text" id="inline-pantone-main" placeholder="Pantone e.g. 355 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
+                                </div>
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <input type="color" id="pantone-sec-swatch" value="#64748b" title="Secondary colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-sec').value=this.value">
+                                    <input type="text" id="inline-hex-sec" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-sec-swatch')">
+                                    <input type="text" id="inline-pantone-sec" placeholder="Pantone e.g. Cool Grey 5 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
+                                </div>
+                                <div style="display:flex;align-items:center;gap:6px">
+                                    <input type="color" id="pantone-acc-swatch" value="#f59e0b" title="Accent colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-acc').value=this.value">
+                                    <input type="text" id="inline-hex-acc" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-acc-swatch')">
+                                    <input type="text" id="inline-pantone-acc" placeholder="Pantone e.g. 123 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
+                                </div>
+                                <button onclick="saveClubColoursInline()" style="width:100%;padding:7px;border-radius:7px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer;margin-top:2px">Save Colours</button>
                             </div>
+                            <!-- hidden span kept for legacy code that reads pantone-labels -->
+                            <span id="pantone-labels" class="hide">—</span>
                         </div>
                         <!-- Sponsor logos -->
                         <div>
@@ -9802,8 +9861,10 @@
                 return `<div class="club-list-card" onclick="openClubDashboard('${club.id}')">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style="background:#dbeafe">
-                                <span class="text-brand-400 font-bold text-sm">${((club.suffix || club.name.substring(0,2))).substring(0,2)}</span>
+                            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" style="background:#dbeafe">
+                                ${(club.club_crest_url || club.logo_url)
+                                    ? `<img src="${escHtml(club.club_crest_url || club.logo_url)}" alt="" style="width:100%;height:100%;object-fit:cover" loading="lazy">`
+                                    : `<span class="text-brand-400 font-bold text-sm">${((club.suffix || club.name.substring(0,2))).substring(0,2)}</span>`}
                             </div>
                             <div>
                                 <div class="flex items-center gap-2 flex-wrap">
@@ -9852,10 +9913,6 @@
         }
 
         function showClubSearch() {
-            const searchArea = document.getElementById('club-search-area');
-            const recentArea = document.getElementById('clubs-recent');
-            if (searchArea) searchArea.classList.remove('hide');
-            if (recentArea) recentArea.classList.add('hide');
             document.getElementById('clubs-search')?.focus();
             renderClubsEnhanced();
         }
@@ -10346,6 +10403,38 @@
             }
         }
 
+        function syncInlineColor(hexInput, pickerId) {
+            const val = hexInput.value.trim();
+            if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+                const picker = document.getElementById(pickerId);
+                if (picker) picker.value = val;
+            }
+        }
+
+        async function saveClubColoursInline() {
+            if (!currentClub?.id) return;
+            const mainHex = document.getElementById('pantone-main-swatch')?.value || null;
+            const secHex  = document.getElementById('pantone-sec-swatch')?.value  || null;
+            const accHex  = document.getElementById('pantone-acc-swatch')?.value  || null;
+            const mainCode = document.getElementById('inline-pantone-main')?.value.trim() || null;
+            const secCode  = document.getElementById('inline-pantone-sec')?.value.trim()  || null;
+            const accCode  = document.getElementById('inline-pantone-acc')?.value.trim()  || null;
+            try {
+                const { error } = await supabase.from('clubs').update({
+                    pantone_main: mainHex, pantone_secondary: secHex, pantone_accent: accHex,
+                    pantone_main_code: mainCode, pantone_sec_code: secCode, pantone_acc_code: accCode,
+                }).eq('id', currentClub.id);
+                if (error) throw error;
+                // Update local state
+                Object.assign(currentClub, { pantone_main: mainHex, pantone_secondary: secHex, pantone_accent: accHex,
+                    pantone_main_code: mainCode, pantone_sec_code: secCode, pantone_acc_code: accCode });
+                showToast('Club colours saved', 'success');
+            } catch (err) {
+                console.error('saveClubColoursInline error:', err);
+                showToast('Failed to save colours', 'error');
+            }
+        }
+
         async function saveClubEnhanced() {
             if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
             try {
@@ -10517,7 +10606,14 @@
         function updateClubDetailHeader() {
             if (!currentClub) return;
             const initials = ((currentClub.suffix || currentClub.name.substring(0, 2))).substring(0, 2);
-            document.getElementById('club-detail-initials').textContent = initials;
+            const avatarEl = document.getElementById('club-detail-avatar');
+            const initialsEl = document.getElementById('club-detail-initials');
+            const logoUrl = currentClub.club_crest_url || currentClub.logo_url || '';
+            if (logoUrl && avatarEl) {
+                avatarEl.innerHTML = `<img src="${escHtml(logoUrl)}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+            } else if (initialsEl) {
+                initialsEl.textContent = initials;
+            }
             document.getElementById('club-detail-name').textContent = currentClub.name;
             document.getElementById('club-detail-sport').textContent = currentClub.sport || '';
             document.getElementById('club-detail-suffix').textContent = `(${currentClub.suffix || ''})`;
@@ -10527,10 +10623,28 @@
             badge.textContent = tierName;
         }
 
+        function toggleClubLeftCol() {
+            const col = document.getElementById('jr-left-col');
+            const grid = col?.closest('.jr-three-col');
+            const btn = document.getElementById('jr-left-collapse-btn');
+            if (!col) return;
+            const isCollapsed = col.classList.toggle('collapsed');
+            if (grid) grid.classList.toggle('left-collapsed', isCollapsed);
+            if (btn) btn.title = isCollapsed ? 'Expand navigation' : 'Collapse navigation';
+            // Flip chevron direction
+            if (btn) btn.innerHTML = isCollapsed
+                ? `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>`
+                : `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>`;
+            localStorage.setItem('jr_left_collapsed', isCollapsed ? '1' : '0');
+        }
+
         function showClubTab(tab) {
             currentClubTab = tab;
             document.querySelectorAll('.club-tab-content').forEach(el => el.classList.add('hide'));
             document.querySelectorAll('#club-record-nav .record-nav-item').forEach(btn => btn.classList.remove('active'));
+            // Also update icon nav active state
+            document.querySelectorAll('.jr-left-icon-nav button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`icon-tab-${tab}`)?.classList.add('active');
             document.getElementById(`club-tab-${tab}`)?.classList.remove('hide');
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
             if (tab === 'overview') renderClubOverviewInfo();
@@ -10832,17 +10946,28 @@
             if (dlBtn) { if (logoSrc) dlBtn.classList.remove('hide'); else dlBtn.classList.add('hide'); }
             // Populate assignment dropdown
             populateUserAssignDropdown('club-assigned-user', currentClub.assigned_user_id);
+            // Populate inline colour editors
+            const mainHex = currentClub.pantone_main || '#3b82f6';
+            const secHex  = currentClub.pantone_secondary || '#64748b';
+            const accHex  = currentClub.pantone_accent || '#f59e0b';
             const mainSwatch = document.getElementById('pantone-main-swatch');
-            const secSwatch = document.getElementById('pantone-sec-swatch');
-            const accSwatch = document.getElementById('pantone-acc-swatch');
-            const pantoneLabels = document.getElementById('pantone-labels');
-            if (mainSwatch) mainSwatch.style.background = currentClub.pantone_main || 'rgba(255,255,255,0.04)';
-            if (secSwatch) secSwatch.style.background = currentClub.pantone_secondary || 'rgba(255,255,255,0.04)';
-            if (accSwatch) accSwatch.style.background = currentClub.pantone_accent || 'rgba(255,255,255,0.04)';
-            if (pantoneLabels) {
-                const codes = [currentClub.pantone_main_code, currentClub.pantone_sec_code, currentClub.pantone_acc_code].filter(Boolean);
-                pantoneLabels.textContent = codes.length ? codes.join(' / ') : (currentClub.pantone_main ? '' : '—');
-            }
+            const secSwatch  = document.getElementById('pantone-sec-swatch');
+            const accSwatch  = document.getElementById('pantone-acc-swatch');
+            if (mainSwatch) mainSwatch.value = mainHex;
+            if (secSwatch)  secSwatch.value  = secHex;
+            if (accSwatch)  accSwatch.value  = accHex;
+            const inlineHexMain = document.getElementById('inline-hex-main');
+            const inlineHexSec  = document.getElementById('inline-hex-sec');
+            const inlineHexAcc  = document.getElementById('inline-hex-acc');
+            if (inlineHexMain) inlineHexMain.value = mainHex;
+            if (inlineHexSec)  inlineHexSec.value  = secHex;
+            if (inlineHexAcc)  inlineHexAcc.value  = accHex;
+            const inlinePMain = document.getElementById('inline-pantone-main');
+            const inlinePSec  = document.getElementById('inline-pantone-sec');
+            const inlinePAcc  = document.getElementById('inline-pantone-acc');
+            if (inlinePMain) inlinePMain.value = currentClub.pantone_main_code || '';
+            if (inlinePSec)  inlinePSec.value  = currentClub.pantone_sec_code  || '';
+            if (inlinePAcc)  inlinePAcc.value  = currentClub.pantone_acc_code  || '';
         }
 
         function updateOverviewStats() {
