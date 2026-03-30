@@ -524,10 +524,19 @@
         .ds-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:0; position:sticky; top:96px; z-index:30; }
 
         /* ── Design Studio Split Dashboard ── */
-        .ds-studio-body { display:grid; grid-template-columns:30% 70%; height:calc(100vh - 152px); overflow:hidden; }
+        .ds-studio-body { display:grid; grid-template-columns:30% 70%; height:calc(100vh - 152px); overflow:hidden; transition:grid-template-columns 0.22s ease; gap:4px; background:#e2e8f0; }
+        .ds-studio-body.list-collapsed { grid-template-columns:36px 1fr; }
         @media(max-width:900px) { .ds-studio-body { grid-template-columns:1fr; height:auto; overflow:visible; } }
 
-        .ds-task-list-panel { border-right:1px solid #e2e8f0; overflow-y:auto; background:#f8fafc; }
+        .ds-task-list-panel { border-right:1px solid #e2e8f0; overflow:hidden; background:#f8fafc; display:flex; flex-direction:column; }
+        .ds-task-list-inner { flex:1; overflow-y:auto; }
+        .ds-task-list-inner::-webkit-scrollbar { width:4px; }
+        .ds-task-list-inner::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+        .ds-task-list-collapsed { display:none; flex-direction:column; align-items:center; padding-top:12px; flex:1; }
+        .ds-studio-body.list-collapsed .ds-task-list-inner { display:none; }
+        .ds-studio-body.list-collapsed .ds-task-list-collapsed { display:flex; }
+        .ds-list-collapse-btn { width:28px; height:28px; border-radius:6px; border:1px solid #e2e8f0; background:#fff; color:#94a3b8; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.15s; }
+        .ds-list-collapse-btn:hover { background:#f1f5f9; color:#475569; border-color:#cbd5e1; }
         .ds-task-list-panel::-webkit-scrollbar { width:4px; }
         .ds-task-list-panel::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
 
@@ -2218,8 +2227,18 @@
             <div class="ds-studio-body">
 
                 <!-- LEFT: grouped smart task list -->
-                <div class="ds-task-list-panel" id="ds-task-list-panel">
-                    <div class="ds-group-empty" style="padding:20px 16px;color:#94a3b8">Loading tasks…</div>
+                <div class="ds-task-list-panel" id="ds-task-list-wrap">
+                    <!-- Scrollable list (shown when expanded) -->
+                    <div class="ds-task-list-inner" id="ds-task-list-panel">
+                        <div class="ds-group-empty" style="padding:20px 16px;color:#94a3b8">Loading tasks…</div>
+                    </div>
+                    <!-- Thin strip shown when collapsed -->
+                    <div class="ds-task-list-collapsed">
+                        <button class="ds-list-collapse-btn" onclick="toggleDSTaskList()" title="Expand task list">
+                            <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                        <span style="writing-mode:vertical-lr;transform:rotate(180deg);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-top:12px;user-select:none">Tasks</span>
+                    </div>
                 </div>
 
                 <!-- RIGHT: embedded DTR panel -->
@@ -17818,11 +17837,17 @@
 
             const panel = document.getElementById('ds-task-list-panel');
             if (panel) {
+                const collapseBar = `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px 6px;position:sticky;top:0;background:#f8fafc;z-index:6;border-bottom:1px solid #e8ecf0">
+                    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8">${filtered.length} task${filtered.length !== 1 ? 's' : ''}</span>
+                    <button class="ds-list-collapse-btn" onclick="toggleDSTaskList()" title="Collapse task list" style="width:24px;height:24px">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                    </button>
+                </div>`;
                 if (filtered.length === 0) {
-                    panel.innerHTML = `<div class="ds-preview-empty" style="padding:40px 20px;text-align:center"><p style="font-size:13px;font-weight:600;color:#94a3b8">No tasks match your filters</p><p style="font-size:11px;color:#b0b8c4;margin-top:4px">Try clearing the search or filters</p></div>`;
+                    panel.innerHTML = collapseBar + `<div class="ds-preview-empty" style="padding:40px 20px;text-align:center"><p style="font-size:13px;font-weight:600;color:#94a3b8">No tasks match your filters</p><p style="font-size:11px;color:#b0b8c4;margin-top:4px">Try clearing the search or filters</p></div>`;
                 } else if (_dsActiveStageTab === 'all') {
                     // Grouped by stage when on All tab
-                    panel.innerHTML = stageGroups.map(({ key, label, color }) => {
+                    panel.innerHTML = collapseBar + stageGroups.map(({ key, label, color }) => {
                         const tasks = filtered.filter(t => getDSTaskStageGroup(t) === key);
                         if (tasks.length === 0) return '';
                         return `<div class="ds-group">
@@ -17837,7 +17862,7 @@
                 } else {
                     // Single group for specific stage tab
                     const { label, color } = stageGroups.find(g => g.key === _dsActiveStageTab) || { label: 'Tasks', color: '#64748b' };
-                    panel.innerHTML = `<div class="ds-group">
+                    panel.innerHTML = collapseBar + `<div class="ds-group">
                         <div class="ds-group-header">
                             <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
                             <span class="ds-group-label" style="color:${color}">${label}</span>
@@ -17946,6 +17971,14 @@
             const activeStage = stages.find(s => ['in_progress','in_review'].includes(s.status));
             if (!activeStage) return 'in_progress';
             return activeStage.status;
+        }
+
+        function toggleDSTaskList() {
+            const body = document.querySelector('.ds-studio-body');
+            if (!body) return;
+            const isCollapsed = body.classList.contains('list-collapsed');
+            body.classList.toggle('list-collapsed', !isCollapsed);
+            localStorage.setItem('ds_list_open', isCollapsed ? '1' : '0');
         }
 
         function switchDSStageTab(tab) {
@@ -18439,6 +18472,9 @@
         }
 
         function renderDSHome() {
+            // Restore task list collapsed state
+            const body = document.querySelector('.ds-studio-body');
+            if (body) body.classList.toggle('list-collapsed', localStorage.getItem('ds_list_open') === '0');
             renderDSDashboard();
             loadDSActivityFeed();
             subscribeToActivityFeed();
@@ -19467,10 +19503,13 @@
                 <div class="dtr-body${isEmbedded ? ' dtr-embedded' : ''}">
                     <div class="dtr-left-panel${leftOpen ? '' : ' collapsed'}" id="dtr-left-panel">
                         <div class="dtr-left-inner" id="dtr-left-inner"${leftOpen ? '' : ' style="display:none"'}>
-                            <div class="dtr-left-tabs">
+                            <div class="dtr-left-tabs" style="padding-right:4px">
                                 <button class="dtr-left-tab active" id="dtr-ltab-brief" onclick="dtrSwitchLeftTab('brief')">Brief</button>
                                 <button class="dtr-left-tab" id="dtr-ltab-products" onclick="dtrSwitchLeftTab('products')">Products</button>
                                 <button class="dtr-left-tab" id="dtr-ltab-assets" onclick="dtrSwitchLeftTab('assets')">Assets</button>
+                                <button onclick="toggleDTRLeft()" title="Collapse panel" style="margin-left:auto;flex-shrink:0;width:26px;height:26px;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;align-self:center;transition:all 0.15s" onmouseover="this.style.color='#475569';this.style.background='#f1f5f9'" onmouseout="this.style.color='#94a3b8';this.style.background='#f8fafc'">
+                                    <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                                </button>
                             </div>
                             <div class="dtr-left-tab-content" id="dtr-left-tab-content">
                                 ${buildDTRLeftColumn(task, club, assets, clubProds, jobProds)}
