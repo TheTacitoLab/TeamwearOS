@@ -1047,6 +1047,10 @@
 
         /* ── Design Task Record v3 — Refined Split Layout ──────────────────── */
         .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 138px); background:#f4f6f9; }
+        /* Embedded in DS preview panel — override sticky/height assumptions */
+        .dtr-embedded { min-height:100%; }
+        .dtr-embedded .dtr-left-panel { position:sticky; top:0; max-height:calc(100vh - 200px); align-self:flex-start; }
+        .dtr-embedded .dtr-activity-col { position:sticky; top:0; max-height:calc(100vh - 200px); align-self:flex-start; }
 
         /* ── Left brief/info panel ── */
         .dtr-left-panel { width:380px; flex-shrink:0; background:#fff; border-right:1px solid #e8ecf0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; }
@@ -17991,8 +17995,6 @@
                 if (clubEl) clubEl.textContent  = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
             }
 
-            // Load preview activity
-            loadDSPreviewActivity(taskId);
         }
 
         function renderDSPreviewPanel(taskId) {
@@ -19412,6 +19414,7 @@
 
         async function renderNewDTRLayout() {
             const panel = _dtrPanelEl || document.getElementById('dt-stage-panel');
+            const isEmbedded = panel?.id === 'dsp-stage-panel';
             _dtrPanelEl = null;
             if (!panel) return;
             const task = currentDesignTaskRecord;
@@ -19461,7 +19464,7 @@
             const leftOpen = localStorage.getItem('dtr_left_open') !== '0';
 
             panel.innerHTML = `
-                <div class="dtr-body">
+                <div class="dtr-body${isEmbedded ? ' dtr-embedded' : ''}">
                     <div class="dtr-left-panel${leftOpen ? '' : ' collapsed'}" id="dtr-left-panel">
                         <div class="dtr-left-inner" id="dtr-left-inner"${leftOpen ? '' : ' style="display:none"'}>
                             <div class="dtr-left-tabs">
@@ -19534,11 +19537,11 @@
 
         function toggleDTREditMode() {
             _dtrEditMode = !_dtrEditMode;
-            const btn = document.getElementById('dt-edit-btn');
-            if (btn) {
-                btn.textContent = _dtrEditMode ? 'Done' : 'Edit';
-                btn.classList.toggle('active', _dtrEditMode);
-            }
+            // Update whichever edit button is visible (full-page or embedded preview)
+            ['dt-edit-btn', 'dsp-edit-btn'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) { btn.textContent = _dtrEditMode ? 'Done' : 'Edit'; btn.classList.toggle('active', _dtrEditMode); }
+            });
             // Re-render current tab in new mode
             const content = document.getElementById('dtr-left-tab-content');
             if (content && currentDesignTaskRecord) {
