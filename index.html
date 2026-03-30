@@ -19489,7 +19489,8 @@
             _dtrEditMode = false;
             _dtrCurrentLeftTab = 'brief';
 
-            const leftOpen = localStorage.getItem('dtr_left_open') !== '0';
+            // In embedded mode always start brief open so two collapsed strips never sit side-by-side
+            const leftOpen = isEmbedded ? true : localStorage.getItem('dtr_left_open') !== '0';
 
             panel.innerHTML = `
                 <div class="dtr-body${isEmbedded ? ' dtr-embedded' : ''}">
