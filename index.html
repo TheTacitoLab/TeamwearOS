@@ -2003,34 +2003,28 @@
         <!-- TOOL: Design Studio V2 -->
         <div id="tool-design-studio" class="hide w-full">
 
-            <!-- Sticky header — single compact row -->
-            <div class="ds-header" style="padding:0 24px;display:flex;align-items:center;gap:0;min-height:44px;border-bottom:1px solid #e2e8f0;background:#fff;">
-                <!-- Divider -->
-                <span style="width:1px;height:18px;background:#e2e8f0;margin:0 12px;flex-shrink:0"></span>
-                <!-- Feed shortcut + Completed Designs tab -->
-                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-                    <button onclick="scrollToFeed()" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;padding:4px 12px;cursor:pointer;transition:all 0.15s">
-                        💬 Feed <span id="ds-unread-badge-hdr" class="ds-notif-badge hide" style="position:static;margin-left:2px">0</span>
-                    </button>
-                    <button id="ds-completed-tab-btn" onclick="toggleDSCompletedPanel()" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:8px;padding:4px 12px;cursor:pointer;transition:all 0.15s">
-                        ✅ Completed Designs <span id="ds-completed-tab-count" class="ds-notif-badge hide" style="position:static;margin-left:2px;background:#94a3b8">0</span>
-                    </button>
-                </div>
-                <!-- Push button to right -->
-                <div style="margin-left:auto">
-                    <button onclick="openCreateDesignTaskModal()" class="btn-primary text-sm flex items-center gap-2" style="padding:6px 14px;font-size:12px">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        New Design Task
-                    </button>
-                </div>
-            </div>
-
-            <!-- Sort bar -->
-            <div class="ds-kanban-sort-bar">
-                <span>Sort:</span>
+            <!-- Sticky toolbar: sort left · actions right -->
+            <div class="ds-header" style="padding:0 24px;display:flex;align-items:center;gap:8px;min-height:48px;border-bottom:1px solid #e2e8f0;background:#fff;">
+                <!-- Sort pills -->
+                <span style="font-size:11px;font-weight:600;color:#94a3b8;margin-right:2px;flex-shrink:0">Sort:</span>
                 <button class="ds-sort-btn active" id="ds-sort-default" onclick="setDSKanbanSort('default')">Default</button>
                 <button class="ds-sort-btn" id="ds-sort-overdue" onclick="setDSKanbanSort('overdue')">Overdue First</button>
                 <button class="ds-sort-btn" id="ds-sort-due" onclick="setDSKanbanSort('due')">Closest Due Date</button>
+                <!-- Push actions to right -->
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
+                    <button onclick="scrollToFeed()" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#64748b;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:5px 12px;cursor:pointer;transition:all 0.15s;white-space:nowrap">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                        Activity <span id="ds-unread-badge-hdr" class="ds-notif-badge hide" style="position:static;margin-left:2px">0</span>
+                    </button>
+                    <button id="ds-completed-tab-btn" onclick="toggleDSCompletedPanel()" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#64748b;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:5px 12px;cursor:pointer;transition:all 0.15s;white-space:nowrap">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Completed <span id="ds-completed-tab-count" class="ds-notif-badge hide" style="position:static;margin-left:2px;background:#94a3b8">0</span>
+                    </button>
+                    <button onclick="openCreateDesignTaskModal()" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;font-size:12px;font-weight:700;white-space:nowrap">
+                        <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                        New Design Task
+                    </button>
+                </div>
             </div>
 
             <!-- Kanban board — 3 columns -->
