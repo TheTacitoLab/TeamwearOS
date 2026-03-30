@@ -548,7 +548,8 @@
         .ds-task-row.urgency-revisions::before { background:#b45309; }
         .ds-task-row.urgency-soon::before      { background:#ea580c; }
         .ds-task-row.urgency-waiting::before   { background:#d97706; }
-        .ds-task-row.urgency-review::before    { background:#16a34a; }
+        .ds-task-row.urgency-new::before       { background:#6366f1; }
+        .ds-task-row.urgency-review::before    { background:#b45309; }
         .ds-task-row.urgency-active::before    { background:#2563eb; }
         .ds-task-row:hover { background:#f0f4f8; }
         .ds-task-row.ds-selected { background:#fff; border-bottom-color:#e2e8f0; box-shadow:inset -2px 0 0 #0f172a; }
@@ -569,7 +570,8 @@
         .ds-row-badge.high     { background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; }
         .ds-row-badge.revisions{ background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
         .ds-row-badge.waiting  { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
-        .ds-row-badge.review   { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+        .ds-row-badge.new      { background:#eef2ff; color:#6366f1; border:1px solid #c7d2fe; }
+        .ds-row-badge.review   { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
         .ds-row-meta-right { display:flex; align-items:center; gap:5px; }
         .ds-row-unread { font-size:9px; font-weight:700; background:#ef4444; color:#fff; border-radius:10px; padding:1px 5px; }
         .ds-row-avatar-sm { width:18px; height:18px; border-radius:50%; background:#e2e8f0; font-size:8px; font-weight:700; color:#64748b; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -1036,15 +1038,30 @@
         .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 138px); background:#f4f6f9; }
 
         /* ── Left brief/info panel ── */
-        .dtr-left-panel { width:320px; flex-shrink:0; background:#fff; border-right:1px solid #e8ecf0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; }
+        .dtr-left-panel { width:380px; flex-shrink:0; background:#fff; border-right:1px solid #e8ecf0; display:flex; flex-direction:column; transition:width 0.25s ease; overflow:hidden; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; }
         .dtr-left-panel.collapsed { width:36px; }
-        .dtr-left-inner { width:320px; overflow-y:auto; flex:1; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+        .dtr-left-inner { width:380px; overflow-y:auto; flex:1; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; display:flex; flex-direction:column; }
         .dtr-left-inner::-webkit-scrollbar { width:4px; }
         .dtr-left-inner::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
-        .dtr-left-toggle-row { display:flex; justify-content:flex-end; padding:8px 10px 6px; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
+        .dtr-left-tabs { display:flex; border-bottom:1.5px solid #e8ecf0; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:3; }
+        .dtr-left-tab { flex:1; padding:10px 6px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; border:none; border-bottom:2px solid transparent; background:transparent; cursor:pointer; color:#94a3b8; transition:all 0.15s; margin-bottom:-1.5px; }
+        .dtr-left-tab.active { color:#0f172a; border-bottom-color:#0f172a; }
+        .dtr-left-tab:hover:not(.active) { color:#475569; background:#f8fafc; }
+        .dtr-left-tab-content { flex:1; }
         .dtr-col-toggle-btn { width:22px; height:22px; border:1px solid #e2e8f0; border-radius:5px; background:#f8fafc; color:#64748b; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0; padding:0; }
         .dtr-col-toggle-btn:hover { background:#e2e8f0; color:#0f172a; }
         .dtr-left-collapsed { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:14px; flex:1; overflow:hidden; }
+        /* Read-only info rows (view mode) */
+        .dtr-ro-section { padding:12px 14px 10px; border-bottom:1px solid #f1f5f9; }
+        .dtr-ro-section-title { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; color:#94a3b8; margin-bottom:8px; display:flex; align-items:center; justify-content:space-between; }
+        .dtr-ro-row { display:flex; align-items:baseline; justify-content:space-between; padding:4px 0; }
+        .dtr-ro-label { font-size:10px; font-weight:600; color:#94a3b8; flex-shrink:0; }
+        .dtr-ro-value { font-size:12px; font-weight:600; color:#0f172a; text-align:right; max-width:210px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .dtr-ro-text { font-size:12px; color:#374151; line-height:1.6; margin:0; white-space:pre-wrap; word-break:break-word; }
+        /* Edit mode button in header */
+        .dt-edit-btn { padding:5px 12px; border-radius:7px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.15s; border:1.5px solid #e2e8f0; background:#f8fafc; color:#475569; white-space:nowrap; }
+        .dt-edit-btn:hover { border-color:#94a3b8; color:#0f172a; }
+        .dt-edit-btn.active { border-color:#0f172a; background:#0f172a; color:#fff; }
 
         /* ── Left panel — refined brief card ── */
         .dtr-brief-card { }
@@ -2151,18 +2168,19 @@
                 <!-- Filters -->
                 <select id="ds-filter-group" class="ds-toolbar-filter" onchange="renderDSDashboard()">
                     <option value="">All Groups</option>
-                    <option value="overdue">Overdue</option>
-                    <option value="revisions">Revisions</option>
-                    <option value="soon">Due Soon</option>
-                    <option value="waiting">Waiting on Feedback</option>
-                    <option value="review">Ready for Review</option>
+                    <option value="new">New</option>
                     <option value="active">In Progress</option>
+                    <option value="review">In Review</option>
                 </select>
-                <select id="ds-filter-priority" class="ds-toolbar-filter" onchange="renderDSDashboard()">
-                    <option value="">All Priority</option>
-                    <option value="urgent">Urgent</option>
-                    <option value="high">High</option>
-                    <option value="standard">Standard</option>
+                <select id="ds-filter-stage" class="ds-toolbar-filter" onchange="renderDSDashboard()">
+                    <option value="">All Stages</option>
+                    <option value="concepts">Concepts</option>
+                    <option value="full range">Full Range</option>
+                    <option value="final artwork">Final Artwork</option>
+                </select>
+                <select id="ds-filter-label" class="ds-toolbar-filter" onchange="renderDSDashboard()">
+                    <option value="">All Labels</option>
+                    <option value="revisions">Revisions Required</option>
                 </select>
 
                 <!-- Right actions -->
@@ -2232,34 +2250,30 @@
             <!-- Sticky header: single slim bar + progress + stage tabs -->
             <div class="dt-top-nav" style="position:sticky;top:96px;z-index:30;background:#fff;">
 
-                <!-- Page header: richer context bar -->
-                <div style="display:flex;align-items:center;gap:12px;padding:10px 24px 10px;border-bottom:1px solid #e8ecf0;background:#fff;min-height:54px;">
-                    <button id="dt-back-btn" onclick="goBack()" class="nav-back-btn hide" style="flex-shrink:0">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        <span id="dt-back-label">Back</span>
-                    </button>
-                    <!-- Primary identity -->
-                    <div style="flex:1;min-width:0">
-                        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-                            <span id="dt-task-name-display" style="font-size:15px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:380px">Design Task</span>
-                            <span id="dt-ref-display" style="font-family:monospace;font-size:11px;color:#94a3b8;font-weight:600;flex-shrink:0"></span>
-                            <span id="dt-status-badge" class="badge design-status-new text-xs" style="flex-shrink:0">New</span>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
-                            <span id="dt-club-display" style="font-size:12px;color:#475569;flex-shrink:0"></span>
-                            <span style="color:#d1d5db;font-size:10px;flex-shrink:0" id="dt-club-dot">·</span>
-                            <span id="dt-designer-display" style="font-size:12px;color:#be185d;flex-shrink:0"></span>
-                            <div id="dt-countdown" class="dt-countdown hide" style="margin-left:2px;flex-shrink:0"></div>
-                        </div>
-                    </div>
-                    <!-- Right: meta + actions -->
-                    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-                        <span id="dt-meta-created" style="font-size:11px;color:#94a3b8"></span>
+                <!-- Page header: clean single-line toolbar -->
+                <div style="display:flex;align-items:center;gap:10px;padding:0 24px;border-bottom:1px solid #e8ecf0;background:#fff;height:48px;">
+                    <!-- Identity -->
+                    <span id="dt-task-name-display" style="font-size:14px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;flex-shrink:1">Design Task</span>
+                    <span id="dt-ref-display" style="font-family:monospace;font-size:11px;color:#94a3b8;font-weight:600;flex-shrink:0"></span>
+                    <span id="dt-status-badge" class="badge design-status-new text-xs" style="flex-shrink:0">New</span>
+                    <!-- Divider -->
+                    <span style="color:#e2e8f0;font-size:16px;flex-shrink:0">|</span>
+                    <!-- Context -->
+                    <span id="dt-club-display" style="font-size:12px;color:#475569;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px"></span>
+                    <span id="dt-club-dot" style="color:#d1d5db;font-size:10px;flex-shrink:0">·</span>
+                    <span id="dt-designer-display" style="font-size:12px;color:#64748b;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px"></span>
+                    <div id="dt-countdown" class="dt-countdown hide" style="flex-shrink:0"></div>
+                    <!-- Right actions -->
+                    <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0">
+                        <button id="dt-edit-btn" class="dt-edit-btn" onclick="toggleDTREditMode()">Edit</button>
                         <button id="dt-delete-btn" class="hide" onclick="deleteDesignTask()"
                             style="padding:5px 11px;border:1.5px solid #fca5a5;border-radius:7px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer">
                             Delete
                         </button>
                     </div>
+                    <!-- Hidden legacy IDs kept for JS compat -->
+                    <button id="dt-back-btn" class="hide" onclick="goBack()"><span id="dt-back-label">Back</span></button>
+                    <span id="dt-meta-created" class="hide"></span>
                 </div>
 
                 <!-- Stage progress bar -->
@@ -17629,16 +17643,9 @@
         let _dsSelectedTaskId = null;
 
         function getDSTaskGroup(task) {
-            const due = task.due_date ? new Date(task.due_date) : null;
-            const dueInfo = due ? getDueInfo(due) : null;
-            const stages = task._stages || [];
-            const hasRevisions = task.status === 'revisions' || stages.some(s => s.status === 'revisions_required');
-            if (dueInfo?.urgency === 'overdue') return 'overdue';
-            if (hasRevisions) return 'revisions';
-            if (dueInfo?.urgency === 'soon') return 'soon';
-            if (task.status === 'awaiting_approval') return 'waiting';
-            if (task.status === 'in_review' || task.status === 'delivered') return 'review';
-            return 'active'; // new + in_progress
+            if (task.status === 'new') return 'new';
+            if (task.status === 'in_review') return 'review';
+            return 'active'; // in_progress (includes stages with revisions_required)
         }
 
         function getDSTaskNextAction(task) {
@@ -17673,7 +17680,8 @@
 
             const query    = (document.getElementById('ds-search')?.value || '').toLowerCase();
             const fGroup   = document.getElementById('ds-filter-group')?.value || '';
-            const fPri     = document.getElementById('ds-filter-priority')?.value || '';
+            const fStage   = document.getElementById('ds-filter-stage')?.value || '';
+            const fLabel   = document.getElementById('ds-filter-label')?.value || '';
 
             let filtered = allTasks.filter(t => {
                 if (query) {
@@ -17682,20 +17690,21 @@
                     const ref  = (t.task_ref  || '').toLowerCase();
                     if (!name.includes(query) && !club.includes(query) && !ref.includes(query)) return false;
                 }
-                if (fPri   && t.priority !== fPri) return false;
                 if (fGroup && getDSTaskGroup(t) !== fGroup) return false;
+                if (fStage) {
+                    const activeStage = (t._stages||[]).find(s => ['in_progress','in_review','revisions_required'].includes(s.status));
+                    if (!activeStage || !(activeStage.stage_name||'').toLowerCase().includes(fStage.toLowerCase())) return false;
+                }
+                if (fLabel === 'revisions' && !(t._stages||[]).some(s => s.status === 'revisions_required')) return false;
                 return true;
             });
 
             const groups = {
-                overdue:   { label: 'Overdue',              color: '#dc2626', tasks: [] },
-                revisions: { label: 'Revisions Needed',     color: '#b45309', tasks: [] },
-                soon:      { label: 'Due Soon',             color: '#ea580c', tasks: [] },
-                waiting:   { label: 'Waiting on Feedback',  color: '#d97706', tasks: [] },
-                review:    { label: 'Ready for Review',     color: '#16a34a', tasks: [] },
-                active:    { label: 'In Progress',          color: '#2563eb', tasks: [] },
+                new:    { label: 'New',         color: '#6366f1', tasks: [] },
+                active: { label: 'In Progress', color: '#2563eb', tasks: [] },
+                review: { label: 'In Review',   color: '#b45309', tasks: [] },
             };
-            const groupOrder = ['overdue','revisions','soon','waiting','review','active'];
+            const groupOrder = ['new', 'active', 'review'];
             filtered.forEach(t => { const g = getDSTaskGroup(t); if (groups[g]) groups[g].tasks.push(t); });
 
             const unreadByTask = {};
@@ -17704,9 +17713,7 @@
             });
 
             const emptyMsgs = {
-                overdue: 'No overdue tasks', revisions: 'No revisions needed',
-                soon: 'Nothing due soon', waiting: 'No jobs waiting for feedback',
-                review: 'Nothing ready for review', active: 'No tasks in progress',
+                new: 'No new tasks', active: 'No tasks in progress', review: 'Nothing in review',
             };
 
             const panel = document.getElementById('ds-task-list-panel');
@@ -17758,17 +17765,16 @@
             const dueInfo = due ? getDueInfo(due) : null;
             const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : null;
             const dueCls = dueInfo ? (dueInfo.urgency === 'overdue' ? 'overdue' : dueInfo.urgency === 'soon' ? 'soon' : 'ok') : 'ok';
-            const urgMap = { overdue:'urgency-overdue', revisions:'urgency-revisions', soon:'urgency-soon', waiting:'urgency-waiting', review:'urgency-review', active:'urgency-active' };
+            const urgMap = { new:'urgency-new', active:'urgency-active', review:'urgency-review' };
             const urg = urgMap[groupKey] || 'urgency-active';
             const isSelected = task.id === _dsSelectedTaskId;
+            const hasRevisions = (task._stages||[]).some(s => s.status === 'revisions_required');
 
             // Badge logic — only show one, priority order
             let badgeHtml = '';
-            if (task.priority === 'urgent') badgeHtml = `<span class="ds-row-badge urgent">Urgent</span>`;
-            else if (task.priority === 'high') badgeHtml = `<span class="ds-row-badge high">High</span>`;
-            else if (groupKey === 'revisions') badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
-            else if (groupKey === 'waiting')   badgeHtml = `<span class="ds-row-badge waiting">Waiting</span>`;
-            else if (groupKey === 'review')    badgeHtml = `<span class="ds-row-badge review">Review</span>`;
+            if (hasRevisions)               badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
+            else if (groupKey === 'review') badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
+            else if (groupKey === 'new')    badgeHtml = `<span class="ds-row-badge new">New</span>`;
 
             const dName = task.designers?.full_name || task._designerName || '';
             const initials = dName ? dName.split(' ').map(w => w[0]||'').join('').substring(0,2).toUpperCase() : '';
@@ -17776,6 +17782,9 @@
                 ? `<span class="ds-row-dot">·</span><span class="ds-row-due ${dueCls}">${dueInfo?.urgency === 'overdue' ? dueInfo.text : dueLabel}</span>`
                 : '';
 
+            const startBtn = task.status === 'new'
+                ? `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #6366f1;color:#6366f1;background:#eef2ff;cursor:pointer;white-space:nowrap">▶ Start</button>`
+                : '';
             return `<div class="ds-task-row ${urg}${isSelected ? ' ds-selected' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')">
                 <div class="ds-row-main">
                     <div class="ds-row-title">${escHtml(task.task_name || 'Untitled Task')}</div>
@@ -17787,6 +17796,7 @@
                     </div>
                 </div>
                 <div class="ds-row-right">
+                    ${startBtn}
                     ${badgeHtml}
                     <div class="ds-row-meta-right">
                         ${unreadCount > 0 ? `<span class="ds-row-unread">${unreadCount}</span>` : ''}
@@ -17962,13 +17972,17 @@
 
                 <!-- Sticky action bar -->
                 <div class="ds-preview-actions">
-                    <button onclick="showDesignTask('${task.id}')" class="btn-primary" style="flex:1;justify-content:center;padding:9px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px">
+                    ${task.status === 'new' ? `
+                    <button onclick="startDesignTask('${task.id}')" class="btn-primary" style="flex:1;justify-content:center;padding:9px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px;background:#6366f1;border-color:#6366f1">
+                        ▶ Start Task
+                    </button>` : ''}
+                    <button onclick="showDesignTask('${task.id}')" class="${task.status === 'new' ? '' : 'btn-primary'}" style="flex:1;justify-content:center;padding:9px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px${task.status === 'new' ? ';border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;color:#475569' : ''}">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
                         Open Full Task
                     </button>
-                    <button onclick="openAddCommentFromDashboard('${task.id}')" style="padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap">
+                    ${task.status !== 'new' ? `<button onclick="openAddCommentFromDashboard('${task.id}')" style="padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap">
                         Add Comment
-                    </button>
+                    </button>` : ''}
                 </div>`;
         }
 
@@ -17978,6 +17992,23 @@
         }
 
         // ── End Design Studio Split Dashboard ─────────────────────────────────
+
+        async function startDesignTask(taskId) {
+            const task = (allDesignTasks || []).find(t => t.id === taskId);
+            if (!task) return;
+            const { error } = await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', taskId);
+            if (error) { showToast('Error starting task', 'error'); return; }
+            task.status = 'in_progress';
+            const stages = task._stages || [];
+            const conceptsStage = stages.find(s => s.stage_number === 2);
+            if (conceptsStage && conceptsStage.status === 'not_started') {
+                const { error: se } = await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', conceptsStage.id);
+                if (!se) conceptsStage.status = 'in_progress';
+            }
+            showToast('Task started — Concepts stage now active');
+            _dsSelectedTaskId = taskId;
+            renderDSDashboard();
+        }
 
         function renderDSHome() {
             renderDSDashboard();
@@ -18983,10 +19014,14 @@
             // Filter archived images (is_archived flag or __archived__ review_comment sentinel)
             const conceptUploads = (conceptUploadsRes.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
 
-            // Cache for tab-switching without re-fetch
+            // Cache for tab-switching and edit mode without re-fetch
             _dtrConceptUploads = conceptUploads;
             _dtrConceptStage = stage2;
-            _dtrConceptTab = 1; // reset to first tab on full re-render
+            _dtrConceptTab = 1;
+            _dtrCachedAssets = assets;
+            _dtrCachedClubProds = clubProds;
+            _dtrEditMode = false;
+            _dtrCurrentLeftTab = 'brief';
 
             const leftOpen = localStorage.getItem('dtr_left_open') !== '0';
 
@@ -18994,12 +19029,14 @@
                 <div class="dtr-body">
                     <div class="dtr-left-panel${leftOpen ? '' : ' collapsed'}" id="dtr-left-panel">
                         <div class="dtr-left-inner" id="dtr-left-inner"${leftOpen ? '' : ' style="display:none"'}>
-                            <div class="dtr-left-toggle-row">
-                                <button class="dtr-col-toggle-btn" onclick="toggleDTRLeft()" title="Collapse brief">
-                                    <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                                </button>
+                            <div class="dtr-left-tabs">
+                                <button class="dtr-left-tab active" id="dtr-ltab-brief" onclick="dtrSwitchLeftTab('brief')">Brief</button>
+                                <button class="dtr-left-tab" id="dtr-ltab-products" onclick="dtrSwitchLeftTab('products')">Products</button>
+                                <button class="dtr-left-tab" id="dtr-ltab-assets" onclick="dtrSwitchLeftTab('assets')">Assets</button>
                             </div>
-                            ${buildDTRLeftColumn(task, club, assets, clubProds)}
+                            <div class="dtr-left-tab-content" id="dtr-left-tab-content">
+                                ${buildDTRLeftColumn(task, club, assets, clubProds)}
+                            </div>
                         </div>
                         <div class="dtr-left-collapsed" id="dtr-left-collapsed"${leftOpen ? ' style="display:none"' : ''}>
                             <button onclick="toggleDTRLeft()" title="Expand brief" style="writing-mode:vertical-lr;text-orientation:mixed;transform:rotate(180deg);padding:14px 8px;border:none;background:transparent;color:#64748b;font-size:10px;font-weight:700;cursor:pointer;letter-spacing:0.8px;text-transform:uppercase">Brief ▶</button>
@@ -19039,6 +19076,46 @@
             _dtrProdSearchTerm = '';
             _dtrActivityFilter = 'all';
             if (currentDesignTaskRecord?.id) loadDesignTaskActivity(currentDesignTaskRecord.id);
+        }
+
+        // ── Left column state ──────────────────────────────────────────────────
+        let _dtrEditMode = false;
+        let _dtrCurrentLeftTab = 'brief';
+        let _dtrCachedAssets = [];
+        let _dtrCachedClubProds = [];
+
+        function dtrSwitchLeftTab(tab) {
+            _dtrCurrentLeftTab = tab;
+            ['brief','products','assets'].forEach(t => {
+                document.getElementById(`dtr-ltab-${t}`)?.classList.toggle('active', t === tab);
+            });
+            const content = document.getElementById('dtr-left-tab-content');
+            if (!content || !currentDesignTaskRecord) return;
+            const task = currentDesignTaskRecord;
+            const club = task.clubs || {};
+            content.innerHTML = _dtrBuildTabContent(tab, task, club, _dtrCachedAssets, _dtrCachedClubProds);
+        }
+
+        function toggleDTREditMode() {
+            _dtrEditMode = !_dtrEditMode;
+            const btn = document.getElementById('dt-edit-btn');
+            if (btn) {
+                btn.textContent = _dtrEditMode ? 'Done' : 'Edit';
+                btn.classList.toggle('active', _dtrEditMode);
+            }
+            // Re-render current tab in new mode
+            const content = document.getElementById('dtr-left-tab-content');
+            if (content && currentDesignTaskRecord) {
+                const task = currentDesignTaskRecord;
+                const club = task.clubs || {};
+                content.innerHTML = _dtrBuildTabContent(_dtrCurrentLeftTab, task, club, _dtrCachedAssets, _dtrCachedClubProds);
+            }
+        }
+
+        function _dtrBuildTabContent(tab, task, club, assets, clubProds) {
+            if (tab === 'products') return _buildDTRProductsTab(task, clubProds);
+            if (tab === 'assets')   return _buildDTRAssetsTab(assets);
+            return _buildDTRBriefTab(task, club);
         }
 
         // ── Left column ────────────────────────────────────────────────────────
@@ -19131,10 +19208,42 @@
                     }).join('')
                     : (task.assigned_designer_id ? `<option value="${task.assigned_designer_id}" selected>${escHtml(task.assigned_designer_name||'Current Designer')}</option>` : ''));
 
-            return `
-                <!-- ── BRIEF CARD ─────────────────────────────────────────── -->
-                <div class="dtr-brief-card">
+            // Return initial tab content for brief tab
+            return _buildDTRBriefTab(task, club);
+        }
 
+        // ── Brief tab ──────────────────────────────────────────────────────────
+        function _buildDTRBriefTab(task, club) {
+            const useClub = task.use_club_colours !== false;
+            const cc = task.custom_colours || {};
+            const PRI = { standard:{ label:'Standard', dot:'⚪' }, high:{ label:'High', dot:'🟠' }, urgent:{ label:'Urgent', dot:'🔴' } };
+            const pri = PRI[task.priority || 'standard'] || PRI.standard;
+            const logoUrl = club.club_crest_url || club.logo_url || '';
+            const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+            const daysLeft = task.due_date ? Math.ceil((new Date(task.due_date) - new Date()) / 86400000) : null;
+            const dueExtra = daysLeft !== null
+                ? daysLeft < 0 ? ` <span style="color:#dc2626;font-size:9px;font-weight:700">${Math.abs(daysLeft)}d overdue</span>`
+                : daysLeft <= 7 ? ` <span style="color:#c2410c;font-size:9px;font-weight:700">${daysLeft}d left</span>` : '' : '';
+            const briefText = task.design_brief || task.design_summary || '';
+            const JTL = typeof JOB_TYPE_LABELS !== 'undefined' ? JOB_TYPE_LABELS : {};
+
+            const colPairs = [
+                { label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+            ];
+
+            // Edit mode: show form fields
+            if (_dtrEditMode) {
+                const designerOpts = `<option value="">— Unassigned —</option>` +
+                    (typeof brandUsers !== 'undefined' && brandUsers?.length
+                        ? brandUsers.map(u => {
+                            const n = typeof userDisplayName === 'function' ? userDisplayName(u) : `${u.first_name||''} ${u.last_name||''}`.trim() || u.email || u.id;
+                            const sel = task.assigned_designer_id === u.id ? ' selected' : '';
+                            return `<option value="${u.id}" data-name="${escHtml(n)}"${sel}>${escHtml(n)}</option>`;
+                        }).join('')
+                        : (task.assigned_designer_id ? `<option value="${task.assigned_designer_id}" selected>${escHtml(task.assigned_designer_name||'Current Designer')}</option>` : ''));
+                return `
                     <!-- Club identity header -->
                     <div class="dtr-brief-summary">
                         ${logoUrl
@@ -19146,8 +19255,7 @@
                         </div>
                         <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 7px;flex-shrink:0">${pri.dot} ${pri.label}</span>
                     </div>
-
-                    <!-- § Job Details ─────────────────────────────────────── -->
+                    <!-- § Job Details -->
                     <div class="dtr-brief-section">
                         <div class="dtr-brief-section-title">Job Details</div>
                         <div class="dtr-edit-row">
@@ -19170,7 +19278,7 @@
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
                             <div class="dtr-edit-row" style="margin-bottom:0">
-                                <label class="dtr-edit-label" for="dtr-ln-due-date">Deadline${dueExtra ? ` ${dueExtra}` : ''}</label>
+                                <label class="dtr-edit-label" for="dtr-ln-due-date">Deadline</label>
                                 <input class="dtr-edit-field" id="dtr-ln-due-date" type="date" value="${task.due_date ? task.due_date.substring(0,10) : ''}">
                             </div>
                             <div class="dtr-edit-row" style="margin-bottom:0">
@@ -19183,24 +19291,22 @@
                             <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
                         </div>
                         ${task.jobs?.job_type ? `<div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding:6px 0">
-                            <span class="dtr-info-label" style="font-size:9px;font-weight:700;text-transform:uppercase;color:#94a3b8">Job Type</span>
+                            <span class="dtr-info-label">Job Type</span>
                             <span style="font-size:11px;font-weight:600;color:#475569">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
                         </div>` : ''}
                     </div>
-
-                    <!-- § Design Brief ────────────────────────────────────── -->
+                    <!-- § Design Brief -->
                     <div class="dtr-brief-section">
                         <div class="dtr-brief-section-title">Design Brief</div>
                         <div class="dtr-edit-row">
-                            <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design vision, colours, and key requirements…" style="min-height:90px">${escHtml(briefText)}</textarea>
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design vision…" style="min-height:90px">${escHtml(briefText)}</textarea>
                         </div>
                         <div class="dtr-edit-row" style="margin-bottom:0">
                             <label class="dtr-edit-label" for="dtr-ln-key-notes">Key Notes</label>
-                            <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Important reminders or constraints…" style="min-height:54px">${escHtml(task.key_notes||'')}</textarea>
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Important reminders…" style="min-height:54px">${escHtml(task.key_notes||'')}</textarea>
                         </div>
                     </div>
-
-                    <!-- § Colours ─────────────────────────────────────────── -->
+                    <!-- § Brand Colours -->
                     <div class="dtr-brief-section" style="border-bottom:none">
                         <div class="dtr-brief-section-title">Brand Colours</div>
                         <div style="display:flex;gap:8px">
@@ -19214,60 +19320,155 @@
                             </div>`).join('')}
                         </div>
                     </div>
-
-                    <!-- Save bar -->
                     <div class="dtr-save-bar">
                         <button class="dtr-save-btn" onclick="saveDTRLeftPanel()">Save Changes</button>
-                    </div>
-                </div>
+                    </div>`;
+            }
 
-                <!-- ── PRODUCTS ACCORDION ──────────────────────────────────── -->
-                <div class="dtr-accordion" id="dtr-acc-products">
-                    <button class="dtr-acc-hdr" onclick="toggleDTRAcc('products')">
-                        <span>Products Required</span>
-                        ${selectedIds.size ? `<span style="background:#e0fdf4;color:#065f46;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${selectedIds.size}</span>` : ''}
-                        <svg class="dtr-acc-chevron" id="dtr-acc-chev-products" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div class="dtr-acc-body" id="dtr-acc-body-products">
+            // Read-only (view) mode
+            const designerName = task.assigned_designer_name || (task.designers?.full_name) || '—';
+            return `
+                <!-- Club identity header -->
+                <div class="dtr-brief-summary">
+                    ${logoUrl
+                        ? `<img src="${escHtml(logoUrl)}" alt="" style="width:32px;height:32px;object-fit:contain;border-radius:6px;background:#fff;border:1px solid #e2e8f0;flex-shrink:0;padding:2px">`
+                        : `<div style="width:32px;height:32px;border-radius:6px;background:#e8ecf0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>`}
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled Task')}</div>
+                        <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
+                    </div>
+                    <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 7px;flex-shrink:0">${pri.dot} ${pri.label}</span>
+                </div>
+                <!-- § Job Details (read-only) -->
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Job Details</div>
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport||'—')}</span></div>
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Designer</span><span class="dtr-ro-value">${escHtml(designerName)}</span></div>
+                    ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span></div>` : ''}
+                </div>
+                <!-- § Design Brief (read-only) -->
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Design Brief</div>
+                    ${briefText
+                        ? `<p class="dtr-ro-text">${escHtml(briefText)}</p>`
+                        : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No brief entered yet.</p>`}
+                    ${task.key_notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
+                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#92400e;margin-bottom:3px">Key Notes</div>
+                        <p class="dtr-ro-text" style="color:#78350f;font-size:11px">${escHtml(task.key_notes)}</p>
+                    </div>` : ''}
+                </div>
+                <!-- § Brand Colours (read-only) -->
+                <div class="dtr-ro-section" style="border-bottom:none">
+                    <div class="dtr-ro-section-title">Brand Colours</div>
+                    <div style="display:flex;gap:8px">
+                        ${colPairs.map(c => `<div style="flex:1">
+                            <div style="height:36px;border-radius:8px;background:${c.hex||'#e8ecf0'};border:1px solid rgba(0,0,0,0.06);margin-bottom:5px;position:relative;overflow:hidden">
+                                ${!c.hex ? `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8">—</div>` : ''}
+                            </div>
+                            <div style="font-size:9px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:1px">${c.label}</div>
+                            ${c.hex ? `<div style="font-size:9px;color:#94a3b8;font-family:monospace">${escHtml(c.hex)}</div>` : ''}
+                            ${c.pantone ? `<div style="font-size:8px;color:#94a3b8;font-family:monospace">${escHtml(c.pantone)}</div>` : ''}
+                        </div>`).join('')}
+                    </div>
+                </div>`;
+        }
+
+        // ── Products tab ───────────────────────────────────────────────────────
+        function _buildDTRProductsTab(task, clubProds) {
+            const selectedIds = new Set(task.products_required || []);
+            const selectedProds = clubProds.filter(cp => selectedIds.has(cp.id));
+
+            if (_dtrEditMode) {
+                const miniProdCards = !task.club_id
+                    ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0">Link a club to see products.</p>`
+                    : !clubProds.length
+                        ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0">No products in club catalogue.</p>`
+                        : clubProds.map(cp => {
+                            const sel = selectedIds.has(cp.id);
+                            const nm = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                            const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                            const img = imgs[0] || cp.image_url || '';
+                            return `<div class="dtr-mini-prod-card${sel ? ' selected' : ''}" onclick="dtrToggleProd('${cp.id}',this)" title="${nm}">
+                                <div class="dtr-mini-check">✓</div>
+                                <div class="dtr-mini-prod-img">
+                                    ${img ? `<img src="${escHtml(img)}" alt="" loading="lazy">` : `<svg width="20" height="20" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
+                                </div>
+                                <div class="dtr-mini-prod-name">${nm}</div>
+                            </div>`;
+                        }).join('');
+                return `
+                    <div class="dtr-ro-section">
+                        <div class="dtr-ro-section-title">Products Required <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:9px">(click to toggle)</span></div>
                         <input class="dtr-prod-search" id="dtr-prod-search" placeholder="Search products…" oninput="dtrFilterProds(this.value)">
                         <div class="dtr-source-toggle">
                             <button class="dtr-source-btn active" id="dtr-src-club" onclick="dtrSwitchProdSource('club')">Club Catalogue</button>
                             <button class="dtr-source-btn" id="dtr-src-master" onclick="dtrSwitchProdSource('master')">All Products</button>
                         </div>
-                        <div id="dtr-prod-grid-club">
-                            <div class="dtr-mini-prod-grid" id="dtr-mini-grid-club">${miniProdCards}</div>
-                        </div>
-                        <div id="dtr-prod-grid-master" style="display:none">
-                            <div class="dtr-mini-prod-grid" id="dtr-mini-grid-master">
-                                <div style="grid-column:1/-1;font-size:11px;color:#94a3b8;padding:6px 0">Switch to "All Products" to browse master catalogue</div>
-                            </div>
-                        </div>
-                        <div class="dtr-selected-products">
-                            <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:5px">Selected (${selectedIds.size})</div>
-                            <div id="dtr-sel-prod-list">${selProdsHtml}</div>
-                        </div>
+                        <div id="dtr-prod-grid-club"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-club">${miniProdCards}</div></div>
+                        <div id="dtr-prod-grid-master" style="display:none"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-master"><div style="grid-column:1/-1;font-size:11px;color:#94a3b8;padding:6px 0">Browse master catalogue…</div></div></div>
                     </div>
-                </div>
+                    <div class="dtr-save-bar">
+                        <button class="dtr-save-btn" onclick="saveDTRLeftPanel()">Save Changes</button>
+                    </div>`;
+            }
 
-                <!-- ── ASSETS ACCORDION ────────────────────────────────────── -->
-                <div class="dtr-accordion" id="dtr-acc-assets">
-                    <button class="dtr-acc-hdr" onclick="toggleDTRAcc('assets')">
-                        <span>Assets for Design</span>
-                        ${assets.length ? `<span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${assets.length}</span>` : ''}
-                        <svg class="dtr-acc-chevron" id="dtr-acc-chev-assets" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="13" height="13"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                    </button>
-                    <div class="dtr-acc-body" id="dtr-acc-body-assets">
-                        <div class="dtr-asset-upload-zone"
-                            onclick="document.getElementById('dtr-asset-finput').click()"
-                            ondragover="event.preventDefault();this.classList.add('drag-over')"
-                            ondragleave="this.classList.remove('drag-over')"
-                            ondrop="dtrAssetDrop(event)">
-                            <svg width="15" height="15" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 4px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <p style="font-size:10px;color:#94a3b8;margin:0">Drop files or click to upload</p>
+            // Read-only
+            const selHtml = selectedProds.length
+                ? selectedProds.map(cp => {
+                    const nm = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                    const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                    const img = imgs[0] || cp.image_url || '';
+                    return `<div class="dtr-selected-list-item">
+                        ${img ? `<div style="width:28px;height:28px;flex-shrink:0;border-radius:5px;background:#f8fafc;border:1px solid #e2e8f0;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="${escHtml(img)}" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>` : ''}
+                        <div class="dtr-sel-prod-name" title="${nm}">${nm}</div>
+                        ${img ? `<button class="dtr-sel-prod-eye" onclick="dtrPreviewProdImage('${escHtml(img)}','${nm}')" title="Preview">
+                            <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        </button>` : ''}
+                    </div>`;
+                }).join('')
+                : `<p style="font-size:12px;color:#94a3b8;margin:0;padding:4px 0">No products selected.</p>`;
+            return `
+                <div class="dtr-ro-section" style="border-bottom:none">
+                    <div class="dtr-ro-section-title">Products Required <span style="background:#e0fdf4;color:#065f46;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${selectedIds.size}</span></div>
+                    ${selHtml}
+                </div>`;
+        }
+
+        // ── Assets tab ─────────────────────────────────────────────────────────
+        function _buildDTRAssetsTab(assets) {
+            const assetsHtml = assets.length
+                ? assets.map(a => {
+                    const isImg = a.file_type?.startsWith('image/');
+                    const ext = (a.file_name || '').split('.').pop().toUpperCase();
+                    return `<div class="dtr-asset-row">
+                        <div class="dtr-asset-thumb-sm">
+                            ${isImg ? `<img src="${escHtml(a.file_url)}" alt="" loading="lazy">` : `<span style="font-size:8px;font-weight:800;color:#475569;text-align:center">${escHtml(ext)}</span>`}
                         </div>
-                        <input type="file" id="dtr-asset-finput" class="hide" multiple accept=".ai,.svg,image/*,.pdf" onchange="dtrAssetSelect(event)">
-                        <div id="dtr-asset-list">${assetsHtml}</div>
+                        <div class="dtr-asset-info">
+                            <div class="dtr-asset-fname-sm" title="${escHtml(a.file_name||'')}">${escHtml(a.file_name||'File')}</div>
+                            <div class="dtr-asset-meta-sm">${dsRelativeTime(a.created_at)}</div>
+                        </div>
+                        <button class="dtr-asset-dl-btn" onclick="downloadFile('${escHtml(a.file_url)}','${escHtml(a.file_name||'file')}')" title="Download">↓</button>
+                    </div>`;
+                }).join('')
+                : `<p style="font-size:12px;color:#94a3b8;margin:0;padding:4px 0">No assets uploaded yet.</p>`;
+            return `
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Assets for Design ${assets.length ? `<span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700">${assets.length}</span>` : ''}</div>
+                    <div id="dtr-asset-list">${assetsHtml}</div>
+                </div>
+                <div class="dtr-ro-section" style="border-bottom:none">
+                    <div class="dtr-asset-upload-zone"
+                        onclick="document.getElementById('dtr-asset-finput').click()"
+                        ondragover="event.preventDefault();this.classList.add('drag-over')"
+                        ondragleave="this.classList.remove('drag-over')"
+                        ondrop="dtrAssetDrop(event)">
+                        <svg width="15" height="15" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 4px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p style="font-size:10px;color:#94a3b8;margin:0">Drop files or click to upload</p>
                     </div>
+                    <input type="file" id="dtr-asset-finput" class="hide" multiple accept=".ai,.svg,image/*,.pdf" onchange="dtrAssetSelect(event)">
                 </div>`;
         }
 
@@ -21013,14 +21214,14 @@
         async function resolveRevisionRequest(entryId, action) {
             // Optimistic local update first
             const entry = _dtActivityLog.find(e => e.id === entryId);
-            if (entry) { entry.task_completed = true; entry.review_comment = action; }
+            if (entry) { entry.task_completed = true; }
             renderDesignTaskActivity();
 
             const { error } = await supabase.from('design_task_activity')
-                .update({ task_completed: true, review_comment: action }).eq('id', entryId);
+                .update({ task_completed: true }).eq('id', entryId);
             if (error) {
                 // Rollback on failure
-                if (entry) { entry.task_completed = false; entry.review_comment = null; }
+                if (entry) { entry.task_completed = false; }
                 renderDesignTaskActivity();
                 showToast('Error updating revision request', 'error');
             }
