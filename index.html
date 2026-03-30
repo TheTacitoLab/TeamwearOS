@@ -2229,7 +2229,6 @@
                         <span id="dsp-club" style="font-size:12px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1"></span>
                         <div style="margin-left:auto;display:flex;gap:6px;flex-shrink:0">
                             <button id="dsp-edit-btn" class="dt-edit-btn" onclick="toggleDTREditMode()" style="font-size:11px;padding:4px 10px">Edit</button>
-                            <button onclick="showDesignTask(currentDesignTaskRecord?.id)" style="font-size:11px;padding:4px 10px;border-radius:6px;font-weight:600;border:1.5px solid #e2e8f0;color:#475569;background:#f8fafc;cursor:pointer">Open Full ↗</button>
                         </div>
                     </div>
                     <!-- Empty state -->
@@ -17785,7 +17784,7 @@
             const query  = (document.getElementById('ds-search')?.value || '').toLowerCase();
             const fLabel = document.getElementById('ds-filter-label')?.value || '';
 
-            let filtered = allTasks.filter(t => {
+            const matchesFilters = t => {
                 if (query) {
                     const name = (t.task_name || '').toLowerCase();
                     const club = (t.clubs?.name || '').toLowerCase();
@@ -17794,32 +17793,50 @@
                 }
                 if (_dsActiveStageTab !== 'all' && getDSTaskStageGroup(t) !== _dsActiveStageTab) return false;
                 if (fLabel) {
-                    const statusLabel = getDSTaskStatusLabel(t);
-                    if (fLabel === 'revisions' && statusLabel !== 'revisions') return false;
-                    else if (fLabel !== 'revisions' && statusLabel !== fLabel) return false;
+                    const sl = getDSTaskStatusLabel(t);
+                    if (sl !== fLabel) return false;
                 }
                 return true;
-            });
+            };
+
+            const filtered = allTasks.filter(matchesFilters);
 
             const unreadByTask = {};
             (_feedAllItems || []).filter(f => !f.is_read && f.task_id).forEach(f => {
                 unreadByTask[f.task_id] = (unreadByTask[f.task_id] || 0) + 1;
             });
 
-            // Stage tab group labels
-            const stageTabLabels = { all: 'Tasks', presentation: 'Presentation Tasks', range: 'Range Tasks', finalise: 'Finalise Tasks' };
-            const groupLabel = stageTabLabels[_dsActiveStageTab] || 'Tasks';
-            const groupColor = { all: '#64748b', presentation: '#6366f1', range: '#2563eb', finalise: '#0891b2' }[_dsActiveStageTab] || '#64748b';
+            const stageGroups = [
+                { key: 'presentation', label: 'Presentation', color: '#6366f1' },
+                { key: 'range',        label: 'Range',        color: '#2563eb' },
+                { key: 'finalise',     label: 'Finalise',     color: '#0891b2' },
+            ];
 
             const panel = document.getElementById('ds-task-list-panel');
             if (panel) {
                 if (filtered.length === 0) {
                     panel.innerHTML = `<div class="ds-preview-empty" style="padding:40px 20px;text-align:center"><p style="font-size:13px;font-weight:600;color:#94a3b8">No tasks match your filters</p><p style="font-size:11px;color:#b0b8c4;margin-top:4px">Try clearing the search or filters</p></div>`;
+                } else if (_dsActiveStageTab === 'all') {
+                    // Grouped by stage when on All tab
+                    panel.innerHTML = stageGroups.map(({ key, label, color }) => {
+                        const tasks = filtered.filter(t => getDSTaskStageGroup(t) === key);
+                        if (tasks.length === 0) return '';
+                        return `<div class="ds-group">
+                            <div class="ds-group-header">
+                                <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
+                                <span class="ds-group-label" style="color:${color}">${label}</span>
+                                <span class="ds-group-count">${tasks.length}</span>
+                            </div>
+                            ${tasks.map(t => _renderDSTaskRow(t, unreadByTask[t.id] || 0, getDSTaskStatusLabel(t))).join('')}
+                        </div>`;
+                    }).join('');
                 } else {
+                    // Single group for specific stage tab
+                    const { label, color } = stageGroups.find(g => g.key === _dsActiveStageTab) || { label: 'Tasks', color: '#64748b' };
                     panel.innerHTML = `<div class="ds-group">
                         <div class="ds-group-header">
-                            <span style="width:7px;height:7px;border-radius:50%;background:${groupColor};flex-shrink:0;display:inline-block"></span>
-                            <span class="ds-group-label" style="color:${groupColor}">${groupLabel}</span>
+                            <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
+                            <span class="ds-group-label" style="color:${color}">${label}</span>
                             <span class="ds-group-count">${filtered.length}</span>
                         </div>
                         ${filtered.map(t => _renderDSTaskRow(t, unreadByTask[t.id] || 0, getDSTaskStatusLabel(t))).join('')}
@@ -17827,11 +17844,12 @@
                 }
             }
 
-            // Auto-select first task
+            // Auto-load first task into preview on first render
             if (!_dsSelectedTaskId && filtered.length > 0) {
-                selectDSTask(filtered[0].id, false);
-            }
-            if (_dsSelectedTaskId) {
+                _dsSelectedTaskId = filtered[0].id;
+                document.querySelector(`.ds-task-row[data-task-id="${_dsSelectedTaskId}"]`)?.classList.add('ds-selected');
+                loadTaskInPreview(_dsSelectedTaskId);
+            } else if (_dsSelectedTaskId) {
                 document.querySelector(`.ds-task-row[data-task-id="${_dsSelectedTaskId}"]`)?.classList.add('ds-selected');
             }
 
@@ -18959,9 +18977,9 @@
             if (!currentStages.length) {
                 await supabase.from('design_stages').insert([
                     { task_id: taskId, brand_id: task.brand_id, stage_number: 1, stage_name: 'Brief', status: 'not_started' },
-                    { task_id: taskId, brand_id: task.brand_id, stage_number: 2, stage_name: 'Concepts', status: 'not_started' },
-                    { task_id: taskId, brand_id: task.brand_id, stage_number: 3, stage_name: 'Full Range', status: 'not_started' },
-                    { task_id: taskId, brand_id: task.brand_id, stage_number: 4, stage_name: 'Final Artwork', status: 'not_started' }
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 2, stage_name: 'Presentation', status: 'not_started' },
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 3, stage_name: 'Range', status: 'not_started' },
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 4, stage_name: 'Finalise', status: 'not_started' }
                 ]);
                 const { data: stagesRetry } = await supabase.from('design_stages').select('*').eq('task_id', taskId).order('stage_number');
                 currentStages = stagesRetry || [];
@@ -19980,14 +19998,14 @@
             return `<div class="dtr-stage-section${stageClass3}" id="dtr-stage-3">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(3)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '3'}</div>
-                    <span class="dtr-stage-title">Full Range</span>
+                    <span class="dtr-stage-title">Range</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     <svg class="dtr-stage-chevron${isOpen3 ? '' : ' closed'}" id="dtr-stage-chev-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-3"${isOpen3 ? '' : ' style="display:none"'}>
                     <div class="dtr-stage-placeholder">
                         <div style="font-size:30px;margin-bottom:8px">🎨</div>
-                        <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Full Range</div>
+                        <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Range</div>
                         <div style="font-size:12px;color:#94a3b8;max-width:320px;margin:0 auto">Upload the full range design — one image per garment with a simple tick or ✕ on each. Coming in the next phase.</div>
                     </div>
                 </div>
@@ -20012,14 +20030,14 @@
             return `<div class="dtr-stage-section${stageClass4}" id="dtr-stage-4">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(4)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '4'}</div>
-                    <span class="dtr-stage-title">Final Artwork</span>
+                    <span class="dtr-stage-title">Finalise</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     <svg class="dtr-stage-chevron${isOpen4 ? '' : ' closed'}" id="dtr-stage-chev-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-4"${isOpen4 ? '' : ' style="display:none"'}>
                     <div class="dtr-stage-placeholder">
                         <div style="font-size:30px;margin-bottom:8px">🖨️</div>
-                        <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Final Artwork</div>
+                        <div style="font-size:13px;font-weight:600;color:#475569;margin-bottom:4px">Finalise</div>
                         <div style="font-size:12px;color:#94a3b8;max-width:320px;margin:0 auto">Final deliverables: Print Files, Full Range PDF, Tech Pack, Website Imagery. Coming in the next phase.</div>
                     </div>
                 </div>
@@ -20058,12 +20076,12 @@
                 return `<div class="dtr-stage-section stage-approved" id="dtr-stage-2">
                     <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
                         <div class="dtr-stage-icon-circle">✓</div>
-                        <span class="dtr-stage-title">Concepts</span>
+                        <span class="dtr-stage-title">Presentation</span>
                         <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(34,197,94,0.1);color:#16a34a;margin-left:4px">Approved</span>
                         ${chevronSvg('dtr-stage-chev-2', true)}
                     </button>
                     <div class="dtr-stage-body" id="dtr-stage-body-2" style="display:none">
-                        <p style="color:#16a34a;font-size:12px;font-weight:600;margin:0">✓ Concepts stage complete.</p>
+                        <p style="color:#16a34a;font-size:12px;font-weight:600;margin:0">✓ Presentation stage complete.</p>
                     </div>
                 </div>`;
             }
@@ -20093,8 +20111,8 @@
 
             // ── Deliver bar ──
             const deliverBtn = isInReview
-                ? `<button class="dtr-deliver-btn delivered" disabled>✓ Concepts Delivered</button>`
-                : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Concepts</button>`;
+                ? `<button class="dtr-deliver-btn delivered" disabled>✓ Presentation Delivered</button>`
+                : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Presentation</button>`;
 
             const revisionsBtn = isRevisions
                 ? `<span style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a">🔄 Revisions Requested</span>`
@@ -20112,7 +20130,7 @@
             return `<div class="dtr-stage-section${stageStateClass}" id="dtr-stage-2">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
                     <div class="dtr-stage-icon-circle">2</div>
-                    <span class="dtr-stage-title">Concepts</span>
+                    <span class="dtr-stage-title">Presentation</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     ${chevronSvg('dtr-stage-chev-2', stage.status === 'not_started')}
                 </button>
@@ -20254,7 +20272,7 @@
                     uploaded_by: actor?.data?.user?.id || null, uploaded_by_name: actorName
                 });
                 if (dbErr) throw dbErr;
-                await dsLogActivity(stage.task_id, stageId, 'version_uploaded', { stage_name: 'Concepts', version_label: `Concept ${conceptNum}` });
+                await dsLogActivity(stage.task_id, stageId, 'version_uploaded', { stage_name: 'Presentation', version_label: `Concept ${conceptNum}` });
                 showToast(`Concept ${conceptNum} image uploaded ✓`);
                 await _dtrRefreshConceptsStage();
             } catch(err) {
@@ -20326,7 +20344,7 @@
             if (!ok) return;
             await supabase.from('design_tasks').update({ status: 'in_review' }).eq('id', stage.task_id);
             if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_review';
-            await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Concepts' });
+            await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Presentation' });
             showToast('Concepts delivered for review ✓');
             await _dtrRefreshConceptsStage();
         }
@@ -20340,7 +20358,7 @@
                 if (!ok) return;
                 await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
                 if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
-                await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: 'Concepts', comment });
+                await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: 'Presentation', comment });
                 showToast('Revisions requested');
                 await _dtrRefreshConceptsStage();
             });
@@ -20404,7 +20422,7 @@
             if (!hasApproved) { showToast('At least one concept must be approved first', 'warning'); return; }
             const ok = await updateStageStatus(stage, 'approved', 'Concepts stage completed');
             if (!ok) return;
-            await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: 'Concepts' });
+            await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: 'Presentation' });
             // Auto-advance stage 3
             const stage3 = currentStages.find(s => s.stage_number === 3);
             if (stage3 && stage3.status === 'not_started') {
