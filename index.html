@@ -2243,17 +2243,6 @@
 
                 <!-- RIGHT: embedded DTR panel -->
                 <div class="ds-preview-panel" id="ds-preview-panel" style="display:flex;flex-direction:column;overflow:hidden">
-                    <!-- Compact DTR header (shown when a task is loaded) -->
-                    <div id="dsp-dtr-header" class="hide" style="display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid #e8ecf0;background:#fff;height:48px;flex-shrink:0">
-                        <span id="dsp-task-name" style="font-size:14px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px"></span>
-                        <span id="dsp-ref" style="font-family:monospace;font-size:11px;color:#94a3b8;flex-shrink:0"></span>
-                        <span id="dsp-status-badge" class="badge design-status-new text-xs" style="flex-shrink:0"></span>
-                        <span style="color:#e2e8f0;flex-shrink:0">|</span>
-                        <span id="dsp-club" style="font-size:12px;color:#475569;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1"></span>
-                        <div style="margin-left:auto;display:flex;gap:6px;flex-shrink:0">
-                            <button id="dsp-edit-btn" class="dt-edit-btn" onclick="toggleDTREditMode()" style="font-size:11px;padding:4px 10px">Edit</button>
-                        </div>
-                    </div>
                     <!-- Empty state -->
                     <div id="dsp-empty" class="ds-preview-empty">
                         <svg width="40" height="40" fill="none" stroke="#e2e8f0" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h6M9 12h6M9 15h4"/></svg>
@@ -17991,13 +17980,11 @@
 
         async function loadTaskInPreview(taskId) {
             const panel = document.getElementById('dsp-stage-panel');
-            const header = document.getElementById('dsp-dtr-header');
             const empty = document.getElementById('dsp-empty');
             if (!panel) { renderDSPreviewPanel(taskId); return; }
 
             if (!taskId) {
                 panel.classList.add('hide');
-                if (header) header.classList.add('hide');
                 if (empty) empty.classList.remove('hide');
                 return;
             }
@@ -18006,28 +17993,11 @@
             if (empty) empty.classList.add('hide');
             panel.classList.remove('hide');
             panel.style.display = '';
-            if (header) { header.classList.remove('hide'); header.style.display = 'flex'; }
             panel.innerHTML = '<div style="padding:48px;text-align:center"><div class="spinner"></div></div>';
 
             // Point the DTR render target at the preview panel BEFORE loading
-            // loadDesignTaskRecordV2 → renderDesignTaskRecordV2 → renderNewDTRLayout
-            // renderNewDTRLayout reads _dtrPanelEl first thing and resets it
             _dtrPanelEl = panel;
             await loadDesignTaskRecordV2(taskId);
-
-            // Update compact preview header from the now-loaded currentDesignTaskRecord
-            const task = currentDesignTaskRecord;
-            if (task) {
-                const nameEl = document.getElementById('dsp-task-name');
-                const refEl  = document.getElementById('dsp-ref');
-                const badge  = document.getElementById('dsp-status-badge');
-                const clubEl = document.getElementById('dsp-club');
-                if (nameEl) nameEl.textContent = task.task_name || 'Untitled Task';
-                if (refEl)  refEl.textContent  = task.task_ref  || '';
-                if (badge)  { badge.textContent = (DS_STATUS_LABELS||{})[task.status] || task.status; badge.className = `badge design-status-${task.status} text-xs`; }
-                if (clubEl) clubEl.textContent  = task.clubs?.name ? `🏟 ${task.clubs.name}` : '';
-            }
-
         }
 
         function renderDSPreviewPanel(taskId) {
@@ -19576,11 +19546,9 @@
 
         function toggleDTREditMode() {
             _dtrEditMode = !_dtrEditMode;
-            // Update whichever edit button is visible (full-page or embedded preview)
-            ['dt-edit-btn', 'dsp-edit-btn'].forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) { btn.textContent = _dtrEditMode ? 'Done' : 'Edit'; btn.classList.toggle('active', _dtrEditMode); }
-            });
+            // Update edit button in full-page header if present
+            const btn = document.getElementById('dt-edit-btn');
+            if (btn) { btn.textContent = _dtrEditMode ? 'Done' : 'Edit'; btn.classList.toggle('active', _dtrEditMode); }
             // Re-render current tab in new mode
             const content = document.getElementById('dtr-left-tab-content');
             if (content && currentDesignTaskRecord) {
@@ -19731,7 +19699,7 @@
                             <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled Task')}</div>
                             <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                         </div>
-                        <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 7px;flex-shrink:0">${pri.dot} ${pri.label}</span>
+                        <button onclick="toggleDTREditMode()" class="dt-edit-btn active" style="font-size:10px;padding:3px 9px;flex-shrink:0">Done</button>
                     </div>
                     <!-- § Job Details -->
                     <div class="dtr-brief-section">
@@ -19815,7 +19783,7 @@
                         <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled Task')}</div>
                         <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                     </div>
-                    <span class="ds-priority ds-priority-${task.priority||'standard'}" style="font-size:9px;padding:2px 7px;flex-shrink:0">${pri.dot} ${pri.label}</span>
+                    <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px;flex-shrink:0">Edit</button>
                 </div>
                 <!-- § Job Details (read-only) -->
                 <div class="dtr-ro-section">
