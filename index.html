@@ -523,6 +523,84 @@
         /* Design Studio header area */
         .ds-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:0; position:sticky; top:96px; z-index:30; }
 
+        /* ── Design Studio Split Dashboard ── */
+        .ds-studio-body { display:grid; grid-template-columns:43% 1fr; height:calc(100vh - 152px); overflow:hidden; }
+        @media(max-width:900px) { .ds-studio-body { grid-template-columns:1fr; height:auto; overflow:visible; } }
+
+        .ds-task-list-panel { border-right:1px solid #e2e8f0; overflow-y:auto; background:#f8fafc; }
+        .ds-task-list-panel::-webkit-scrollbar { width:4px; }
+        .ds-task-list-panel::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+
+        .ds-preview-panel { overflow-y:auto; background:#fff; display:flex; flex-direction:column; }
+        .ds-preview-panel::-webkit-scrollbar { width:4px; }
+        .ds-preview-panel::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+
+        /* Group header */
+        .ds-group-header { display:flex; align-items:center; gap:8px; padding:10px 16px 7px; position:sticky; top:0; background:#f8fafc; z-index:5; border-bottom:1px solid #e8ecf0; }
+        .ds-group-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; flex:1; }
+        .ds-group-count { font-size:10px; font-weight:700; color:#94a3b8; background:#e2e8f0; border-radius:10px; padding:1px 7px; }
+        .ds-group-empty { padding:6px 16px 10px; font-size:11px; color:#b0b8c4; font-style:italic; }
+
+        /* Task row */
+        .ds-task-row { display:flex; align-items:flex-start; gap:0; padding:10px 14px 10px 20px; border-bottom:1px solid #f1f5f9; cursor:pointer; background:#f8fafc; transition:background 0.1s; position:relative; }
+        .ds-task-row::before { content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; border-radius:2px; background:#e2e8f0; }
+        .ds-task-row.urgency-overdue::before   { background:#dc2626; }
+        .ds-task-row.urgency-revisions::before { background:#b45309; }
+        .ds-task-row.urgency-soon::before      { background:#ea580c; }
+        .ds-task-row.urgency-waiting::before   { background:#d97706; }
+        .ds-task-row.urgency-review::before    { background:#16a34a; }
+        .ds-task-row.urgency-active::before    { background:#2563eb; }
+        .ds-task-row:hover { background:#f0f4f8; }
+        .ds-task-row.ds-selected { background:#fff; border-bottom-color:#e2e8f0; box-shadow:inset -2px 0 0 #0f172a; }
+
+        .ds-row-main { flex:1; min-width:0; }
+        .ds-row-title { font-size:13px; font-weight:600; color:#0f172a; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .ds-row-meta { display:flex; align-items:center; gap:5px; flex-wrap:wrap; }
+        .ds-row-club  { font-size:11px; color:#475569; font-weight:500; }
+        .ds-row-dot   { color:#d1d5db; font-size:10px; }
+        .ds-row-stage { font-size:11px; color:#6b7280; }
+        .ds-row-due   { font-size:11px; font-weight:600; }
+        .ds-row-due.overdue { color:#dc2626; }
+        .ds-row-due.soon    { color:#ea580c; }
+        .ds-row-due.ok      { color:#64748b; }
+        .ds-row-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; margin-left:8px; padding-top:1px; }
+        .ds-row-badge { font-size:9px; font-weight:700; padding:2px 6px; border-radius:10px; text-transform:uppercase; letter-spacing:0.04em; white-space:nowrap; }
+        .ds-row-badge.urgent   { background:#fef2f2; color:#dc2626; border:1px solid #fecaca; }
+        .ds-row-badge.high     { background:#fff7ed; color:#ea580c; border:1px solid #fed7aa; }
+        .ds-row-badge.revisions{ background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
+        .ds-row-badge.waiting  { background:#fffbeb; color:#b45309; border:1px solid #fde68a; }
+        .ds-row-badge.review   { background:#f0fdf4; color:#16a34a; border:1px solid #bbf7d0; }
+        .ds-row-meta-right { display:flex; align-items:center; gap:5px; }
+        .ds-row-unread { font-size:9px; font-weight:700; background:#ef4444; color:#fff; border-radius:10px; padding:1px 5px; }
+        .ds-row-avatar-sm { width:18px; height:18px; border-radius:50%; background:#e2e8f0; font-size:8px; font-weight:700; color:#64748b; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+        /* Preview panel */
+        .ds-preview-empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; min-height:300px; color:#94a3b8; gap:10px; padding:40px; }
+        .ds-preview-header { padding:20px 24px 16px; border-bottom:1px solid #f1f5f9; }
+        .ds-preview-title { font-size:17px; font-weight:700; color:#0f172a; line-height:1.3; margin-bottom:4px; }
+        .ds-preview-ref { font-size:11px; font-family:monospace; color:#94a3b8; }
+        .ds-preview-meta-grid { display:grid; grid-template-columns:1fr 1fr; margin:14px 24px 0; border:1px solid #e8ecf0; border-radius:12px; overflow:hidden; }
+        .ds-meta-cell { padding:10px 14px; border-bottom:1px solid #f1f5f9; border-right:1px solid #f1f5f9; }
+        .ds-meta-cell:nth-child(even) { border-right:none; }
+        .ds-meta-cell:nth-last-child(-n+2) { border-bottom:none; }
+        .ds-meta-label { font-size:10px; font-weight:600; color:#94a3b8; text-transform:uppercase; letter-spacing:0.06em; margin-bottom:3px; }
+        .ds-meta-value { font-size:12px; font-weight:600; color:#0f172a; }
+        .ds-preview-block { margin:16px 24px 0; border:1px solid #f1f5f9; border-radius:12px; overflow:hidden; }
+        .ds-block-header { padding:7px 14px; background:#f8fafc; border-bottom:1px solid #f1f5f9; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:#6b7280; }
+        .ds-block-body { padding:12px 14px; }
+        .ds-blockers-item { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid #fef2f2; font-size:12px; }
+        .ds-blockers-item:last-child { border-bottom:none; }
+        .ds-activity-item { display:flex; align-items:flex-start; gap:8px; padding:5px 0; border-bottom:1px solid #f8fafc; }
+        .ds-activity-item:last-child { border-bottom:none; }
+        .ds-activity-avatar-sm { width:22px; height:22px; border-radius:50%; background:#e8ecf0; font-size:8px; font-weight:700; color:#64748b; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+        .ds-preview-actions { padding:14px 24px; border-top:1px solid #f1f5f9; display:flex; gap:8px; flex-wrap:wrap; background:#fff; position:sticky; bottom:0; margin-top:auto; }
+
+        /* Search/filter inputs in toolbar */
+        .ds-toolbar-search { padding:5px 10px 5px 30px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; background:#f8fafc; color:#0f172a; min-width:180px; outline:none; }
+        .ds-toolbar-search:focus { border-color:#cbd5e1; background:#fff; }
+        .ds-toolbar-filter { padding:5px 10px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; background:#f8fafc; color:#0f172a; cursor:pointer; outline:none; }
+        .ds-toolbar-filter:focus { border-color:#cbd5e1; }
+
         /* 3-view tabs: Pending / Delivered / Completed */
         .ds-view-tabs { display:flex; gap:0; border-top:1px solid #e2e8f0; }
         .ds-view-tab { position:relative; display:flex; align-items:center; gap:8px; padding:12px 24px; font-size:13px; font-weight:600; color:#64748b; background:transparent; border:none; cursor:pointer; transition:all 0.2s; }
@@ -2003,19 +2081,39 @@
         <!-- TOOL: Design Studio V2 -->
         <div id="tool-design-studio" class="hide w-full">
 
-            <!-- Sticky toolbar: sort left · actions right -->
-            <div class="ds-header" style="padding:0 24px;display:flex;align-items:center;gap:8px;min-height:48px;border-bottom:1px solid #e2e8f0;background:#fff;">
-                <!-- Sort pills -->
-                <span style="font-size:11px;font-weight:600;color:#94a3b8;margin-right:2px;flex-shrink:0">Sort:</span>
-                <button class="ds-sort-btn active" id="ds-sort-default" onclick="setDSKanbanSort('default')">Default</button>
-                <button class="ds-sort-btn" id="ds-sort-overdue" onclick="setDSKanbanSort('overdue')">Overdue First</button>
-                <button class="ds-sort-btn" id="ds-sort-due" onclick="setDSKanbanSort('due')">Closest Due Date</button>
-                <!-- Push actions to right -->
+            <!-- Sticky toolbar -->
+            <div class="ds-header" style="padding:0 20px;display:flex;align-items:center;gap:10px;min-height:52px;">
+                <!-- Title + count -->
+                <div style="flex-shrink:0">
+                    <span style="font-size:14px;font-weight:700;color:#0f172a">Design Studio</span>
+                    <span id="ds-active-count" style="margin-left:7px;font-size:11px;color:#94a3b8;font-weight:500">0 active tasks</span>
+                </div>
+
+                <!-- Search -->
+                <div style="position:relative;flex-shrink:0">
+                    <svg style="position:absolute;left:8px;top:50%;transform:translateY(-50%);pointer-events:none" width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input id="ds-search" class="ds-toolbar-search" placeholder="Search tasks or clubs…" oninput="renderDSDashboard()">
+                </div>
+
+                <!-- Filters -->
+                <select id="ds-filter-group" class="ds-toolbar-filter" onchange="renderDSDashboard()">
+                    <option value="">All Groups</option>
+                    <option value="overdue">Overdue</option>
+                    <option value="revisions">Revisions</option>
+                    <option value="soon">Due Soon</option>
+                    <option value="waiting">Waiting on Feedback</option>
+                    <option value="review">Ready for Review</option>
+                    <option value="active">In Progress</option>
+                </select>
+                <select id="ds-filter-priority" class="ds-toolbar-filter" onchange="renderDSDashboard()">
+                    <option value="">All Priority</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="high">High</option>
+                    <option value="standard">Standard</option>
+                </select>
+
+                <!-- Right actions -->
                 <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
-                    <button onclick="scrollToFeed()" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#64748b;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:5px 12px;cursor:pointer;transition:all 0.15s;white-space:nowrap">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-                        Activity <span id="ds-unread-badge-hdr" class="ds-notif-badge hide" style="position:static;margin-left:2px">0</span>
-                    </button>
                     <button id="ds-completed-tab-btn" onclick="toggleDSCompletedPanel()" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#64748b;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:5px 12px;cursor:pointer;transition:all 0.15s;white-space:nowrap">
                         <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Completed <span id="ds-completed-tab-count" class="ds-notif-badge hide" style="position:static;margin-left:2px;background:#94a3b8">0</span>
@@ -2025,47 +2123,30 @@
                         New Design Task
                     </button>
                 </div>
+
+                <!-- Hidden legacy: unread badge element kept so JS refs don't break -->
+                <span id="ds-unread-badge-hdr" class="ds-notif-badge hide" style="position:absolute;opacity:0;pointer-events:none">0</span>
             </div>
 
-            <!-- Kanban board — 3 columns -->
-            <div class="ds-kanban-board" id="ds-kanban-board-v2">
+            <!-- Split-screen dashboard body -->
+            <div class="ds-studio-body">
 
-                <!-- NEW -->
-                <div class="ds-kanban-col">
-                    <div class="dsk-col-header">
-                        <span class="dsk-col-dot new"></span>
-                        <span class="dsk-col-title">New</span>
-                        <span class="dsk-col-count" id="dsk-count-v2-new">0</span>
-                    </div>
-                    <div class="dsk-col-body" id="dsk-body-v2-new"></div>
-                    <div class="dsk-col-empty hide" id="dsk-empty-v2-new">No new tasks</div>
+                <!-- LEFT: grouped smart task list -->
+                <div class="ds-task-list-panel" id="ds-task-list-panel">
+                    <div class="ds-group-empty" style="padding:20px 16px;color:#94a3b8">Loading tasks…</div>
                 </div>
 
-                <!-- IN PROGRESS -->
-                <div class="ds-kanban-col">
-                    <div class="dsk-col-header">
-                        <span class="dsk-col-dot in_progress"></span>
-                        <span class="dsk-col-title">In Progress</span>
-                        <span class="dsk-col-count" id="dsk-count-v2-in_progress">0</span>
+                <!-- RIGHT: selected task preview -->
+                <div class="ds-preview-panel" id="ds-preview-panel">
+                    <div class="ds-preview-empty">
+                        <svg width="40" height="40" fill="none" stroke="#e2e8f0" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h6M9 12h6M9 15h4"/></svg>
+                        <p style="font-size:13px;font-weight:600;color:#94a3b8">Select a task to preview</p>
+                        <p style="font-size:11px;color:#b0b8c4">Click any task in the list to see its details</p>
                     </div>
-                    <div class="dsk-col-body" id="dsk-body-v2-in_progress"></div>
-                    <div class="dsk-col-empty hide" id="dsk-empty-v2-in_progress">No tasks in progress</div>
                 </div>
-
-                <!-- DELIVERED -->
-                <div class="ds-kanban-col">
-                    <div class="dsk-col-header">
-                        <span class="dsk-col-dot delivered"></span>
-                        <span class="dsk-col-title">Delivered</span>
-                        <span class="dsk-col-count" id="dsk-count-v2-delivered">0</span>
-                    </div>
-                    <div class="dsk-col-body" id="dsk-body-v2-delivered"></div>
-                    <div class="dsk-col-empty hide" id="dsk-empty-v2-delivered">No delivered tasks</div>
-                </div>
-
             </div>
 
-            <!-- Completed Designs panel (hidden by default) -->
+            <!-- Completed Designs panel (hidden by default, slides in below) -->
             <div id="ds-completed-panel" class="ds-completed-panel hide">
                 <div class="ds-completed-panel-inner">
                     <div class="ds-completed-panel-hdr">
@@ -2080,33 +2161,14 @@
                 </div>
             </div>
 
-            <!-- Activity Feed — collapsible section below kanban -->
-            <div style="padding:0 24px 24px">
-                <div style="border:1px solid #e2e8f0;border-radius:14px;overflow:hidden">
-                    <button onclick="toggleDSFeed()" style="width:100%;display:flex;align-items:center;gap:8px;padding:12px 16px;background:#fff;border:none;cursor:pointer;text-align:left">
-                        <span style="font-size:13px;font-weight:700;color:#0f172a;flex:1">Activity Feed <span id="ds-unread-badge" class="ds-notif-badge hide">0</span></span>
-                        <div style="display:flex;align-items:center;gap:8px">
-                            <button onclick="event.stopPropagation();markAllFeedRead()" style="font-size:11px;color:#64748b;background:transparent;border:none;cursor:pointer;padding:0">Mark all read</button>
-                            <button id="ds-feed-history-btn" onclick="event.stopPropagation();toggleFeedHistory()" style="font-size:11px;color:#64748b;background:transparent;border:1.5px solid #e2e8f0;border-radius:6px;cursor:pointer;padding:2px 8px;transition:all 0.15s">History</button>
-                            <svg id="ds-feed-chevron" style="width:16px;height:16px;color:#64748b;transition:transform 0.2s;transform:rotate(-90deg)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                        </div>
-                    </button>
-                    <div id="ds-feed-panel-wrap" class="hide" style="background:#f8fafc;border-top:1px solid #e2e8f0">
-                        <div class="ds-feed-list" id="ds-feed-list" style="max-height:320px;overflow-y:auto">
-                            <div class="ds-empty-state" style="padding:30px 16px">
-                                <div class="es-icon">💬</div>
-                                <p>No activity yet</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Keep legacy hidden elements so existing Kanban render functions don't crash -->
+            <!-- Keep legacy hidden elements so existing render functions don't crash -->
             <div class="hide">
+                <span id="ds-unread-badge">0</span>
+                <div id="ds-feed-panel-wrap"><div id="ds-feed-list"></div></div>
                 <div id="ds-view-pending"><div id="ds-kanban-board"><div id="dsk-body-new"></div><div id="dsk-body-in_progress"></div><div id="dsk-body-revisions"></div><div id="dsk-body-in_review"></div><span id="dsk-count-new"></span><span id="dsk-count-in_progress"></span><span id="dsk-count-revisions"></span><span id="dsk-count-in_review"></span><div id="dsk-empty-new"></div><div id="dsk-empty-in_progress"></div><div id="dsk-empty-revisions"></div><div id="dsk-empty-in_review"></div><div id="ds-kanban-empty"></div></div></div>
                 <div id="ds-view-delivered"><div id="ds-delivered-grid"></div><div id="ds-delivered-empty"></div></div>
                 <div id="ds-view-completed"><div id="ds-completed-grid"></div><div id="ds-completed-empty"></div></div>
+                <div id="ds-kanban-board-v2"><div id="dsk-body-v2-new"></div><div id="dsk-body-v2-in_progress"></div><div id="dsk-body-v2-delivered"></div><span id="dsk-count-v2-new">0</span><span id="dsk-count-v2-in_progress">0</span><span id="dsk-count-v2-delivered">0</span><div id="dsk-empty-v2-new"></div><div id="dsk-empty-v2-in_progress"></div><div id="dsk-empty-v2-delivered"></div></div>
                 <span id="ds-badge-pending"></span><span id="ds-badge-delivered"></span><span id="ds-badge-completed"></span>
                 <button id="ds-tab-pending"></button><button id="ds-tab-delivered"></button><button id="ds-tab-completed"></button>
             </div>
@@ -17505,8 +17567,363 @@
             });
         }
 
-        function renderDSHome() {
+        // ── Design Studio Split Dashboard ─────────────────────────────────────
+
+        let _dsSelectedTaskId = null;
+
+        function getDSTaskGroup(task) {
+            const due = task.due_date ? new Date(task.due_date) : null;
+            const dueInfo = due ? getDueInfo(due) : null;
+            const stages = task._stages || [];
+            const hasRevisions = task.status === 'revisions' || stages.some(s => s.status === 'revisions_required');
+            if (dueInfo?.urgency === 'overdue') return 'overdue';
+            if (hasRevisions) return 'revisions';
+            if (dueInfo?.urgency === 'soon') return 'soon';
+            if (task.status === 'awaiting_approval') return 'waiting';
+            if (task.status === 'in_review' || task.status === 'delivered') return 'review';
+            return 'active'; // new + in_progress
+        }
+
+        function getDSTaskNextAction(task) {
+            const stages = task._stages || [];
+            const activeStage = stages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status));
+            const allApproved = stages.length > 0 && stages.every(s => ['approved','skipped'].includes(s.status));
+            if (task.status === 'awaiting_approval') return { label: 'Awaiting customer approval', color: 'amber', icon: '⏳' };
+            if (!activeStage) {
+                if (allApproved || task.status === 'delivered') return { label: 'Prepare final artwork for delivery', color: 'green', icon: '✓' };
+                const first = stages.find(s => s.status === 'not_started');
+                return { label: first ? `Start Stage ${first.stage_number}: ${escHtml(first.stage_name)}` : 'Begin design work', color: 'blue', icon: '→' };
+            }
+            const sn = `Stage ${activeStage.stage_number}: ${escHtml(activeStage.stage_name || '')}`;
+            switch (activeStage.status) {
+                case 'revisions_required': return { label: `Apply revisions — ${sn}`, color: 'red',   icon: '↩' };
+                case 'in_review':          return { label: `Awaiting internal review — ${sn}`, color: 'amber', icon: '👀' };
+                case 'in_progress':        return { label: `Working on ${sn}`, color: 'blue',  icon: '✏' };
+                default:                   return { label: 'Continue task', color: 'blue', icon: '→' };
+            }
+        }
+
+        function renderDSDashboard() {
+            const allTasks = (allDesignTasks || []).filter(t => !['completed'].includes(t.status));
+            const completedTasks = (allDesignTasks || []).filter(t => t.status === 'completed');
+
+            const countEl = document.getElementById('ds-active-count');
+            const activeTasks = allTasks.filter(t => t.status !== 'delivered');
+            if (countEl) countEl.textContent = `${activeTasks.length} active task${activeTasks.length !== 1 ? 's' : ''}`;
+
+            const tabBadge = document.getElementById('ds-completed-tab-count');
+            if (tabBadge) { tabBadge.textContent = completedTasks.length; tabBadge.classList.toggle('hide', completedTasks.length === 0); }
+
+            const query    = (document.getElementById('ds-search')?.value || '').toLowerCase();
+            const fGroup   = document.getElementById('ds-filter-group')?.value || '';
+            const fPri     = document.getElementById('ds-filter-priority')?.value || '';
+
+            let filtered = allTasks.filter(t => {
+                if (query) {
+                    const name = (t.task_name || '').toLowerCase();
+                    const club = (t.clubs?.name || '').toLowerCase();
+                    const ref  = (t.task_ref  || '').toLowerCase();
+                    if (!name.includes(query) && !club.includes(query) && !ref.includes(query)) return false;
+                }
+                if (fPri   && t.priority !== fPri) return false;
+                if (fGroup && getDSTaskGroup(t) !== fGroup) return false;
+                return true;
+            });
+
+            const groups = {
+                overdue:   { label: 'Overdue',              color: '#dc2626', tasks: [] },
+                revisions: { label: 'Revisions Needed',     color: '#b45309', tasks: [] },
+                soon:      { label: 'Due Soon',             color: '#ea580c', tasks: [] },
+                waiting:   { label: 'Waiting on Feedback',  color: '#d97706', tasks: [] },
+                review:    { label: 'Ready for Review',     color: '#16a34a', tasks: [] },
+                active:    { label: 'In Progress',          color: '#2563eb', tasks: [] },
+            };
+            const groupOrder = ['overdue','revisions','soon','waiting','review','active'];
+            filtered.forEach(t => { const g = getDSTaskGroup(t); if (groups[g]) groups[g].tasks.push(t); });
+
+            const unreadByTask = {};
+            (_feedAllItems || []).filter(f => !f.is_read && f.task_id).forEach(f => {
+                unreadByTask[f.task_id] = (unreadByTask[f.task_id] || 0) + 1;
+            });
+
+            const emptyMsgs = {
+                overdue: 'No overdue tasks', revisions: 'No revisions needed',
+                soon: 'Nothing due soon', waiting: 'No jobs waiting for feedback',
+                review: 'Nothing ready for review', active: 'No tasks in progress',
+            };
+
+            const panel = document.getElementById('ds-task-list-panel');
+            if (panel) {
+                if (filtered.length === 0) {
+                    panel.innerHTML = `<div class="ds-preview-empty" style="padding:40px 20px;text-align:center"><p style="font-size:13px;font-weight:600;color:#94a3b8">No tasks match your filters</p><p style="font-size:11px;color:#b0b8c4;margin-top:4px">Try clearing the search or filters</p></div>`;
+                } else {
+                    panel.innerHTML = groupOrder.map(key => {
+                        const { label, color, tasks } = groups[key];
+                        return `<div class="ds-group">
+                            <div class="ds-group-header">
+                                <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
+                                <span class="ds-group-label" style="color:${color}">${label}</span>
+                                <span class="ds-group-count">${tasks.length}</span>
+                            </div>
+                            ${tasks.length === 0
+                                ? `<div class="ds-group-empty">${emptyMsgs[key]}</div>`
+                                : tasks.map(t => _renderDSTaskRow(t, unreadByTask[t.id] || 0, key)).join('')}
+                        </div>`;
+                    }).join('');
+                }
+            }
+
+            // Auto-select first task
+            if (!_dsSelectedTaskId) {
+                for (const key of groupOrder) {
+                    if (groups[key].tasks.length > 0) { selectDSTask(groups[key].tasks[0].id, false); break; }
+                }
+            }
+            if (_dsSelectedTaskId) {
+                document.querySelector(`.ds-task-row[data-task-id="${_dsSelectedTaskId}"]`)?.classList.add('ds-selected');
+                renderDSPreviewPanel(_dsSelectedTaskId);
+            } else {
+                renderDSPreviewPanel(null);
+            }
+
+            // Keep legacy kanban board data in sync
             renderDSKanbanBoard();
+        }
+
+        function _renderDSTaskRow(task, unreadCount, groupKey) {
+            const stages = task._stages || [];
+            const activeStage = stages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status))
+                             || stages.find(s => s.status === 'not_started');
+            const stageLabel = activeStage
+                ? `Stage ${activeStage.stage_number}: ${activeStage.stage_name}`
+                : (stages.length > 0 && stages.every(s => ['approved','skipped'].includes(s.status)) ? 'All stages complete' : 'Not started');
+            const due = task.due_date ? new Date(task.due_date) : null;
+            const dueInfo = due ? getDueInfo(due) : null;
+            const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : null;
+            const dueCls = dueInfo ? (dueInfo.urgency === 'overdue' ? 'overdue' : dueInfo.urgency === 'soon' ? 'soon' : 'ok') : 'ok';
+            const urgMap = { overdue:'urgency-overdue', revisions:'urgency-revisions', soon:'urgency-soon', waiting:'urgency-waiting', review:'urgency-review', active:'urgency-active' };
+            const urg = urgMap[groupKey] || 'urgency-active';
+            const isSelected = task.id === _dsSelectedTaskId;
+
+            // Badge logic — only show one, priority order
+            let badgeHtml = '';
+            if (task.priority === 'urgent') badgeHtml = `<span class="ds-row-badge urgent">Urgent</span>`;
+            else if (task.priority === 'high') badgeHtml = `<span class="ds-row-badge high">High</span>`;
+            else if (groupKey === 'revisions') badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
+            else if (groupKey === 'waiting')   badgeHtml = `<span class="ds-row-badge waiting">Waiting</span>`;
+            else if (groupKey === 'review')    badgeHtml = `<span class="ds-row-badge review">Review</span>`;
+
+            const dName = task.designers?.full_name || task._designerName || '';
+            const initials = dName ? dName.split(' ').map(w => w[0]||'').join('').substring(0,2).toUpperCase() : '';
+            const dueHtml = dueLabel
+                ? `<span class="ds-row-dot">·</span><span class="ds-row-due ${dueCls}">${dueInfo?.urgency === 'overdue' ? dueInfo.text : dueLabel}</span>`
+                : '';
+
+            return `<div class="ds-task-row ${urg}${isSelected ? ' ds-selected' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')">
+                <div class="ds-row-main">
+                    <div class="ds-row-title">${escHtml(task.task_name || 'Untitled Task')}</div>
+                    <div class="ds-row-meta">
+                        ${task.clubs?.name ? `<span class="ds-row-club">${escHtml(task.clubs.name)}</span>` : ''}
+                        ${task.clubs?.name ? `<span class="ds-row-dot">·</span>` : ''}
+                        <span class="ds-row-stage">${escHtml(stageLabel)}</span>
+                        ${dueHtml}
+                    </div>
+                </div>
+                <div class="ds-row-right">
+                    ${badgeHtml}
+                    <div class="ds-row-meta-right">
+                        ${unreadCount > 0 ? `<span class="ds-row-unread">${unreadCount}</span>` : ''}
+                        ${initials ? `<div class="ds-row-avatar-sm">${initials}</div>` : ''}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function selectDSTask(taskId, render = true) {
+            document.querySelectorAll('.ds-task-row').forEach(r => r.classList.remove('ds-selected'));
+            const row = document.querySelector(`.ds-task-row[data-task-id="${taskId}"]`);
+            if (row) row.classList.add('ds-selected');
+            _dsSelectedTaskId = taskId;
+            if (render) renderDSPreviewPanel(taskId);
+        }
+
+        function renderDSPreviewPanel(taskId) {
+            const panel = document.getElementById('ds-preview-panel');
+            if (!panel) return;
+            if (!taskId) {
+                panel.innerHTML = `<div class="ds-preview-empty">
+                    <svg width="40" height="40" fill="none" stroke="#e2e8f0" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h6M9 12h6M9 15h4"/></svg>
+                    <p style="font-size:13px;font-weight:600;color:#94a3b8">Select a task to preview</p>
+                    <p style="font-size:11px;color:#b0b8c4">Click any task in the list to see its details</p>
+                </div>`;
+                return;
+            }
+            const task = (allDesignTasks || []).find(t => t.id === taskId);
+            if (!task) return;
+
+            const stages = task._stages || [];
+            const due = task.due_date ? new Date(task.due_date) : null;
+            const dueInfo = due ? getDueInfo(due) : null;
+            const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : '—';
+            const dueCls = dueInfo ? (dueInfo.urgency === 'overdue' ? '#dc2626' : dueInfo.urgency === 'soon' ? '#ea580c' : '#0f172a') : '#94a3b8';
+            const nextAct = getDSTaskNextAction(task);
+
+            const colorBg   = { red:'#fef2f2', amber:'#fffbeb', blue:'#eff6ff', green:'#f0fdf4', grey:'#f8fafc' };
+            const colorBdr  = { red:'#fecaca', amber:'#fde68a', blue:'#bfdbfe', green:'#bbf7d0', grey:'#e2e8f0' };
+            const colorText = { red:'#dc2626', amber:'#b45309', blue:'#1d4ed8', green:'#16a34a', grey:'#64748b' };
+            const colorIcon = { red:'#fee2e2', amber:'#fef3c7', blue:'#dbeafe', green:'#dcfce7', grey:'#e2e8f0' };
+
+            const activeStage = stages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status))
+                             || stages.find(s => s.status === 'not_started');
+            const stageLbl = activeStage
+                ? `Stage ${activeStage.stage_number}: ${activeStage.stage_name}`
+                : (stages.length > 0 && stages.every(s => ['approved','skipped'].includes(s.status)) ? 'All stages complete' : 'Not started');
+
+            const statusLabels = { new:'New', in_progress:'In Progress', revisions:'Revisions', in_review:'Internal Review', awaiting_approval:'Awaiting Approval', delivered:'Delivered', completed:'Completed' };
+            const priLabels    = { urgent:'🔴 Urgent', high:'🟠 High', standard:'Standard' };
+            const designerName = task.designers?.full_name || task._designerName || 'Unassigned';
+            const brief = task.design_brief || task.design_summary || '';
+            const notes = task.key_notes || '';
+
+            // Blockers
+            const blockers = [];
+            const hasRevisions = task.status === 'revisions' || stages.some(s => s.status === 'revisions_required');
+            if (hasRevisions) {
+                const rs = stages.find(s => s.status === 'revisions_required');
+                blockers.push({ icon: '↩', text: rs ? `Revisions requested — Stage ${rs.stage_number}: ${rs.stage_name}` : 'Revisions requested' });
+            }
+            if (task.status === 'awaiting_approval') blockers.push({ icon: '⏳', text: 'Waiting for customer approval before work can continue' });
+            if (!brief && task.status === 'new') blockers.push({ icon: '📄', text: 'Design brief not yet filled in' });
+
+            // Activity feed for this task
+            const feedItems = (_feedAllItems || []).filter(f => f.task_id === taskId).slice(0, 5);
+
+            // Stage status styling
+            const stageStyleMap = {
+                not_started:        { color:'#94a3b8', bg:'#f1f5f9', icon:'○', label:'Not started' },
+                in_progress:        { color:'#2563eb', bg:'#eff6ff', icon:'◑', label:'In progress' },
+                in_review:          { color:'#b45309', bg:'#fffbeb', icon:'◕', label:'In review' },
+                revisions_required: { color:'#dc2626', bg:'#fef2f2', icon:'↩', label:'Revisions' },
+                approved:           { color:'#16a34a', bg:'#f0fdf4', icon:'✓', label:'Approved' },
+                skipped:            { color:'#94a3b8', bg:'#f8fafc', icon:'↷', label:'Skipped' },
+            };
+
+            panel.innerHTML = `
+                <!-- Preview header -->
+                <div class="ds-preview-header">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+                        <div style="flex:1;min-width:0">
+                            <div class="ds-preview-title">${escHtml(task.task_name || 'Untitled Task')}</div>
+                            <div style="display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap">
+                                ${task.task_ref ? `<span class="ds-preview-ref">${escHtml(task.task_ref)}</span>` : ''}
+                                ${task.clubs?.name ? `<span style="font-size:12px;color:#475569;font-weight:500">${escHtml(task.clubs.name)}</span>` : ''}
+                            </div>
+                        </div>
+                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:8px;flex-shrink:0;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]}">${statusLabels[task.status] || task.status}</span>
+                    </div>
+                </div>
+
+                <!-- Meta grid -->
+                <div class="ds-preview-meta-grid">
+                    <div class="ds-meta-cell"><div class="ds-meta-label">Current Stage</div><div class="ds-meta-value">${escHtml(stageLbl)}</div></div>
+                    <div class="ds-meta-cell"><div class="ds-meta-label">Due Date</div><div class="ds-meta-value" style="color:${dueCls}">${dueLabel}${dueInfo ? `<span style="font-size:10px;margin-left:5px;font-weight:600">(${dueInfo.text})</span>` : ''}</div></div>
+                    <div class="ds-meta-cell"><div class="ds-meta-label">Designer</div><div class="ds-meta-value">${escHtml(designerName)}</div></div>
+                    <div class="ds-meta-cell"><div class="ds-meta-label">Priority</div><div class="ds-meta-value">${priLabels[task.priority || 'standard'] || 'Standard'}</div></div>
+                </div>
+
+                <!-- Next action (prominent) -->
+                <div style="margin:16px 24px 0;border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]}">
+                    <div style="width:30px;height:30px;border-radius:8px;background:${colorIcon[nextAct.color]};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${nextAct.icon}</div>
+                    <div>
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${colorText[nextAct.color]};margin-bottom:2px">Next Action</div>
+                        <div style="font-size:13px;font-weight:700;color:#0f172a;line-height:1.3">${nextAct.label}</div>
+                    </div>
+                </div>
+
+                <!-- Brief summary -->
+                <div class="ds-preview-block" style="margin-top:16px">
+                    <div class="ds-block-header">Brief Summary</div>
+                    <div class="ds-block-body">
+                        ${brief
+                            ? `<p style="font-size:12px;color:#374151;line-height:1.65;margin:0">${escHtml(brief.substring(0,320))}${brief.length>320?'…':''}</p>
+                               ${notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#78350f;line-height:1.5"><strong>Notes:</strong> ${escHtml(notes)}</div>` : ''}`
+                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No brief entered yet.</p>`}
+                    </div>
+                </div>
+
+                <!-- Blockers -->
+                <div class="ds-preview-block" style="margin-top:12px;${blockers.length ? 'border-color:#fecaca' : ''}">
+                    <div class="ds-block-header" style="${blockers.length ? 'background:#fef2f2;color:#dc2626;border-bottom-color:#fecaca' : ''}">Blockers &amp; Missing Assets</div>
+                    <div class="ds-block-body" style="padding:${blockers.length ? '8px 14px' : '12px 14px'}">
+                        ${blockers.length
+                            ? blockers.map(b => `<div class="ds-blockers-item"><span style="font-size:13px;flex-shrink:0">${b.icon}</span><span style="font-size:12px;color:#374151">${escHtml(b.text)}</span></div>`).join('')
+                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No blockers recorded.</p>`}
+                    </div>
+                </div>
+
+                <!-- Stage progress -->
+                <div class="ds-preview-block" style="margin-top:12px">
+                    <div class="ds-block-header">Stage Progress</div>
+                    <div class="ds-block-body" style="padding:8px 14px">
+                        ${stages.length > 0
+                            ? stages.map(s => {
+                                const sc = stageStyleMap[s.status] || stageStyleMap.not_started;
+                                return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f8fafc">
+                                    <span style="width:18px;height:18px;border-radius:5px;background:${sc.bg};color:${sc.color};font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${sc.icon}</span>
+                                    <span style="font-size:12px;color:#374151;flex:1">Stage ${s.stage_number}: ${escHtml(s.stage_name || '')}</span>
+                                    <span style="font-size:10px;font-weight:600;color:${sc.color}">${sc.label}</span>
+                                </div>`;
+                            }).join('')
+                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No stages configured.</p>`}
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="ds-preview-block" style="margin-top:12px;margin-bottom:16px">
+                    <div class="ds-block-header">Recent Activity</div>
+                    <div class="ds-block-body">
+                        ${feedItems.length > 0
+                            ? feedItems.map(item => {
+                                const ini = dsActorInitials(item.actor_name || '');
+                                const det = item.action_detail || {};
+                                const lbl = dsActivityLabel(item.action_type, det);
+                                const ago = item.created_at ? formatTimeAgo(item.created_at) : '';
+                                return `<div class="ds-activity-item">
+                                    <div class="ds-activity-avatar-sm">${ini}</div>
+                                    <div style="flex:1;min-width:0">
+                                        <div style="font-size:11px;color:#374151;line-height:1.4">${lbl}</div>
+                                        <div style="font-size:10px;color:#94a3b8;margin-top:1px">${ago}</div>
+                                    </div>
+                                </div>`;
+                            }).join('')
+                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No recent activity on this task.</p>`}
+                    </div>
+                </div>
+
+                <!-- Spacer so action bar doesn't overlap content -->
+                <div style="flex:1;min-height:10px"></div>
+
+                <!-- Sticky action bar -->
+                <div class="ds-preview-actions">
+                    <button onclick="showDesignTask('${task.id}')" class="btn-primary" style="flex:1;justify-content:center;padding:9px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:7px">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
+                        Open Full Task
+                    </button>
+                    <button onclick="openAddCommentFromDashboard('${task.id}')" style="padding:9px 14px;border:1.5px solid #e2e8f0;border-radius:10px;background:#f8fafc;font-size:12px;font-weight:600;color:#475569;cursor:pointer;white-space:nowrap">
+                        Add Comment
+                    </button>
+                </div>`;
+        }
+
+        function openAddCommentFromDashboard(taskId) {
+            // Navigate to full task page and open comment box
+            showDesignTask(taskId);
+        }
+
+        // ── End Design Studio Split Dashboard ─────────────────────────────────
+
+        function renderDSHome() {
+            renderDSDashboard();
             loadDSActivityFeed();
             subscribeToActivityFeed();
         }
@@ -17838,10 +18255,10 @@
             const unread = _feedAllItems.filter(f => !f.is_read).length;
             const badge = document.getElementById('ds-unread-badge');
             if (badge) { badge.textContent = unread; badge.classList.toggle('hide', unread === 0); }
-            // Sync header badge and refresh per-card unread alerts on the kanban
+            // Sync header badge and refresh dashboard
             const hdrBadge = document.getElementById('ds-unread-badge-hdr');
             if (hdrBadge) { hdrBadge.textContent = unread; hdrBadge.classList.toggle('hide', unread === 0); }
-            renderDSKanbanBoard();
+            renderDSDashboard();
         }
 
         function toggleFeedHistory() {
