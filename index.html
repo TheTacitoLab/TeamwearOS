@@ -17911,9 +17911,9 @@
                 ac.revisions > 0 ? `<span class="ds-act-pill revisions"><svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>${ac.revisions}</span>` : '',
             ].filter(Boolean).join('');
 
-            const unreadCount = _dsUnreadByTask[task.id] || 0;
-            const unreadDot = unreadCount > 0
-                ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:0 4px;margin-left:5px;flex-shrink:0">${unreadCount}</span>`
+            const _unread = _dsUnreadByTask[task.id] || 0;
+            const unreadDot = _unread > 0
+                ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;border-radius:8px;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:0 4px;margin-left:5px;flex-shrink:0">${_unread}</span>`
                 : '';
             const startBtn = task.status === 'new'
                 ? `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #6366f1;color:#6366f1;background:#eef2ff;cursor:pointer;white-space:nowrap">▶ Start</button>`
