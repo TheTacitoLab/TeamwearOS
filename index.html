@@ -20069,15 +20069,14 @@
                 ${uploads.map(u => {
                     const isImg = (u.file_type || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url || '');
                     const thumb = isImg
-                        ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0" loading="lazy" onclick="dtrPreviewImg('${escHtml(u.file_url)}')" />`
-                        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:default">📄</div>`;
+                        ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()" />`
+                        : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()">📄</div>`;
                     const fname = (u.file_url || '').split('/').pop().split('?')[0];
                     return `<div class="dtr-cimg-card">
                         <div class="dtr-cimg-thumb">${thumb}</div>
                         <div class="dtr-cimg-actions">
-                            ${isApproved
-                                ? `<a href="${escHtml(u.file_url)}" download target="_blank" title="Download" style="padding:5px 8px;border-radius:7px;font-size:11px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;text-decoration:none;display:inline-flex;align-items:center;gap:3px"><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> DL</a>`
-                                : `<button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickStageImg('${u.id}','${stageId}',${stageNum})" title="Approve">✓</button>
+                            <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:13px">⬇</button>
+                            ${isApproved ? '' : `<button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickStageImg('${u.id}','${stageId}',${stageNum})" title="Approve">✓</button>
                                    <button class="dtr-x-btn${u.status==='declined'?' xed':''}" onclick="dtrXStageImg('${u.id}','${stageId}',${stageNum})" title="Decline">✕</button>
                                    <button class="dtr-archive-btn" onclick="dtrArchiveStageImg('${u.id}','${stageId}',${stageNum})" title="Remove">⊘</button>`}
                         </div>
@@ -20301,6 +20300,7 @@
                             ? `<img class="dtr-cimg-thumb" src="${escHtml(u.file_url)}" alt="" loading="lazy" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()">`
                             : `<div class="dtr-cimg-nothumb" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}');event.stopPropagation()">${isPdf ? '📄' : '📁'}</div>`}
                         <div class="dtr-cimg-actions">
+                            <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(u.file_name||'download')}')" title="Download" style="font-size:13px">⬇</button>
                             <button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickConceptImg('${u.id}','${stageId}',${conceptNum})" title="Approve">✓</button>
                             <button class="dtr-x-btn${u.status==='declined'?' xed':''}" onclick="dtrXConceptImg('${u.id}','${stageId}',${conceptNum})" title="Decline">✕</button>
                             <button class="dtr-archive-btn" onclick="dtrArchiveConceptImg('${u.id}','${stageId}',${conceptNum})" title="Archive">⊗</button>
@@ -22258,6 +22258,27 @@
             });
             if (error) { showToast('Error saving annotation', 'error'); return; }
 
+            // Log annotation as a Revision Request in design task activity
+            if (currentDesignTaskRecord?.id && currentBrand?.id) {
+                const pinLabel = String.fromCharCode(64 + ((pinNum - 1) % 26 + 1));
+                const userName = currentUserProfile
+                    ? ((currentUserProfile.first_name||'') + ' ' + (currentUserProfile.last_name||'')).trim() || currentUserProfile.email?.split('@')[0] || 'Unknown'
+                    : 'Unknown';
+                await supabase.from('design_task_activity').insert({
+                    design_task_id: currentDesignTaskRecord.id,
+                    brand_id: currentBrand.id,
+                    user_id: actorId,
+                    user_name: userName,
+                    message: `[Annotation ${pinLabel}] ${comment}`,
+                    activity_type: 'revision_request',
+                    task_completed: false
+                });
+                // Refresh activity list if it's visible
+                if (typeof loadDesignTaskActivity === 'function' && currentDesignTaskRecord.id) {
+                    loadDesignTaskActivity(currentDesignTaskRecord.id);
+                }
+            }
+
             pendingAnnPin = null;
             const form = document.getElementById('ds-ann-new-form');
             if (form) form.classList.add('hide');
@@ -22283,7 +22304,7 @@
                 pin.className = `ann-pin ${ann.actor_id ? 'designer' : 'manager'}`;
                 pin.style.left = `${ann.x_position}%`;
                 pin.style.top  = `${ann.y_position}%`;
-                pin.textContent = ann.pin_number || (idx + 1);
+                pin.textContent = ann.pin_number ? String.fromCharCode(64 + ((ann.pin_number - 1) % 26 + 1)) : String.fromCharCode(65 + idx % 26);
                 pin.title = ann.comment;
                 pin.onclick = (e) => { e.stopPropagation(); highlightAnnotation(ann.id); };
                 wrap.appendChild(pin);
@@ -22300,7 +22321,7 @@
             list.innerHTML = currentAnnotations.map((ann, idx) => `
                 <div class="ds-ann-item" id="ann-item-${ann.id}" onclick="highlightAnnotation('${ann.id}')">
                     <div class="ds-ann-item-header">
-                        <div class="ann-pin designer" style="position:static;transform:none;width:18px;height:18px;font-size:10px">${ann.pin_number || idx+1}</div>
+                        <div class="ann-pin designer" style="position:static;transform:none;width:18px;height:18px;font-size:10px">${ann.pin_number ? String.fromCharCode(64 + ((ann.pin_number - 1) % 26 + 1)) : String.fromCharCode(65 + idx % 26)}</div>
                         <span style="font-size:11px;font-weight:600;color:#e5e7eb">${escHtml(ann.actor_name||'Unknown')}</span>
                     </div>
                     <div class="ds-ann-item-text">${escHtml(ann.comment)}</div>
