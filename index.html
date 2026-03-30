@@ -524,7 +524,7 @@
         .ds-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:0; position:sticky; top:96px; z-index:30; }
 
         /* ── Design Studio Split Dashboard ── */
-        .ds-studio-body { display:grid; grid-template-columns:43% 1fr; height:calc(100vh - 152px); overflow:hidden; }
+        .ds-studio-body { display:grid; grid-template-columns:30% 70%; height:calc(100vh - 152px); overflow:hidden; }
         @media(max-width:900px) { .ds-studio-body { grid-template-columns:1fr; height:auto; overflow:visible; } }
 
         .ds-task-list-panel { border-right:1px solid #e2e8f0; overflow-y:auto; background:#f8fafc; }
@@ -17890,84 +17890,100 @@
                     </div>
                 </div>
 
-                <!-- Meta grid -->
-                <div class="ds-preview-meta-grid">
-                    <div class="ds-meta-cell"><div class="ds-meta-label">Current Stage</div><div class="ds-meta-value">${escHtml(stageLbl)}</div></div>
-                    <div class="ds-meta-cell"><div class="ds-meta-label">Due Date</div><div class="ds-meta-value" style="color:${dueCls}">${dueLabel}${dueInfo ? `<span style="font-size:10px;margin-left:5px;font-weight:600">(${dueInfo.text})</span>` : ''}</div></div>
-                    <div class="ds-meta-cell"><div class="ds-meta-label">Designer</div><div class="ds-meta-value">${escHtml(designerName)}</div></div>
-                    <div class="ds-meta-cell"><div class="ds-meta-label">Priority</div><div class="ds-meta-value">${priLabels[task.priority || 'standard'] || 'Standard'}</div></div>
-                </div>
+                <!-- Two-column body -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #f1f5f9">
 
-                <!-- Next action (prominent) -->
-                <div style="margin:16px 24px 0;border-radius:12px;padding:13px 16px;display:flex;align-items:center;gap:12px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]}">
-                    <div style="width:30px;height:30px;border-radius:8px;background:${colorIcon[nextAct.color]};display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">${nextAct.icon}</div>
-                    <div>
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${colorText[nextAct.color]};margin-bottom:2px">Next Action</div>
-                        <div style="font-size:13px;font-weight:700;color:#0f172a;line-height:1.3">${nextAct.label}</div>
+                    <!-- Left column: meta + next action + brief -->
+                    <div style="padding:16px 18px;border-right:1px solid #f1f5f9">
+
+                        <!-- Meta grid -->
+                        <div class="ds-preview-meta-grid" style="margin:0 0 14px">
+                            <div class="ds-meta-cell"><div class="ds-meta-label">Current Stage</div><div class="ds-meta-value">${escHtml(stageLbl)}</div></div>
+                            <div class="ds-meta-cell"><div class="ds-meta-label">Due Date</div><div class="ds-meta-value" style="color:${dueCls}">${dueLabel}${dueInfo ? `<span style="font-size:10px;margin-left:4px;font-weight:600">(${dueInfo.text})</span>` : ''}</div></div>
+                            <div class="ds-meta-cell"><div class="ds-meta-label">Designer</div><div class="ds-meta-value">${escHtml(designerName)}</div></div>
+                            <div class="ds-meta-cell"><div class="ds-meta-label">Priority</div><div class="ds-meta-value">${priLabels[task.priority || 'standard'] || 'Standard'}</div></div>
+                        </div>
+
+                        <!-- Next action -->
+                        <div style="border-radius:10px;padding:11px 14px;display:flex;align-items:center;gap:10px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]};margin-bottom:14px">
+                            <div style="width:26px;height:26px;border-radius:7px;background:${colorIcon[nextAct.color]};display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0">${nextAct.icon}</div>
+                            <div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${colorText[nextAct.color]};margin-bottom:1px">Next Action</div>
+                                <div style="font-size:12px;font-weight:700;color:#0f172a;line-height:1.3">${nextAct.label}</div>
+                            </div>
+                        </div>
+
+                        <!-- Brief summary -->
+                        <div class="ds-preview-block" style="margin:0">
+                            <div class="ds-block-header">Brief Summary</div>
+                            <div class="ds-block-body">
+                                ${brief
+                                    ? `<p style="font-size:12px;color:#374151;line-height:1.65;margin:0">${escHtml(brief.substring(0,400))}${brief.length>400?'…':''}</p>
+                                       ${notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#78350f;line-height:1.5"><strong>Notes:</strong> ${escHtml(notes)}</div>` : ''}`
+                                    : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No brief entered yet.</p>`}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right column: stage progress + blockers -->
+                    <div style="padding:16px 18px">
+
+                        <!-- Stage progress -->
+                        <div class="ds-preview-block" style="margin:0 0 14px">
+                            <div class="ds-block-header">Stage Progress</div>
+                            <div class="ds-block-body" style="padding:8px 14px">
+                                ${stages.length > 0
+                                    ? stages.map(s => {
+                                        const sc = stageStyleMap[s.status] || stageStyleMap.not_started;
+                                        return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f8fafc">
+                                            <span style="width:18px;height:18px;border-radius:5px;background:${sc.bg};color:${sc.color};font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${sc.icon}</span>
+                                            <span style="font-size:12px;color:#374151;flex:1">Stage ${s.stage_number}: ${escHtml(s.stage_name || '')}</span>
+                                            <span style="font-size:10px;font-weight:600;color:${sc.color}">${sc.label}</span>
+                                        </div>`;
+                                    }).join('')
+                                    : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No stages configured.</p>`}
+                            </div>
+                        </div>
+
+                        <!-- Blockers -->
+                        <div class="ds-preview-block" style="margin:0;${blockers.length ? 'border-color:#fecaca' : ''}">
+                            <div class="ds-block-header" style="${blockers.length ? 'background:#fef2f2;color:#dc2626;border-bottom-color:#fecaca' : ''}">Blockers &amp; Missing Assets</div>
+                            <div class="ds-block-body" style="padding:${blockers.length ? '8px 14px' : '12px 14px'}">
+                                ${blockers.length
+                                    ? blockers.map(b => `<div class="ds-blockers-item"><span style="font-size:13px;flex-shrink:0">${b.icon}</span><span style="font-size:12px;color:#374151">${escHtml(b.text)}</span></div>`).join('')
+                                    : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No blockers recorded.</p>`}
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
-                <!-- Brief summary -->
-                <div class="ds-preview-block" style="margin-top:16px">
-                    <div class="ds-block-header">Brief Summary</div>
-                    <div class="ds-block-body">
-                        ${brief
-                            ? `<p style="font-size:12px;color:#374151;line-height:1.65;margin:0">${escHtml(brief.substring(0,320))}${brief.length>320?'…':''}</p>
-                               ${notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;color:#78350f;line-height:1.5"><strong>Notes:</strong> ${escHtml(notes)}</div>` : ''}`
-                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No brief entered yet.</p>`}
+                <!-- Full-width activity section -->
+                <div style="padding:16px 24px 20px">
+                    <div class="ds-preview-block" style="margin:0">
+                        <div class="ds-block-header">Recent Activity</div>
+                        <div class="ds-block-body">
+                            ${feedItems.length > 0
+                                ? feedItems.map(item => {
+                                    const ini = dsActorInitials(item.actor_name || '');
+                                    const det = item.action_detail || {};
+                                    const lbl = dsActivityLabel(item.action_type, det);
+                                    const ago = item.created_at ? formatTimeAgo(item.created_at) : '';
+                                    return `<div class="ds-activity-item">
+                                        <div class="ds-activity-avatar-sm">${ini}</div>
+                                        <div style="flex:1;min-width:0">
+                                            <div style="font-size:11px;color:#374151;line-height:1.4">${lbl}</div>
+                                            <div style="font-size:10px;color:#94a3b8;margin-top:1px">${ago}</div>
+                                        </div>
+                                    </div>`;
+                                }).join('')
+                                : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No recent activity on this task.</p>`}
+                        </div>
                     </div>
                 </div>
 
-                <!-- Blockers -->
-                <div class="ds-preview-block" style="margin-top:12px;${blockers.length ? 'border-color:#fecaca' : ''}">
-                    <div class="ds-block-header" style="${blockers.length ? 'background:#fef2f2;color:#dc2626;border-bottom-color:#fecaca' : ''}">Blockers &amp; Missing Assets</div>
-                    <div class="ds-block-body" style="padding:${blockers.length ? '8px 14px' : '12px 14px'}">
-                        ${blockers.length
-                            ? blockers.map(b => `<div class="ds-blockers-item"><span style="font-size:13px;flex-shrink:0">${b.icon}</span><span style="font-size:12px;color:#374151">${escHtml(b.text)}</span></div>`).join('')
-                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No blockers recorded.</p>`}
-                    </div>
-                </div>
-
-                <!-- Stage progress -->
-                <div class="ds-preview-block" style="margin-top:12px">
-                    <div class="ds-block-header">Stage Progress</div>
-                    <div class="ds-block-body" style="padding:8px 14px">
-                        ${stages.length > 0
-                            ? stages.map(s => {
-                                const sc = stageStyleMap[s.status] || stageStyleMap.not_started;
-                                return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f8fafc">
-                                    <span style="width:18px;height:18px;border-radius:5px;background:${sc.bg};color:${sc.color};font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${sc.icon}</span>
-                                    <span style="font-size:12px;color:#374151;flex:1">Stage ${s.stage_number}: ${escHtml(s.stage_name || '')}</span>
-                                    <span style="font-size:10px;font-weight:600;color:${sc.color}">${sc.label}</span>
-                                </div>`;
-                            }).join('')
-                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No stages configured.</p>`}
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="ds-preview-block" style="margin-top:12px;margin-bottom:16px">
-                    <div class="ds-block-header">Recent Activity</div>
-                    <div class="ds-block-body">
-                        ${feedItems.length > 0
-                            ? feedItems.map(item => {
-                                const ini = dsActorInitials(item.actor_name || '');
-                                const det = item.action_detail || {};
-                                const lbl = dsActivityLabel(item.action_type, det);
-                                const ago = item.created_at ? formatTimeAgo(item.created_at) : '';
-                                return `<div class="ds-activity-item">
-                                    <div class="ds-activity-avatar-sm">${ini}</div>
-                                    <div style="flex:1;min-width:0">
-                                        <div style="font-size:11px;color:#374151;line-height:1.4">${lbl}</div>
-                                        <div style="font-size:10px;color:#94a3b8;margin-top:1px">${ago}</div>
-                                    </div>
-                                </div>`;
-                            }).join('')
-                            : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No recent activity on this task.</p>`}
-                    </div>
-                </div>
-
-                <!-- Spacer so action bar doesn't overlap content -->
+                <!-- Spacer -->
                 <div style="flex:1;min-height:10px"></div>
 
                 <!-- Sticky action bar -->
