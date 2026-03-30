@@ -1159,19 +1159,18 @@
         /* Left col collapse toggle */
         .jr-left-collapse-btn {
             display: flex; align-items: center; justify-content: center;
-            width: 28px; height: 28px; border-radius: 8px;
+            width: 26px; height: 26px; border-radius: 7px;
             border: 1.5px solid #e2e8f0; background: #fff; cursor: pointer;
-            color: #64748b; flex-shrink: 0; transition: all 0.15s;
+            color: #94a3b8; flex-shrink: 0; transition: all 0.15s;
         }
-        .jr-left-collapse-btn:hover { background: #f1f5f9; color: #0f172a; }
-        .jr-left-col.collapsed > *:not(.jr-left-col-inner) { display: none; }
-        .jr-left-col-inner { overflow: hidden; }
-        .jr-left-col.collapsed .jr-left-col-inner .glass,
-        .jr-left-col.collapsed .jr-left-col-inner .record-side-nav { display: none; }
-        .jr-left-col.collapsed .jr-left-col-inner .jr-left-icon-nav { display: flex !important; }
+        .jr-left-collapse-btn:hover { background: #f1f5f9; color: #0f172a; border-color:#cbd5e1; }
+        /* Hide info card and nav when collapsed; show icon nav */
+        .jr-left-col.collapsed .jr-left-col-inner > .glass,
+        .jr-left-col.collapsed .jr-left-col-inner > .record-side-nav { display: none; }
+        .jr-left-col.collapsed .jr-left-icon-nav { display: flex !important; }
         .jr-left-icon-nav {
-            display: none; flex-direction: column; align-items: center; gap: 4px;
-            padding: 8px 0;
+            display: none; flex-direction: column; align-items: center; gap: 2px;
+            padding: 6px 0;
         }
         .jr-left-icon-nav button {
             width: 36px; height: 36px; border-radius: 8px; border: none;
@@ -1182,11 +1181,12 @@
         .jr-left-icon-nav button:hover { background: #f1f5f9; color: #0f172a; }
         .jr-left-icon-nav button.active { background: #0f172a; color: #fff; }
 
-        /* Left column: job info card + sticky nav */
+        /* Left column: collapsible info card + sticky nav */
         .jr-left-col {
-            display: flex; flex-direction: column; gap: 14px;
-            position: sticky; top: 74px;
+            display: flex; flex-direction: column; gap: 0;
+            position: sticky; top: 74px; align-self: start;
         }
+        .jr-left-col-inner { display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
         @media (max-width: 767px) { .jr-left-col { position: static; } }
 
         /* Middle column: pipelines at top + content below */
@@ -3761,29 +3761,21 @@
              ============================================================ -->
         <div id="tool-clubs" class="hide w-full p-6 md:p-8 lg:px-12">
             <!-- Page nav row -->
-            <div class="page-nav-row">
-                <button onclick="showLaunchpad()" class="nav-home-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-                    Launchpad
-                </button>
-                <span class="nav-page-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M9 21V5.25A2.25 2.25 0 0111.25 3h1.5A2.25 2.25 0 0115 5.25V21m-6 0h6M3.75 21V10.5A2.25 2.25 0 016 8.25h.75M20.25 21V10.5a2.25 2.25 0 00-2.25-2.25H17.25"/></svg>
-                    Clubs
-                </span>
-            </div>
-
-            <!-- Compact split action grid -->
-            <div class="split-action-grid">
-                <div onclick="showCreateClubModal()" class="split-action-card">
-                    <div class="split-action-icon" style="background:#ede9fe">
-                        <svg class="w-5 h-5" fill="none" stroke="#6d28d9" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h3 class="font-bold text-sm">Create New Club</h3>
-                        <p class="text-gray-500 text-xs mt-0.5">Set up a brand new club record</p>
-                    </div>
-                    <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <div class="page-nav-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div style="display:flex;align-items:center;gap:8px">
+                    <button onclick="showLaunchpad()" class="nav-home-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                        Launchpad
+                    </button>
+                    <span class="nav-page-btn">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M9 21V5.25A2.25 2.25 0 0111.25 3h1.5A2.25 2.25 0 0115 5.25V21m-6 0h6M3.75 21V10.5A2.25 2.25 0 016 8.25h.75M20.25 21V10.5a2.25 2.25 0 00-2.25-2.25H17.25"/></svg>
+                        Clubs
+                    </span>
                 </div>
+                <button onclick="showCreateClubModal()" class="btn-primary text-xs px-4 py-2" style="display:flex;align-items:center;gap:6px">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                    New Club
+                </button>
             </div>
 
             <!-- Club search area (always visible) -->
@@ -3808,15 +3800,10 @@
                 <div id="clubs-enhanced-empty" class="hide text-center py-16">
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center text-3xl">🏟️</div>
                     <p class="text-gray-400 font-medium mb-2">No clubs found</p>
-                    <p class="text-gray-600 text-sm">Try adjusting your search or filters</p>
+                    <p class="text-gray-600 text-sm">Try adjusting your search or filters, or <button onclick="showCreateClubModal()" class="text-brand-400 hover:underline">create a new club</button>.</p>
                 </div>
             </div>
 
-            <!-- Recent clubs when not searching -->
-            <div id="clubs-recent" class="">
-                <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">All Clubs</h3>
-                <div id="clubs-recent-list" class="space-y-3"></div>
-            </div>
         </div>
 
         <!-- ============================================================
@@ -3834,83 +3821,86 @@
             <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (timeline+content) | right (activity) -->
             <div class="jr-three-col">
 
-                <!-- ── Column 1: Compact club info card + sticky nav menu ── -->
+                <!-- ── Column 1: Collapsible info card + nav ── -->
                 <div class="jr-left-col" id="jr-left-col">
-                    <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+                    <!-- Collapse toggle — always visible -->
+                    <div style="display:flex;justify-content:flex-end;padding-bottom:6px">
                         <button class="jr-left-collapse-btn" onclick="toggleClubLeftCol()" id="jr-left-collapse-btn" title="Collapse navigation">
                             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                         </button>
                     </div>
+                    <!-- Content wrapper (collapsed state swaps glass+nav for icon-only nav) -->
                     <div class="jr-left-col-inner">
-                    <!-- Icon nav shown when collapsed -->
-                    <div class="jr-left-icon-nav" id="jr-left-icon-nav">
-                        <button onclick="showClubTab('overview')" id="icon-tab-overview" title="Overview">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                        </button>
-                        <button onclick="showClubTab('teams')" id="icon-tab-teams" title="Teams">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        </button>
-                        <button onclick="showClubTab('products')" id="icon-tab-products" title="Products">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        </button>
-                        <button onclick="showClubTab('orderforms')" id="icon-tab-orderforms" title="Order Forms">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        </button>
-                        <button onclick="showClubTab('jobs')" id="icon-tab-jobs" title="Jobs">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        </button>
-                        <button onclick="showClubTab('onboarding')" id="icon-tab-onboarding" title="Onboarding">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                        </button>
-                    </div>
-                    <!-- Compact club info card -->
-                        <div class="flex items-start justify-between gap-3 mb-3">
-                            <div class="flex items-center gap-3 min-w-0">
-                                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#dbeafe">
-                                    <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
-                                </div>
-                                <div class="min-w-0">
-                                    <h2 id="club-detail-name" class="text-sm font-bold leading-tight truncate"></h2>
-                                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                                        <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                        <!-- Icon-only nav shown when collapsed -->
+                        <div class="jr-left-icon-nav" id="jr-left-icon-nav">
+                            <button onclick="showClubTab('overview')" id="icon-tab-overview" title="Overview">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                            </button>
+                            <button onclick="showClubTab('teams')" id="icon-tab-teams" title="Teams">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </button>
+                            <button onclick="showClubTab('products')" id="icon-tab-products" title="Club Products">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                            </button>
+                            <button onclick="showClubTab('orderforms')" id="icon-tab-orderforms" title="Order Forms">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            </button>
+                            <button onclick="showClubTab('jobs')" id="icon-tab-jobs" title="Jobs">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            </button>
+                            <button onclick="showClubTab('onboarding')" id="icon-tab-onboarding" title="Onboarding">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                            </button>
+                        </div>
+                        <!-- Compact club info card -->
+                        <div class="glass rounded-2xl p-4">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#dbeafe">
+                                        <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h2 id="club-detail-name" class="text-sm font-bold leading-tight truncate"></h2>
+                                        <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                                            <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                                        </div>
                                     </div>
                                 </div>
+                                <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
                             </div>
-                            <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
+                            <div class="pt-3 border-t border-gray-800 space-y-2">
+                                <div><span class="text-xs text-gray-600">Sport</span><p id="club-detail-sport" class="text-xs font-semibold mt-0.5">—</p></div>
+                                <div><span class="text-xs text-gray-600">Suffix</span><p id="club-detail-suffix" class="text-xs font-semibold font-mono mt-0.5">—</p></div>
+                            </div>
                         </div>
-                        <div class="pt-3 border-t border-gray-800 space-y-2">
-                            <div><span class="text-xs text-gray-600">Sport</span><p id="club-detail-sport" class="text-xs font-semibold mt-0.5">—</p></div>
-                            <div><span class="text-xs text-gray-600">Suffix</span><p id="club-detail-suffix" class="text-xs font-semibold font-mono mt-0.5">—</p></div>
+                        <!-- Sticky navigation menu -->
+                        <div class="record-side-nav" id="club-record-nav">
+                            <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                                Overview
+                            </button>
+                            <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                Teams
+                            </button>
+                            <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                                Club Products
+                            </button>
+                            <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Order Forms
+                            </button>
+                            <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                Jobs
+                            </button>
+                            <div class="record-nav-divider"></div>
+                            <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                                Onboarding
+                            </button>
                         </div>
-                    </div>
-                    <!-- Sticky navigation menu -->
-                    <div class="record-side-nav" id="club-record-nav">
-                        <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                            Overview
-                        </button>
-                        <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            Teams
-                        </button>
-                        <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            Club Products
-                        </button>
-                        <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Order Forms
-                        </button>
-                        <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            Jobs
-                        </button>
-                        <div class="record-nav-divider"></div>
-                        <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                            Onboarding
-                        </button>
-                    </div>
                     </div><!-- end jr-left-col-inner -->
                 </div>
 
@@ -9889,17 +9879,7 @@
                 </div>`;
             };
 
-            // Update recent list (all clubs)
-            const recentList = document.getElementById('clubs-recent-list');
-            if (recentList) {
-                if (clubs.length === 0) {
-                    recentList.innerHTML = `<div class="empty-state"><div class="empty-icon"><svg class="w-12 h-12 mx-auto text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5M9 21V5.25A2.25 2.25 0 0111.25 3h1.5A2.25 2.25 0 0115 5.25V21m-6 0h6M3.75 21V10.5A2.25 2.25 0 016 8.25h.75M20.25 21V10.5a2.25 2.25 0 00-2.25-2.25H17.25"/></svg></div><p>No clubs yet. Create your first club above.</p></div>`;
-                } else {
-                    recentList.innerHTML = clubs.slice(0, 20).map(c => makeClubHtml(c)).join('');
-                }
-            }
-
-            // Update search results if search is active
+            // Render clubs list
             const container = document.getElementById('clubs-enhanced-list');
             const emptyEl = document.getElementById('clubs-enhanced-empty');
             if (!container) return;
