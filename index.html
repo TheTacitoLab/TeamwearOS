@@ -348,6 +348,27 @@
         .sh-open-btn-primary:hover { background: #5b21b6; }
         .sh-open-btn-secondary { background: #f1f5f9; color: #475569; }
         .sh-open-btn-secondary:hover { background: #e2e8f0; color: #1e293b; }
+        /* Next action editor */
+        .sh-na-section { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+        .sh-na-current { font-size: 12px; color: #1e293b; font-weight: 600; margin-bottom: 4px; }
+        .sh-na-due { font-size: 11px; color: #92400e; margin-bottom: 8px; }
+        .sh-na-complete-btn { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; background: #d97706; color: #fff; transition: background 0.15s; }
+        .sh-na-complete-btn:hover { background: #b45309; }
+        .sh-na-form { margin-top: 10px; }
+        .sh-na-input { width: 100%; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 12px; color: #1e293b; background: #fff; outline: none; margin-bottom: 6px; }
+        .sh-na-input:focus { border-color: #a78bfa; }
+        .sh-na-date { padding: 5px 8px; border: 1px solid #e2e8f0; border-radius: 7px; font-size: 11px; color: #1e293b; background: #fff; outline: none; flex: 1; }
+        .sh-na-date:focus { border-color: #a78bfa; }
+        .sh-na-save-btn { padding: 5px 12px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; border: none; background: #6d28d9; color: #fff; }
+        .sh-na-save-btn:hover { background: #5b21b6; }
+        .sh-na-history { margin-top: 10px; }
+        .sh-na-hist-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 6px; }
+        .sh-na-hist-item { display: flex; gap: 8px; padding: 5px 0; border-bottom: 1px solid #f1f5f9; align-items: flex-start; }
+        .sh-na-hist-item:last-child { border-bottom: none; }
+        .sh-na-hist-check { color: #10b981; font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+        .sh-na-hist-text { font-size: 11px; color: #64748b; line-height: 1.4; }
+        .sh-na-hist-date { font-size: 10px; color: #94a3b8; margin-top: 1px; }
+        .sh-rev-badge { display: inline-block; padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 700; background: rgba(16,185,129,0.1); color: #059669; }
         @media (max-width: 900px) {
             .sh-wrapper { flex-direction: column; height: auto; }
             .sh-left { flex: none; width: 100%; height: 55vh; border-right: none; border-bottom: 1px solid #e2e8f0; }
@@ -3590,7 +3611,10 @@
                             <div><span class="text-xs text-gray-600">Linked Club</span><p id="jr-club-link" class="text-xs font-semibold mt-0.5">—</p></div>
                             <div><span class="text-xs text-gray-600">Created</span><p id="jr-created" class="text-xs font-semibold mt-0.5">—</p></div>
                             <div><span class="text-xs text-gray-600">Days Open</span><p id="jr-days-open" class="text-xs font-semibold mt-0.5">—</p></div>
+                            <div class="col-span-2"><span class="text-xs text-gray-600">Est. Revenue</span><p id="jr-est-revenue" class="text-xs font-semibold mt-0.5" style="color:#059669">—</p></div>
                         </div>
+                        <!-- Next Action -->
+                        <div id="jr-next-action" class="mt-3 pt-3 border-t border-gray-800"></div>
                     </div>
                     <!-- Sticky navigation menu -->
                     <div class="record-side-nav" id="job-record-nav">
@@ -3880,9 +3904,15 @@
                                 <option value="">— No club linked —</option>
                             </select>
                         </div>
-                        <div class="mt-3">
-                            <label class="text-xs text-gray-500 mb-1 block">Shopify Draft Order URL</label>
-                            <input type="url" id="job-shopify-url" placeholder="https://admin.shopify.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
+                        <div class="grid grid-cols-2 gap-3 mt-3">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Estimated Revenue (£)</label>
+                                <input type="number" id="job-revenue" placeholder="0.00" min="0" step="0.01" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Shopify Draft Order URL</label>
+                                <input type="url" id="job-shopify-url" placeholder="https://admin.shopify.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
                         </div>
                     </div>
                     <div class="flex gap-3">
@@ -12996,13 +13026,15 @@
         let _shActiveTab = 'leads';
         let _shSelectedId = null;
         let _shSelectedType = null;
-        const _shCollapsed = new Set(); // stage keys/ids that are collapsed
+        const _shCollapsed = new Set();    // stage keys/ids that are collapsed
+        const _shForceOpen  = new Set();   // empty stages user has explicitly expanded
 
         function switchSalesHomeTab(tab) {
             _shActiveTab = tab;
             _shSelectedId = null;
             _shSelectedType = null;
             _shCollapsed.clear();
+            _shForceOpen.clear();
 
             // Tabs
             document.getElementById('sh-tab-leads')?.classList.toggle('active', tab === 'leads');
@@ -13025,8 +13057,13 @@
         }
 
         function toggleSalesStage(key) {
-            if (_shCollapsed.has(key)) _shCollapsed.delete(key);
-            else _shCollapsed.add(key);
+            if (_shCollapsed.has(key)) {
+                _shCollapsed.delete(key);
+                _shForceOpen.add(key); // user explicitly expanded (even if empty)
+            } else {
+                _shCollapsed.add(key);
+                _shForceOpen.delete(key);
+            }
             renderSalesHome();
         }
 
@@ -13077,6 +13114,8 @@
                 const stageLeads = activeLeads
                     .filter(l => l.kanban_stage_id === stage.id)
                     .sort((a, b) => (a.kanban_order || 0) - (b.kanban_order || 0));
+                // Auto-collapse empty stages
+                if (stageLeads.length === 0 && !_shForceOpen.has(stage.id)) _shCollapsed.add(stage.id);
                 const color = stage.color || '#64748b';
                 const cards = stageLeads.map(lead => {
                     const sel = _shSelectedId === lead.id && _shSelectedType === 'lead';
@@ -13108,14 +13147,21 @@
 
             const cols = JOB_STAGES.map(stage => {
                 const stageJobs = allJobs.filter(j => j.stage === stage.key);
+                // Auto-collapse empty stages (user can click to expand)
+                if (stageJobs.length === 0 && !_shForceOpen.has(stage.key)) _shCollapsed.add(stage.key);
+                const stageTotal = stageJobs.reduce((s, j) => s + (j.estimated_revenue || 0), 0);
+                const titleWithTotal = stageTotal > 0
+                    ? `${escHtml(stage.label)} <span style="font-size:9px;font-weight:600;color:${stage.color};opacity:0.8">£${stageTotal.toLocaleString('en-GB')}</span>`
+                    : escHtml(stage.label);
                 const cards = stageJobs.map(job => {
                     const sel = _shSelectedId === job.id && _shSelectedType === 'job';
                     const club = escHtml(job.clubs?.name || '—');
                     const num = job.job_number ? `<span class="sh-card-tag" style="background:#f1f5f9;color:#94a3b8">${escHtml(job.job_number)}</span>` : '';
+                    const rev = job.estimated_revenue ? `<span class="sh-rev-badge">£${Number(job.estimated_revenue).toLocaleString('en-GB')}</span>` : '';
                     const shopify = job.shopify_draft_order_url ? `<span class="sh-card-tag" style="background:rgba(5,150,105,0.1);color:#059669">Shopify</span>` : '';
-                    return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + shopify, sel);
+                    return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + rev + shopify, sel);
                 }).join('');
-                return _shKanbanCol(stage.key, stage.color, escHtml(stage.label), stageJobs.length, cards);
+                return _shKanbanCol(stage.key, stage.color, titleWithTotal, stageJobs.length, cards);
             });
 
             board.innerHTML = cols.join('');
@@ -13185,12 +13231,25 @@
             const clubName = job.clubs?.name || '—';
             const ownerName = job.created_by ? getUserDisplayName(job.created_by) : null;
 
+            // Next action HTML
+            const naHtml = _buildNextActionHtml(job);
+
+            // History HTML
+            const hist = Array.isArray(job.next_action_history) ? job.next_action_history : [];
+            const histHtml = hist.length > 0
+                ? `<div class="sh-na-history"><div class="sh-na-hist-title">Completed Actions</div>${hist.slice().reverse().map(h => {
+                    const doneAt = h.completed_at ? new Date(h.completed_at).toLocaleDateString('en-GB') : '';
+                    return `<div class="sh-na-hist-item"><span class="sh-na-hist-check">✓</span><div><div class="sh-na-hist-text">${escHtml(h.action || h.text || '')}</div><div class="sh-na-hist-date">${doneAt}</div></div></div>`;
+                }).join('')}</div>`
+                : '';
+
             container.innerHTML = `<div class="sh-preview-content">
                 <div class="sh-preview-top">
                     <div class="sh-preview-title">${escHtml(job.job_name)}</div>
                     <div class="sh-preview-subtitle">${escHtml(clubName)}</div>
                     <div class="sh-preview-pills">
                         <span class="sh-stage-pill" style="background:${stage.bg};color:${stage.color};border:1px solid ${stage.color}30">${escHtml(stage.label)}</span>
+                        ${job.estimated_revenue ? `<span class="sh-stage-pill" style="background:rgba(16,185,129,0.1);color:#059669;border:1px solid rgba(16,185,129,0.2)">£${Number(job.estimated_revenue).toLocaleString('en-GB')}</span>` : ''}
                         ${job.range_approved ? `<span class="sh-stage-pill" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2)">Range ✓</span>` : ''}
                     </div>
                 </div>
@@ -13203,10 +13262,14 @@
                     ${ownerName && ownerName !== '—' ? `<div class="sh-detail-row"><span class="sh-detail-label">Owner</span><span class="sh-detail-value">${escHtml(ownerName)}</span></div>` : ''}
                 </div>
 
-                ${job.description ? `<div class="sh-section">
+                ${job.job_description ? `<div class="sh-section">
                     <div class="sh-section-title">Description</div>
-                    <div class="sh-notes-text">${escHtml(job.description)}</div>
+                    <div class="sh-notes-text">${escHtml(job.job_description)}</div>
                 </div>` : ''}
+
+                <!-- Next Action -->
+                ${naHtml}
+                ${histHtml}
 
                 ${job.shopify_draft_order_url ? `<div class="sh-section">
                     <div class="sh-section-title">Shopify</div>
@@ -13220,6 +13283,83 @@
                     <button class="sh-open-btn sh-open-btn-primary" onclick="openJobRecord('${jobId}')">Open Full Record</button>
                 </div>
             </div>`;
+        }
+
+        // Shared helper: build next-action section HTML (used in both preview + job record card)
+        function _buildNextActionHtml(job) {
+            const hasAction = !!job.next_action;
+            const dueDate = job.next_action_due_date;
+            const dueFmt = dueDate ? new Date(dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : null;
+            const isOverdue = dueDate && new Date(dueDate) < new Date() && !job.next_action_completed;
+            return `<div class="sh-na-section">
+                <div class="sh-section-title" style="color:#92400e">Next Action</div>
+                ${hasAction ? `
+                    <div class="sh-na-current">${escHtml(job.next_action)}</div>
+                    ${dueFmt ? `<div class="sh-na-due" style="${isOverdue ? 'color:#dc2626;font-weight:700' : ''}">Due: ${dueFmt}${isOverdue ? ' ⚠ Overdue' : ''}</div>` : ''}
+                    <button class="sh-na-complete-btn" onclick="completeNextAction('${job.id}')">✓ Mark Complete</button>
+                    <hr style="border:none;border-top:1px solid #fde68a;margin:10px 0">
+                ` : ''}
+                <div class="sh-na-form">
+                    <input class="sh-na-input" id="sh-na-text-${job.id}" placeholder="${hasAction ? 'Update action…' : 'Add next action…'}" value="${hasAction ? escHtml(job.next_action) : ''}">
+                    <div style="display:flex;gap:6px;align-items:center">
+                        <input type="date" class="sh-na-date" id="sh-na-date-${job.id}" value="${dueDate || ''}">
+                        <button class="sh-na-save-btn" onclick="saveNextAction('${job.id}')">Save</button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // Shared helper: render next action in job record left card
+        function _renderJobNextAction(container, job) {
+            if (!container) return;
+            if (!job) { container.innerHTML = ''; return; }
+            const hasAction = !!job.next_action;
+            if (!hasAction) { container.innerHTML = `<div class="text-xs text-gray-600 mb-1">Next Action</div><p class="text-xs text-gray-500 italic">None set</p>`; return; }
+            const dueDate = job.next_action_due_date;
+            const dueFmt = dueDate ? new Date(dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : null;
+            const isOverdue = dueDate && new Date(dueDate) < new Date();
+            container.innerHTML = `<div class="text-xs text-gray-600 mb-1">Next Action</div>
+                <p class="text-xs font-semibold">${escHtml(job.next_action)}</p>
+                ${dueFmt ? `<p class="text-xs mt-0.5" style="color:${isOverdue ? '#dc2626' : '#d97706'}">${isOverdue ? '⚠ Overdue · ' : ''}Due ${dueFmt}</p>` : ''}`;
+        }
+
+        async function saveNextAction(jobId) {
+            const textEl  = document.getElementById(`sh-na-text-${jobId}`);
+            const dateEl  = document.getElementById(`sh-na-date-${jobId}`);
+            const actionText = textEl?.value.trim();
+            if (!actionText) { showToast('Please enter an action', 'error'); return; }
+            const dueDate = dateEl?.value || null;
+            const { error } = await supabase.from('jobs').update({
+                next_action: actionText,
+                next_action_due_date: dueDate
+            }).eq('id', jobId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const job = jobs.find(j => j.id === jobId);
+            if (job) { job.next_action = actionText; job.next_action_due_date = dueDate; }
+            // Update job record left card if open
+            if (currentJob?.id === jobId) { currentJob.next_action = actionText; currentJob.next_action_due_date = dueDate; _renderJobNextAction(document.getElementById('jr-next-action'), currentJob); }
+            showToast('Next action saved', 'success');
+            // Re-render preview
+            const preview = document.getElementById('sh-preview');
+            if (preview && !preview.classList.contains('hide') && _shSelectedId === jobId) _renderJobPreview(preview, jobId);
+        }
+
+        async function completeNextAction(jobId) {
+            const job = jobs.find(j => j.id === jobId);
+            if (!job?.next_action) return;
+            const histItem = { action: job.next_action, due_date: job.next_action_due_date || null, completed_at: new Date().toISOString() };
+            const history  = Array.isArray(job.next_action_history) ? [...job.next_action_history, histItem] : [histItem];
+            const { error } = await supabase.from('jobs').update({
+                next_action: null,
+                next_action_due_date: null,
+                next_action_history: history
+            }).eq('id', jobId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            job.next_action = null; job.next_action_due_date = null; job.next_action_history = history;
+            if (currentJob?.id === jobId) { Object.assign(currentJob, { next_action: null, next_action_due_date: null, next_action_history: history }); _renderJobNextAction(document.getElementById('jr-next-action'), currentJob); }
+            showToast('Action marked complete ✓', 'success');
+            const preview = document.getElementById('sh-preview');
+            if (preview && !preview.classList.contains('hide') && _shSelectedId === jobId) _renderJobPreview(preview, jobId);
         }
 
         // =============================================
@@ -13346,6 +13486,7 @@
             document.getElementById('job-channel').value = 'direct';
             document.getElementById('job-stage').value = 'discovery';
             document.getElementById('job-shopify-url').value = '';
+            document.getElementById('job-revenue').value = '';
             // Populate club dropdown
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
@@ -13373,6 +13514,7 @@
             document.getElementById('job-channel').value = currentJob.channel || 'direct';
             document.getElementById('job-stage').value = currentJob.stage || 'discovery';
             document.getElementById('job-shopify-url').value = currentJob.shopify_draft_order_url || '';
+            document.getElementById('job-revenue').value = currentJob.estimated_revenue || '';
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
                 clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
@@ -13400,7 +13542,8 @@
                 channel: document.getElementById('job-channel').value,
                 stage: document.getElementById('job-stage').value,
                 club_id: clubId,
-                shopify_draft_order_url: shopifyUrl
+                shopify_draft_order_url: shopifyUrl,
+                estimated_revenue: parseFloat(document.getElementById('job-revenue')?.value) || null
             };
 
             if (jobId) {
@@ -13571,6 +13714,9 @@
             document.getElementById('jr-created').textContent = new Date(currentJob.created_at).toLocaleDateString('en-GB');
             const days = Math.floor((new Date() - new Date(currentJob.created_at)) / 86400000);
             document.getElementById('jr-days-open').textContent = `${days} day${days !== 1 ? 's' : ''}`;
+            const revEl = document.getElementById('jr-est-revenue');
+            if (revEl) revEl.textContent = currentJob.estimated_revenue ? `£${Number(currentJob.estimated_revenue).toLocaleString('en-GB')}` : '—';
+            _renderJobNextAction(document.getElementById('jr-next-action'), currentJob);
             renderJobStagePills();
             renderDesignStagePills();
         }
