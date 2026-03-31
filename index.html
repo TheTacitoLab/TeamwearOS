@@ -275,6 +275,66 @@
         .tab-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; font-size: 11px; font-weight: 700; background: #e2e8f0; color: #64748b; }
         .sales-stage-tab.active .tab-count { background: rgba(109,40,217,0.12); color: #6d28d9; }
 
+        /* ── Sales Home Split-Screen ─────────────────────────────────────── */
+        .sh-wrapper { display: flex; height: calc(100vh - 112px); min-height: 0; overflow: hidden; }
+        .sh-left { display: flex; flex-direction: column; width: 340px; flex-shrink: 0; border-right: 1px solid #e2e8f0; background: #f8fafc; overflow: hidden; }
+        .sh-right { flex: 1; overflow-y: auto; background: #ffffff; }
+        .sh-header { padding: 16px 16px 0; flex-shrink: 0; }
+        .sh-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; }
+        .sh-tab { display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #94a3b8; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+        .sh-tab:hover { color: #475569; }
+        .sh-tab.active { color: #6d28d9; border-bottom-color: #6d28d9; }
+        .sh-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; font-size: 10px; font-weight: 700; background: #e2e8f0; color: #64748b; }
+        .sh-tab.active .sh-count { background: rgba(109,40,217,0.12); color: #6d28d9; }
+        .sh-actions { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .sh-action-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
+        .sh-action-btn-primary { background: #6d28d9; color: #fff; border-color: #6d28d9; }
+        .sh-action-btn-primary:hover { background: #5b21b6; border-color: #5b21b6; }
+        .sh-action-btn-secondary { background: #ffffff; color: #475569; border-color: #e2e8f0; }
+        .sh-action-btn-secondary:hover { border-color: #cbd5e1; background: #f8fafc; color: #1e293b; }
+        .sh-search-wrap { padding: 0 12px 10px; flex-shrink: 0; }
+        .sh-search-input { width: 100%; padding: 7px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #1e293b; background: #ffffff; outline: none; transition: border-color 0.15s; }
+        .sh-search-input:focus { border-color: #a78bfa; }
+        .sh-list { flex: 1; overflow-y: auto; padding: 0 0 16px; }
+        .sh-list::-webkit-scrollbar { width: 4px; }
+        .sh-list::-webkit-scrollbar-track { background: transparent; }
+        .sh-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+        .sh-stage-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 6px; position: sticky; top: 0; background: #f8fafc; z-index: 1; }
+        .sh-stage-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; }
+        .sh-stage-ct { font-size: 10px; font-weight: 700; color: #94a3b8; background: #e2e8f0; border-radius: 8px; padding: 1px 7px; }
+        .sh-record-card { margin: 0 10px 4px; padding: 10px 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
+        .sh-record-card:hover { border-color: #c4b5fd; background: rgba(109,40,217,0.02); }
+        .sh-record-card.sh-selected { border-color: #6d28d9; background: rgba(109,40,217,0.04); box-shadow: 0 0 0 2px rgba(109,40,217,0.1); }
+        .sh-card-name { font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sh-card-club { font-size: 12px; color: #64748b; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sh-card-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .sh-stage-pill { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+        .sh-empty-stage { padding: 8px 16px; font-size: 12px; color: #cbd5e1; font-style: italic; }
+        /* Right panel */
+        .sh-preview-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #cbd5e1; padding: 40px; text-align: center; }
+        .sh-preview-empty svg { margin-bottom: 16px; }
+        .sh-preview-empty p { font-size: 14px; }
+        .sh-preview-content { padding: 32px; max-width: 640px; }
+        .sh-preview-top { margin-bottom: 24px; }
+        .sh-preview-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+        .sh-preview-subtitle { font-size: 14px; color: #64748b; }
+        .sh-preview-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .sh-section { border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+        .sh-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 12px; }
+        .sh-notes-text { font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-wrap; }
+        .sh-notes-empty { font-size: 13px; color: #cbd5e1; font-style: italic; }
+        .sh-preview-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
+        .sh-open-btn { display: inline-flex; align-items: center; gap-7px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; border: none; }
+        .sh-open-btn-primary { background: #6d28d9; color: #fff; }
+        .sh-open-btn-primary:hover { background: #5b21b6; }
+        .sh-open-btn-secondary { background: #f1f5f9; color: #475569; }
+        .sh-open-btn-secondary:hover { background: #e2e8f0; color: #1e293b; }
+        @media (max-width: 768px) {
+            .sh-wrapper { flex-direction: column; height: auto; }
+            .sh-left { width: 100%; height: 50vh; border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .sh-right { min-height: 50vh; }
+        }
+
         /* Toggle switch */
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .toggle-switch input { opacity: 0; width: 0; height: 0; }
@@ -3396,85 +3456,84 @@
         <!-- ============================================================
              TOOL: SALES
              ============================================================ -->
-        <div id="tool-sales" class="hide w-full p-6 md:p-8 lg:px-12">
+        <div id="tool-sales" class="hide w-full">
 
-            <!-- CONTEXT-SENSITIVE ACTION BAR (above stage tabs) -->
-            <div id="sales-action-bar-leads" class="flex items-center justify-between flex-wrap gap-3 mb-4">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <input type="text" id="leads-search" placeholder="Search name or club…"
-                        oninput="renderKanban()"
-                        class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800" style="min-width:180px">
-                    <select id="leads-sport-filter" onchange="renderKanban()"
-                        class="px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white text-gray-800">
-                        <option value="">All Sports</option>
-                    </select>
+            <!-- Split-screen layout -->
+            <div class="sh-wrapper">
+
+                <!-- ── LEFT PANEL ── -->
+                <div class="sh-left">
+                    <div class="sh-header">
+                        <!-- Leads / Jobs tabs -->
+                        <div class="sh-tabs">
+                            <button id="sh-tab-leads" class="sh-tab active" onclick="switchSalesHomeTab('leads')">
+                                Leads <span id="stab-leads-count" class="sh-count">0</span>
+                            </button>
+                            <button id="sh-tab-jobs" class="sh-tab" onclick="switchSalesHomeTab('jobs')">
+                                Jobs <span id="stab-jobs-count" class="sh-count">0</span>
+                            </button>
+                        </div>
+                        <!-- Context actions -->
+                        <div id="sh-actions-leads" class="sh-actions">
+                            <button onclick="openLeadModal(null)" class="sh-action-btn sh-action-btn-primary">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                Add Lead
+                            </button>
+                            <button onclick="openStageConfig()" class="sh-action-btn sh-action-btn-secondary">Stages</button>
+                            <button onclick="exportLeadsCSV()" class="sh-action-btn sh-action-btn-secondary">Export</button>
+                        </div>
+                        <div id="sh-actions-jobs" class="sh-actions hide">
+                            <button onclick="openNewJobModal()" class="sh-action-btn sh-action-btn-primary">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                New Job
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search -->
+                    <div class="sh-search-wrap">
+                        <input type="text" id="sh-search" placeholder="Search name or club…"
+                            oninput="renderSalesHome()"
+                            class="sh-search-input">
+                    </div>
+
+                    <!-- Record list -->
+                    <div class="sh-list" id="sh-list"></div>
                 </div>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="openLeadModal(null)" class="btn-primary flex items-center gap-2 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Lead
-                    </button>
-                    <button onclick="openStageConfig()" class="btn-secondary text-sm">Stages</button>
-                    <button onclick="exportLeadsCSV()" class="btn-secondary text-sm">Export CSV</button>
-                    <button onclick="document.getElementById('leads-csv-import-modal').classList.remove('hide')" class="btn-secondary text-sm">Import CSV</button>
-                </div>
-            </div>
-            <div id="sales-action-bar-jobs" class="hide flex items-center justify-between mb-4">
-                <p id="jobs-kanban-filter-label" class="text-sm text-gray-500">All active jobs</p>
-                <button onclick="openNewJobModal()" class="btn-primary text-sm flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    New Job
-                </button>
-            </div>
-            <div id="sales-action-bar-production" class="hide"></div>
-            <div id="sales-action-bar-completed" class="hide flex items-center mb-4">
-                <h3 class="text-lg font-bold">Completed Jobs</h3>
-            </div>
 
-            <!-- 4-STAGE TAB NAVIGATION -->
-            <div class="sales-stage-tabs" id="sales-stage-tabs">
-                <button id="stab-leads" onclick="showSalesTab('leads')" class="sales-stage-tab active">
-                    <span>LEADS</span>
-                    <span id="stab-leads-count" class="tab-count">0</span>
-                </button>
-                <button id="stab-jobs" onclick="showSalesTab('jobs')" class="sales-stage-tab">
-                    <span>JOBS</span>
-                    <span id="stab-jobs-count" class="tab-count">0</span>
-                </button>
-                <button id="stab-production" onclick="showSalesTab('production')" class="sales-stage-tab">
-                    <span>PRODUCTION</span>
-                </button>
-                <button id="stab-completed" onclick="showSalesTab('completed')" class="sales-stage-tab">
-                    <span>COMPLETED</span>
-                    <span id="stab-completed-count" class="tab-count">0</span>
-                </button>
-            </div>
-
-            <!-- ── TAB: LEADS ── -->
-            <div id="sales-tab-leads">
-                <div class="kanban-board" id="kanban-board"></div>
-            </div>
-
-            <!-- ── TAB: JOBS ── -->
-            <div id="sales-tab-jobs" class="hide">
-                <div class="kanban-board" id="jobs-kanban-board"></div>
-            </div>
-
-            <!-- ── TAB: PRODUCTION ── -->
-            <div id="sales-tab-production" class="hide">
-                <div class="glass rounded-2xl p-8 text-center" style="max-width:560px;margin:40px auto">
-                    <div style="font-size:48px;margin-bottom:16px">🏭</div>
-                    <h3 class="text-xl font-bold mb-3">Production</h3>
-                    <p class="text-gray-500 mb-4">This section will display all <strong>paid Shopify orders</strong> fed directly into TeamwearOS.</p>
-                    <p class="text-gray-500 text-sm mb-6">From here you'll be able to batch weekly orders into a single Purchase Order, generate a complete PDF of all order details, and create a factory production sheet — ready for your factory to start straight away.</p>
-                    <span class="text-xs font-semibold px-3 py-1.5 rounded-full" style="background:rgba(251,191,36,0.15);color:#d97706;border:1px solid rgba(217,119,6,0.25)">Coming Soon — Shopify Integration</span>
+                <!-- ── RIGHT PANEL ── -->
+                <div class="sh-right" id="sh-right">
+                    <div id="sh-preview-empty" class="sh-preview-empty">
+                        <svg width="48" height="48" fill="none" stroke="#e2e8f0" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                        </svg>
+                        <p>Select a record to preview</p>
+                    </div>
+                    <div id="sh-preview" class="hide"></div>
                 </div>
             </div>
 
-            <!-- ── TAB: COMPLETED ── -->
-            <div id="sales-tab-completed" class="hide">
-                <div id="completed-jobs-list" class="space-y-3"></div>
+            <!-- Hidden legacy containers kept for JS compatibility -->
+            <div class="hide" aria-hidden="true">
+                <div id="kanban-board"></div>
+                <div id="jobs-kanban-board"></div>
+                <div id="sales-tab-leads"></div>
+                <div id="sales-tab-jobs"></div>
+                <div id="sales-tab-production"></div>
+                <div id="sales-tab-completed"></div>
+                <div id="sales-action-bar-leads"></div>
+                <div id="sales-action-bar-jobs"></div>
+                <div id="sales-action-bar-production"></div>
+                <div id="sales-action-bar-completed"></div>
+                <div id="stab-completed-count"></div>
             </div>
+
+            <!-- Completed jobs (shown in Jobs tab, bottom section) -->
+            <div class="hide"><div id="completed-jobs-list"></div></div>
+
+            <!-- Sport filter kept for renderKanban() compat -->
+            <div class="hide"><select id="leads-sport-filter"><option value="">All Sports</option></select></div>
+            <div class="hide"><input type="text" id="leads-search"></div>
         </div>
 
         <!-- ============================================================
@@ -6239,7 +6298,7 @@
                     break;
                 case 'sales':
                     Promise.all([loadLeads(), loadKanbanStages(), loadJobs()]).then(() => {
-                        showSalesTab('leads');
+                        switchSalesHomeTab(_shActiveTab || 'leads');
                         updateSalesTabCounts();
                     });
                     break;
@@ -12877,24 +12936,12 @@
         // SALES — NAVIGATION
         // =============================================
         function showSalesTab(tab) {
-            ['leads','jobs','production','completed'].forEach(t => {
-                const panel = document.getElementById(`sales-tab-${t}`);
-                const btn   = document.getElementById(`stab-${t}`);
-                const bar   = document.getElementById(`sales-action-bar-${t}`);
-                if (panel) panel.classList.add('hide');
-                if (btn)   btn.classList.remove('active');
-                if (bar)   bar.classList.add('hide');
-            });
-            const activePanel = document.getElementById(`sales-tab-${tab}`);
-            const activeBtn   = document.getElementById(`stab-${tab}`);
-            const activeBar   = document.getElementById(`sales-action-bar-${tab}`);
-            if (activePanel) activePanel.classList.remove('hide');
-            if (activeBtn)   activeBtn.classList.add('active');
-            if (activeBar)   activeBar.classList.remove('hide');
-
-            if (tab === 'leads')     renderKanban();
-            if (tab === 'jobs')      renderJobsKanban();
-            if (tab === 'completed') renderCompletedJobs();
+            // New Sales Home — map legacy tab names to new switcher
+            if (tab === 'leads' || tab === 'jobs') {
+                switchSalesHomeTab(tab);
+            } else if (tab === 'completed') {
+                switchSalesHomeTab('jobs'); // completed jobs live inside the jobs list
+            }
             updateSalesTabCounts();
         }
 
@@ -12923,6 +12970,280 @@
 
         // Keep updateSalesBadges as shim for any other call sites
         function updateSalesBadges() { updateSalesTabCounts(); }
+
+        // =============================================
+        // SALES HOME — SPLIT-SCREEN UI
+        // =============================================
+        let _shActiveTab = 'leads';
+        let _shSelectedId = null;
+        let _shSelectedType = null;
+
+        function switchSalesHomeTab(tab) {
+            _shActiveTab = tab;
+            _shSelectedId = null;
+            _shSelectedType = null;
+
+            // Tabs
+            document.getElementById('sh-tab-leads')?.classList.toggle('active', tab === 'leads');
+            document.getElementById('sh-tab-jobs')?.classList.toggle('active', tab === 'jobs');
+
+            // Actions
+            const aL = document.getElementById('sh-actions-leads');
+            const aJ = document.getElementById('sh-actions-jobs');
+            if (aL) aL.classList.toggle('hide', tab !== 'leads');
+            if (aJ) aJ.classList.toggle('hide', tab !== 'jobs');
+
+            // Reset preview
+            const previewEmpty = document.getElementById('sh-preview-empty');
+            const preview = document.getElementById('sh-preview');
+            if (previewEmpty) previewEmpty.classList.remove('hide');
+            if (preview) { preview.classList.add('hide'); preview.innerHTML = ''; }
+
+            renderSalesHome();
+            updateSalesTabCounts();
+        }
+
+        function renderSalesHome() {
+            const list = document.getElementById('sh-list');
+            if (!list) return;
+            const search = (document.getElementById('sh-search')?.value || '').toLowerCase().trim();
+
+            if (_shActiveTab === 'leads') {
+                _renderSalesHomeLeads(list, search);
+            } else {
+                _renderSalesHomeJobs(list, search);
+            }
+        }
+
+        function _renderSalesHomeLeads(list, search) {
+            let activeLeads = leads.filter(l => l.status !== 'converted' && l.status !== 'archived');
+            if (search) activeLeads = activeLeads.filter(l =>
+                l.lead_name?.toLowerCase().includes(search) ||
+                l.club_name?.toLowerCase().includes(search)
+            );
+
+            if (kanbanStages.length === 0) {
+                list.innerHTML = `<div class="sh-empty-stage">No stages configured. Click "Stages" to get started.</div>`;
+                return;
+            }
+
+            let html = '';
+            kanbanStages.forEach(stage => {
+                const stageLeads = activeLeads
+                    .filter(l => l.kanban_stage_id === stage.id)
+                    .sort((a, b) => (a.kanban_order || 0) - (b.kanban_order || 0));
+                const stageColor = stage.color || '#64748b';
+                html += `<div class="sh-stage-header">
+                    <span class="sh-stage-title" style="color:${stageColor}">${escHtml(stage.name)}</span>
+                    <span class="sh-stage-ct">${stageLeads.length}</span>
+                </div>`;
+                if (stageLeads.length === 0) {
+                    html += `<div class="sh-empty-stage">No leads</div>`;
+                } else {
+                    stageLeads.forEach(lead => {
+                        const isSelected = _shSelectedId === lead.id && _shSelectedType === 'lead';
+                        html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
+                            onclick="selectSalesRecord('lead','${lead.id}')">
+                            <div class="sh-card-name">${escHtml(lead.lead_name)}</div>
+                            <div class="sh-card-club">${escHtml(lead.club_name || '—')}</div>
+                            <div class="sh-card-meta">
+                                <span class="sh-stage-pill" style="background:${stageColor}18;color:${stageColor};border:1px solid ${stageColor}30">${escHtml(stage.name)}</span>
+                                ${lead.sport ? `<span class="sh-stage-pill" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0">${escHtml(lead.sport)}</span>` : ''}
+                            </div>
+                        </div>`;
+                    });
+                }
+            });
+
+            // Also show any leads not matched to a stage
+            const unassigned = activeLeads.filter(l => !kanbanStages.find(s => s.id === l.kanban_stage_id));
+            if (unassigned.length > 0) {
+                html += `<div class="sh-stage-header">
+                    <span class="sh-stage-title">Unassigned</span>
+                    <span class="sh-stage-ct">${unassigned.length}</span>
+                </div>`;
+                unassigned.forEach(lead => {
+                    const isSelected = _shSelectedId === lead.id && _shSelectedType === 'lead';
+                    html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
+                        onclick="selectSalesRecord('lead','${lead.id}')">
+                        <div class="sh-card-name">${escHtml(lead.lead_name)}</div>
+                        <div class="sh-card-club">${escHtml(lead.club_name || '—')}</div>
+                    </div>`;
+                });
+            }
+
+            if (!html) html = `<div class="sh-empty-stage" style="padding:24px 16px;text-align:center">No leads found</div>`;
+            list.innerHTML = html;
+        }
+
+        function _renderSalesHomeJobs(list, search) {
+            let activeJobs = jobs.filter(j => j.stage !== 'completed');
+            let completedJobs = jobs.filter(j => j.stage === 'completed');
+            if (search) {
+                activeJobs = activeJobs.filter(j =>
+                    j.job_name?.toLowerCase().includes(search) ||
+                    j.clubs?.name?.toLowerCase().includes(search) ||
+                    j.job_number?.toLowerCase().includes(search)
+                );
+                completedJobs = completedJobs.filter(j =>
+                    j.job_name?.toLowerCase().includes(search) ||
+                    j.clubs?.name?.toLowerCase().includes(search) ||
+                    j.job_number?.toLowerCase().includes(search)
+                );
+            }
+
+            const activeStages = JOB_STAGES.filter(s => s.key !== 'completed');
+            let html = '';
+
+            activeStages.forEach(stage => {
+                const stageJobs = activeJobs.filter(j => j.stage === stage.key);
+                html += `<div class="sh-stage-header">
+                    <span class="sh-stage-title" style="color:${stage.color}">${escHtml(stage.label)}</span>
+                    <span class="sh-stage-ct">${stageJobs.length}</span>
+                </div>`;
+                if (stageJobs.length === 0) {
+                    html += `<div class="sh-empty-stage">No jobs</div>`;
+                } else {
+                    stageJobs.forEach(job => {
+                        const isSelected = _shSelectedId === job.id && _shSelectedType === 'job';
+                        const clubName = job.clubs?.name || '—';
+                        html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
+                            onclick="selectSalesRecord('job','${job.id}')">
+                            <div class="sh-card-name">${escHtml(job.job_name)}</div>
+                            <div class="sh-card-club">${escHtml(clubName)}${job.job_number ? ` · <span style="color:#94a3b8">${escHtml(job.job_number)}</span>` : ''}</div>
+                            <div class="sh-card-meta">
+                                <span class="sh-stage-pill" style="background:${stage.bg};color:${stage.color};border:1px solid ${stage.color}30">${escHtml(stage.label)}</span>
+                            </div>
+                        </div>`;
+                    });
+                }
+            });
+
+            // Completed section
+            if (completedJobs.length > 0) {
+                html += `<div class="sh-stage-header" style="margin-top:8px">
+                    <span class="sh-stage-title" style="color:#16a34a">Completed</span>
+                    <span class="sh-stage-ct">${completedJobs.length}</span>
+                </div>`;
+                completedJobs.forEach(job => {
+                    const isSelected = _shSelectedId === job.id && _shSelectedType === 'job';
+                    const clubName = job.clubs?.name || '—';
+                    html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
+                        onclick="selectSalesRecord('job','${job.id}')">
+                        <div class="sh-card-name" style="color:#64748b">${escHtml(job.job_name)}</div>
+                        <div class="sh-card-club">${escHtml(clubName)}</div>
+                        <div class="sh-card-meta">
+                            <span class="sh-stage-pill" style="background:rgba(22,163,74,0.1);color:#16a34a;border:1px solid rgba(22,163,74,0.2)">Completed ✓</span>
+                        </div>
+                    </div>`;
+                });
+            }
+
+            if (!html) html = `<div class="sh-empty-stage" style="padding:24px 16px;text-align:center">No jobs found</div>`;
+            list.innerHTML = html;
+        }
+
+        function selectSalesRecord(type, id) {
+            _shSelectedId = id;
+            _shSelectedType = type;
+
+            // Highlight selected card
+            document.querySelectorAll('#sh-list .sh-record-card').forEach(el => {
+                el.classList.remove('sh-selected');
+            });
+            event?.currentTarget?.classList?.add('sh-selected');
+
+            // Show preview
+            const previewEmpty = document.getElementById('sh-preview-empty');
+            const preview = document.getElementById('sh-preview');
+            if (previewEmpty) previewEmpty.classList.add('hide');
+            if (preview) {
+                preview.classList.remove('hide');
+                if (type === 'lead') {
+                    _renderLeadPreview(preview, id);
+                } else {
+                    _renderJobPreview(preview, id);
+                }
+            }
+        }
+
+        function _renderLeadPreview(container, leadId) {
+            const lead = leads.find(l => l.id === leadId);
+            if (!lead) { container.innerHTML = `<div class="sh-preview-content"><p class="sh-notes-empty">Record not found.</p></div>`; return; }
+            const stage = kanbanStages.find(s => s.id === lead.kanban_stage_id);
+            const stageColor = stage?.color || '#64748b';
+            const stageName  = stage?.name  || 'Unassigned';
+            const assignedName = lead.assigned_to ? escHtml(getUserDisplayName(lead.assigned_to)) : null;
+
+            container.innerHTML = `
+                <div class="sh-preview-content">
+                    <div class="sh-preview-top">
+                        <div class="sh-preview-title">${escHtml(lead.lead_name)}</div>
+                        <div class="sh-preview-subtitle">${escHtml(lead.club_name || '—')}${lead.sport ? ` · ${escHtml(lead.sport)}` : ''}</div>
+                        <div class="sh-preview-pills">
+                            <span class="sh-stage-pill" style="background:${stageColor}18;color:${stageColor};border:1px solid ${stageColor}30;font-size:12px;padding:3px 10px">${escHtml(stageName)}</span>
+                            ${lead.status === 'converted' ? `<span class="sh-stage-pill" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2);font-size:12px;padding:3px 10px">Converted</span>` : ''}
+                            ${assignedName ? `<span class="sh-stage-pill" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;font-size:12px;padding:3px 10px">👤 ${assignedName}</span>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="sh-section">
+                        <div class="sh-section-title">Notes</div>
+                        ${lead.notes
+                            ? `<div class="sh-notes-text">${escHtml(lead.notes)}</div>`
+                            : `<div class="sh-notes-empty">No notes recorded.</div>`}
+                    </div>
+
+                    <div class="sh-preview-actions">
+                        <button class="sh-open-btn sh-open-btn-primary" onclick="openLeadModal('${leadId}')">
+                            Open Full Record
+                        </button>
+                        ${lead.status !== 'converted' ? `<button class="sh-open-btn sh-open-btn-secondary" onclick="convertLeadToJob('${leadId}')">Convert to Job</button>` : ''}
+                    </div>
+                </div>`;
+        }
+
+        function _renderJobPreview(container, jobId) {
+            const job = jobs.find(j => j.id === jobId);
+            if (!job) { container.innerHTML = `<div class="sh-preview-content"><p class="sh-notes-empty">Record not found.</p></div>`; return; }
+            const stage = JOB_STAGES.find(s => s.key === job.stage) || JOB_STAGES[0];
+            const clubName = job.clubs?.name || '—';
+
+            container.innerHTML = `
+                <div class="sh-preview-content">
+                    <div class="sh-preview-top">
+                        <div class="sh-preview-title">${escHtml(job.job_name)}</div>
+                        <div class="sh-preview-subtitle">${escHtml(clubName)}${job.job_number ? ` · <span style="color:#94a3b8">${escHtml(job.job_number)}</span>` : ''}</div>
+                        <div class="sh-preview-pills">
+                            <span class="sh-stage-pill" style="background:${stage.bg};color:${stage.color};border:1px solid ${stage.color}30;font-size:12px;padding:3px 10px">${escHtml(stage.label)}</span>
+                            ${job.range_approved ? `<span class="sh-stage-pill" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2);font-size:12px;padding:3px 10px">Range ✓</span>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="sh-section">
+                        <div class="sh-section-title">Description</div>
+                        ${job.description
+                            ? `<div class="sh-notes-text">${escHtml(job.description)}</div>`
+                            : `<div class="sh-notes-empty">No description recorded.</div>`}
+                    </div>
+
+                    ${job.shopify_draft_order_url ? `
+                    <div class="sh-section">
+                        <div class="sh-section-title">Shopify</div>
+                        <a href="${escHtml(job.shopify_draft_order_url)}" target="_blank" rel="noopener"
+                            class="kanban-shopify-link" style="font-size:12px;padding:5px 10px">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            View Draft Order
+                        </a>
+                    </div>` : ''}
+
+                    <div class="sh-preview-actions">
+                        <button class="sh-open-btn sh-open-btn-primary" onclick="openJobRecord('${jobId}')">
+                            Open Full Record
+                        </button>
+                    </div>
+                </div>`;
+        }
 
         // =============================================
         // SALES — STAGE GRID
@@ -13244,7 +13565,7 @@
             } else {
                 document.getElementById('tool-job-record').classList.add('hide');
                 document.getElementById('tool-sales').classList.remove('hide');
-                showSalesTab('jobs');
+                switchSalesHomeTab('jobs');
             }
         }
 
@@ -15574,6 +15895,9 @@
                     ${cards || `<div class="kanban-empty">Drop leads here</div>`}
                 </div>`;
             }).join('');
+
+            // Keep Sales Home in sync
+            if (document.getElementById('sh-list')) renderSalesHome();
         }
 
         // =============================================
@@ -15618,6 +15942,9 @@
                     ${cards || `<div class="kanban-empty">No jobs</div>`}
                 </div>`;
             }).join('');
+
+            // Keep Sales Home in sync
+            if (document.getElementById('sh-list')) renderSalesHome();
         }
 
         // Drag & drop handlers
