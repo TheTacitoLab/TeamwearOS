@@ -277,62 +277,81 @@
 
         /* ── Sales Home Split-Screen ─────────────────────────────────────── */
         .sh-wrapper { display: flex; height: calc(100vh - 112px); min-height: 0; overflow: hidden; }
-        .sh-left { display: flex; flex-direction: column; width: 340px; flex-shrink: 0; border-right: 1px solid #e2e8f0; background: #f8fafc; overflow: hidden; }
-        .sh-right { flex: 1; overflow-y: auto; background: #ffffff; }
-        .sh-header { padding: 16px 16px 0; flex-shrink: 0; }
-        .sh-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; }
-        .sh-tab { display: flex; align-items: center; gap: 6px; padding: 8px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #94a3b8; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+        .sh-left { display: flex; flex-direction: column; flex: 0 0 75%; width: 75%; border-right: 1px solid #e2e8f0; background: #f8fafc; overflow: hidden; }
+        .sh-right { flex: 0 0 25%; width: 25%; min-width: 256px; overflow-y: auto; background: #ffffff; }
+        .sh-header { padding: 14px 16px 0; flex-shrink: 0; }
+        .sh-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px; }
+        .sh-tab { display: flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #94a3b8; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
         .sh-tab:hover { color: #475569; }
         .sh-tab.active { color: #6d28d9; border-bottom-color: #6d28d9; }
         .sh-count { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; font-size: 10px; font-weight: 700; background: #e2e8f0; color: #64748b; }
         .sh-tab.active .sh-count { background: rgba(109,40,217,0.12); color: #6d28d9; }
-        .sh-actions { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
+        .sh-actions { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
         .sh-action-btn { display: inline-flex; align-items: center; gap: 4px; padding: 5px 11px; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.15s; border: 1px solid transparent; }
         .sh-action-btn-primary { background: #6d28d9; color: #fff; border-color: #6d28d9; }
         .sh-action-btn-primary:hover { background: #5b21b6; border-color: #5b21b6; }
         .sh-action-btn-secondary { background: #ffffff; color: #475569; border-color: #e2e8f0; }
         .sh-action-btn-secondary:hover { border-color: #cbd5e1; background: #f8fafc; color: #1e293b; }
-        .sh-search-wrap { padding: 0 12px 10px; flex-shrink: 0; }
-        .sh-search-input { width: 100%; padding: 7px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; color: #1e293b; background: #ffffff; outline: none; transition: border-color 0.15s; }
+        .sh-search-wrap { padding: 0 16px 10px; flex-shrink: 0; }
+        .sh-search-input { width: 100%; padding: 6px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; color: #1e293b; background: #ffffff; outline: none; transition: border-color 0.15s; }
         .sh-search-input:focus { border-color: #a78bfa; }
-        .sh-list { flex: 1; overflow-y: auto; padding: 0 0 16px; }
-        .sh-list::-webkit-scrollbar { width: 4px; }
-        .sh-list::-webkit-scrollbar-track { background: transparent; }
-        .sh-list::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
-        .sh-stage-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 6px; position: sticky; top: 0; background: #f8fafc; z-index: 1; }
-        .sh-stage-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; }
-        .sh-stage-ct { font-size: 10px; font-weight: 700; color: #94a3b8; background: #e2e8f0; border-radius: 8px; padding: 1px 7px; }
-        .sh-record-card { margin: 0 10px 4px; padding: 10px 12px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; cursor: pointer; transition: all 0.15s; }
-        .sh-record-card:hover { border-color: #c4b5fd; background: rgba(109,40,217,0.02); }
+        /* Kanban board */
+        .sh-kanban { flex: 1; display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding: 0 16px 16px; align-items: flex-start; }
+        .sh-kanban::-webkit-scrollbar { height: 5px; }
+        .sh-kanban::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        .sh-kanban::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .sh-kb-col { flex: 0 0 210px; display: flex; flex-direction: column; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; max-height: 100%; transition: flex-basis 0.2s; }
+        .sh-kb-col.sh-kb-collapsed { flex-basis: 44px; }
+        .sh-kb-col-hd { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px; cursor: pointer; user-select: none; flex-shrink: 0; gap: 6px; transition: background 0.12s; }
+        .sh-kb-col-hd:hover { background: #f8fafc; }
+        .sh-kb-col-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .sh-kb-col-ct { font-size: 10px; font-weight: 700; background: #f1f5f9; color: #64748b; border-radius: 8px; padding: 1px 6px; flex-shrink: 0; }
+        .sh-kb-col-chevron { color: #cbd5e1; flex-shrink: 0; transition: transform 0.2s; line-height: 1; }
+        .sh-kb-col.sh-kb-collapsed .sh-kb-col-chevron { transform: rotate(-90deg); }
+        .sh-kb-col-body { overflow-y: auto; flex: 1; padding: 6px 8px 8px; }
+        .sh-kb-col-body::-webkit-scrollbar { width: 3px; }
+        .sh-kb-col-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 2px; }
+        .sh-kb-col.sh-kb-collapsed .sh-kb-col-body { display: none; }
+        .sh-kb-empty { padding: 12px 4px; font-size: 11px; color: #d1d5db; text-align: center; font-style: italic; }
+        /* Record cards inside kanban */
+        .sh-record-card { padding: 9px 10px; background: #ffffff; border: 1px solid #e8edf3; border-radius: 8px; cursor: pointer; transition: all 0.15s; margin-bottom: 5px; }
+        .sh-record-card:last-child { margin-bottom: 0; }
+        .sh-record-card:hover { border-color: #c4b5fd; box-shadow: 0 2px 8px rgba(109,40,217,0.08); transform: translateY(-1px); }
         .sh-record-card.sh-selected { border-color: #6d28d9; background: rgba(109,40,217,0.04); box-shadow: 0 0 0 2px rgba(109,40,217,0.1); }
-        .sh-card-name { font-size: 13px; font-weight: 600; color: #0f172a; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sh-card-club { font-size: 12px; color: #64748b; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sh-card-meta { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+        .sh-card-name { font-size: 12px; font-weight: 600; color: #0f172a; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sh-card-club { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .sh-card-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+        .sh-card-tag { display: inline-block; padding: 1px 6px; border-radius: 5px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+        /* Right preview panel */
+        .sh-preview-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; color: #d1d5db; padding: 32px 24px; text-align: center; }
+        .sh-preview-empty p { font-size: 13px; margin-top: 12px; }
+        .sh-preview-content { padding: 20px; }
+        .sh-preview-top { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid #f1f5f9; }
+        .sh-preview-title { font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 2px; line-height: 1.3; }
+        .sh-preview-subtitle { font-size: 12px; color: #64748b; }
+        .sh-preview-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
         .sh-stage-pill { display: inline-block; padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 700; white-space: nowrap; }
-        .sh-empty-stage { padding: 8px 16px; font-size: 12px; color: #cbd5e1; font-style: italic; }
-        /* Right panel */
-        .sh-preview-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #cbd5e1; padding: 40px; text-align: center; }
-        .sh-preview-empty svg { margin-bottom: 16px; }
-        .sh-preview-empty p { font-size: 14px; }
-        .sh-preview-content { padding: 32px; max-width: 640px; }
-        .sh-preview-top { margin-bottom: 24px; }
-        .sh-preview-title { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
-        .sh-preview-subtitle { font-size: 14px; color: #64748b; }
-        .sh-preview-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .sh-section { border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
-        .sh-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 12px; }
-        .sh-notes-text { font-size: 14px; color: #334155; line-height: 1.6; white-space: pre-wrap; }
-        .sh-notes-empty { font-size: 13px; color: #cbd5e1; font-style: italic; }
-        .sh-preview-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 24px; }
-        .sh-open-btn { display: inline-flex; align-items: center; gap-7px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.15s; border: none; }
+        .sh-section { margin-bottom: 14px; }
+        .sh-section-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.7px; color: #94a3b8; margin-bottom: 8px; }
+        .sh-detail-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 5px; }
+        .sh-detail-label { font-size: 11px; color: #94a3b8; font-weight: 600; min-width: 72px; flex-shrink: 0; }
+        .sh-detail-value { font-size: 12px; color: #334155; font-weight: 500; }
+        .sh-notes-text { font-size: 12px; color: #334155; line-height: 1.6; white-space: pre-wrap; max-height: 120px; overflow-y: auto; }
+        .sh-notes-empty { font-size: 12px; color: #d1d5db; font-style: italic; }
+        .sh-activity-item { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid #f8fafc; }
+        .sh-activity-item:last-child { border-bottom: none; }
+        .sh-activity-dot { width: 6px; height: 6px; border-radius: 50%; background: #e2e8f0; flex-shrink: 0; margin-top: 4px; }
+        .sh-activity-text { font-size: 11px; color: #64748b; line-height: 1.4; }
+        .sh-preview-actions { display: flex; flex-direction: column; gap: 6px; margin-top: 16px; }
+        .sh-open-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.15s; border: none; width: 100%; }
         .sh-open-btn-primary { background: #6d28d9; color: #fff; }
         .sh-open-btn-primary:hover { background: #5b21b6; }
         .sh-open-btn-secondary { background: #f1f5f9; color: #475569; }
         .sh-open-btn-secondary:hover { background: #e2e8f0; color: #1e293b; }
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .sh-wrapper { flex-direction: column; height: auto; }
-            .sh-left { width: 100%; height: 50vh; border-right: none; border-bottom: 1px solid #e2e8f0; }
-            .sh-right { min-height: 50vh; }
+            .sh-left { flex: none; width: 100%; height: 55vh; border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .sh-right { flex: none; width: 100%; min-height: 45vh; }
         }
 
         /* Toggle switch */
@@ -3497,8 +3516,8 @@
                             class="sh-search-input">
                     </div>
 
-                    <!-- Record list -->
-                    <div class="sh-list" id="sh-list"></div>
+                    <!-- Kanban board -->
+                    <div class="sh-kanban" id="sh-list"></div>
                 </div>
 
                 <!-- ── RIGHT PANEL ── -->
@@ -12972,16 +12991,18 @@
         function updateSalesBadges() { updateSalesTabCounts(); }
 
         // =============================================
-        // SALES HOME — SPLIT-SCREEN UI
+        // SALES HOME — SPLIT-SCREEN KANBAN
         // =============================================
         let _shActiveTab = 'leads';
         let _shSelectedId = null;
         let _shSelectedType = null;
+        const _shCollapsed = new Set(); // stage keys/ids that are collapsed
 
         function switchSalesHomeTab(tab) {
             _shActiveTab = tab;
             _shSelectedId = null;
             _shSelectedType = null;
+            _shCollapsed.clear();
 
             // Tabs
             document.getElementById('sh-tab-leads')?.classList.toggle('active', tab === 'leads');
@@ -13003,19 +13024,44 @@
             updateSalesTabCounts();
         }
 
-        function renderSalesHome() {
-            const list = document.getElementById('sh-list');
-            if (!list) return;
-            const search = (document.getElementById('sh-search')?.value || '').toLowerCase().trim();
-
-            if (_shActiveTab === 'leads') {
-                _renderSalesHomeLeads(list, search);
-            } else {
-                _renderSalesHomeJobs(list, search);
-            }
+        function toggleSalesStage(key) {
+            if (_shCollapsed.has(key)) _shCollapsed.delete(key);
+            else _shCollapsed.add(key);
+            renderSalesHome();
         }
 
-        function _renderSalesHomeLeads(list, search) {
+        function renderSalesHome() {
+            const board = document.getElementById('sh-list');
+            if (!board) return;
+            const search = (document.getElementById('sh-search')?.value || '').toLowerCase().trim();
+            if (_shActiveTab === 'leads') _renderSHLeadsKanban(board, search);
+            else _renderSHJobsKanban(board, search);
+        }
+
+        function _shKanbanCard(type, id, name, club, tagsHtml, selected) {
+            return `<div class="sh-record-card${selected ? ' sh-selected' : ''}" onclick="selectSalesRecord('${type}','${id}')">
+                <div class="sh-card-name">${name}</div>
+                <div class="sh-card-club">${club}</div>
+                ${tagsHtml ? `<div class="sh-card-tags">${tagsHtml}</div>` : ''}
+            </div>`;
+        }
+
+        function _shKanbanCol(key, color, title, count, cardsHtml) {
+            const collapsed = _shCollapsed.has(key);
+            const chevron = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>`;
+            return `<div class="sh-kb-col${collapsed ? ' sh-kb-collapsed' : ''}">
+                <div class="sh-kb-col-hd" onclick="toggleSalesStage('${key}')">
+                    <span class="sh-kb-col-title" style="color:${color}">${title}</span>
+                    <span class="sh-kb-col-ct">${count}</span>
+                    <span class="sh-kb-col-chevron">${chevron}</span>
+                </div>
+                <div class="sh-kb-col-body">
+                    ${cardsHtml || `<div class="sh-kb-empty">No records</div>`}
+                </div>
+            </div>`;
+        }
+
+        function _renderSHLeadsKanban(board, search) {
             let activeLeads = leads.filter(l => l.status !== 'converted' && l.status !== 'archived');
             if (search) activeLeads = activeLeads.filter(l =>
                 l.lead_name?.toLowerCase().includes(search) ||
@@ -13023,135 +13069,64 @@
             );
 
             if (kanbanStages.length === 0) {
-                list.innerHTML = `<div class="sh-empty-stage">No stages configured. Click "Stages" to get started.</div>`;
+                board.innerHTML = `<div style="padding:32px;color:#94a3b8;font-size:13px">No stages configured. Click "Stages" to get started.</div>`;
                 return;
             }
 
-            let html = '';
-            kanbanStages.forEach(stage => {
+            let cols = kanbanStages.map(stage => {
                 const stageLeads = activeLeads
                     .filter(l => l.kanban_stage_id === stage.id)
                     .sort((a, b) => (a.kanban_order || 0) - (b.kanban_order || 0));
-                const stageColor = stage.color || '#64748b';
-                html += `<div class="sh-stage-header">
-                    <span class="sh-stage-title" style="color:${stageColor}">${escHtml(stage.name)}</span>
-                    <span class="sh-stage-ct">${stageLeads.length}</span>
-                </div>`;
-                if (stageLeads.length === 0) {
-                    html += `<div class="sh-empty-stage">No leads</div>`;
-                } else {
-                    stageLeads.forEach(lead => {
-                        const isSelected = _shSelectedId === lead.id && _shSelectedType === 'lead';
-                        html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
-                            onclick="selectSalesRecord('lead','${lead.id}')">
-                            <div class="sh-card-name">${escHtml(lead.lead_name)}</div>
-                            <div class="sh-card-club">${escHtml(lead.club_name || '—')}</div>
-                            <div class="sh-card-meta">
-                                <span class="sh-stage-pill" style="background:${stageColor}18;color:${stageColor};border:1px solid ${stageColor}30">${escHtml(stage.name)}</span>
-                                ${lead.sport ? `<span class="sh-stage-pill" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0">${escHtml(lead.sport)}</span>` : ''}
-                            </div>
-                        </div>`;
-                    });
-                }
+                const color = stage.color || '#64748b';
+                const cards = stageLeads.map(lead => {
+                    const sel = _shSelectedId === lead.id && _shSelectedType === 'lead';
+                    const sport = lead.sport ? `<span class="sh-card-tag" style="background:#f1f5f9;color:#64748b">${escHtml(lead.sport)}</span>` : '';
+                    return _shKanbanCard('lead', lead.id, escHtml(lead.lead_name), escHtml(lead.club_name || '—'), sport, sel);
+                }).join('');
+                return _shKanbanCol(stage.id, color, escHtml(stage.name), stageLeads.length, cards);
             });
 
-            // Also show any leads not matched to a stage
             const unassigned = activeLeads.filter(l => !kanbanStages.find(s => s.id === l.kanban_stage_id));
             if (unassigned.length > 0) {
-                html += `<div class="sh-stage-header">
-                    <span class="sh-stage-title">Unassigned</span>
-                    <span class="sh-stage-ct">${unassigned.length}</span>
-                </div>`;
-                unassigned.forEach(lead => {
-                    const isSelected = _shSelectedId === lead.id && _shSelectedType === 'lead';
-                    html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
-                        onclick="selectSalesRecord('lead','${lead.id}')">
-                        <div class="sh-card-name">${escHtml(lead.lead_name)}</div>
-                        <div class="sh-card-club">${escHtml(lead.club_name || '—')}</div>
-                    </div>`;
-                });
+                const cards = unassigned.map(lead => {
+                    const sel = _shSelectedId === lead.id && _shSelectedType === 'lead';
+                    return _shKanbanCard('lead', lead.id, escHtml(lead.lead_name), escHtml(lead.club_name || '—'), '', sel);
+                }).join('');
+                cols.push(_shKanbanCol('__unassigned', '#94a3b8', 'Unassigned', unassigned.length, cards));
             }
 
-            if (!html) html = `<div class="sh-empty-stage" style="padding:24px 16px;text-align:center">No leads found</div>`;
-            list.innerHTML = html;
+            board.innerHTML = cols.join('');
         }
 
-        function _renderSalesHomeJobs(list, search) {
-            let activeJobs = jobs.filter(j => j.stage !== 'completed');
-            let completedJobs = jobs.filter(j => j.stage === 'completed');
-            if (search) {
-                activeJobs = activeJobs.filter(j =>
-                    j.job_name?.toLowerCase().includes(search) ||
-                    j.clubs?.name?.toLowerCase().includes(search) ||
-                    j.job_number?.toLowerCase().includes(search)
-                );
-                completedJobs = completedJobs.filter(j =>
-                    j.job_name?.toLowerCase().includes(search) ||
-                    j.clubs?.name?.toLowerCase().includes(search) ||
-                    j.job_number?.toLowerCase().includes(search)
-                );
-            }
+        function _renderSHJobsKanban(board, search) {
+            let allJobs = jobs.slice();
+            if (search) allJobs = allJobs.filter(j =>
+                j.job_name?.toLowerCase().includes(search) ||
+                j.clubs?.name?.toLowerCase().includes(search) ||
+                j.job_number?.toLowerCase().includes(search)
+            );
 
-            const activeStages = JOB_STAGES.filter(s => s.key !== 'completed');
-            let html = '';
-
-            activeStages.forEach(stage => {
-                const stageJobs = activeJobs.filter(j => j.stage === stage.key);
-                html += `<div class="sh-stage-header">
-                    <span class="sh-stage-title" style="color:${stage.color}">${escHtml(stage.label)}</span>
-                    <span class="sh-stage-ct">${stageJobs.length}</span>
-                </div>`;
-                if (stageJobs.length === 0) {
-                    html += `<div class="sh-empty-stage">No jobs</div>`;
-                } else {
-                    stageJobs.forEach(job => {
-                        const isSelected = _shSelectedId === job.id && _shSelectedType === 'job';
-                        const clubName = job.clubs?.name || '—';
-                        html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
-                            onclick="selectSalesRecord('job','${job.id}')">
-                            <div class="sh-card-name">${escHtml(job.job_name)}</div>
-                            <div class="sh-card-club">${escHtml(clubName)}${job.job_number ? ` · <span style="color:#94a3b8">${escHtml(job.job_number)}</span>` : ''}</div>
-                            <div class="sh-card-meta">
-                                <span class="sh-stage-pill" style="background:${stage.bg};color:${stage.color};border:1px solid ${stage.color}30">${escHtml(stage.label)}</span>
-                            </div>
-                        </div>`;
-                    });
-                }
+            const cols = JOB_STAGES.map(stage => {
+                const stageJobs = allJobs.filter(j => j.stage === stage.key);
+                const cards = stageJobs.map(job => {
+                    const sel = _shSelectedId === job.id && _shSelectedType === 'job';
+                    const club = escHtml(job.clubs?.name || '—');
+                    const num = job.job_number ? `<span class="sh-card-tag" style="background:#f1f5f9;color:#94a3b8">${escHtml(job.job_number)}</span>` : '';
+                    const shopify = job.shopify_draft_order_url ? `<span class="sh-card-tag" style="background:rgba(5,150,105,0.1);color:#059669">Shopify</span>` : '';
+                    return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + shopify, sel);
+                }).join('');
+                return _shKanbanCol(stage.key, stage.color, escHtml(stage.label), stageJobs.length, cards);
             });
 
-            // Completed section
-            if (completedJobs.length > 0) {
-                html += `<div class="sh-stage-header" style="margin-top:8px">
-                    <span class="sh-stage-title" style="color:#16a34a">Completed</span>
-                    <span class="sh-stage-ct">${completedJobs.length}</span>
-                </div>`;
-                completedJobs.forEach(job => {
-                    const isSelected = _shSelectedId === job.id && _shSelectedType === 'job';
-                    const clubName = job.clubs?.name || '—';
-                    html += `<div class="sh-record-card${isSelected ? ' sh-selected' : ''}"
-                        onclick="selectSalesRecord('job','${job.id}')">
-                        <div class="sh-card-name" style="color:#64748b">${escHtml(job.job_name)}</div>
-                        <div class="sh-card-club">${escHtml(clubName)}</div>
-                        <div class="sh-card-meta">
-                            <span class="sh-stage-pill" style="background:rgba(22,163,74,0.1);color:#16a34a;border:1px solid rgba(22,163,74,0.2)">Completed ✓</span>
-                        </div>
-                    </div>`;
-                });
-            }
-
-            if (!html) html = `<div class="sh-empty-stage" style="padding:24px 16px;text-align:center">No jobs found</div>`;
-            list.innerHTML = html;
+            board.innerHTML = cols.join('');
         }
 
         function selectSalesRecord(type, id) {
             _shSelectedId = id;
             _shSelectedType = type;
 
-            // Highlight selected card
-            document.querySelectorAll('#sh-list .sh-record-card').forEach(el => {
-                el.classList.remove('sh-selected');
-            });
-            event?.currentTarget?.classList?.add('sh-selected');
+            // Re-render list to update selected state
+            renderSalesHome();
 
             // Show preview
             const previewEmpty = document.getElementById('sh-preview-empty');
@@ -13159,11 +13134,8 @@
             if (previewEmpty) previewEmpty.classList.add('hide');
             if (preview) {
                 preview.classList.remove('hide');
-                if (type === 'lead') {
-                    _renderLeadPreview(preview, id);
-                } else {
-                    _renderJobPreview(preview, id);
-                }
+                if (type === 'lead') _renderLeadPreview(preview, id);
+                else _renderJobPreview(preview, id);
             }
         }
 
@@ -13175,32 +13147,35 @@
             const stageName  = stage?.name  || 'Unassigned';
             const assignedName = lead.assigned_to ? escHtml(getUserDisplayName(lead.assigned_to)) : null;
 
-            container.innerHTML = `
-                <div class="sh-preview-content">
-                    <div class="sh-preview-top">
-                        <div class="sh-preview-title">${escHtml(lead.lead_name)}</div>
-                        <div class="sh-preview-subtitle">${escHtml(lead.club_name || '—')}${lead.sport ? ` · ${escHtml(lead.sport)}` : ''}</div>
-                        <div class="sh-preview-pills">
-                            <span class="sh-stage-pill" style="background:${stageColor}18;color:${stageColor};border:1px solid ${stageColor}30;font-size:12px;padding:3px 10px">${escHtml(stageName)}</span>
-                            ${lead.status === 'converted' ? `<span class="sh-stage-pill" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2);font-size:12px;padding:3px 10px">Converted</span>` : ''}
-                            ${assignedName ? `<span class="sh-stage-pill" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;font-size:12px;padding:3px 10px">👤 ${assignedName}</span>` : ''}
-                        </div>
+            container.innerHTML = `<div class="sh-preview-content">
+                <div class="sh-preview-top">
+                    <div class="sh-preview-title">${escHtml(lead.lead_name)}</div>
+                    <div class="sh-preview-subtitle">${escHtml(lead.club_name || '—')}</div>
+                    <div class="sh-preview-pills">
+                        <span class="sh-stage-pill" style="background:${stageColor}18;color:${stageColor};border:1px solid ${stageColor}30">${escHtml(stageName)}</span>
+                        ${lead.sport ? `<span class="sh-stage-pill" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0">${escHtml(lead.sport)}</span>` : ''}
+                        ${lead.status === 'converted' ? `<span class="sh-stage-pill" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2)">Converted</span>` : ''}
                     </div>
+                </div>
 
-                    <div class="sh-section">
-                        <div class="sh-section-title">Notes</div>
-                        ${lead.notes
-                            ? `<div class="sh-notes-text">${escHtml(lead.notes)}</div>`
-                            : `<div class="sh-notes-empty">No notes recorded.</div>`}
-                    </div>
+                <div class="sh-section">
+                    <div class="sh-section-title">Details</div>
+                    ${assignedName ? `<div class="sh-detail-row"><span class="sh-detail-label">Assigned</span><span class="sh-detail-value">${assignedName}</span></div>` : ''}
+                    ${lead.county ? `<div class="sh-detail-row"><span class="sh-detail-label">County</span><span class="sh-detail-value">${escHtml(lead.county)}</span></div>` : ''}
+                </div>
 
-                    <div class="sh-preview-actions">
-                        <button class="sh-open-btn sh-open-btn-primary" onclick="openLeadModal('${leadId}')">
-                            Open Full Record
-                        </button>
-                        ${lead.status !== 'converted' ? `<button class="sh-open-btn sh-open-btn-secondary" onclick="convertLeadToJob('${leadId}')">Convert to Job</button>` : ''}
-                    </div>
-                </div>`;
+                <div class="sh-section">
+                    <div class="sh-section-title">Notes</div>
+                    ${lead.notes
+                        ? `<div class="sh-notes-text">${escHtml(lead.notes)}</div>`
+                        : `<div class="sh-notes-empty">No notes recorded.</div>`}
+                </div>
+
+                <div class="sh-preview-actions">
+                    <button class="sh-open-btn sh-open-btn-primary" onclick="openLeadModal('${leadId}')">Open Full Record</button>
+                    ${lead.status !== 'converted' ? `<button class="sh-open-btn sh-open-btn-secondary" onclick="convertLeadToJob('${leadId}')">Convert to Job →</button>` : ''}
+                </div>
+            </div>`;
         }
 
         function _renderJobPreview(container, jobId) {
@@ -13208,41 +13183,43 @@
             if (!job) { container.innerHTML = `<div class="sh-preview-content"><p class="sh-notes-empty">Record not found.</p></div>`; return; }
             const stage = JOB_STAGES.find(s => s.key === job.stage) || JOB_STAGES[0];
             const clubName = job.clubs?.name || '—';
+            const ownerName = job.created_by ? getUserDisplayName(job.created_by) : null;
 
-            container.innerHTML = `
-                <div class="sh-preview-content">
-                    <div class="sh-preview-top">
-                        <div class="sh-preview-title">${escHtml(job.job_name)}</div>
-                        <div class="sh-preview-subtitle">${escHtml(clubName)}${job.job_number ? ` · <span style="color:#94a3b8">${escHtml(job.job_number)}</span>` : ''}</div>
-                        <div class="sh-preview-pills">
-                            <span class="sh-stage-pill" style="background:${stage.bg};color:${stage.color};border:1px solid ${stage.color}30;font-size:12px;padding:3px 10px">${escHtml(stage.label)}</span>
-                            ${job.range_approved ? `<span class="sh-stage-pill" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2);font-size:12px;padding:3px 10px">Range ✓</span>` : ''}
-                        </div>
+            container.innerHTML = `<div class="sh-preview-content">
+                <div class="sh-preview-top">
+                    <div class="sh-preview-title">${escHtml(job.job_name)}</div>
+                    <div class="sh-preview-subtitle">${escHtml(clubName)}</div>
+                    <div class="sh-preview-pills">
+                        <span class="sh-stage-pill" style="background:${stage.bg};color:${stage.color};border:1px solid ${stage.color}30">${escHtml(stage.label)}</span>
+                        ${job.range_approved ? `<span class="sh-stage-pill" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2)">Range ✓</span>` : ''}
                     </div>
+                </div>
 
-                    <div class="sh-section">
-                        <div class="sh-section-title">Description</div>
-                        ${job.description
-                            ? `<div class="sh-notes-text">${escHtml(job.description)}</div>`
-                            : `<div class="sh-notes-empty">No description recorded.</div>`}
-                    </div>
+                <div class="sh-section">
+                    <div class="sh-section-title">Details</div>
+                    ${job.job_number ? `<div class="sh-detail-row"><span class="sh-detail-label">Job #</span><span class="sh-detail-value">${escHtml(job.job_number)}</span></div>` : ''}
+                    ${job.job_type ? `<div class="sh-detail-row"><span class="sh-detail-label">Type</span><span class="sh-detail-value">${JOB_TYPE_LABELS[job.job_type] || job.job_type}</span></div>` : ''}
+                    ${job.channel ? `<div class="sh-detail-row"><span class="sh-detail-label">Channel</span><span class="sh-detail-value">${CHANNEL_LABELS[job.channel] || job.channel}</span></div>` : ''}
+                    ${ownerName && ownerName !== '—' ? `<div class="sh-detail-row"><span class="sh-detail-label">Owner</span><span class="sh-detail-value">${escHtml(ownerName)}</span></div>` : ''}
+                </div>
 
-                    ${job.shopify_draft_order_url ? `
-                    <div class="sh-section">
-                        <div class="sh-section-title">Shopify</div>
-                        <a href="${escHtml(job.shopify_draft_order_url)}" target="_blank" rel="noopener"
-                            class="kanban-shopify-link" style="font-size:12px;padding:5px 10px">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                            View Draft Order
-                        </a>
-                    </div>` : ''}
+                ${job.description ? `<div class="sh-section">
+                    <div class="sh-section-title">Description</div>
+                    <div class="sh-notes-text">${escHtml(job.description)}</div>
+                </div>` : ''}
 
-                    <div class="sh-preview-actions">
-                        <button class="sh-open-btn sh-open-btn-primary" onclick="openJobRecord('${jobId}')">
-                            Open Full Record
-                        </button>
-                    </div>
-                </div>`;
+                ${job.shopify_draft_order_url ? `<div class="sh-section">
+                    <div class="sh-section-title">Shopify</div>
+                    <a href="${escHtml(job.shopify_draft_order_url)}" target="_blank" rel="noopener" class="kanban-shopify-link">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                        View Draft Order
+                    </a>
+                </div>` : ''}
+
+                <div class="sh-preview-actions">
+                    <button class="sh-open-btn sh-open-btn-primary" onclick="openJobRecord('${jobId}')">Open Full Record</button>
+                </div>
+            </div>`;
         }
 
         // =============================================
