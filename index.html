@@ -1303,7 +1303,9 @@
         .dtr-concept-images { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-bottom:14px; }
         .dtr-cimg-card { border:2px solid #e4e8ef; border-radius:10px; overflow:hidden; background:#f8fafc; transition:border-color 0.15s; }
         .dtr-cimg-card.ci-approved { border-color:#22c55e; background:rgba(34,197,94,0.02); }
-        .dtr-cimg-card.ci-declined { border-color:#fca5a5; opacity:0.65; }
+        .dtr-cimg-card.ci-declined { border-color:#ef4444; background:rgba(239,68,68,0.02); }
+        .dtr-cimg-card.ci-revisions { border-color:#f59e0b; background:rgba(245,158,11,0.02); }
+        .dtr-concept-upload.upload-revisions { border-color:#f59e0b !important; background:rgba(245,158,11,0.04) !important; }
         .dtr-cimg-thumb { width:100%; aspect-ratio:4/3; object-fit:contain; background:#f8fafc; display:block; cursor:pointer; }
         .dtr-cimg-nothumb { width:100%; aspect-ratio:4/3; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:30px; cursor:pointer; }
         .dtr-cimg-actions { display:flex; gap:4px; padding:6px 6px; background:#fff; border-top:1px solid #f1f5f9; }
@@ -2388,28 +2390,17 @@
             <!-- Sticky header: single slim bar + progress + stage tabs -->
             <div class="dt-top-nav" style="position:sticky;top:96px;z-index:30;background:#fff;">
 
-                <!-- Page header: clean single-line toolbar -->
-                <div style="display:flex;align-items:center;gap:10px;padding:0 24px;border-bottom:1px solid #e8ecf0;background:#fff;height:48px;">
-                    <!-- Identity -->
-                    <span id="dt-task-name-display" style="font-size:14px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px;flex-shrink:1">Design Task</span>
-                    <span id="dt-ref-display" style="font-family:monospace;font-size:11px;color:#94a3b8;font-weight:600;flex-shrink:0"></span>
-                    <span id="dt-status-badge" class="badge design-status-new text-xs" style="flex-shrink:0">New</span>
-                    <!-- Divider -->
-                    <span style="color:#e2e8f0;font-size:16px;flex-shrink:0">|</span>
-                    <!-- Context -->
-                    <span id="dt-club-display" style="font-size:12px;color:#475569;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px"></span>
-                    <span id="dt-club-dot" style="color:#d1d5db;font-size:10px;flex-shrink:0">·</span>
-                    <span id="dt-designer-display" style="font-size:12px;color:#64748b;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px"></span>
-                    <div id="dt-countdown" class="dt-countdown hide" style="flex-shrink:0"></div>
-                    <!-- Right actions -->
-                    <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0">
-                        <button id="dt-edit-btn" class="dt-edit-btn" onclick="toggleDTREditMode()">Edit</button>
-                        <button id="dt-delete-btn" class="hide" onclick="deleteDesignTask()"
-                            style="padding:5px 11px;border:1.5px solid #fca5a5;border-radius:7px;background:#fef2f2;color:#dc2626;font-size:11px;font-weight:700;cursor:pointer">
-                            Delete
-                        </button>
-                    </div>
-                    <!-- Hidden legacy IDs kept for JS compat -->
+                <!-- Identity elements kept hidden for JS compat — visual identity is shown in the record body -->
+                <div style="display:none">
+                    <span id="dt-task-name-display"></span>
+                    <span id="dt-ref-display"></span>
+                    <span id="dt-status-badge" class="badge design-status-new text-xs"></span>
+                    <span id="dt-club-display"></span>
+                    <span id="dt-club-dot"></span>
+                    <span id="dt-designer-display"></span>
+                    <div id="dt-countdown" class="dt-countdown hide"></div>
+                    <button id="dt-edit-btn" class="dt-edit-btn" onclick="toggleDTREditMode()">Edit</button>
+                    <button id="dt-delete-btn" class="hide" onclick="deleteDesignTask()">Delete</button>
                     <button id="dt-back-btn" class="hide" onclick="goBack()"><span id="dt-back-label">Back</span></button>
                     <span id="dt-meta-created" class="hide"></span>
                 </div>
@@ -3364,7 +3355,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="text-xs text-gray-500 mb-1 block">Assigned To</label>
+                            <label class="text-xs text-gray-500 mb-1 block">Owner</label>
                             <select id="lead-assigned-to" class="w-full px-3 py-2 rounded-lg text-sm">
                                 <option value="">Unassigned</option>
                             </select>
@@ -3580,17 +3571,8 @@
              TOOL: JOB RECORD (Full page, 7 tabs)
              ============================================================ -->
         <div id="tool-job-record" class="hide job-record-page">
-            <!-- Back navigation -->
-            <div class="flex items-center gap-3 mb-5 flex-wrap">
-                <button onclick="closeJobRecord()" id="job-back-btn" class="nav-back-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    <span id="job-back-label">Back to Sales</span>
-                </button>
-                <div id="job-breadcrumb" class="breadcrumb-trail"></div>
-            </div>
-
             <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (pipelines+content) | right (activity) -->
-            <div class="jr-three-col">
+            <div class="jr-three-col" style="padding-top:20px">
 
                 <!-- ── Column 1: Job info card + sticky nav menu ── -->
                 <div class="jr-left-col">
@@ -3684,18 +3666,16 @@
             <div id="jt-content-overview">
                 <div class="glass rounded-2xl p-4">
                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Job Details</h4>
-                    <!-- Two-column layout: details left, description+contact right -->
+                    <!-- Two-column layout: owner left, description+contact right -->
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-                        <!-- Left: details grid + assigned users -->
+                        <!-- Left: Owner (assigned users) only — all other metadata is in the sidebar card -->
                         <div>
-                            <div id="jr-overview-details"></div>
-                            <!-- Assigned users integrated into details -->
-                            <div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
-                                <label class="text-xs text-gray-500 block mb-2">Assigned To</label>
-                                <div id="jr-assigned-users-list" class="user-assign-list mb-2"></div>
-                                <div id="jr-assigned-users-chips" class="flex flex-wrap gap-1 mt-1"></div>
-                                <select id="jr-assigned-user" class="hide"><option value="">Unassigned</option></select>
-                            </div>
+                            <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
+                            <div id="jr-assigned-users-list" class="user-assign-list mb-2"></div>
+                            <div id="jr-assigned-users-chips" class="flex flex-wrap gap-1 mt-1"></div>
+                            <select id="jr-assigned-user" class="hide"><option value="">Unassigned</option></select>
+                            <!-- Shopify + other detail links rendered here by JS -->
+                            <div id="jr-overview-details" class="mt-3"></div>
                         </div>
                         <!-- Right: description + contact info -->
                         <div>
@@ -4201,6 +4181,13 @@
                             <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:#f1f5f9">Edit</button>
                         </div>
                         <div id="club-overview-info"><!-- Populated by JS --></div>
+                        <!-- Owner assignment -->
+                        <div class="mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.06)">
+                            <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
+                            <select id="club-assigned-user" class="w-full px-3 py-2 rounded-lg text-sm" onchange="saveClubAssignment(this.value)">
+                                <option value="">Unassigned</option>
+                            </select>
+                        </div>
                     </div>
                     <!-- Branding card -->
                     <div class="card">
@@ -13975,60 +13962,20 @@
         function renderJobOverview() {
             if (!currentJob) return;
 
-            // ── Left column: details grid ──
+            // ── Left column: Shopify link only (metadata lives in sidebar card) ──
             const details = document.getElementById('jr-overview-details');
             if (details) {
-                const deadlineFmt = currentJob.deadline_date
-                    ? new Date(currentJob.deadline_date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
-                    : null;
-                const orderTarget = calcOrderTargetDate(currentJob.deadline_date);
-                const orderTargetFmt = orderTarget
-                    ? orderTarget.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
-                    : null;
-
-                const rows = [
-                    ['Job Type',      JOB_TYPE_LABELS[currentJob.job_type]  || currentJob.job_type],
-                    ['Club Type',     CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type],
-                    ['Channel',       CHANNEL_LABELS[currentJob.channel]     || currentJob.channel],
-                    ['Stage',         JOB_STAGES.find(s => s.key === currentJob.stage)?.label || currentJob.stage],
-                    ['Linked Club',   currentJob.clubs?.name || 'None'],
-                    ['Owner',         getUserDisplayName(currentJob.created_by)],
-                    ['Range Approved',currentJob.range_approved ? 'Yes ✓' : 'No'],
-                ];
-
-                const deadlineBlock = deadlineFmt ? `
-                    <div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
-                        <div class="grid grid-cols-2 gap-x-6 gap-y-2">
-                            <div>
-                                <span class="text-xs text-gray-500">Deadline Date</span>
-                                <p class="text-sm font-semibold mt-0.5" style="color:#dc2626">${deadlineFmt}</p>
-                            </div>
-                            ${orderTargetFmt ? `<div>
-                                <span class="text-xs text-gray-500">Order Target</span>
-                                <p class="text-sm font-semibold mt-0.5" style="color:#d97706">${orderTargetFmt}</p>
-                            </div>` : ''}
-                        </div>
-                    </div>` : '';
-
                 const shopifyUrl = currentJob.shopify_draft_order_url;
-                const shopifyBlock = shopifyUrl
-                    ? `<div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
+                details.innerHTML = shopifyUrl
+                    ? `<div class="pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
                            <span class="text-xs text-gray-500 block mb-1">Shopify Draft Order</span>
                            <a href="${escHtml(shopifyUrl)}" target="_blank" rel="noopener"
-                              class="text-sm font-semibold text-brand-400 flex items-center gap-1.5 hover:underline" style="word-break:break-all">
+                              class="text-sm font-semibold flex items-center gap-1.5 hover:underline" style="color:#60a5fa;word-break:break-all">
                               <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                               View Draft Order ↗
                            </a>
                        </div>`
                     : '';
-
-                details.innerHTML = `<div class="grid grid-cols-2 gap-x-6 gap-y-2">
-                    ${rows.map(([k, v]) => `
-                        <div>
-                            <span class="text-xs text-gray-500">${k}</span>
-                            <p class="text-sm font-semibold mt-0.5">${escHtml(v || '—')}</p>
-                        </div>`).join('')}
-                </div>${deadlineBlock}${shopifyBlock}`;
             }
 
             // ── Right column: description ──
@@ -18648,73 +18595,97 @@
                 skipped:            { color:'#94a3b8', bg:'#f8fafc', icon:'↷', label:'Skipped' },
             };
 
-            panel.innerHTML = `<div style="padding:20px;display:flex;flex-direction:column;gap:14px;height:100%;box-sizing:border-box;overflow-y:auto">
+            panel.innerHTML = `<div style="display:flex;height:100%;overflow:hidden">
 
-                <!-- Header -->
-                <div>
-                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px">
-                        <div style="font-size:15px;font-weight:800;color:#0f172a;line-height:1.3;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
-                        <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:8px;flex-shrink:0;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-                        ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px">${escHtml(task.task_ref)}</span>` : ''}
-                        ${task.clubs?.name ? `<span style="font-size:11px;color:#475569;font-weight:500">${escHtml(task.clubs.name)}</span>` : ''}
-                    </div>
-                </div>
+                <!-- LEFT COLUMN: task details + brief -->
+                <div style="flex:1;min-width:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
 
-                <!-- Next action pill -->
-                <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]}">
-                    <div style="font-size:16px;flex-shrink:0">${nextAct.icon}</div>
+                    <!-- Header -->
                     <div>
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${colorText[nextAct.color]}">Next Action</div>
-                        <div style="font-size:12px;font-weight:700;color:#0f172a;line-height:1.3;margin-top:1px">${nextAct.label}</div>
+                        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px">
+                            <div style="font-size:14px;font-weight:800;color:#0f172a;line-height:1.3;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
+                            <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;flex-shrink:0;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                            ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px">${escHtml(task.task_ref)}</span>` : ''}
+                            ${task.clubs?.name ? `<span style="font-size:11px;color:#475569;font-weight:500">${escHtml(task.clubs.name)}</span>` : ''}
+                        </div>
                     </div>
+
+                    <!-- Key details grid -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                        <div style="background:#f8fafc;border-radius:8px;padding:7px 10px">
+                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:2px">Owner</div>
+                            <div style="font-size:12px;font-weight:600;color:#1e293b">${escHtml(designerName)}</div>
+                        </div>
+                        <div style="background:#f8fafc;border-radius:8px;padding:7px 10px">
+                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:2px">Priority</div>
+                            <div style="font-size:12px;font-weight:600;color:#1e293b">${priLabels[task.priority || 'standard'] || 'Standard'}</div>
+                        </div>
+                        <div style="background:#f8fafc;border-radius:8px;padding:7px 10px;grid-column:span 2">
+                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:2px">Deadline</div>
+                            <div style="font-size:12px;font-weight:600;color:${dueCls}">${dueLabel}${dueInfo ? `<span style="font-size:10px;margin-left:5px;font-weight:600">${dueInfo.text}</span>` : ''}</div>
+                        </div>
+                    </div>
+
+                    <!-- Blockers -->
+                    ${blockers.length > 0 ? `<div style="display:flex;flex-direction:column;gap:5px">
+                        ${blockers.map(b => `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:#fef2f2;border:1px solid #fecaca">
+                            <span style="font-size:13px;flex-shrink:0">${b.icon}</span>
+                            <span style="font-size:11px;color:#dc2626;font-weight:600;line-height:1.4">${escHtml(b.text)}</span>
+                        </div>`).join('')}
+                    </div>` : ''}
+
+                    <!-- Brief (full, not truncated) -->
+                    ${brief ? `<div style="border:1px solid #e2e8f0;border-radius:10px;padding:11px">
+                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:5px">Brief</div>
+                        <p style="font-size:12px;color:#374151;line-height:1.65;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>
+                    </div>` : ''}
+
+                    <!-- Open button -->
+                    <div style="margin-top:auto;padding-top:4px;display:flex;flex-direction:column;gap:6px">
+                        <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
+                            Open Task Record
+                        </button>
+                        ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="width:100%;padding:8px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #6366f1;background:#f5f3ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;gap:6px">▶ Start Task</button>` : ''}
+                    </div>
+
                 </div>
 
-                <!-- Key details -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                    <div style="background:#f8fafc;border-radius:8px;padding:8px 10px">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:3px">Designer</div>
-                        <div style="font-size:12px;font-weight:600;color:#1e293b">${escHtml(designerName)}</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:8px;padding:8px 10px">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:3px">Priority</div>
-                        <div style="font-size:12px;font-weight:600;color:#1e293b">${priLabels[task.priority || 'standard'] || 'Standard'}</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:8px;padding:8px 10px;grid-column:span 2">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:3px">Deadline</div>
-                        <div style="font-size:12px;font-weight:600;color:${dueCls}">${dueLabel}${dueInfo ? `<span style="font-size:10px;margin-left:5px;font-weight:600">${dueInfo.text}</span>` : ''}</div>
-                    </div>
-                </div>
+                <!-- RIGHT COLUMN: stage timeline + next action -->
+                <div style="width:190px;flex-shrink:0;overflow-y:auto;padding:16px 12px;background:#f8fafc;border-left:1px solid #e8ecf0;display:flex;flex-direction:column;gap:10px;box-sizing:border-box">
 
-                <!-- Stage progress -->
-                <div style="border:1px solid #e2e8f0;border-radius:10px;overflow:hidden">
-                    <div style="padding:8px 12px;background:#f8fafc;border-bottom:1px solid #e2e8f0;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8">Stage Progress</div>
-                    ${stages.length > 0
-                        ? stages.map((s, i) => {
-                            const sc = stageStyleMap[s.status] || stageStyleMap.not_started;
-                            return `<div style="display:flex;align-items:center;gap:10px;padding:9px 12px${i < stages.length - 1 ? ';border-bottom:1px solid #f1f5f9' : ''}">
-                                <span style="width:20px;height:20px;border-radius:6px;background:${sc.bg};color:${sc.color};font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${sc.icon}</span>
-                                <span style="font-size:12px;color:#334155;flex:1;font-weight:500">${escHtml(s.stage_name || `Stage ${s.stage_number}`)}</span>
-                                <span style="font-size:10px;font-weight:700;color:${sc.color}">${sc.label}</span>
-                            </div>`;
-                        }).join('')
-                        : `<div style="padding:10px 12px;font-size:12px;color:#94a3b8;font-style:italic">No stages configured.</div>`}
-                </div>
+                    <!-- Stage timeline -->
+                    <div>
+                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:8px">Stages</div>
+                        ${stages.length > 0
+                            ? stages.map((s, i) => {
+                                const sc = stageStyleMap[s.status] || stageStyleMap.not_started;
+                                const isLast = i === stages.length - 1;
+                                return `<div style="display:flex;align-items:flex-start;gap:8px;position:relative;padding-bottom:${isLast ? '0' : '12px'}">
+                                    <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0">
+                                        <span style="width:22px;height:22px;border-radius:50%;background:${sc.bg};color:${sc.color};font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid ${sc.color}20;flex-shrink:0;z-index:1">${sc.icon}</span>
+                                        ${!isLast ? `<div style="width:1.5px;flex:1;background:#e2e8f0;margin-top:2px;min-height:10px"></div>` : ''}
+                                    </div>
+                                    <div style="padding-top:2px;min-width:0">
+                                        <div style="font-size:11px;font-weight:600;color:#334155;line-height:1.3">${escHtml(s.stage_name || `Stage ${s.stage_number}`)}</div>
+                                        <div style="font-size:10px;font-weight:600;color:${sc.color};margin-top:1px">${sc.label}</div>
+                                    </div>
+                                </div>`;
+                            }).join('')
+                            : `<div style="font-size:11px;color:#94a3b8;font-style:italic">No stages configured.</div>`}
+                    </div>
 
-                <!-- Brief snippet -->
-                ${brief ? `<div style="border:1px solid #e2e8f0;border-radius:10px;padding:12px">
-                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Brief</div>
-                    <p style="font-size:12px;color:#374151;line-height:1.65;margin:0">${escHtml(brief.substring(0, 160))}${brief.length > 160 ? '…' : ''}</p>
-                </div>` : ''}
+                    <!-- Next Action (highlighted) -->
+                    <div style="margin-top:auto;padding:10px;border-radius:10px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]}">
+                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${colorText[nextAct.color]};margin-bottom:4px">Next Action</div>
+                        <div style="display:flex;align-items:flex-start;gap:7px">
+                            <div style="font-size:15px;flex-shrink:0;line-height:1.2">${nextAct.icon}</div>
+                            <div style="font-size:11px;font-weight:700;color:#0f172a;line-height:1.4">${nextAct.label}</div>
+                        </div>
+                    </div>
 
-                <!-- Open button -->
-                <div style="margin-top:auto;padding-top:4px;display:flex;flex-direction:column;gap:6px">
-                    <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:10px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
-                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
-                        Open Design Task Record
-                    </button>
-                    ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #6366f1;background:#f5f3ff;color:#4f46e5;display:flex;align-items:center;justify-content:center;gap:6px">▶ Start Task</button>` : ''}
                 </div>
 
             </div>`;
@@ -20355,7 +20326,7 @@
                             </div>
                         </div>
                         <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
+                            <label class="dtr-edit-label" for="dtr-ln-designer">Owner</label>
                             <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
                         </div>
                         ${task.jobs?.job_type ? `<div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding:6px 0">
@@ -20407,7 +20378,10 @@
                         <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled Task')}</div>
                         <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                     </div>
-                    <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px;flex-shrink:0">Edit</button>
+                    <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
+                        <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px">Edit</button>
+                        ${(isSuperAdmin || currentUserProfile?.role === 'admin') ? `<button onclick="deleteDesignTask()" style="padding:3px 9px;border:1.5px solid #fca5a5;border-radius:7px;background:#fef2f2;color:#dc2626;font-size:10px;font-weight:700;cursor:pointer">Delete</button>` : ''}
+                    </div>
                 </div>
                 <!-- § Job Details (read-only) -->
                 <div class="dtr-ro-section">
@@ -20415,7 +20389,7 @@
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport||'—')}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Designer</span><span class="dtr-ro-value">${escHtml(designerName)}</span></div>
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${escHtml(designerName)}</span></div>
                     ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span></div>` : ''}
                 </div>
                 <!-- § Design Brief (read-only) -->
@@ -20626,7 +20600,8 @@
                         ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()" />`
                         : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">📄</div>`;
                     const fname = (u.file_url || '').split('/').pop().split('?')[0];
-                    return `<div class="dtr-cimg-card" id="dtr-cimg-${u.id}" style="position:relative">
+                    const cardCls = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : (u.review_comment && u.review_comment !== '__archived__') ? ' ci-revisions' : '';
+                    return `<div class="dtr-cimg-card${cardCls}" id="dtr-cimg-${u.id}" style="position:relative">
                         <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
                         <div class="dtr-cimg-thumb">${thumb}</div>
                         <div class="dtr-cimg-actions">
@@ -20641,7 +20616,7 @@
             </div>` : '';
 
             // Upload zone (hidden when approved)
-            const uploadZone = isApproved ? '' : `<div class="dtr-concept-upload" id="dtr-${sectionLabel}-upload"
+            const uploadZone = isApproved ? '' : `<div class="dtr-concept-upload${isRevisions ? ' upload-revisions' : ''}" id="dtr-${sectionLabel}-upload"
                 style="cursor:pointer"
                 onclick="document.getElementById('dtr-${sectionLabel}-file-input').click()"
                 ondragover="event.preventDefault();this.classList.add('drag-over')"
@@ -20658,14 +20633,15 @@
                 ? `<button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered</button>`
                 : `<button onclick="dtrDeliverStage('${stageId}',${stageNum},'${deliverLabel}')" ${!hasUploads ? 'disabled' : ''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasUploads?'#eff6ff':'#f8fafc'};color:${hasUploads?'#1d4ed8':'#b0bec5'};cursor:${hasUploads?'pointer':'not-allowed'}">${deliverLabel}</button>`;
             const revisionsBtn = isDelivered
-                ? `<button onclick="dtrStageRevisions('${stageId}',${stageNum})" style="padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
-                : (isRevisions ? `<span style="padding:4px 10px;border-radius:8px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
+                ? `<button onclick="dtrStageRevisions('${stageId}',${stageNum})" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
+                : (isRevisions ? `<span style="padding:4px 9px;border-radius:7px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
             const completeBtn = (allApproved && !isApproved)
-                ? `<button onclick="dtrCompleteStage('${stageId}',${stageNum},'${completeLabel}')" style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer;margin-left:auto">✓ ${completeLabel}</button>`
+                ? `<button onclick="dtrCompleteStage('${stageId}',${stageNum},'${completeLabel}')" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer">✓ ${completeLabel}</button>`
                 : '';
 
-            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
-                ${deliverBtn}${revisionsBtn}${completeBtn}
+            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
+                <div>${deliverBtn}</div>
+                <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
             </div>`;
 
             return `${imagesHtml}${uploadZone}${deliverBar}`;
@@ -20694,7 +20670,8 @@
                     ${uploads.map((u, idx) => {
                         const isImg = (u.file_type || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url || '');
                         const fname = (u.file_url || '').split('/').pop().split('?')[0];
-                        return `<div class="dtr-cimg-card" id="dtr-cimg-${u.id}" style="position:relative">
+                        const fCardCls = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : (u.review_comment && u.review_comment !== '__archived__') ? ' ci-revisions' : '';
+                        return `<div class="dtr-cimg-card${fCardCls}" id="dtr-cimg-${u.id}" style="position:relative">
                             <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
                             ${isImg
                                 ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()" />`
@@ -20708,7 +20685,7 @@
                     }).join('')}
                 </div>` : '';
 
-                const uploadZone = isApproved ? '' : `<div class="dtr-concept-upload" style="cursor:pointer;margin-bottom:10px"
+                const uploadZone = isApproved ? '' : `<div class="dtr-concept-upload${isRevisions ? ' upload-revisions' : ''}" style="cursor:pointer;margin-bottom:10px"
                     onclick="document.getElementById('dtr-${sec.key}-input').click()"
                     ondragover="event.preventDefault();this.classList.add('drag-over')"
                     ondragleave="this.classList.remove('drag-over')"
@@ -20729,14 +20706,15 @@
                 ? `<button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered for Review</button>`
                 : `<button onclick="dtrDeliverStage('${stageId}',4,'Deliver Final Design')" ${!hasAnyUpload?'disabled':''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasAnyUpload?'#eff6ff':'#f8fafc'};color:${hasAnyUpload?'#1d4ed8':'#b0bec5'};cursor:${hasAnyUpload?'pointer':'not-allowed'}">Deliver Final Design</button>`;
             const revisionsBtn = isInReview
-                ? `<button onclick="dtrStageRevisions('${stageId}',4)" style="padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
-                : (isRevisions ? `<span style="padding:4px 10px;border-radius:8px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
+                ? `<button onclick="dtrStageRevisions('${stageId}',4)" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
+                : (isRevisions ? `<span style="padding:4px 9px;border-radius:7px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
             const completeBtn = isInReview
-                ? `<button onclick="dtrCompleteStage('${stageId}',4,'Approve Final Design')" style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer;margin-left:auto">✓ Approve Final Design</button>`
+                ? `<button onclick="dtrCompleteStage('${stageId}',4,'Approve Final Design')" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer">✓ Approve Final</button>`
                 : '';
 
-            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:12px;border-top:1px solid #f1f5f9">
-                ${deliverBtn}${revisionsBtn}${completeBtn}
+            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:12px;border-top:1px solid #f1f5f9">
+                <div>${deliverBtn}</div>
+                <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
             </div>`;
 
             return sectionsHtml + deliverBar;
@@ -20869,11 +20847,11 @@
                 : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Concepts</button>`;
 
             const revisionsBtn = isRevisions
-                ? `<span style="padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a">🔄 Revisions Requested</span>`
-                : `<button class="dtr-revisions-btn" onclick="dtrToggleRevisionForm('${stage.id}')">↩ Request Revisions</button>`;
+                ? `<span style="padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a;white-space:nowrap">🔄 Revisions Requested</span>`
+                : `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #fde68a;background:#fff;color:#b45309;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrToggleRevisionForm('${stage.id}')">↩ Revisions</button>`;
 
             const completeBtn = hasApprovedConcept
-                ? `<button class="dtr-complete-btn" onclick="dtrCompleteConceptsStage('${stage.id}')">✓ Complete Section</button>`
+                ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrCompleteConceptsStage('${stage.id}')">✓ Complete</button>`
                 : '';
 
             const activeStatuses = ['in_progress','in_review','revisions_required'];
@@ -20891,10 +20869,9 @@
                 <div class="dtr-stage-body" id="dtr-stage-body-2"${stage.status === 'not_started' ? ' style="display:none"' : ''}>
                     <div class="dtr-concept-tabs">${tabs}</div>
                     <div id="dtr-concept-tab-content">${tabContent}</div>
-                    <div class="dtr-deliver-bar">
-                        ${deliverBtn}
-                        ${revisionsBtn}
-                        ${completeBtn}
+                    <div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <div>${deliverBtn}</div>
+                        <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
                     </div>
                     <div id="dtr-revision-form-${stage.id}" class="dtr-revision-form hide">
                         <div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:8px">📝 Request Revisions — Feedback</div>
@@ -20920,7 +20897,7 @@
                 ? `<div class="dtr-concept-images">${uploads.map((u, idx) => {
                     const isImg = u.file_type?.startsWith('image/');
                     const isPdf = u.file_type === 'application/pdf' || u.file_name?.toLowerCase().endsWith('.pdf');
-                    const cls   = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : '';
+                    const cls   = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : (u.review_comment && u.review_comment !== '__archived__') ? ' ci-revisions' : '';
                     return `<div class="dtr-cimg-card${cls}" id="dtr-cimg-${u.id}" style="position:relative">
                         <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
                         ${isImg
@@ -20938,7 +20915,7 @@
 
             // Upload zone
             const uploadZone = stageApproved ? '' : `
-                <div class="dtr-concept-upload"
+                <div class="dtr-concept-upload${stage.status === 'revisions_required' ? ' upload-revisions' : ''}"
                     onclick="document.getElementById('dtr-cpt-input-${stageId}-${conceptNum}').click()"
                     ondragover="event.preventDefault();this.classList.add('drag-over')"
                     ondragleave="this.classList.remove('drag-over')"
@@ -21239,12 +21216,26 @@
         function _renderStagesInner(s2, s3, s4) {
             const stagesInner = document.getElementById('dtr-stages-inner');
             if (!stagesInner) return;
+            // Preserve open/closed state of stage accordion bodies before rebuilding
+            const openState = {};
+            [2, 3, 4].forEach(n => {
+                const b = document.getElementById(`dtr-stage-body-${n}`);
+                if (b) openState[n] = b.style.display !== 'none';
+            });
             stagesInner.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-top:2px">
                 <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Stages</span>
                 <button onclick="toggleDTRStages()" title="Collapse stages" style="width:22px;height:22px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.color='#475569';this.style.background='#f1f5f9'" onmouseout="this.style.color='#94a3b8';this.style.background='#f8fafc'">
                     <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                 </button>
             </div>` + buildDTRStagesColumn(s2, s3, s4, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
+            // Restore open/closed state after rebuild
+            [2, 3, 4].forEach(n => {
+                if (openState[n] === undefined) return; // wasn't open before, leave default
+                const b = document.getElementById(`dtr-stage-body-${n}`);
+                const c = document.getElementById(`dtr-stage-chev-${n}`);
+                if (b) b.style.display = openState[n] ? '' : 'none';
+                if (c) c.classList.toggle('closed', !openState[n]);
+            });
         }
 
         // ── Stage 3 / 4 upload actions ────────────────────────────────────────
