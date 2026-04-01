@@ -20130,6 +20130,7 @@
                                         <option value="sub_task">Sub-Tasks</option>
                                         <option value="revision_request">Revisions</option>
                                         <option value="history">History</option>
+                                        <option value="feed">Feed</option>
                                     </select>
                                 </div>
                             </div>
@@ -20673,8 +20674,10 @@
             // Deliver bar
             const isDelivered = isInReview;
             const deliverBtn = isDelivered
-                ? `<button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered</button>`
-                : `<button onclick="dtrDeliverStage('${stageId}',${stageNum},'${deliverLabel}')" ${!hasUploads ? 'disabled' : ''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasUploads?'#eff6ff':'#f8fafc'};color:${hasUploads?'#1d4ed8':'#b0bec5'};cursor:${hasUploads?'pointer':'not-allowed'}">${deliverLabel}</button>`;
+                ? `<div style="display:flex;align-items:center;gap:5px"><button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered</button><button onclick="dtrUndeliverStage('${stageId}',${stageNum})" style="padding:4px 8px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer" title="Undo deliver">↩</button></div>`
+                : isRevisions
+                    ? `<button onclick="dtrDeliverStage('${stageId}',${stageNum},'${deliverLabel}')" style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer">Re-Deliver</button>`
+                    : `<button onclick="dtrDeliverStage('${stageId}',${stageNum},'${deliverLabel}')" ${!hasUploads ? 'disabled' : ''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasUploads?'#eff6ff':'#f8fafc'};color:${hasUploads?'#1d4ed8':'#b0bec5'};cursor:${hasUploads?'pointer':'not-allowed'}">${deliverLabel}</button>`;
             const revisionsBtn = isRevisions
                 ? `<span style="padding:4px 9px;border-radius:7px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>`
                 : isDelivered
@@ -20912,7 +20915,8 @@
                 if (cStatus === 'approved')  cls += ' ct-approved';
                 if (cStatus === 'declined')  cls += ' ct-declined';
                 const badge = count ? ` <span style="font-size:9px;font-weight:700;opacity:0.7;margin-left:2px">(${count})</span>` : '';
-                return `<button class="${cls}" id="dtr-ctab-${i}" onclick="dtrSwitchConceptTab(${i})">Concept ${i}${badge}</button>`;
+                const tabActions = isInReview ? `<span onclick="dtrApproveConceptSection('${stage.id}',${i});event.stopPropagation()" style="margin-left:5px;color:#16a34a;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Approve concept">✓</span><span onclick="dtrDeclineConceptSection('${stage.id}',${i});event.stopPropagation()" style="margin-left:2px;color:#dc2626;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Decline concept">✕</span>` : '';
+                return `<button class="${cls}" id="dtr-ctab-${i}" onclick="dtrSwitchConceptTab(${i})">Concept ${i}${badge}${tabActions}</button>`;
             }).join('');
 
             // ── Active tab content ──
@@ -20921,8 +20925,10 @@
 
             // ── Deliver bar ──
             const deliverBtn = isInReview
-                ? `<button class="dtr-deliver-btn delivered" disabled>✓ Concepts Delivered</button>`
-                : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Concepts</button>`;
+                ? `<div style="display:flex;align-items:center;gap:5px"><button class="dtr-deliver-btn delivered" disabled>✓ Concepts Delivered</button><button onclick="dtrUndeliverConcepts('${stage.id}')" style="padding:3px 8px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer" title="Undo deliver">↩</button></div>`
+                : isRevisions
+                    ? `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')">Re-Deliver Concepts</button>`
+                    : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stage.id}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver Concepts</button>`;
 
             const revisionsBtn = isRevisions
                 ? `<span style="padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a;white-space:nowrap">🔄 Revisions Requested</span>`
@@ -21008,17 +21014,6 @@
                     accept="image/*,.pdf,.ai,.eps,.svg"
                     onchange="dtrConceptImgSelect(event,'${stageId}',${conceptNum})">`;
 
-            // Feedback box (shown when concept is declined or there is existing feedback)
-            const showFeedback = conceptStatus === 'declined' || feedback;
-            const feedbackHtml = showFeedback ? `
-                <div style="margin-top:10px">
-                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:4px">Feedback / Decline Notes</div>
-                    <textarea id="dtr-cpt-fb-${conceptNum}" rows="2"
-                        style="width:100%;border:1.5px solid #fca5a5;border-radius:8px;padding:7px 10px;font-size:11px;color:#374151;outline:none;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fef2f2"
-                        onfocus="this.style.borderColor='#f87171'" onblur="this.style.borderColor='#fca5a5';dtrSaveConceptFeedback('${stageId}',${conceptNum})"
-                        placeholder="Describe what needs to change…">${escHtml(feedback)}</textarea>
-                </div>` : '';
-
             // Section-level approve / decline — only show when there are uploads AND stage not yet approved
             const sectionActions = (stageApproved || uploads.length === 0) ? '' : `
                 <div class="dtr-concept-section-actions">
@@ -21032,7 +21027,7 @@
                     </button>
                 </div>`;
 
-            return `${imagesHtml}${uploadZone}${feedbackHtml}${sectionActions}`;
+            return `${imagesHtml}${uploadZone}${sectionActions}`;
         }
 
         // ── Concept stage actions ──────────────────────────────────────────────
@@ -21095,7 +21090,9 @@
         }
 
         async function dtrTickConceptImg(uploadId, stageId, conceptNum) {
-            const { error } = await supabase.from('stage_uploads').update({ status: 'approved' }).eq('id', uploadId);
+            const upload = _dtrConceptUploads.find(u => u.id === uploadId);
+            const newStatus = upload?.status === 'approved' ? 'pending' : 'approved';
+            const { error } = await supabase.from('stage_uploads').update({ status: newStatus }).eq('id', uploadId);
             if (error) { showToast('Error updating image', 'error'); return; }
             await _dtrRefreshConceptsStage();
         }
@@ -21346,7 +21343,10 @@
             await _dtrRefreshStagesCol();
         }
         async function dtrTickStageImg(uploadId, stageId, stageNum) {
-            await supabase.from('stage_uploads').update({ status: 'approved' }).eq('id', uploadId);
+            const uploads = stageNum === 3 ? _dtrRangeUploads : _dtrFinaliseUploads;
+            const upload = uploads.find(u => u.id === uploadId);
+            const newStatus = upload?.status === 'approved' ? 'pending' : 'approved';
+            await supabase.from('stage_uploads').update({ status: newStatus }).eq('id', uploadId);
             await _dtrRefreshStagesCol();
         }
         async function dtrXStageImg(uploadId, stageId, stageNum) {
@@ -21380,6 +21380,18 @@
                 await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', nextStage.id);
             }
             if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_approved', { label });
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrUndeliverConcepts(stageId) {
+            await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', stageId);
+            const stage = currentStages.find(s => s.id === stageId);
+            if (stage) stage.status = 'in_progress';
+            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_reverted', { stage_name: 'Concepts' });
+            await _dtrRefreshConceptsStage();
+        }
+        async function dtrUndeliverStage(stageId, stageNum) {
+            await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', stageId);
+            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_reverted', { stageNum });
             await _dtrRefreshStagesCol();
         }
         async function dtrRevertStage(stageId, stageNum) {
@@ -22461,6 +22473,7 @@
         // ── Design Task Activity (Comments & Sub-Tasks) ────────────────────────
 
         let _dtActivityLog = [];
+        let _dtActivityFeed = [];
         let _dtActivityInputType = 'comment'; // 'comment' | 'sub_task'
         let _dtrActivityFilter = 'all'; // 'all' | 'comment' | 'sub_task'
 
@@ -22468,7 +22481,15 @@
             _dtrActivityFilter = filter;
             const sel = document.getElementById('dtr-act-filter-select');
             if (sel && sel.value !== filter) sel.value = filter;
-            renderDesignTaskActivity();
+            const composer = document.querySelector('.dtr-activity-composer');
+            if (composer) composer.style.display = filter === 'feed' ? 'none' : '';
+            if (filter === 'feed' && currentDesignTaskRecord?.id) {
+                supabase.from('design_activity_feed').select('*').eq('task_id', currentDesignTaskRecord.id)
+                    .order('created_at', { ascending: false }).limit(200)
+                    .then(({ data }) => { _dtActivityFeed = data || []; renderDesignTaskActivity(); });
+            } else {
+                renderDesignTaskActivity();
+            }
         }
 
         function setDTInputType(type) {
@@ -22483,15 +22504,54 @@
 
         async function loadDesignTaskActivity(taskId) {
             if (!taskId) return;
-            const { data } = await supabase.from('design_task_activity')
-                .select('*').eq('design_task_id', taskId).order('created_at', { ascending: false });
-            _dtActivityLog = data || [];
+            const [actResult, feedResult] = await Promise.all([
+                supabase.from('design_task_activity').select('*').eq('design_task_id', taskId).order('created_at', { ascending: false }),
+                supabase.from('design_activity_feed').select('*').eq('task_id', taskId).order('created_at', { ascending: false }).limit(200)
+            ]);
+            _dtActivityLog = actResult.data || [];
+            _dtActivityFeed = feedResult.data || [];
             renderDesignTaskActivity();
         }
+
+        const _feedActionLabels = {
+            stage_submitted_for_review: 'Delivered for Review',
+            stage_reverted: 'Stage Reverted',
+            stage_revisions_requested: 'Revisions Requested',
+            stage_approved: 'Stage Approved',
+            stage_delivered: 'Delivered',
+            upload: 'File Uploaded',
+            version_uploaded: 'Version Uploaded',
+            task_completed: 'Task Completed',
+            comment_added: 'Comment Added',
+            subtask_added: 'Sub-Task Added',
+        };
 
         function renderDesignTaskActivity() {
             const list = document.getElementById('dt-act-list');
             if (!list) return;
+
+            if (_dtrActivityFilter === 'feed') {
+                if (!_dtActivityFeed.length) {
+                    list.innerHTML = `<p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">No feed activity yet.</p>`;
+                    return;
+                }
+                list.innerHTML = _dtActivityFeed.map(entry => {
+                    const label = _feedActionLabels[entry.action_type] || entry.action_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+                    const detail = entry.action_detail ? Object.entries(entry.action_detail).filter(([k,v])=>v).map(([k,v])=>`${v}`).join(' · ') : '';
+                    const ts = entry.created_at ? new Date(entry.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+                    const actor = entry.actor_name || 'System';
+                    return `<div style="display:flex;align-items:flex-start;gap:7px;margin-bottom:7px;padding:6px 8px;border-radius:8px;background:#f8fafc;border:1px solid #f1f5f9">
+                        <div style="width:7px;height:7px;border-radius:50%;background:#94a3b8;flex-shrink:0;margin-top:4px"></div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-size:11px;font-weight:700;color:#334155">${escHtml(label)}</div>
+                            ${detail ? `<div style="font-size:11px;color:#64748b;margin-top:1px">${escHtml(detail)}</div>` : ''}
+                            <div style="font-size:10px;color:#94a3b8;margin-top:2px">${escHtml(actor)} · ${escHtml(ts)}</div>
+                        </div>
+                    </div>`;
+                }).join('');
+                return;
+            }
+
             const isHistory = _dtrActivityFilter === 'history';
             let filtered;
             if (isHistory) {
