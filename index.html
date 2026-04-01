@@ -3612,6 +3612,8 @@
                             <div><span class="text-xs text-gray-600">Created</span><p id="jr-created" class="text-xs font-semibold mt-0.5">—</p></div>
                             <div><span class="text-xs text-gray-600">Days Open</span><p id="jr-days-open" class="text-xs font-semibold mt-0.5">—</p></div>
                             <div class="col-span-2"><span class="text-xs text-gray-600">Est. Revenue</span><p id="jr-est-revenue" class="text-xs font-semibold mt-0.5" style="color:#059669">—</p></div>
+                            <div><span class="text-xs text-gray-600">Deadline</span><p id="jr-deadline" class="text-xs font-semibold mt-0.5" style="color:#dc2626">—</p></div>
+                            <div><span class="text-xs text-gray-600">Order Target</span><p id="jr-order-target" class="text-xs font-semibold mt-0.5" style="color:#d97706">—</p></div>
                         </div>
                         <!-- Next Action -->
                         <div id="jr-next-action" class="mt-3 pt-3 border-t border-gray-800"></div>
@@ -3682,23 +3684,24 @@
             <div id="jt-content-overview">
                 <div class="glass rounded-2xl p-4">
                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Job Details</h4>
-                    <div id="jr-overview-details"></div>
-                    <!-- Assigned users (multi-user) -->
-                    <div class="mt-4 pt-4 border-t border-gray-800">
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="text-xs text-gray-500">Assigned To</label>
-                            <span class="text-xs text-gray-600">Select multiple for collaboration</span>
+                    <!-- Two-column layout: details left, description+contact right -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+                        <!-- Left: details grid + assigned users -->
+                        <div>
+                            <div id="jr-overview-details"></div>
+                            <!-- Assigned users integrated into details -->
+                            <div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
+                                <label class="text-xs text-gray-500 block mb-2">Assigned To</label>
+                                <div id="jr-assigned-users-list" class="user-assign-list mb-2"></div>
+                                <div id="jr-assigned-users-chips" class="flex flex-wrap gap-1 mt-1"></div>
+                                <select id="jr-assigned-user" class="hide"><option value="">Unassigned</option></select>
+                            </div>
                         </div>
-                        <div id="jr-assigned-users-list" class="user-assign-list mb-2">
-                            <!-- Populated by JS -->
+                        <!-- Right: description + contact info -->
+                        <div>
+                            <div id="jr-overview-description"></div>
+                            <div id="jr-overview-contact"></div>
                         </div>
-                        <div id="jr-assigned-users-chips" class="flex flex-wrap gap-1 mt-1">
-                            <!-- Chips shown here -->
-                        </div>
-                        <!-- Legacy hidden select for backward compatibility -->
-                        <select id="jr-assigned-user" class="hide">
-                            <option value="">Unassigned</option>
-                        </select>
                     </div>
                 </div>
             </div>
@@ -3910,8 +3913,33 @@
                                 <input type="number" id="job-revenue" placeholder="0.00" min="0" step="0.01" class="w-full px-3 py-2 rounded-lg text-sm">
                             </div>
                             <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Shopify Draft Order URL</label>
-                                <input type="url" id="job-shopify-url" placeholder="https://admin.shopify.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <label class="text-xs text-gray-500 mb-1 block">Deadline Date</label>
+                                <input type="date" id="job-deadline-date" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Shopify Draft Order URL</label>
+                            <input type="url" id="job-shopify-url" placeholder="https://admin.shopify.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <div class="modal-section">
+                        <p class="modal-section-title">Contact Details</p>
+                        <div class="grid grid-cols-2 gap-3 mb-3">
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Contact Name</label>
+                                <input type="text" id="job-contact-name" placeholder="e.g. John Smith" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Role</label>
+                                <input type="text" id="job-contact-role" placeholder="e.g. Club Secretary" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Email</label>
+                                <input type="email" id="job-contact-email" placeholder="email@example.com" class="w-full px-3 py-2 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500 mb-1 block">Phone</label>
+                                <input type="tel" id="job-contact-phone" placeholder="e.g. 07700 900000" class="w-full px-3 py-2 rounded-lg text-sm">
                             </div>
                         </div>
                     </div>
@@ -13159,7 +13187,9 @@
                     const num = job.job_number ? `<span class="sh-card-tag" style="background:#f1f5f9;color:#94a3b8">${escHtml(job.job_number)}</span>` : '';
                     const rev = job.estimated_revenue ? `<span class="sh-rev-badge">£${Number(job.estimated_revenue).toLocaleString('en-GB')}</span>` : '';
                     const shopify = job.shopify_draft_order_url ? `<span class="sh-card-tag" style="background:rgba(5,150,105,0.1);color:#059669">Shopify</span>` : '';
-                    return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + rev + shopify, sel);
+                    const ot = calcOrderTargetDate(job.deadline_date);
+                    const orderTargetTag = ot ? `<span class="sh-card-tag" style="background:rgba(217,119,6,0.1);color:#d97706" title="Order target date (7 weeks before deadline)">Order by ${ot.toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</span>` : '';
+                    return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + rev + orderTargetTag + shopify, sel);
                 }).join('');
                 return _shKanbanCol(stage.key, stage.color, titleWithTotal, stageJobs.length, cards);
             });
@@ -13231,17 +13261,41 @@
             const clubName = job.clubs?.name || '—';
             const ownerName = job.created_by ? getUserDisplayName(job.created_by) : null;
 
+            // Deadline + order target
+            const deadlineFmt = job.deadline_date
+                ? new Date(job.deadline_date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+                : null;
+            const orderTarget = calcOrderTargetDate(job.deadline_date);
+            const orderTargetFmt = orderTarget
+                ? orderTarget.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+                : null;
+
             // Next action HTML
             const naHtml = _buildNextActionHtml(job);
 
-            // History HTML
+            // Completed actions — collapsible dropdown
             const hist = Array.isArray(job.next_action_history) ? job.next_action_history : [];
             const histHtml = hist.length > 0
-                ? `<div class="sh-na-history"><div class="sh-na-hist-title">Completed Actions</div>${hist.slice().reverse().map(h => {
-                    const doneAt = h.completed_at ? new Date(h.completed_at).toLocaleDateString('en-GB') : '';
-                    return `<div class="sh-na-hist-item"><span class="sh-na-hist-check">✓</span><div><div class="sh-na-hist-text">${escHtml(h.action || h.text || '')}</div><div class="sh-na-hist-date">${doneAt}</div></div></div>`;
-                }).join('')}</div>`
+                ? `<details class="sh-na-history-dropdown" style="margin-top:6px">
+                    <summary style="cursor:pointer;font-size:11px;font-weight:700;color:#92400e;list-style:none;display:flex;align-items:center;gap:4px;padding:4px 0;user-select:none">
+                        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" class="sh-hist-chevron"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        Completed Actions (${hist.length})
+                    </summary>
+                    <div class="sh-na-history" style="margin-top:4px">${hist.slice().reverse().map(h => {
+                        const doneAt = h.completed_at ? new Date(h.completed_at).toLocaleDateString('en-GB') : '';
+                        return `<div class="sh-na-hist-item"><span class="sh-na-hist-check">✓</span><div><div class="sh-na-hist-text">${escHtml(h.action || h.text || '')}</div><div class="sh-na-hist-date">${doneAt}</div></div></div>`;
+                    }).join('')}</div>
+                   </details>`
                 : '';
+
+            // Contact section
+            const hasContact = job.contact_name || job.contact_email || job.contact_phone;
+            const contactHtml = hasContact ? `<div class="sh-section">
+                <div class="sh-section-title">Contact</div>
+                ${job.contact_name ? `<div class="sh-detail-row"><span class="sh-detail-label">Name</span><span class="sh-detail-value">${escHtml(job.contact_name)}${job.contact_role ? ` <span style="color:#94a3b8;font-weight:400">· ${escHtml(job.contact_role)}</span>` : ''}</span></div>` : ''}
+                ${job.contact_email ? `<div class="sh-detail-row"><span class="sh-detail-label">Email</span><a href="mailto:${escHtml(job.contact_email)}" class="sh-detail-value" style="color:#60a5fa">${escHtml(job.contact_email)}</a></div>` : ''}
+                ${job.contact_phone ? `<div class="sh-detail-row"><span class="sh-detail-label">Phone</span><a href="tel:${escHtml(job.contact_phone)}" class="sh-detail-value" style="color:#60a5fa">${escHtml(job.contact_phone)}</a></div>` : ''}
+            </div>` : '';
 
             container.innerHTML = `<div class="sh-preview-content">
                 <div class="sh-preview-top">
@@ -13260,12 +13314,16 @@
                     ${job.job_type ? `<div class="sh-detail-row"><span class="sh-detail-label">Type</span><span class="sh-detail-value">${JOB_TYPE_LABELS[job.job_type] || job.job_type}</span></div>` : ''}
                     ${job.channel ? `<div class="sh-detail-row"><span class="sh-detail-label">Channel</span><span class="sh-detail-value">${CHANNEL_LABELS[job.channel] || job.channel}</span></div>` : ''}
                     ${ownerName && ownerName !== '—' ? `<div class="sh-detail-row"><span class="sh-detail-label">Owner</span><span class="sh-detail-value">${escHtml(ownerName)}</span></div>` : ''}
+                    ${deadlineFmt ? `<div class="sh-detail-row"><span class="sh-detail-label">Deadline</span><span class="sh-detail-value" style="color:#dc2626;font-weight:700">${deadlineFmt}</span></div>` : ''}
+                    ${orderTargetFmt ? `<div class="sh-detail-row"><span class="sh-detail-label">Order By</span><span class="sh-detail-value" style="color:#d97706;font-weight:700">${orderTargetFmt}</span></div>` : ''}
                 </div>
 
                 ${job.job_description ? `<div class="sh-section">
                     <div class="sh-section-title">Description</div>
                     <div class="sh-notes-text">${escHtml(job.job_description)}</div>
                 </div>` : ''}
+
+                ${contactHtml}
 
                 <!-- Next Action -->
                 ${naHtml}
@@ -13487,6 +13545,11 @@
             document.getElementById('job-stage').value = 'discovery';
             document.getElementById('job-shopify-url').value = '';
             document.getElementById('job-revenue').value = '';
+            document.getElementById('job-deadline-date').value = '';
+            document.getElementById('job-contact-name').value = '';
+            document.getElementById('job-contact-role').value = '';
+            document.getElementById('job-contact-email').value = '';
+            document.getElementById('job-contact-phone').value = '';
             // Populate club dropdown
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
@@ -13515,6 +13578,11 @@
             document.getElementById('job-stage').value = currentJob.stage || 'discovery';
             document.getElementById('job-shopify-url').value = currentJob.shopify_draft_order_url || '';
             document.getElementById('job-revenue').value = currentJob.estimated_revenue || '';
+            document.getElementById('job-deadline-date').value = currentJob.deadline_date || '';
+            document.getElementById('job-contact-name').value = currentJob.contact_name || '';
+            document.getElementById('job-contact-role').value = currentJob.contact_role || '';
+            document.getElementById('job-contact-email').value = currentJob.contact_email || '';
+            document.getElementById('job-contact-phone').value = currentJob.contact_phone || '';
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
                 clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
@@ -13543,7 +13611,12 @@
                 stage: document.getElementById('job-stage').value,
                 club_id: clubId,
                 shopify_draft_order_url: shopifyUrl,
-                estimated_revenue: parseFloat(document.getElementById('job-revenue')?.value) || null
+                estimated_revenue: parseFloat(document.getElementById('job-revenue')?.value) || null,
+                deadline_date: document.getElementById('job-deadline-date')?.value || null,
+                contact_name: document.getElementById('job-contact-name')?.value.trim() || null,
+                contact_role: document.getElementById('job-contact-role')?.value.trim() || null,
+                contact_email: document.getElementById('job-contact-email')?.value.trim() || null,
+                contact_phone: document.getElementById('job-contact-phone')?.value.trim() || null
             };
 
             if (jobId) {
@@ -13716,6 +13789,17 @@
             document.getElementById('jr-days-open').textContent = `${days} day${days !== 1 ? 's' : ''}`;
             const revEl = document.getElementById('jr-est-revenue');
             if (revEl) revEl.textContent = currentJob.estimated_revenue ? `£${Number(currentJob.estimated_revenue).toLocaleString('en-GB')}` : '—';
+            const deadlineEl = document.getElementById('jr-deadline');
+            if (deadlineEl) {
+                deadlineEl.textContent = currentJob.deadline_date
+                    ? new Date(currentJob.deadline_date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+                    : '—';
+            }
+            const orderTargetEl = document.getElementById('jr-order-target');
+            if (orderTargetEl) {
+                const ot = calcOrderTargetDate(currentJob.deadline_date);
+                orderTargetEl.textContent = ot ? ot.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+            }
             _renderJobNextAction(document.getElementById('jr-next-action'), currentJob);
             renderJobStagePills();
             renderDesignStagePills();
@@ -13880,37 +13964,99 @@
         // Allow design studio to jump straight to design tab
         function switchJobTab(tab) { showJobTab(tab); }
 
+        // Helper: calculate order target date (7 weeks before deadline)
+        function calcOrderTargetDate(deadlineDate) {
+            if (!deadlineDate) return null;
+            const d = new Date(deadlineDate + 'T00:00:00');
+            d.setDate(d.getDate() - 49);
+            return d;
+        }
+
         function renderJobOverview() {
             if (!currentJob) return;
+
+            // ── Left column: details grid ──
             const details = document.getElementById('jr-overview-details');
-            if (!details) return;
-            const rows = [
-                ['Job Type',      JOB_TYPE_LABELS[currentJob.job_type]  || currentJob.job_type],
-                ['Club Type',     CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type],
-                ['Channel',       CHANNEL_LABELS[currentJob.channel]     || currentJob.channel],
-                ['Stage',         JOB_STAGES.find(s => s.key === currentJob.stage)?.label || currentJob.stage],
-                ['Linked Club',   currentJob.clubs?.name || 'None'],
-                ['Owner',         getUserDisplayName(currentJob.created_by)],
-                ['Range Approved',currentJob.range_approved ? 'Yes ✓' : 'No'],
-            ];
-            const shopifyUrl = currentJob.shopify_draft_order_url;
-            const shopifyBlock = shopifyUrl
-                ? `<div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
-                       <span class="text-xs text-gray-500 block mb-1">Shopify Draft Order</span>
-                       <a href="${escHtml(shopifyUrl)}" target="_blank" rel="noopener"
-                          class="text-sm font-semibold text-brand-400 flex items-center gap-1.5 hover:underline" style="word-break:break-all">
-                          <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                          View Draft Order ↗
-                       </a>
-                   </div>`
-                : '';
-            details.innerHTML = `<div class="grid grid-cols-2 gap-x-6 gap-y-2">
-                ${rows.map(([k, v]) => `
-                    <div>
-                        <span class="text-xs text-gray-500">${k}</span>
-                        <p class="text-sm font-semibold mt-0.5">${escHtml(v || '—')}</p>
-                    </div>`).join('')}
-            </div>${shopifyBlock}`;
+            if (details) {
+                const deadlineFmt = currentJob.deadline_date
+                    ? new Date(currentJob.deadline_date + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+                    : null;
+                const orderTarget = calcOrderTargetDate(currentJob.deadline_date);
+                const orderTargetFmt = orderTarget
+                    ? orderTarget.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' })
+                    : null;
+
+                const rows = [
+                    ['Job Type',      JOB_TYPE_LABELS[currentJob.job_type]  || currentJob.job_type],
+                    ['Club Type',     CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type],
+                    ['Channel',       CHANNEL_LABELS[currentJob.channel]     || currentJob.channel],
+                    ['Stage',         JOB_STAGES.find(s => s.key === currentJob.stage)?.label || currentJob.stage],
+                    ['Linked Club',   currentJob.clubs?.name || 'None'],
+                    ['Owner',         getUserDisplayName(currentJob.created_by)],
+                    ['Range Approved',currentJob.range_approved ? 'Yes ✓' : 'No'],
+                ];
+
+                const deadlineBlock = deadlineFmt ? `
+                    <div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
+                        <div class="grid grid-cols-2 gap-x-6 gap-y-2">
+                            <div>
+                                <span class="text-xs text-gray-500">Deadline Date</span>
+                                <p class="text-sm font-semibold mt-0.5" style="color:#dc2626">${deadlineFmt}</p>
+                            </div>
+                            ${orderTargetFmt ? `<div>
+                                <span class="text-xs text-gray-500">Order Target</span>
+                                <p class="text-sm font-semibold mt-0.5" style="color:#d97706">${orderTargetFmt}</p>
+                            </div>` : ''}
+                        </div>
+                    </div>` : '';
+
+                const shopifyUrl = currentJob.shopify_draft_order_url;
+                const shopifyBlock = shopifyUrl
+                    ? `<div class="mt-3 pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
+                           <span class="text-xs text-gray-500 block mb-1">Shopify Draft Order</span>
+                           <a href="${escHtml(shopifyUrl)}" target="_blank" rel="noopener"
+                              class="text-sm font-semibold text-brand-400 flex items-center gap-1.5 hover:underline" style="word-break:break-all">
+                              <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                              View Draft Order ↗
+                           </a>
+                       </div>`
+                    : '';
+
+                details.innerHTML = `<div class="grid grid-cols-2 gap-x-6 gap-y-2">
+                    ${rows.map(([k, v]) => `
+                        <div>
+                            <span class="text-xs text-gray-500">${k}</span>
+                            <p class="text-sm font-semibold mt-0.5">${escHtml(v || '—')}</p>
+                        </div>`).join('')}
+                </div>${deadlineBlock}${shopifyBlock}`;
+            }
+
+            // ── Right column: description ──
+            const descEl = document.getElementById('jr-overview-description');
+            if (descEl) {
+                descEl.innerHTML = `<div class="mb-4">
+                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Description</span>
+                    ${currentJob.job_description
+                        ? `<p class="text-sm leading-relaxed" style="color:#cbd5e1">${escHtml(currentJob.job_description)}</p>`
+                        : `<p class="text-xs italic" style="color:#475569">No description added. Click Edit to add one.</p>`}
+                </div>`;
+            }
+
+            // ── Right column: contact info ──
+            const contactEl = document.getElementById('jr-overview-contact');
+            if (contactEl) {
+                const hasContact = currentJob.contact_name || currentJob.contact_email || currentJob.contact_phone;
+                contactEl.innerHTML = `<div class="pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
+                    <span class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Contact</span>
+                    ${hasContact ? `
+                        <div class="space-y-1">
+                            ${currentJob.contact_name ? `<div class="flex items-baseline gap-2"><span class="text-xs text-gray-600 w-10 flex-shrink-0">Name</span><span class="text-sm font-semibold">${escHtml(currentJob.contact_name)}${currentJob.contact_role ? ` <span class="text-xs text-gray-500 font-normal">· ${escHtml(currentJob.contact_role)}</span>` : ''}</span></div>` : ''}
+                            ${currentJob.contact_email ? `<div class="flex items-baseline gap-2"><span class="text-xs text-gray-600 w-10 flex-shrink-0">Email</span><a href="mailto:${escHtml(currentJob.contact_email)}" class="text-sm font-semibold" style="color:#60a5fa">${escHtml(currentJob.contact_email)}</a></div>` : ''}
+                            ${currentJob.contact_phone ? `<div class="flex items-baseline gap-2"><span class="text-xs text-gray-600 w-10 flex-shrink-0">Phone</span><a href="tel:${escHtml(currentJob.contact_phone)}" class="text-sm font-semibold" style="color:#60a5fa">${escHtml(currentJob.contact_phone)}</a></div>` : ''}
+                        </div>
+                    ` : `<p class="text-xs italic" style="color:#475569">No contact added. Click Edit to add one.</p>`}
+                </div>`;
+            }
         }
 
         async function renderJobProducts() {
