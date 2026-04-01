@@ -266,6 +266,7 @@
         .kanban-shopify-link { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #059669; background: rgba(5,150,105,0.08); border: 1px solid rgba(5,150,105,0.2); border-radius: 6px; padding: 3px 8px; text-decoration: none; margin-top: 6px; transition: all 0.15s; }
         .kanban-shopify-link:hover { background: rgba(5,150,105,0.15); color: #047857; }
         .kanban-empty { color: #94a3b8; font-size: 12px; padding: 12px 0; text-align: center; font-style: italic; }
+        .kanban-column.kc-empty { flex: 0 0 44px !important; padding: 0; min-height: 200px; }
 
         /* Sales stage tab bar */
         .sales-stage-tabs { display: flex; gap: 0; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; overflow-x: auto; }
@@ -16096,6 +16097,8 @@
                     .filter(l => l.kanban_stage_id === stage.id)
                     .sort((a, b) => (a.kanban_order || 0) - (b.kanban_order || 0));
 
+                const moveOpts = kanbanStages.filter(s => s.id !== stage.id)
+                    .map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('');
                 const cards = stageLeads.map(lead => {
                     const salesperson = lead.assigned_to ? escHtml(getUserDisplayName(lead.assigned_to)) : '';
                     return `<div class="kanban-card"
@@ -16111,14 +16114,31 @@
                         </div>
                         <div class="kanban-card-footer">
                             ${salesperson ? `<span class="kanban-salesperson">${salesperson}</span>` : '<span></span>'}
-                            <button onclick="event.stopPropagation();convertLeadToJob('${lead.id}')"
-                                class="btn-convert" style="font-size:11px;padding:4px 8px">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                Convert
-                            </button>
+                            <div style="display:flex;align-items:center;gap:5px">
+                                <select onchange="kanbanMoveCard('${lead.id}',this.value);this.value=''" onclick="event.stopPropagation()"
+                                    style="font-size:10px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 5px;background:#f8fafc;color:#64748b;cursor:pointer;max-width:80px;height:24px">
+                                    <option value="">Move →</option>${moveOpts}
+                                </select>
+                                <button onclick="event.stopPropagation();convertLeadToJob('${lead.id}')"
+                                    class="btn-convert" style="font-size:11px;padding:4px 8px">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                    Convert
+                                </button>
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
+
+                if (stageLeads.length === 0) {
+                    return `<div class="kanban-column kc-empty"
+                        ondragover="onKanbanDragOver(event)"
+                        ondrop="onKanbanDrop(event,'${stage.id}')"
+                        ondragleave="onKanbanDragLeave(event)">
+                        <div style="height:100%;min-height:200px;display:flex;align-items:center;justify-content:center">
+                            <span style="writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:${stage.color}">${escHtml(stage.name)}</span>
+                        </div>
+                    </div>`;
+                }
 
                 return `<div class="kanban-column"
                     ondragover="onKanbanDragOver(event)"
@@ -16128,7 +16148,7 @@
                         <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.name)}</span>
                         <span class="kanban-count">${stageLeads.length}</span>
                     </div>
-                    ${cards || `<div class="kanban-empty">Drop leads here</div>`}
+                    ${cards}
                 </div>`;
             }).join('');
 
@@ -16152,6 +16172,8 @@
 
             board.innerHTML = activeStages.map(stage => {
                 const stageJobs = activeJobs.filter(j => j.stage === stage.key);
+                const jobMoveOpts = activeStages.filter(s => s.key !== stage.key)
+                    .map(s => `<option value="${s.key}">${escHtml(s.label)}</option>`).join('');
                 const cards = stageJobs.map(job => {
                     const clubName  = escHtml(job.clubs?.name || '—');
                     const shopifyHtml = job.shopify_draft_order_url
@@ -16167,15 +16189,29 @@
                         <div class="kanban-card-club">${clubName}</div>
                         ${job.job_number ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">${escHtml(job.job_number)}</div>` : ''}
                         ${shopifyHtml}
+                        <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
+                            <select onchange="kanbanMoveJob('${job.id}',this.value);this.value=''" onclick="event.stopPropagation()"
+                                style="font-size:10px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 5px;background:#f8fafc;color:#64748b;cursor:pointer;max-width:120px;height:24px">
+                                <option value="">Move →</option>${jobMoveOpts}
+                            </select>
+                        </div>
                     </div>`;
                 }).join('');
+
+                if (stageJobs.length === 0) {
+                    return `<div class="kanban-column kc-empty">
+                        <div style="height:100%;min-height:200px;display:flex;align-items:center;justify-content:center">
+                            <span style="writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:${stage.color}">${escHtml(stage.label)}</span>
+                        </div>
+                    </div>`;
+                }
 
                 return `<div class="kanban-column">
                     <div class="kanban-col-header">
                         <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.label)}</span>
                         <span class="kanban-count">${stageJobs.length}</span>
                     </div>
-                    ${cards || `<div class="kanban-empty">No jobs</div>`}
+                    ${cards}
                 </div>`;
             }).join('');
 
@@ -16212,6 +16248,25 @@
             await loadLeads();
             renderKanban();
             dragLeadId = null;
+        }
+
+        async function kanbanMoveCard(leadId, stageId) {
+            if (!stageId) return;
+            const { error } = await supabase.from('leads').update({ kanban_stage_id: stageId }).eq('id', leadId);
+            if (error) { showToast('Error moving card: ' + error.message, 'error'); return; }
+            const stageName = kanbanStages.find(s => s.id === stageId)?.name || '';
+            showToast(`Moved to ${stageName} ✓`);
+            await loadLeads();
+            renderKanban();
+        }
+        async function kanbanMoveJob(jobId, stageKey) {
+            if (!stageKey) return;
+            const { error } = await supabase.from('jobs').update({ stage: stageKey }).eq('id', jobId);
+            if (error) { showToast('Error moving job', 'error'); return; }
+            const stageName = JOB_STAGES.find(s => s.key === stageKey)?.label || '';
+            showToast(`Moved to ${stageName} ✓`);
+            await loadJobs();
+            renderJobsKanban();
         }
 
         // =============================================
@@ -20915,7 +20970,7 @@
                 if (cStatus === 'approved')  cls += ' ct-approved';
                 if (cStatus === 'declined')  cls += ' ct-declined';
                 const badge = count ? ` <span style="font-size:9px;font-weight:700;opacity:0.7;margin-left:2px">(${count})</span>` : '';
-                const tabActions = isInReview ? `<span onclick="dtrApproveConceptSection('${stage.id}',${i});event.stopPropagation()" style="margin-left:5px;color:#16a34a;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Approve concept">✓</span><span onclick="dtrDeclineConceptSection('${stage.id}',${i});event.stopPropagation()" style="margin-left:2px;color:#dc2626;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Decline concept">✕</span>` : '';
+                const tabActions = isInReview ? `<span onclick="dtrApproveConceptSection('${stage.id}',${i});event.stopPropagation()" style="margin-left:5px;color:#16a34a;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Approve concept">✓</span><span onclick="dtrDeleteConcept('${stage.id}',${i});event.stopPropagation()" style="margin-left:2px;color:#dc2626;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Delete concept">✕</span>` : '';
                 return `<button class="${cls}" id="dtr-ctab-${i}" onclick="dtrSwitchConceptTab(${i})">Concept ${i}${badge}${tabActions}</button>`;
             }).join('');
 
@@ -20940,6 +20995,10 @@
                 ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrCompleteConceptsStage('${stage.id}')">✓ Complete</button>`
                 : `<button disabled style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;font-size:11px;font-weight:600;cursor:not-allowed">✓ Complete</button>`;
 
+            const approveConceptBtn = isInReview
+                ? `<button onclick="dtrApproveConceptSection('${stage.id}',${_dtrConceptTab})" style="padding:4px 10px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer">✓ Approve ${_dtrConceptTab}</button>`
+                : '';
+
             const activeStatuses = ['in_progress','in_review','revisions_required'];
             const stageStateClass = isRevisions ? ' stage-active stage-revisions'
                 : activeStatuses.includes(stage.status) ? ' stage-active'
@@ -20957,7 +21016,7 @@
                     <div id="dtr-concept-tab-content">${tabContent}</div>
                     <div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                         <div>${deliverBtn}</div>
-                        <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
+                        <div style="display:flex;align-items:center;gap:6px">${approveConceptBtn}${revisionsBtn}${completeBtn}</div>
                     </div>
                     <div id="dtr-revision-form-${stage.id}" class="dtr-revision-form hide">
                         <div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:8px">📝 Request Revisions — Feedback</div>
@@ -21014,20 +21073,7 @@
                     accept="image/*,.pdf,.ai,.eps,.svg"
                     onchange="dtrConceptImgSelect(event,'${stageId}',${conceptNum})">`;
 
-            // Section-level approve / decline — only show when there are uploads AND stage not yet approved
-            const sectionActions = (stageApproved || uploads.length === 0) ? '' : `
-                <div class="dtr-concept-section-actions">
-                    <button class="dtr-concept-approve-btn${conceptStatus==='approved'?' approved':''}"
-                        onclick="dtrApproveConceptSection('${stageId}',${conceptNum})">
-                        ${conceptStatus === 'approved' ? '✓ Concept Approved' : `Approve Concept ${conceptNum}`}
-                    </button>
-                    <button class="dtr-concept-decline-btn"
-                        onclick="dtrDeclineConceptSection('${stageId}',${conceptNum})">
-                        Decline Concept ${conceptNum}
-                    </button>
-                </div>`;
-
-            return `${imagesHtml}${uploadZone}${sectionActions}`;
+            return `${imagesHtml}${uploadZone}`;
         }
 
         // ── Concept stage actions ──────────────────────────────────────────────
@@ -21132,6 +21178,26 @@
             if (error) { showToast('Error declining concept', 'error'); return; }
             stage.concept_statuses = cs;
             showToast(`Concept ${conceptNum} declined`);
+            await _dtrRefreshConceptsStage();
+        }
+
+        async function dtrDeleteConcept(stageId, conceptNum) {
+            if (!confirm(`Delete Concept ${conceptNum} and all its uploads? This cannot be undone.`)) return;
+            const uploadIds = _dtrConceptUploads.filter(u => u.section_label === `concept_${conceptNum}`).map(u => u.id);
+            if (uploadIds.length) {
+                await supabase.from('stage_uploads').delete().in('id', uploadIds);
+            }
+            const stage = currentStages.find(s => s.id === stageId);
+            if (stage) {
+                const cs = { ...(stage.concept_statuses || {}) };
+                delete cs[`concept_${conceptNum}`];
+                delete cs[`concept_${conceptNum}_feedback`];
+                const { error } = await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', stageId);
+                if (error) { showToast('Error deleting concept', 'error'); return; }
+                stage.concept_statuses = cs;
+                if (_dtrConceptStage) _dtrConceptStage.concept_statuses = cs;
+            }
+            showToast(`Concept ${conceptNum} deleted`);
             await _dtrRefreshConceptsStage();
         }
 
