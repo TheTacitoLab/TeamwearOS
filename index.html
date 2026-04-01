@@ -628,7 +628,7 @@
         .ds-studio-body.list-collapsed { grid-template-columns:36px 1fr; }
         @media(max-width:900px) { .ds-studio-body { grid-template-columns:1fr; height:auto; overflow:visible; } }
 
-        .ds-task-list-panel { border-right:1px solid #e2e8f0; overflow:hidden; background:#f8fafc; display:flex; flex-direction:column; }
+        .ds-task-list-panel { border-right:1px solid #e8ecf0; overflow:hidden; background:#fff; display:flex; flex-direction:column; }
         .ds-task-list-inner { flex:1; overflow-y:auto; }
         .ds-task-list-inner::-webkit-scrollbar { width:4px; }
         .ds-task-list-inner::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
@@ -645,13 +645,13 @@
         .ds-preview-panel::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
 
         /* Group header */
-        .ds-group-header { display:flex; align-items:center; gap:8px; padding:10px 16px 7px; position:sticky; top:0; background:#f8fafc; z-index:5; border-bottom:1px solid #e8ecf0; }
+        .ds-group-header { display:flex; align-items:center; gap:8px; padding:10px 16px 7px; position:sticky; top:0; background:#f8fafc; z-index:5; border-bottom:1px solid #edf0f4; }
         .ds-group-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; flex:1; }
         .ds-group-count { font-size:10px; font-weight:700; color:#94a3b8; background:#e2e8f0; border-radius:10px; padding:1px 7px; }
         .ds-group-empty { padding:6px 16px 10px; font-size:11px; color:#b0b8c4; font-style:italic; }
 
         /* Task row */
-        .ds-task-row { display:flex; align-items:flex-start; gap:0; padding:10px 14px 10px 20px; border-bottom:1px solid #f1f5f9; cursor:pointer; background:#f8fafc; transition:background 0.1s; position:relative; }
+        .ds-task-row { display:flex; align-items:flex-start; gap:0; padding:11px 14px 11px 20px; border-bottom:1px solid #f0f2f5; cursor:pointer; background:#fff; transition:background 0.1s; position:relative; }
         .ds-task-row::before { content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; border-radius:2px; background:#e2e8f0; }
         .ds-task-row.urgency-overdue::before   { background:#dc2626; }
         .ds-task-row.urgency-revisions::before { background:#b45309; }
@@ -1156,7 +1156,7 @@
         .ds-s1-btn.needs-info:hover { background:rgba(245,158,11,0.15); }
 
         /* ── Design Task Record v3 — Refined Split Layout ──────────────────── */
-        .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 138px); background:#f4f6f9; }
+        .dtr-body { display:flex; align-items:stretch; min-height:calc(100vh - 138px); background:#f0f2f5; }
         /* Embedded in DS preview panel — override sticky/height assumptions */
         .dtr-embedded { min-height:100%; }
         .dtr-embedded .dtr-left-panel { position:sticky; top:0; max-height:calc(100vh - 200px); align-self:flex-start; }
@@ -1257,7 +1257,7 @@
         /* ── Stage section cards ── */
         .dtr-stages-col { flex:1; min-width:0; overflow:hidden; display:flex; flex-direction:column; transition:width 0.25s ease, flex 0.25s ease; border-right:1px solid #e8ecf0; }
         .dtr-stages-col.stage-col-collapsed { flex:none; width:36px; }
-        .dtr-stages-inner { flex:1; overflow-y:auto; padding:14px 16px; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+        .dtr-stages-inner { flex:1; overflow-y:auto; padding:18px 20px; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
         .dtr-stages-inner::-webkit-scrollbar { width:4px; }
         .dtr-stages-inner::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
         .dtr-stages-strip { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:12px; flex:1; overflow:hidden; background:#f8fafc; }
@@ -1267,14 +1267,14 @@
         .dtr-activity-strip { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:12px; background:#fff; height:100%; border-left:1px solid #e8ecf0; }
         .dtr-col-strip-label { writing-mode:vertical-lr; transform:rotate(180deg); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.8px; color:#94a3b8; margin-top:12px; user-select:none; }
 
-        .dtr-stage-section { border:1.5px solid #e4e8ef; border-radius:14px; background:#fff; margin-bottom:12px; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); transition:border-color 0.2s, box-shadow 0.2s; }
+        .dtr-stage-section { border:1.5px solid #e4e8ef; border-radius:16px; background:#fff; margin-bottom:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.03); transition:border-color 0.2s, box-shadow 0.2s; }
         .dtr-stage-section.stage-approved { border-color:#86efac; background:rgba(34,197,94,0.01); }
         .dtr-stage-section.stage-inactive { background:#fafbfc; border-color:#edf0f4; }
         .dtr-stage-section.stage-active { border-color:#bfdbfe; box-shadow:0 2px 12px rgba(37,99,235,0.09); position:relative; }
         .dtr-stage-section.stage-active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:#2563eb; border-radius:3px 0 0 3px; }
         .dtr-stage-section.stage-revisions { border-color:#fca5a5; box-shadow:0 2px 12px rgba(239,68,68,0.08); }
         .dtr-stage-section.stage-revisions::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:#dc2626; border-radius:3px 0 0 3px; }
-        .dtr-stage-hdr { width:100%; display:flex; align-items:center; gap:12px; padding:14px 18px; border:none; background:transparent; cursor:pointer; text-align:left; transition:background 0.12s; }
+        .dtr-stage-hdr { width:100%; display:flex; align-items:center; gap:12px; padding:15px 20px; border:none; background:transparent; cursor:pointer; text-align:left; transition:background 0.12s; }
         .dtr-stage-hdr:hover { background:#f8fafc; }
         .dtr-stage-section.stage-approved .dtr-stage-hdr:hover { background:rgba(34,197,94,0.03); }
         .dtr-stage-section.stage-inactive .dtr-stage-hdr { cursor:pointer; opacity:0.85; }
@@ -3597,6 +3597,13 @@
                             <div><span class="text-xs text-gray-600">Deadline</span><p id="jr-deadline" class="text-xs font-semibold mt-0.5" style="color:#dc2626">—</p></div>
                             <div><span class="text-xs text-gray-600">Order Target</span><p id="jr-order-target" class="text-xs font-semibold mt-0.5" style="color:#d97706">—</p></div>
                         </div>
+                        <!-- Owner -->
+                        <div class="mt-3 pt-3 border-t border-gray-800">
+                            <span class="text-xs text-gray-600 block mb-1.5">Owner</span>
+                            <select id="jr-owner-sidebar" onchange="saveJobAssignment(this.value)" style="width:100%;font-size:12px;font-weight:500;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#e2e8f0;outline:none;cursor:pointer">
+                                <option value="">Unassigned</option>
+                            </select>
+                        </div>
                         <!-- Next Action -->
                         <div id="jr-next-action" class="mt-3 pt-3 border-t border-gray-800"></div>
                     </div>
@@ -3666,23 +3673,15 @@
             <div id="jt-content-overview">
                 <div class="glass rounded-2xl p-4">
                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Job Details</h4>
-                    <!-- Two-column layout: owner left, description+contact right -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
-                        <!-- Left: Owner (assigned users) only — all other metadata is in the sidebar card -->
-                        <div>
-                            <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
-                            <div id="jr-assigned-users-list" class="user-assign-list mb-2"></div>
-                            <div id="jr-assigned-users-chips" class="flex flex-wrap gap-1 mt-1"></div>
-                            <select id="jr-assigned-user" class="hide"><option value="">Unassigned</option></select>
-                            <!-- Shopify + other detail links rendered here by JS -->
-                            <div id="jr-overview-details" class="mt-3"></div>
-                        </div>
-                        <!-- Right: description + contact info -->
-                        <div>
-                            <div id="jr-overview-description"></div>
-                            <div id="jr-overview-contact"></div>
-                        </div>
+                    <!-- Hidden compat elements (owner is now in sidebar dropdown) -->
+                    <div class="hide">
+                        <div id="jr-assigned-users-list"></div>
+                        <div id="jr-assigned-users-chips"></div>
+                        <select id="jr-assigned-user"><option value="">Unassigned</option></select>
                     </div>
+                    <div id="jr-overview-description"></div>
+                    <div id="jr-overview-contact" style="margin-top:16px"></div>
+                    <div id="jr-overview-details" style="margin-top:16px"></div>
                 </div>
             </div>
 
@@ -13708,10 +13707,9 @@
             showJobTab('overview');
             // Load activity log, user assignment, and design pipeline in parallel
             await Promise.all([loadJobActivity(), loadBrandUsers(), loadJobDesignPipeline(jobId)]);
-            // Populate multi-user assignment list
-            const currentAssignedIds = currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []);
-            populateMultiUserAssign('jr-assigned-users-list', 'jr-assigned-users-chips', currentAssignedIds);
-            // Also populate hidden legacy dropdown for any backward-compat code
+            // Populate owner sidebar dropdown
+            populateUserAssignDropdown('jr-owner-sidebar', currentJob?.assigned_user_id);
+            // Keep hidden compat elements populated
             populateUserAssignDropdown('jr-assigned-user', currentJob?.assigned_user_id);
             // Reset activity tab
             jobActivityTabFilter = 'all';
@@ -17003,9 +17001,9 @@
             { key: 'internal_task',          label: 'Internal Task' }
         ];
         const DS_DESIGN_TYPES = [
-            'Full Range', 'New Concept', 'Revision / Update', 'Replica / Copy',
-            'Rush Design', 'Match Kit', 'Training Wear', 'Casual Wear',
-            'Logo Design New', 'Logo Re-Draw'
+            'New Concept', 'New Kit Design', 'Full Range Design', 'Season Refresh',
+            'Sponsor Update', 'Logo Redraw', 'Colour Change', 'Design Amendment',
+            'Artwork Setup', 'Mockup Creation'
         ];
         const DS_STATUS_LABELS = {
             new:'New', in_progress:'In Progress', revisions:'Revisions',
@@ -18598,7 +18596,7 @@
             panel.innerHTML = `<div style="display:flex;height:100%;overflow:hidden">
 
                 <!-- LEFT COLUMN: task details + brief -->
-                <div style="flex:1;min-width:0;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
+                <div style="flex:1;min-width:0;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
 
                     <!-- Header -->
                     <div>
@@ -18642,6 +18640,11 @@
                         <p style="font-size:12px;color:#374151;line-height:1.65;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>
                     </div>` : ''}
 
+                    <!-- Task type chips -->
+                    ${task.design_types?.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px">
+                        ${task.design_types.map(t => `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;background:rgba(124,58,237,0.08);color:#7c3aed;border:1px solid #c4b5fd">${escHtml(t)}</span>`).join('')}
+                    </div>` : ''}
+
                     <!-- Open button -->
                     <div style="margin-top:auto;padding-top:4px;display:flex;flex-direction:column;gap:6px">
                         <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
@@ -18654,11 +18657,11 @@
                 </div>
 
                 <!-- RIGHT COLUMN: stage timeline + next action -->
-                <div style="width:190px;flex-shrink:0;overflow-y:auto;padding:16px 12px;background:#f8fafc;border-left:1px solid #e8ecf0;display:flex;flex-direction:column;gap:10px;box-sizing:border-box">
+                <div style="flex:1;min-width:0;overflow-y:auto;padding:18px 16px;background:#f8fafc;border-left:1px solid #e8ecf0;display:flex;flex-direction:column;gap:10px;box-sizing:border-box">
 
                     <!-- Stage timeline -->
                     <div>
-                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:8px">Stages</div>
+                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #e8ecf0">Stage Progress</div>
                         ${stages.length > 0
                             ? stages.map((s, i) => {
                                 const sc = stageStyleMap[s.status] || stageStyleMap.not_started;
@@ -20030,42 +20033,24 @@
 
             panel.innerHTML = `
                 <div class="dtr-body${isEmbedded ? ' dtr-embedded' : ''}">
-                    <div class="dtr-left-panel${leftOpen ? '' : ' collapsed'}" id="dtr-left-panel">
-                        <div class="dtr-left-inner" id="dtr-left-inner"${leftOpen ? '' : ' style="display:none"'}>
-                            <div class="dtr-left-tabs" style="padding-right:4px">
+                    <div class="dtr-left-panel" id="dtr-left-panel">
+                        <div class="dtr-left-inner" id="dtr-left-inner">
+                            <div class="dtr-left-tabs">
                                 <button class="dtr-left-tab active" id="dtr-ltab-brief" onclick="dtrSwitchLeftTab('brief')">Brief</button>
                                 <button class="dtr-left-tab" id="dtr-ltab-products" onclick="dtrSwitchLeftTab('products')">Products</button>
                                 <button class="dtr-left-tab" id="dtr-ltab-assets" onclick="dtrSwitchLeftTab('assets')">Assets</button>
-                                <button onclick="toggleDTRLeft()" title="Collapse panel" style="margin-left:auto;flex-shrink:0;width:26px;height:26px;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;align-self:center;transition:all 0.15s" onmouseover="this.style.color='#475569';this.style.background='#f1f5f9'" onmouseout="this.style.color='#94a3b8';this.style.background='#f8fafc'">
-                                    <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                                </button>
                             </div>
                             <div class="dtr-left-tab-content" id="dtr-left-tab-content">
                                 ${buildDTRLeftColumn(task, club, assets, clubProds, jobProds)}
                             </div>
                         </div>
-                        <div class="dtr-left-collapsed" id="dtr-left-collapsed"${leftOpen ? ' style="display:none"' : ''}>
-                            <button class="ds-list-collapse-btn" onclick="toggleDTRLeft()" title="Expand brief">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                            </button>
-                            <span style="writing-mode:vertical-lr;transform:rotate(180deg);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#94a3b8;margin-top:12px;user-select:none">Brief</span>
-                        </div>
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
                         <div id="dtr-stages-inner" class="dtr-stages-inner">
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-top:2px">
+                            <div style="margin-bottom:12px;padding-top:2px">
                                 <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Stages</span>
-                                <button onclick="toggleDTRStages()" title="Collapse stages" style="width:22px;height:22px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.color='#475569';this.style.background='#f1f5f9'" onmouseout="this.style.color='#94a3b8';this.style.background='#f8fafc'">
-                                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                                </button>
                             </div>
                             ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads, rangeUploads, finaliseUploads)}
-                        </div>
-                        <div class="dtr-stages-strip" id="dtr-stages-strip" style="display:none">
-                            <button onclick="toggleDTRStages()" title="Expand stages" class="ds-list-collapse-btn">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                            </button>
-                            <span class="dtr-col-strip-label">Stages</span>
                         </div>
                     </div>
                     <div class="dtr-activity-col" id="dtr-activity-col">
@@ -20073,18 +20058,13 @@
                             <div class="dtr-activity-header">
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
                                     <h4>Activity</h4>
-                                    <div style="display:flex;align-items:center;gap:5px">
-                                        <select id="dtr-act-filter-select" onchange="filterDTRActivity(null,this.value)" style="font-size:11px;font-weight:600;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:3px 8px;background:#f8fafc;cursor:pointer;outline:none">
-                                            <option value="all">All Active</option>
-                                            <option value="comment">Comments</option>
-                                            <option value="sub_task">Sub-Tasks</option>
-                                            <option value="revision_request">Revisions</option>
-                                            <option value="history">History</option>
-                                        </select>
-                                        <button onclick="toggleDTRActivity()" title="Collapse activity" style="width:22px;height:22px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.color='#475569';this.style.background='#f1f5f9'" onmouseout="this.style.color='#94a3b8';this.style.background='#f8fafc'">
-                                            <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                        </button>
-                                    </div>
+                                    <select id="dtr-act-filter-select" onchange="filterDTRActivity(null,this.value)" style="font-size:11px;font-weight:600;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:3px 8px;background:#f8fafc;cursor:pointer;outline:none">
+                                        <option value="all">All Active</option>
+                                        <option value="comment">Comments</option>
+                                        <option value="sub_task">Sub-Tasks</option>
+                                        <option value="revision_request">Revisions</option>
+                                        <option value="history">History</option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="dtr-activity-inner">
@@ -20101,12 +20081,6 @@
                                     onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
                                 <button onclick="addDesignTaskActivity()" class="dtr-composer-post-btn">Post</button>
                             </div>
-                        </div>
-                        <div class="dtr-activity-strip" id="dtr-activity-strip" style="display:none">
-                            <button onclick="toggleDTRActivity()" title="Expand activity" class="ds-list-collapse-btn">
-                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                            </button>
-                            <span class="dtr-col-strip-label">Activity</span>
                         </div>
                     </div>
                 </div>`;
@@ -20334,6 +20308,16 @@
                             <span style="font-size:11px;font-weight:600;color:#475569">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
                         </div>` : ''}
                     </div>
+                    <!-- § Task Type -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Task Type</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:5px">
+                            ${DS_DESIGN_TYPES.map(t => {
+                                const isActive = (task.design_types || []).includes(t);
+                                return `<button class="dt-design-type-chip ${isActive ? 'active' : ''}" onclick="toggleDtDesignType('${escHtml(t)}',this)">${isActive ? '<svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>' : ''}${escHtml(t)}</button>`;
+                            }).join('')}
+                        </div>
+                    </div>
                     <!-- § Design Brief -->
                     <div class="dtr-brief-section">
                         <div class="dtr-brief-section-title">Design Brief</div>
@@ -20392,6 +20376,14 @@
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${escHtml(designerName)}</span></div>
                     ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span></div>` : ''}
                 </div>
+                ${(task.design_types?.length) ? `
+                <!-- § Task Type -->
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Task Type</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px">
+                        ${task.design_types.map(t => `<span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:12px;background:rgba(124,58,237,0.08);color:#7c3aed;border:1px solid #c4b5fd">${escHtml(t)}</span>`).join('')}
+                    </div>
+                </div>` : ''}
                 <!-- § Design Brief (read-only) -->
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Design Brief</div>
@@ -21222,11 +21214,8 @@
                 const b = document.getElementById(`dtr-stage-body-${n}`);
                 if (b) openState[n] = b.style.display !== 'none';
             });
-            stagesInner.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;padding-top:2px">
+            stagesInner.innerHTML = `<div style="margin-bottom:12px;padding-top:2px">
                 <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Stages</span>
-                <button onclick="toggleDTRStages()" title="Collapse stages" style="width:22px;height:22px;border-radius:5px;border:1px solid #e2e8f0;background:#f8fafc;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s" onmouseover="this.style.color='#475569';this.style.background='#f1f5f9'" onmouseout="this.style.color='#94a3b8';this.style.background='#f8fafc'">
-                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                </button>
             </div>` + buildDTRStagesColumn(s2, s3, s4, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
             // Restore open/closed state after rebuild
             [2, 3, 4].forEach(n => {
