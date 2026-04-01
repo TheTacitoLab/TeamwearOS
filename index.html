@@ -5299,8 +5299,30 @@
                             </div>
 
                             <div>
-                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Colour Notes</label>
-                                <textarea id="cdt-colour-palette" placeholder="e.g. Navy primary, gold secondary — refer to Pantone 280 C / 116 C" rows="2" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:8px">Brand Colours</label>
+                                <div style="display:flex;flex-direction:column;gap:8px">
+                                    <div style="display:flex;align-items:center;gap:8px">
+                                        <div id="cdt-sw-primary" style="position:relative;width:26px;height:26px;border-radius:6px;background:#e8ecf0;border:1.5px solid #e2e8f0;flex-shrink:0;cursor:pointer;overflow:hidden" onclick="document.getElementById('cdt-cp-primary').click()" title="Pick main colour">
+                                            <input type="color" id="cdt-cp-primary" value="#000000" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" oninput="cdtColourPick('primary',this.value)">
+                                        </div>
+                                        <span style="font-size:11px;color:#64748b;font-weight:600;width:65px;flex-shrink:0">Main</span>
+                                        <input id="cdt-pan-primary" type="text" placeholder="e.g. 286 C" style="flex:1;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;font-family:monospace;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0';_cdtColours.primary.pantone=this.value">
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:8px">
+                                        <div id="cdt-sw-secondary" style="position:relative;width:26px;height:26px;border-radius:6px;background:#e8ecf0;border:1.5px solid #e2e8f0;flex-shrink:0;cursor:pointer;overflow:hidden" onclick="document.getElementById('cdt-cp-secondary').click()" title="Pick secondary colour">
+                                            <input type="color" id="cdt-cp-secondary" value="#000000" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" oninput="cdtColourPick('secondary',this.value)">
+                                        </div>
+                                        <span style="font-size:11px;color:#64748b;font-weight:600;width:65px;flex-shrink:0">Secondary</span>
+                                        <input id="cdt-pan-secondary" type="text" placeholder="e.g. 116 C" style="flex:1;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;font-family:monospace;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0';_cdtColours.secondary.pantone=this.value">
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:8px">
+                                        <div id="cdt-sw-accent" style="position:relative;width:26px;height:26px;border-radius:6px;background:#e8ecf0;border:1.5px solid #e2e8f0;flex-shrink:0;cursor:pointer;overflow:hidden" onclick="document.getElementById('cdt-cp-accent').click()" title="Pick accent colour">
+                                            <input type="color" id="cdt-cp-accent" value="#000000" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" oninput="cdtColourPick('accent',this.value)">
+                                        </div>
+                                        <span style="font-size:11px;color:#64748b;font-weight:600;width:65px;flex-shrink:0">Accent</span>
+                                        <input id="cdt-pan-accent" type="text" placeholder="e.g. 485 C" style="flex:1;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;font-family:monospace;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0';_cdtColours.accent.pantone=this.value">
+                                    </div>
+                                </div>
                             </div>
 
                             <div>
@@ -17194,6 +17216,14 @@
 
         // ── Create Design Task (modal) ────────────────────────────────────────
         let _cdtSelectedProducts = [];
+        let _cdtColours = { primary:{hex:'',pantone:''}, secondary:{hex:'',pantone:''}, accent:{hex:'',pantone:''} };
+
+        function cdtColourPick(key, hex) {
+            if (!_cdtColours[key]) _cdtColours[key] = {};
+            _cdtColours[key].hex = hex;
+            const sw = document.getElementById(`cdt-sw-${key}`);
+            if (sw) sw.style.background = hex;
+        }
 
         async function openCreateDesignTaskModal(linkedJobId) {
             if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
@@ -17205,13 +17235,20 @@
                 ['cdt-name','cdt-team','cdt-season-event','cdt-sport'].forEach(id => {
                     const el = document.getElementById(id); if (el) el.value = '';
                 });
-                ['cdt-design-brief','cdt-colour-palette','cdt-key-notes'].forEach(id => {
+                ['cdt-design-brief','cdt-key-notes'].forEach(id => {
                     const el = document.getElementById(id); if (el) el.value = '';
                 });
                 document.getElementById('cdt-due-date').value = '';
                 document.getElementById('cdt-order-type').value = '';
                 document.getElementById('cdt-priority').value = 'standard';
                 document.getElementById('cdt-job-type').value = '';
+                // Reset colour pickers
+                _cdtColours = { primary:{hex:'',pantone:''}, secondary:{hex:'',pantone:''}, accent:{hex:'',pantone:''} };
+                ['primary','secondary','accent'].forEach(k => {
+                    const sw = document.getElementById(`cdt-sw-${k}`); if (sw) sw.style.background = '#e8ecf0';
+                    const cp = document.getElementById(`cdt-cp-${k}`); if (cp) cp.value = '#000000';
+                    const pan = document.getElementById(`cdt-pan-${k}`); if (pan) pan.value = '';
+                });
                 _cdtSelectedProducts = [];
                 _cdtAllProducts = [];
                 _cdtClubFilter = null;
@@ -17458,7 +17495,7 @@
                     sport:        document.getElementById('cdt-sport')?.value?.trim() || null,
                     priority:     document.getElementById('cdt-priority')?.value || 'standard',
                     design_brief: document.getElementById('cdt-design-brief')?.value?.trim() || null,
-                    colour_palette: document.getElementById('cdt-colour-palette')?.value?.trim() || null,
+                    custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
                     key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
                     products_required: _cdtSelectedProducts.length ? _cdtSelectedProducts : [],
                     use_club_colours: true
@@ -18549,7 +18586,8 @@
             const task = (allDesignTasks || []).find(t => t.id === taskId);
             if (!task) return;
 
-            const stages = task._stages || [];
+            // Exclude Brief (stage 1) from preview — only show Concept, Range, Finalise
+            const stages = (task._stages || []).filter(s => s.stage_number > 1);
             const due = task.due_date ? new Date(task.due_date) : null;
             const dueInfo = due ? getDueInfo(due) : null;
             const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : '—';
@@ -18640,11 +18678,6 @@
                         <p style="font-size:12px;color:#374151;line-height:1.65;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>
                     </div>` : ''}
 
-                    <!-- Task type chips -->
-                    ${task.design_types?.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px">
-                        ${task.design_types.map(t => `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;background:rgba(124,58,237,0.08);color:#7c3aed;border:1px solid #c4b5fd">${escHtml(t)}</span>`).join('')}
-                    </div>` : ''}
-
                     <!-- Open button -->
                     <div style="margin-top:auto;padding-top:4px;display:flex;flex-direction:column;gap:6px">
                         <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
@@ -18681,7 +18714,7 @@
                     </div>
 
                     <!-- Next Action (highlighted) -->
-                    <div style="margin-top:auto;padding:10px;border-radius:10px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]}">
+                    <div style="padding:10px;border-radius:10px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]}">
                         <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${colorText[nextAct.color]};margin-bottom:4px">Next Action</div>
                         <div style="display:flex;align-items:flex-start;gap:7px">
                             <div style="font-size:15px;flex-shrink:0;line-height:1.2">${nextAct.icon}</div>
@@ -18689,9 +18722,42 @@
                         </div>
                     </div>
 
+                    <!-- Unread activity -->
+                    <div id="dsp-panel-notif-${task.id}" style="margin-top:4px"></div>
+
                 </div>
 
             </div>`;
+
+            // Load unread activity asynchronously and inject into the panel
+            _loadPreviewPanelNotifications(task.id);
+        }
+
+        async function _loadPreviewPanelNotifications(taskId) {
+            const { data } = await supabase.from('design_task_activity')
+                .select('*').eq('design_task_id', taskId)
+                .eq('task_completed', false)
+                .order('created_at', { ascending: false })
+                .limit(6);
+            const el = document.getElementById(`dsp-panel-notif-${taskId}`);
+            if (!el) return; // panel has changed since we started loading
+            if (!data?.length) return; // nothing unread
+            const typeInfo = { comment:'💬', sub_task:'📋', revision_request:'🔄' };
+            const items = data.map(entry => {
+                const icon = typeInfo[entry.activity_type] || '•';
+                const ts   = typeof dsRelativeTime === 'function' ? dsRelativeTime(entry.created_at) : '';
+                const isRev = entry.activity_type === 'revision_request';
+                return `<div style="display:flex;align-items:flex-start;gap:7px;padding:6px 8px;border-radius:8px;background:${isRev ? '#fef2f2' : '#fffef0'};border:1px solid ${isRev ? '#fecaca' : '#fde68a'};margin-bottom:4px">
+                    <span style="font-size:12px;flex-shrink:0;line-height:1.4">${icon}</span>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(entry.message || '')}</div>
+                        <div style="font-size:9px;color:#9ca3af;margin-top:1px">${escHtml(entry.user_name || 'Unknown')} · ${ts}</div>
+                    </div>
+                </div>`;
+            }).join('');
+            el.innerHTML = `<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:7px;padding-top:10px;border-top:1px solid #e8ecf0">
+                Unread Activity&nbsp;<span style="background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700">${data.length}</span>
+            </div>${items}`;
         }
 
         function openAddCommentFromDashboard(taskId) {
@@ -20149,9 +20215,9 @@
 
             // Colour swatches
             const colPairs = [
-                { label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
-                { label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
-                { label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+                { key:'primary',   label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { key:'secondary', label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { key:'accent',    label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
             // Mini product cards
@@ -20241,9 +20307,9 @@
             const JTL = typeof JOB_TYPE_LABELS !== 'undefined' ? JOB_TYPE_LABELS : {};
 
             const colPairs = [
-                { label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
-                { label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
-                { label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+                { key:'primary',   label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { key:'secondary', label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { key:'accent',    label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
             // Edit mode: show form fields
@@ -20308,16 +20374,6 @@
                             <span style="font-size:11px;font-weight:600;color:#475569">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
                         </div>` : ''}
                     </div>
-                    <!-- § Task Type -->
-                    <div class="dtr-brief-section">
-                        <div class="dtr-brief-section-title">Task Type</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:5px">
-                            ${DS_DESIGN_TYPES.map(t => {
-                                const isActive = (task.design_types || []).includes(t);
-                                return `<button class="dt-design-type-chip ${isActive ? 'active' : ''}" onclick="toggleDtDesignType('${escHtml(t)}',this)">${isActive ? '<svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>' : ''}${escHtml(t)}</button>`;
-                            }).join('')}
-                        </div>
-                    </div>
                     <!-- § Design Brief -->
                     <div class="dtr-brief-section">
                         <div class="dtr-brief-section-title">Design Brief</div>
@@ -20370,20 +20426,15 @@
                 <!-- § Job Details (read-only) -->
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Job Details</div>
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport||'—')}</span></div>
+                    ${task.sport ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport)}</span></div>` : ''}
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${escHtml(designerName)}</span></div>
+                    ${task.order_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
+                    ${task.team ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Team</span><span class="dtr-ro-value">${escHtml(task.team)}</span></div>` : ''}
+                    ${task.season_event ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Season</span><span class="dtr-ro-value">${escHtml(task.season_event)}</span></div>` : ''}
                     ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span></div>` : ''}
                 </div>
-                ${(task.design_types?.length) ? `
-                <!-- § Task Type -->
-                <div class="dtr-ro-section">
-                    <div class="dtr-ro-section-title">Task Type</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2px">
-                        ${task.design_types.map(t => `<span style="font-size:10px;font-weight:600;padding:2px 9px;border-radius:12px;background:rgba(124,58,237,0.08);color:#7c3aed;border:1px solid #c4b5fd">${escHtml(t)}</span>`).join('')}
-                    </div>
-                </div>` : ''}
                 <!-- § Design Brief (read-only) -->
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Design Brief</div>
@@ -20631,7 +20682,12 @@
                 ? `<button onclick="dtrCompleteStage('${stageId}',${stageNum},'${completeLabel}')" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer">✓ ${completeLabel}</button>`
                 : '';
 
-            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
+            const deliverBar = isApproved
+                ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e8ecf0;display:flex;align-items:center;justify-content:space-between">
+                    <span style="color:#16a34a;font-size:11px;font-weight:600">✓ Stage complete</span>
+                    <button onclick="dtrRevertStage('${stageId}',${stageNum})" style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#b45309;cursor:pointer">Revert</button>
+                </div>`
+                : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
                 <div>${deliverBtn}</div>
                 <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
             </div>`;
@@ -20704,7 +20760,12 @@
                 ? `<button onclick="dtrCompleteStage('${stageId}',4,'Approve Final Design')" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer">✓ Approve Final</button>`
                 : '';
 
-            const deliverBar = isApproved ? '' : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:12px;border-top:1px solid #f1f5f9">
+            const deliverBar = isApproved
+                ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e8ecf0;display:flex;align-items:center;justify-content:space-between">
+                    <span style="color:#16a34a;font-size:11px;font-weight:600">✓ Stage complete</span>
+                    <button onclick="dtrRevertStage('${stageId}',4)" style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#b45309;cursor:pointer">Revert</button>
+                </div>`
+                : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:4px;padding-top:12px;border-top:1px solid #f1f5f9">
                 <div>${deliverBtn}</div>
                 <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
             </div>`;
@@ -20726,7 +20787,7 @@
                 : stage.status === 'revisions_required' ? ' stage-active stage-revisions'
                 : ['in_progress','in_review'].includes(stage.status) ? ' stage-active'
                 : ' stage-inactive';
-            const isOpen3 = ['in_progress','in_review','revisions_required'].includes(stage.status) || (isApproved && uploads.length > 0);
+            const isOpen3 = !isApproved && ['in_progress','in_review','revisions_required'].includes(stage.status);
             return `<div class="dtr-stage-section${stageClass3}" id="dtr-stage-3">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(3)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '2'}</div>
@@ -20754,7 +20815,7 @@
                 : stage.status === 'revisions_required' ? ' stage-active stage-revisions'
                 : ['in_progress','in_review'].includes(stage.status) ? ' stage-active'
                 : ' stage-inactive';
-            const isOpen4 = ['in_progress','in_review','revisions_required'].includes(stage.status) || (isApproved && uploads.length > 0);
+            const isOpen4 = !isApproved && ['in_progress','in_review','revisions_required'].includes(stage.status);
             return `<div class="dtr-stage-section${stageClass4}" id="dtr-stage-4">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(4)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '3'}</div>
@@ -20795,17 +20856,37 @@
 
             const chevronSvg = (id, closed) => `<svg class="dtr-stage-chevron${closed ? ' closed' : ''}" id="${id}" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>`;
 
-            // ── Approved: thin collapsed bar ──
+            // ── Approved: collapsed bar with downloadable uploads ──
             if (isApproved) {
+                const approvedUploadsHtml = conceptUploads.length
+                    ? `<div class="dtr-concept-images" style="margin-top:10px">${conceptUploads.map((u, idx) => {
+                        const isImg = (u.file_type||'').startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url||'');
+                        const fname = (u.file_url||'').split('/').pop().split('?')[0];
+                        return `<div class="dtr-cimg-card ci-approved" id="dtr-cimg-${u.id}" style="position:relative">
+                            <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
+                            <div class="dtr-cimg-thumb">${isImg
+                                ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()" />`
+                                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">📄</div>`}</div>
+                            <div class="dtr-cimg-actions">
+                                <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:13px">⬇</button>
+                            </div>
+                            <div style="padding:3px 6px 5px;font-size:9px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(fname)}">${escHtml(fname)}</div>
+                        </div>`;
+                    }).join('')}</div>`
+                    : '<p style="font-size:11px;color:#94a3b8;font-style:italic;margin:10px 0 0">No uploads on this stage.</p>';
                 return `<div class="dtr-stage-section stage-approved" id="dtr-stage-2">
                     <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
                         <div class="dtr-stage-icon-circle">✓</div>
                         <span class="dtr-stage-title">Concepts</span>
                         <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(34,197,94,0.1);color:#16a34a;margin-left:4px">Approved</span>
-                        ${chevronSvg('dtr-stage-chev-2', true)}
+                        ${chevronSvg('dtr-stage-chev-2', false)}
                     </button>
                     <div class="dtr-stage-body" id="dtr-stage-body-2" style="display:none">
-                        <p style="color:#16a34a;font-size:12px;font-weight:600;margin:0">✓ Concepts stage complete.</p>
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                            <span style="color:#16a34a;font-size:12px;font-weight:600">✓ Concepts stage complete.</span>
+                            <button onclick="dtrRevertStage('${stage.id}',2)" style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#b45309;cursor:pointer">Revert</button>
+                        </div>
+                        ${approvedUploadsHtml}
                     </div>
                 </div>`;
             }
@@ -21217,9 +21298,11 @@
             stagesInner.innerHTML = `<div style="margin-bottom:12px;padding-top:2px">
                 <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Stages</span>
             </div>` + buildDTRStagesColumn(s2, s3, s4, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
-            // Restore open/closed state after rebuild
+            // Restore open/closed state after rebuild (skip for newly-approved stages — let them collapse)
+            const stageObjs = { 2: s2, 3: s3, 4: s4 };
             [2, 3, 4].forEach(n => {
-                if (openState[n] === undefined) return; // wasn't open before, leave default
+                if (openState[n] === undefined) return; // wasn't rendered before, leave default
+                if (stageObjs[n]?.status === 'approved') return; // always collapse completed stages
                 const b = document.getElementById(`dtr-stage-body-${n}`);
                 const c = document.getElementById(`dtr-stage-chev-${n}`);
                 if (b) b.style.display = openState[n] ? '' : 'none';
@@ -21290,6 +21373,12 @@
                 await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', nextStage.id);
             }
             if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_approved', { label });
+            await _dtrRefreshStagesCol();
+        }
+        async function dtrRevertStage(stageId, stageNum) {
+            if (!confirm('Revert this stage back to In Progress?')) return;
+            await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', stageId);
+            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_reverted', { stageNum });
             await _dtrRefreshStagesCol();
         }
 
