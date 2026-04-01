@@ -1317,11 +1317,11 @@
         .dtr-archive-btn:hover { border-color:#94a3b8; color:#64748b; }
 
         /* ── Concept section approve/decline ── */
-        .dtr-concept-section-actions { display:flex; align-items:center; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid #f1f5f9; flex-wrap:wrap; }
-        .dtr-concept-approve-btn { padding:8px 16px; border-radius:9px; font-size:12px; font-weight:700; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; cursor:pointer; transition:all 0.15s; }
+        .dtr-concept-section-actions { display:flex; align-items:center; gap:6px; margin-top:10px; padding-top:10px; border-top:1px solid #f1f5f9; flex-wrap:wrap; }
+        .dtr-concept-approve-btn { padding:4px 10px; border-radius:7px; font-size:11px; font-weight:600; border:1px solid #86efac; background:#f0fdf4; color:#16a34a; cursor:pointer; transition:all 0.15s; }
         .dtr-concept-approve-btn:hover { background:#16a34a; color:#fff; border-color:#16a34a; }
-        .dtr-concept-approve-btn.approved { background:#16a34a; color:#fff; border-color:#16a34a; cursor:default; }
-        .dtr-concept-decline-btn { padding:8px 16px; border-radius:9px; font-size:12px; font-weight:700; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; cursor:pointer; transition:all 0.15s; }
+        .dtr-concept-approve-btn.approved { background:#16a34a; color:#fff; border-color:#16a34a; cursor:default; font-size:11px; padding:4px 10px; }
+        .dtr-concept-decline-btn { padding:4px 10px; border-radius:7px; font-size:11px; font-weight:600; border:1px solid #fca5a5; background:#fef2f2; color:#dc2626; cursor:pointer; transition:all 0.15s; }
         .dtr-concept-decline-btn:hover { background:#dc2626; color:#fff; border-color:#dc2626; }
 
         /* ── Concept upload zone ── */
@@ -20650,9 +20650,9 @@
                         <div class="dtr-cimg-actions">
                             <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:13px">⬇</button>
                             ${isApproved ? '' : `<button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickStageImg('${u.id}','${stageId}',${stageNum})" title="Approve">✓</button>
-                                   <button class="dtr-x-btn${u.status==='declined'?' xed':''}" onclick="dtrXStageImg('${u.id}','${stageId}',${stageNum})" title="Decline">✕</button>
                                    <button class="dtr-archive-btn" onclick="dtrArchiveStageImg('${u.id}','${stageId}',${stageNum})" title="Remove">⊘</button>`}
                         </div>
+                        ${u.review_comment && u.review_comment !== '__archived__' ? `<div style="position:absolute;top:4px;right:4px;background:#f59e0b;color:#fff;font-size:8px;font-weight:700;border-radius:4px;padding:1px 5px;z-index:3;pointer-events:none">↩</div>` : ''}
                         <div style="padding:3px 6px 5px;font-size:9px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(fname)}">${escHtml(fname)}</div>
                     </div>`;
                 }).join('')}
@@ -20675,12 +20675,14 @@
             const deliverBtn = isDelivered
                 ? `<button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered</button>`
                 : `<button onclick="dtrDeliverStage('${stageId}',${stageNum},'${deliverLabel}')" ${!hasUploads ? 'disabled' : ''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasUploads?'#eff6ff':'#f8fafc'};color:${hasUploads?'#1d4ed8':'#b0bec5'};cursor:${hasUploads?'pointer':'not-allowed'}">${deliverLabel}</button>`;
-            const revisionsBtn = isDelivered
-                ? `<button onclick="dtrStageRevisions('${stageId}',${stageNum})" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
-                : (isRevisions ? `<span style="padding:4px 9px;border-radius:7px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
-            const completeBtn = (allApproved && !isApproved)
+            const revisionsBtn = isRevisions
+                ? `<span style="padding:4px 9px;border-radius:7px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>`
+                : isDelivered
+                    ? `<button onclick="dtrStageRevisions('${stageId}',${stageNum})" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Request Revisions</button>`
+                    : `<button disabled style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:600;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;cursor:not-allowed">Request Revisions</button>`;
+            const completeBtn = (allApproved && isDelivered)
                 ? `<button onclick="dtrCompleteStage('${stageId}',${stageNum},'${completeLabel}')" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer">✓ ${completeLabel}</button>`
-                : '';
+                : `<button disabled style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:600;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;cursor:not-allowed">✓ Complete Section</button>`;
 
             const deliverBar = isApproved
                 ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e8ecf0;display:flex;align-items:center;justify-content:space-between">
@@ -20714,21 +20716,22 @@
                     (sec.key === 'finalise_art' && (u.section_label === 'finalise' || !u.section_label || !u.section_label.startsWith('finalise_')))
                 );
 
-                const imagesHtml = uploads.length ? `<div class="dtr-concept-images" style="margin-bottom:6px">
+                const imagesHtml = uploads.length ? `<div class="dtr-concept-images" style="margin-bottom:6px;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px">
                     ${uploads.map((u, idx) => {
                         const isImg = (u.file_type || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url || '');
                         const fname = (u.file_url || '').split('/').pop().split('?')[0];
                         const fCardCls = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : (u.review_comment && u.review_comment !== '__archived__') ? ' ci-revisions' : '';
                         return `<div class="dtr-cimg-card${fCardCls}" id="dtr-cimg-${u.id}" style="position:relative">
-                            <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
+                            <div style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:7px;background:rgba(0,0,0,0.55);color:#fff;font-size:8px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
                             ${isImg
-                                ? `<img src="${escHtml(u.file_url)}" style="width:100%;height:100%;object-fit:cover;border-radius:6px 6px 0 0;cursor:pointer" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()" />`
-                                : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:#f8fafc;border-radius:6px 6px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">📄</div>`}
-                            <div class="dtr-cimg-actions">
-                                <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:13px">⬇</button>
-                                ${isApproved ? '' : `<button class="dtr-archive-btn" onclick="dtrArchiveStageImg('${u.id}','${stageId}',4)" title="Remove">⊘</button>`}
+                                ? `<img src="${escHtml(u.file_url)}" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px 4px 0 0;cursor:pointer;display:block" loading="lazy" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()" />`
+                                : `<div style="width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:20px;background:#f8fafc;border-radius:4px 4px 0 0;cursor:pointer" onclick="openPreviewModal('${escHtml(u.id)}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">📄</div>`}
+                            <div class="dtr-cimg-actions" style="padding:3px 4px;gap:2px">
+                                <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:11px;padding:2px 4px">⬇</button>
+                                ${isApproved ? '' : `<button class="dtr-archive-btn" onclick="dtrArchiveStageImg('${u.id}','${stageId}',4)" title="Remove" style="font-size:11px;padding:2px 4px">⊘</button>`}
                             </div>
-                            <div style="padding:3px 6px 5px;font-size:9px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(fname)}">${escHtml(fname)}</div>
+                            ${u.review_comment && u.review_comment !== '__archived__' ? `<div style="position:absolute;top:2px;right:2px;background:#f59e0b;color:#fff;font-size:7px;font-weight:700;border-radius:3px;padding:1px 4px;z-index:3;pointer-events:none">↩</div>` : ''}
+                            <div style="padding:2px 4px 3px;font-size:8px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(fname)}">${escHtml(fname)}</div>
                         </div>`;
                     }).join('')}
                 </div>` : '';
@@ -20753,12 +20756,14 @@
             const deliverBtn = isInReview
                 ? `<button disabled style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:default">✓ Delivered for Review</button>`
                 : `<button onclick="dtrDeliverStage('${stageId}',4,'Deliver Final Design')" ${!hasAnyUpload?'disabled':''} style="padding:8px 18px;border-radius:9px;font-size:12px;font-weight:700;border:1.5px solid #93c5fd;background:${hasAnyUpload?'#eff6ff':'#f8fafc'};color:${hasAnyUpload?'#1d4ed8':'#b0bec5'};cursor:${hasAnyUpload?'pointer':'not-allowed'}">Deliver Final Design</button>`;
-            const revisionsBtn = isInReview
-                ? `<button onclick="dtrStageRevisions('${stageId}',4)" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions Required</button>`
-                : (isRevisions ? `<span style="padding:4px 9px;border-radius:7px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>` : '');
+            const revisionsBtn = isRevisions
+                ? `<span style="padding:4px 9px;border-radius:7px;background:rgba(239,68,68,0.1);color:#dc2626;font-size:11px;font-weight:700">Revisions Requested</span>`
+                : isInReview
+                    ? `<button onclick="dtrStageRevisions('${stageId}',4)" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Request Revisions</button>`
+                    : `<button disabled style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:600;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;cursor:not-allowed">Request Revisions</button>`;
             const completeBtn = isInReview
                 ? `<button onclick="dtrCompleteStage('${stageId}',4,'Approve Final Design')" style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#16a34a;cursor:pointer">✓ Approve Final</button>`
-                : '';
+                : `<button disabled style="padding:4px 10px;border-radius:7px;font-size:11px;font-weight:600;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;cursor:not-allowed">✓ Approve Final</button>`;
 
             const deliverBar = isApproved
                 ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e8ecf0;display:flex;align-items:center;justify-content:space-between">
@@ -20921,11 +20926,13 @@
 
             const revisionsBtn = isRevisions
                 ? `<span style="padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a;white-space:nowrap">🔄 Revisions Requested</span>`
-                : `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #fde68a;background:#fff;color:#b45309;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrToggleRevisionForm('${stage.id}')">↩ Revisions</button>`;
+                : isInReview
+                    ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #fde68a;background:#fff;color:#b45309;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrToggleRevisionForm('${stage.id}')">↩ Request Revisions</button>`
+                    : `<button disabled style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;font-size:11px;font-weight:600;cursor:not-allowed">↩ Request Revisions</button>`;
 
-            const completeBtn = hasApprovedConcept
+            const completeBtn = (hasApprovedConcept && isInReview)
                 ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrCompleteConceptsStage('${stage.id}')">✓ Complete</button>`
-                : '';
+                : `<button disabled style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;font-size:11px;font-weight:600;cursor:not-allowed">✓ Complete</button>`;
 
             const activeStatuses = ['in_progress','in_review','revisions_required'];
             const stageStateClass = isRevisions ? ' stage-active stage-revisions'
@@ -20979,9 +20986,9 @@
                         <div class="dtr-cimg-actions">
                             <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(u.file_name||'download')}')" title="Download" style="font-size:13px">⬇</button>
                             <button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickConceptImg('${u.id}','${stageId}',${conceptNum})" title="Approve">✓</button>
-                            <button class="dtr-x-btn${u.status==='declined'?' xed':''}" onclick="dtrXConceptImg('${u.id}','${stageId}',${conceptNum})" title="Decline">✕</button>
                             <button class="dtr-archive-btn" onclick="dtrArchiveConceptImg('${u.id}','${stageId}',${conceptNum})" title="Archive">⊗</button>
                         </div>
+                        ${u.review_comment && u.review_comment !== '__archived__' ? `<div style="position:absolute;top:4px;right:4px;background:#f59e0b;color:#fff;font-size:8px;font-weight:700;border-radius:4px;padding:1px 5px;z-index:3;pointer-events:none">↩</div>` : ''}
                     </div>`;
                 }).join('')}</div>`
                 : `<p style="font-size:11px;color:#94a3b8;margin:0 0 10px;padding:4px 0">No images uploaded for Concept ${conceptNum} yet.</p>`;
