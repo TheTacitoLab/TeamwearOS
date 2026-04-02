@@ -3904,6 +3904,10 @@
                             <label class="text-xs text-gray-500 mb-1 block">Shopify Draft Order URL</label>
                             <input type="url" id="job-shopify-url" placeholder="https://admin.shopify.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
+                        <div class="mt-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Factory Order Folder (Google Drive)</label>
+                            <input type="url" id="job-google-drive-url" placeholder="https://drive.google.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
                     </div>
                     <div class="modal-section">
                         <p class="modal-section-title">Contact Details</p>
@@ -13133,6 +13137,9 @@
             const type = _shDragType, id = _shDragId;
             if (!type || !id) return;
             _shDragType = null; _shDragId = null;
+            // Ensure target column is open after card lands
+            _shCollapsed.delete(targetKey);
+            _shForceOpen.add(targetKey);
             if (type === 'lead') {
                 await kanbanMoveCard(id, targetKey);
             } else if (type === 'job') {
@@ -13160,7 +13167,7 @@
             </div>`;
         }
 
-        function _shKanbanCol(key, color, title, count, cardsHtml) {
+        function _shKanbanCol(key, color, title, count, cardsHtml, subtitle='') {
             const collapsed = _shCollapsed.has(key);
             const dropAttrs = `ondragover="onSHDragOver(event)" ondragleave="onSHDragLeave(event)" ondrop="onSHDrop(event,'${key}')"`;
             const chevron = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>`;
@@ -13174,8 +13181,11 @@
             }
             return `<div class="sh-kb-col" ${dropAttrs}>
                 <div class="sh-kb-col-hd" onclick="toggleSalesStage('${key}')">
-                    <span class="sh-kb-col-title" style="color:${color}">${title}</span>
-                    <span class="sh-kb-col-ct">${count}</span>
+                    <div style="flex:1;min-width:0;overflow:hidden">
+                        <div class="sh-kb-col-title" style="color:${color}">${title}</div>
+                        ${subtitle ? `<div style="font-size:9px;font-weight:700;color:${color};opacity:0.55;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${subtitle}</div>` : ''}
+                    </div>
+                    <span class="sh-kb-col-ct" style="flex-shrink:0">${count}</span>
                     <span class="sh-kb-col-chevron">${chevron}</span>
                 </div>
                 <div class="sh-kb-col-body">
@@ -13236,9 +13246,7 @@
                 // Auto-collapse empty stages (user can click to expand)
                 if (stageJobs.length === 0 && !_shForceOpen.has(stage.key)) _shCollapsed.add(stage.key);
                 const stageTotal = stageJobs.reduce((s, j) => s + (j.estimated_revenue || 0), 0);
-                const titleWithTotal = stageTotal > 0
-                    ? `${escHtml(stage.label)} <span style="font-size:9px;font-weight:600;color:${stage.color};opacity:0.8">£${stageTotal.toLocaleString('en-GB')}</span>`
-                    : escHtml(stage.label);
+                const stageSubtitle = stageTotal > 0 ? `£${stageTotal.toLocaleString('en-GB')}` : '';
                 const cards = stageJobs.map(job => {
                     const sel = _shSelectedId === job.id && _shSelectedType === 'job';
                     const club = escHtml(job.clubs?.name || '—');
@@ -13249,7 +13257,7 @@
                     const orderTargetTag = ot ? `<span class="sh-card-tag" style="background:rgba(217,119,6,0.1);color:#d97706" title="Order target date (7 weeks before deadline)">Order by ${ot.toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</span>` : '';
                     return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + rev + orderTargetTag + shopify, sel);
                 }).join('');
-                return _shKanbanCol(stage.key, stage.color, titleWithTotal, stageJobs.length, cards);
+                return _shKanbanCol(stage.key, stage.color, escHtml(stage.label), stageJobs.length, cards, stageSubtitle);
             });
 
             board.innerHTML = cols.join('');
@@ -13635,6 +13643,7 @@
             document.getElementById('job-channel').value = currentJob.channel || 'direct';
             document.getElementById('job-stage').value = currentJob.stage || 'discovery';
             document.getElementById('job-shopify-url').value = currentJob.shopify_draft_order_url || '';
+            document.getElementById('job-google-drive-url').value = currentJob.google_drive_url || '';
             document.getElementById('job-revenue').value = currentJob.estimated_revenue || '';
             document.getElementById('job-deadline-date').value = currentJob.deadline_date || '';
             document.getElementById('job-contact-name').value = currentJob.contact_name || '';
@@ -13669,6 +13678,7 @@
                 stage: document.getElementById('job-stage').value,
                 club_id: clubId,
                 shopify_draft_order_url: shopifyUrl,
+                google_drive_url: document.getElementById('job-google-drive-url')?.value.trim() || null,
                 estimated_revenue: parseFloat(document.getElementById('job-revenue')?.value) || null,
                 deadline_date: document.getElementById('job-deadline-date')?.value || null,
                 contact_name: document.getElementById('job-contact-name')?.value.trim() || null,
@@ -14036,16 +14046,24 @@
             const details = document.getElementById('jr-overview-details');
             if (details) {
                 const shopifyUrl = currentJob.shopify_draft_order_url;
-                details.innerHTML = shopifyUrl
-                    ? `<div class="pt-3" style="border-top:1px solid rgba(255,255,255,0.06)">
-                           <span class="text-xs text-gray-500 block mb-1">Shopify Draft Order</span>
-                           <a href="${escHtml(shopifyUrl)}" target="_blank" rel="noopener"
-                              class="text-sm font-semibold flex items-center gap-1.5 hover:underline" style="color:#60a5fa;word-break:break-all">
-                              <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                              View Draft Order ↗
-                           </a>
-                       </div>`
-                    : '';
+                const driveUrl = currentJob.google_drive_url;
+                const extLink = (href, label) => `<a href="${escHtml(href)}" target="_blank" rel="noopener" class="text-sm font-semibold flex items-center gap-1.5 hover:underline" style="color:#60a5fa;word-break:break-all"><svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>${label}</a>`;
+                details.innerHTML = [
+                    driveUrl ? `<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="text-xs text-gray-500">Factory Order Folder</span>
+                            <span style="color:#16a34a;font-size:11px;font-weight:700">✓</span>
+                        </div>
+                        ${extLink(driveUrl, 'Open Drive Folder ↗')}
+                    </div>` : `<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="text-xs text-gray-500">Factory Order Folder</span>
+                            <span style="color:#94a3b8;font-size:11px">—</span>
+                        </div>
+                        <p class="text-xs italic" style="color:#475569">No Drive URL set. Click Edit to add one.</p>
+                    </div>`,
+                    shopifyUrl ? `<div class="pt-3"><span class="text-xs text-gray-500 block mb-1">Shopify Draft Order</span>${extLink(shopifyUrl, 'View Draft Order ↗')}</div>` : ''
+                ].join('');
             }
 
             // ── Right column: description ──
@@ -19686,10 +19704,19 @@
                     { task_id: taskId, brand_id: task.brand_id, stage_number: 1, stage_name: 'Brief', status: 'not_started' },
                     { task_id: taskId, brand_id: task.brand_id, stage_number: 2, stage_name: 'Concepts', status: 'not_started' },
                     { task_id: taskId, brand_id: task.brand_id, stage_number: 3, stage_name: 'Range', status: 'not_started' },
-                    { task_id: taskId, brand_id: task.brand_id, stage_number: 4, stage_name: 'Finalise', status: 'not_started' }
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 4, stage_name: 'Finalise', status: 'not_started' },
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 5, stage_name: 'Upload To Drive', status: 'not_started' }
                 ]);
                 const { data: stagesRetry } = await supabase.from('design_stages').select('*').eq('task_id', taskId).order('stage_number');
                 currentStages = stagesRetry || [];
+            }
+            // Migrate existing tasks that don't yet have stage 5
+            if (!currentStages.find(s => s.stage_number === 5)) {
+                await supabase.from('design_stages').insert([
+                    { task_id: taskId, brand_id: task.brand_id, stage_number: 5, stage_name: 'Upload To Drive', status: 'not_started' }
+                ]);
+                const { data: stagesUpdated } = await supabase.from('design_stages').select('*').eq('task_id', taskId).order('stage_number');
+                currentStages = stagesUpdated || [];
             }
 
             renderDesignTaskRecordV2();
@@ -20715,8 +20742,8 @@
         }
 
         // ── Stages column ──────────────────────────────────────────────────────
-        function buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads, rangeUploads, finaliseUploads) {
-            const allApproved = stage2?.status === 'approved' && stage3?.status === 'approved' && stage4?.status === 'approved';
+        function buildDTRStagesColumn(stage2, stage3, stage4, stage5, conceptUploads, rangeUploads, finaliseUploads) {
+            const allApproved = stage2?.status === 'approved' && stage3?.status === 'approved' && stage4?.status === 'approved' && (!stage5 || stage5.status === 'approved');
             const taskAlreadyDone = currentDesignTaskRecord?.status === 'completed';
             const completeTaskBtn = (allApproved && !taskAlreadyDone) ? `
                 <div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:14px;text-align:center">
@@ -20727,6 +20754,7 @@
                 stage2 ? buildDTRConceptsStage(stage2, conceptUploads) : '',
                 stage3 ? buildDTRFullRangeStage(stage3, rangeUploads || []) : '',
                 stage4 ? buildDTRFinalArtworkStage(stage4, finaliseUploads || []) : '',
+                stage5 ? buildDTRUploadToDriveStage(stage5) : '',
                 completeTaskBtn,
             ].join('');
         }
@@ -20939,6 +20967,98 @@
                     ${_buildFinaliseStageBody(stage, uploads)}
                 </div>
             </div>`;
+        }
+
+        // ── STAGE 5: UPLOAD TO DRIVE ──────────────────────────────────────────
+        function buildDTRUploadToDriveStage(stage) {
+            const isApproved = stage.status === 'approved';
+            const statusLabel = dsStageStatusLabel(stage.status);
+            const statusStyleMap = {
+                not_started:'background:#f1f5f9;color:#64748b', in_progress:'background:rgba(37,99,235,0.1);color:#1d4ed8',
+                approved:'background:rgba(34,197,94,0.1);color:#16a34a', skipped:'background:rgba(34,197,94,0.08);color:#16a34a',
+            };
+            const statusStyle = statusStyleMap[stage.status] || statusStyleMap.not_started;
+            const stageClass5 = isApproved ? ' stage-approved' : stage.status === 'in_progress' ? ' stage-active' : ' stage-inactive';
+            const isOpen5 = !isApproved && stage.status === 'in_progress';
+
+            // Resolve drive URL: job record first, then manually saved on stage
+            const linkedJob = (typeof jobs !== 'undefined' ? jobs : []).find(j => j.id === currentDesignTaskRecord?.job_id);
+            const jobDriveUrl = linkedJob?.google_drive_url || null;
+            const savedDriveUrl = stage.concept_statuses?.drive_url || null;
+            const driveUrl = jobDriveUrl || savedDriveUrl || '';
+
+            let bodyHtml;
+            if (isApproved) {
+                bodyHtml = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                    <span style="color:#16a34a;font-size:12px;font-weight:600">✓ Files confirmed uploaded to Drive</span>
+                    <button onclick="dtrRevertStage('${stage.id}',5)" style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#b45309;cursor:pointer">Revert</button>
+                </div>
+                ${driveUrl ? `<a href="${escHtml(driveUrl)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#2563eb;text-decoration:none" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Factory Order Folder ↗</a>` : ''}`;
+            } else {
+                const urlSection = driveUrl
+                    ? `<div style="margin-bottom:12px">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Factory Order Folder</div>
+                        <a href="${escHtml(driveUrl)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#2563eb;text-decoration:none;padding:6px 10px;border-radius:8px;border:1.5px solid #bfdbfe;background:#eff6ff" onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'">
+                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            Open Drive Folder ↗
+                        </a>
+                        ${jobDriveUrl ? '<p style="font-size:10px;color:#94a3b8;margin:4px 0 0">Linked from job record</p>' : '<p style="font-size:10px;color:#94a3b8;margin:4px 0 0">Manually saved</p>'}
+                    </div>`
+                    : `<div style="margin-bottom:12px">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Factory Order Folder URL</div>
+                        <p style="font-size:11px;color:#94a3b8;margin:0 0 8px;font-style:italic">No Drive URL found on linked job. Enter it manually below.</p>
+                        <div style="display:flex;gap:6px">
+                            <input id="dtr-drive-url-input" type="url" value="" placeholder="https://drive.google.com/…"
+                                style="flex:1;padding:6px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:11px;color:#374151;outline:none;font-family:inherit"
+                                onfocus="this.style.borderColor='#93c5fd'" onblur="this.style.borderColor='#e2e8f0'">
+                            <button onclick="dtrSaveDriveUrl('${stage.id}')" style="padding:6px 12px;border-radius:8px;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap">Save URL</button>
+                        </div>
+                    </div>`;
+                const canConfirm = !!driveUrl;
+                bodyHtml = urlSection + `<div style="padding-top:10px;border-top:1px solid #f1f5f9">
+                    <button onclick="dtrConfirmDriveUpload('${stage.id}')"
+                        ${canConfirm ? '' : 'disabled'}
+                        style="padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;border:none;background:${canConfirm ? 'linear-gradient(135deg,#16a34a,#15803d)' : '#e2e8f0'};color:${canConfirm ? '#fff' : '#94a3b8'};cursor:${canConfirm ? 'pointer' : 'not-allowed'};transition:opacity 0.15s">
+                        ✓ Confirm Files Uploaded to Drive
+                    </button>
+                    ${!canConfirm ? '<p style="font-size:10px;color:#94a3b8;margin:6px 0 0">Add a Drive URL above to enable confirmation</p>' : ''}
+                </div>`;
+            }
+
+            return `<div class="dtr-stage-section${stageClass5}" id="dtr-stage-5">
+                <button class="dtr-stage-hdr" onclick="dtrToggleStage(5)">
+                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '4'}</div>
+                    <span class="dtr-stage-title">Upload To Drive</span>
+                    <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
+                    <svg class="dtr-stage-chevron${isOpen5 ? '' : ' closed'}" id="dtr-stage-chev-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dtr-stage-body" id="dtr-stage-body-5"${isOpen5 ? '' : ' style="display:none"'}>
+                    ${bodyHtml}
+                </div>
+            </div>`;
+        }
+
+        async function dtrSaveDriveUrl(stageId) {
+            const url = document.getElementById('dtr-drive-url-input')?.value.trim();
+            if (!url) { showToast('Please enter a URL', 'warning'); return; }
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const cs = { ...(stage.concept_statuses || {}), drive_url: url };
+            await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', stageId);
+            stage.concept_statuses = cs;
+            showToast('Drive URL saved ✓');
+            await _dtrRefreshStagesCol();
+        }
+
+        async function dtrConfirmDriveUpload(stageId) {
+            if (!confirm('Confirm that all files have been uploaded to the Google Drive folder?')) return;
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            await supabase.from('design_stages').update({ status: 'approved' }).eq('id', stageId);
+            stage.status = 'approved';
+            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_approved', { stage_name: 'Upload To Drive' });
+            showToast('Drive upload confirmed ✓');
+            await _dtrRefreshStagesCol();
         }
 
         // ── Stage toggle ───────────────────────────────────────────────────────
@@ -21367,7 +21487,8 @@
                 .select('*').eq('stage_id', stage2.id).order('uploaded_at');
             _dtrConceptUploads = (uploads || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
             _dtrConceptStage   = s2;
-            _renderStagesInner(s2, stage3, stage4);
+            const stage5 = currentStages.find(s => s.stage_number === 5);
+            _renderStagesInner(s2, stage3, stage4, stage5);
         }
 
         // ── Generic stage refresh ──────────────────────────────────────────────
@@ -21375,17 +21496,21 @@
             const stage2 = currentStages.find(s => s.stage_number === 2);
             const stage3 = currentStages.find(s => s.stage_number === 3);
             const stage4 = currentStages.find(s => s.stage_number === 4);
-            const [r2, r3, r4] = await Promise.all([
+            const stage5 = currentStages.find(s => s.stage_number === 5);
+            const [r2, r3, r4, r5] = await Promise.all([
                 stage2 ? supabase.from('design_stages').select('*').eq('id', stage2.id).single() : { data: null },
                 stage3 ? supabase.from('design_stages').select('*').eq('id', stage3.id).single() : { data: null },
                 stage4 ? supabase.from('design_stages').select('*').eq('id', stage4.id).single() : { data: null },
+                stage5 ? supabase.from('design_stages').select('*').eq('id', stage5.id).single() : { data: null },
             ]);
             if (r2.data) { const i = currentStages.findIndex(s => s.id === r2.data.id); if (i !== -1) currentStages[i] = r2.data; _dtrConceptStage = r2.data; }
             if (r3.data) { const i = currentStages.findIndex(s => s.id === r3.data.id); if (i !== -1) currentStages[i] = r3.data; }
             if (r4.data) { const i = currentStages.findIndex(s => s.id === r4.data.id); if (i !== -1) currentStages[i] = r4.data; }
+            if (r5.data) { const i = currentStages.findIndex(s => s.id === r5.data.id); if (i !== -1) currentStages[i] = r5.data; }
             const s2 = r2.data || stage2;
             const s3 = r3.data || stage3;
             const s4 = r4.data || stage4;
+            const s5 = r5.data || stage5;
             const [u2, u3, u4] = await Promise.all([
                 stage2 ? supabase.from('stage_uploads').select('*').eq('stage_id', stage2.id).order('uploaded_at') : { data: [] },
                 stage3 ? supabase.from('stage_uploads').select('*').eq('stage_id', stage3.id).order('uploaded_at') : { data: [] },
@@ -21394,24 +21519,24 @@
             _dtrConceptUploads = (u2.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
             _dtrRangeUploads = (u3.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
             _dtrFinaliseUploads = (u4.data || []).filter(u => !u.is_archived && u.review_comment !== '__archived__');
-            _renderStagesInner(s2, s3, s4);
+            _renderStagesInner(s2, s3, s4, s5);
         }
 
-        function _renderStagesInner(s2, s3, s4) {
+        function _renderStagesInner(s2, s3, s4, s5) {
             const stagesInner = document.getElementById('dtr-stages-inner');
             if (!stagesInner) return;
             // Preserve open/closed state of stage accordion bodies before rebuilding
             const openState = {};
-            [2, 3, 4].forEach(n => {
+            [2, 3, 4, 5].forEach(n => {
                 const b = document.getElementById(`dtr-stage-body-${n}`);
                 if (b) openState[n] = b.style.display !== 'none';
             });
             stagesInner.innerHTML = `<div style="margin-bottom:12px;padding-top:2px">
                 <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Stages</span>
-            </div>` + buildDTRStagesColumn(s2, s3, s4, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
+            </div>` + buildDTRStagesColumn(s2, s3, s4, s5, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
             // Restore open/closed state after rebuild (skip for newly-approved stages — let them collapse)
-            const stageObjs = { 2: s2, 3: s3, 4: s4 };
-            [2, 3, 4].forEach(n => {
+            const stageObjs = { 2: s2, 3: s3, 4: s4, 5: s5 };
+            [2, 3, 4, 5].forEach(n => {
                 if (openState[n] === undefined) return; // wasn't rendered before, leave default
                 if (stageObjs[n]?.status === 'approved') return; // always collapse completed stages
                 const b = document.getElementById(`dtr-stage-body-${n}`);
