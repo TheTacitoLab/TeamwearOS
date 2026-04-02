@@ -303,6 +303,8 @@
         .sh-kanban::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         .sh-kb-col { flex: 0 0 210px; display: flex; flex-direction: column; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; max-height: 100%; transition: flex-basis 0.2s; }
         .sh-kb-col.sh-kb-collapsed { flex-basis: 44px; }
+        .sh-kb-col.sh-drag-over { border-color: rgba(37,130,246,0.45); background: rgba(37,130,246,0.04); }
+        .sh-record-card.sh-dragging { opacity: 0.45; }
         .sh-kb-col-hd { display: flex; align-items: center; justify-content: space-between; padding: 10px 10px; cursor: pointer; user-select: none; flex-shrink: 0; gap: 6px; transition: background 0.12s; }
         .sh-kb-col-hd:hover { background: #f8fafc; }
         .sh-kb-col-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1310,8 +1312,9 @@
         .dtr-cimg-thumb { width:100%; aspect-ratio:4/3; object-fit:contain; background:#f8fafc; display:block; cursor:pointer; }
         .dtr-cimg-nothumb { width:100%; aspect-ratio:4/3; background:#f1f5f9; display:flex; align-items:center; justify-content:center; font-size:30px; cursor:pointer; }
         .dtr-cimg-actions { display:flex; gap:4px; padding:6px 6px; background:#fff; border-top:1px solid #f1f5f9; }
-        .dtr-tick-btn { flex:1; padding:6px 0; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #86efac; background:#f0fdf4; color:#16a34a; transition:all 0.15s; }
-        .dtr-tick-btn:hover,.dtr-tick-btn.ticked { background:#16a34a; color:#fff; border-color:#16a34a; }
+        .dtr-tick-btn { flex:1; padding:6px 0; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #e2e8f0; background:#f8fafc; color:#cbd5e1; transition:all 0.15s; }
+        .dtr-tick-btn:hover { border-color:#86efac; background:#f0fdf4; color:#16a34a; }
+        .dtr-tick-btn.ticked { background:#16a34a; color:#fff; border-color:#16a34a; }
         .dtr-x-btn { flex:1; padding:6px 0; border-radius:7px; font-size:12px; font-weight:700; cursor:pointer; border:1.5px solid #fca5a5; background:#fef2f2; color:#dc2626; transition:all 0.15s; }
         .dtr-x-btn:hover,.dtr-x-btn.xed { background:#dc2626; color:#fff; border-color:#dc2626; }
         .dtr-archive-btn { padding:6px 8px; border-radius:7px; font-size:11px; cursor:pointer; border:1px solid #e4e8ef; background:#f8fafc; color:#94a3b8; transition:all 0.15s; flex-shrink:0; }
@@ -13104,6 +13107,39 @@
             renderSalesHome();
         }
 
+        // ── Sales Kanban drag & drop ────────────────────────────────────────────
+        let _shDragType = null, _shDragId = null;
+        function onSHDragStart(event, type, id) {
+            _shDragType = type; _shDragId = id;
+            event.currentTarget.classList.add('sh-dragging');
+            event.dataTransfer.effectAllowed = 'move';
+        }
+        function onSHDragEnd(event) {
+            event.currentTarget.classList.remove('sh-dragging');
+            document.querySelectorAll('.sh-kb-col.sh-drag-over').forEach(el => el.classList.remove('sh-drag-over'));
+        }
+        function onSHDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+            event.currentTarget.classList.add('sh-drag-over');
+        }
+        function onSHDragLeave(event) {
+            if (event.currentTarget.contains(event.relatedTarget)) return;
+            event.currentTarget.classList.remove('sh-drag-over');
+        }
+        async function onSHDrop(event, targetKey) {
+            event.preventDefault();
+            event.currentTarget.classList.remove('sh-drag-over');
+            const type = _shDragType, id = _shDragId;
+            if (!type || !id) return;
+            _shDragType = null; _shDragId = null;
+            if (type === 'lead') {
+                await kanbanMoveCard(id, targetKey);
+            } else if (type === 'job') {
+                await kanbanMoveJob(id, targetKey);
+            }
+        }
+
         function renderSalesHome() {
             const board = document.getElementById('sh-list');
             if (!board) return;
@@ -13113,7 +13149,11 @@
         }
 
         function _shKanbanCard(type, id, name, club, tagsHtml, selected) {
-            return `<div class="sh-record-card${selected ? ' sh-selected' : ''}" onclick="selectSalesRecord('${type}','${id}')">
+            return `<div class="sh-record-card${selected ? ' sh-selected' : ''}"
+                draggable="true"
+                ondragstart="onSHDragStart(event,'${type}','${id}')"
+                ondragend="onSHDragEnd(event)"
+                onclick="selectSalesRecord('${type}','${id}')">
                 <div class="sh-card-name">${name}</div>
                 <div class="sh-card-club">${club}</div>
                 ${tagsHtml ? `<div class="sh-card-tags">${tagsHtml}</div>` : ''}
@@ -13122,15 +13162,24 @@
 
         function _shKanbanCol(key, color, title, count, cardsHtml) {
             const collapsed = _shCollapsed.has(key);
+            const dropAttrs = `ondragover="onSHDragOver(event)" ondragleave="onSHDragLeave(event)" ondrop="onSHDrop(event,'${key}')"`;
             const chevron = `<svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>`;
-            return `<div class="sh-kb-col${collapsed ? ' sh-kb-collapsed' : ''}">
+            if (collapsed) {
+                return `<div class="sh-kb-col sh-kb-collapsed" ${dropAttrs} onclick="toggleSalesStage('${key}')" style="cursor:pointer;display:flex;align-items:center;justify-content:center">
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 0">
+                        <span class="sh-kb-col-ct">${count}</span>
+                        <span style="writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:${color};white-space:nowrap">${title}</span>
+                    </div>
+                </div>`;
+            }
+            return `<div class="sh-kb-col" ${dropAttrs}>
                 <div class="sh-kb-col-hd" onclick="toggleSalesStage('${key}')">
                     <span class="sh-kb-col-title" style="color:${color}">${title}</span>
                     <span class="sh-kb-col-ct">${count}</span>
                     <span class="sh-kb-col-chevron">${chevron}</span>
                 </div>
                 <div class="sh-kb-col-body">
-                    ${cardsHtml || `<div class="sh-kb-empty">No records</div>`}
+                    ${cardsHtml || `<div class="sh-kb-empty">Drop cards here</div>`}
                 </div>
             </div>`;
         }
@@ -20970,8 +21019,7 @@
                 if (cStatus === 'approved')  cls += ' ct-approved';
                 if (cStatus === 'declined')  cls += ' ct-declined';
                 const badge = count ? ` <span style="font-size:9px;font-weight:700;opacity:0.7;margin-left:2px">(${count})</span>` : '';
-                const tabActions = isInReview ? `<span onclick="dtrApproveConceptSection('${stage.id}',${i});event.stopPropagation()" style="margin-left:5px;color:#16a34a;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Approve concept">✓</span><span onclick="dtrDeleteConcept('${stage.id}',${i});event.stopPropagation()" style="margin-left:2px;color:#dc2626;font-size:11px;font-weight:800;cursor:pointer;line-height:1" title="Delete concept">✕</span>` : '';
-                return `<button class="${cls}" id="dtr-ctab-${i}" onclick="dtrSwitchConceptTab(${i})">Concept ${i}${badge}${tabActions}</button>`;
+                return `<button class="${cls}" id="dtr-ctab-${i}" onclick="dtrSwitchConceptTab(${i})">Concept ${i}${badge}</button>`;
             }).join('');
 
             // ── Active tab content ──
@@ -20991,13 +21039,9 @@
                     ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #fde68a;background:#fff;color:#b45309;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrToggleRevisionForm('${stage.id}')">↩ Request Revisions</button>`
                     : `<button disabled style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;font-size:11px;font-weight:600;cursor:not-allowed">↩ Request Revisions</button>`;
 
-            const completeBtn = (hasApprovedConcept && isInReview)
+            const completeBtn = isInReview
                 ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrCompleteConceptsStage('${stage.id}')">✓ Complete</button>`
                 : `<button disabled style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;font-size:11px;font-weight:600;cursor:not-allowed">✓ Complete</button>`;
-
-            const approveConceptBtn = isInReview
-                ? `<button onclick="dtrApproveConceptSection('${stage.id}',${_dtrConceptTab})" style="padding:4px 10px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer">✓ Approve ${_dtrConceptTab}</button>`
-                : '';
 
             const activeStatuses = ['in_progress','in_review','revisions_required'];
             const stageStateClass = isRevisions ? ' stage-active stage-revisions'
@@ -21016,7 +21060,7 @@
                     <div id="dtr-concept-tab-content">${tabContent}</div>
                     <div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                         <div>${deliverBtn}</div>
-                        <div style="display:flex;align-items:center;gap:6px">${approveConceptBtn}${revisionsBtn}${completeBtn}</div>
+                        <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
                     </div>
                     <div id="dtr-revision-form-${stage.id}" class="dtr-revision-form hide">
                         <div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:8px">📝 Request Revisions — Feedback</div>
@@ -21293,9 +21337,6 @@
         async function dtrCompleteConceptsStage(stageId) {
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage) return;
-            const cs = stage.concept_statuses || {};
-            const hasApproved = [1,2,3].some(i => cs[`concept_${i}`] === 'approved');
-            if (!hasApproved) { showToast('At least one concept must be approved first', 'warning'); return; }
             const ok = await updateStageStatus(stage, 'approved', 'Concepts stage completed');
             if (!ok) return;
             await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: 'Concepts' });
