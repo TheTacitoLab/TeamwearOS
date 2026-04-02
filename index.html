@@ -1260,7 +1260,7 @@
         /* ── Stage section cards ── */
         .dtr-stages-col { flex:1; min-width:0; overflow:hidden; display:flex; flex-direction:column; transition:width 0.25s ease, flex 0.25s ease; border-right:1px solid #e8ecf0; }
         .dtr-stages-col.stage-col-collapsed { flex:none; width:36px; }
-        .dtr-stages-inner { flex:1; overflow-y:auto; padding:18px 20px; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+        .dtr-stages-inner { flex:1; overflow-y:auto; padding:8px 20px; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
         .dtr-stages-inner::-webkit-scrollbar { width:4px; }
         .dtr-stages-inner::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
         .dtr-stages-strip { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:12px; flex:1; overflow:hidden; background:#f8fafc; }
@@ -2745,6 +2745,17 @@
                                 <select id="sg-price-list" style="width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:13px;font-weight:600;color:#0f172a;background:#fff;outline:none;cursor:pointer">
                                     <!-- populated by initStoreGenerator() -->
                                 </select>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Product Status</label>
+                                <div style="display:flex;gap:8px">
+                                    <label style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:#0f172a;background:#fff" onclick="document.getElementById('sg-status-draft').checked=true;this.parentNode.querySelectorAll('label').forEach(l=>l.style.borderColor='#e2e8f0');this.style.borderColor='#0f172a'">
+                                        <input type="radio" id="sg-status-draft" name="sg-product-status" value="draft" checked style="accent-color:#0f172a"> Draft
+                                    </label>
+                                    <label style="flex:1;display:flex;align-items:center;gap:7px;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:#0f172a;background:#fff" onclick="document.getElementById('sg-status-active').checked=true;this.parentNode.querySelectorAll('label').forEach(l=>l.style.borderColor='#e2e8f0');this.style.borderColor='#22c55e'">
+                                        <input type="radio" id="sg-status-active" name="sg-product-status" value="active" style="accent-color:#22c55e"> Active
+                                    </label>
+                                </div>
                             </div>
                             <div>
                                 <label style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px;display:block;margin-bottom:4px">Shopify Collection Name</label>
@@ -10460,7 +10471,10 @@
             const a    = document.createElement('a');
             a.href = url;
             a.download = `${club.suffix || club.name.replace(/\s+/g, '-')}_shopify_${priceList}.csv`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
             URL.revokeObjectURL(url);
             showToast(`CSV downloaded — ${productsWithImages.length} product${productsWithImages.length !== 1 ? 's' : ''} · ${priceList} pricing · ${status}`);
         }
@@ -20244,9 +20258,6 @@
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
                         <div id="dtr-stages-inner" class="dtr-stages-inner">
-                            <div style="margin-bottom:12px;padding-top:2px">
-                                <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Stages</span>
-                            </div>
                             ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads, rangeUploads, finaliseUploads)}
                         </div>
                     </div>
@@ -20501,6 +20512,20 @@
                             <label class="dtr-edit-label" for="dtr-ln-designer">Owner</label>
                             <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
                         </div>
+                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
+                            <label class="dtr-edit-label" for="dtr-ln-club">Club</label>
+                            <select class="dtr-edit-field" id="dtr-ln-club" onchange="dtrEditClubChanged()">
+                                <option value="">— No Club —</option>
+                                ${(clubs||[]).map(c => `<option value="${c.id}"${task.club_id===c.id?' selected':''}>${escHtml(c.name)}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
+                            <label class="dtr-edit-label" for="dtr-ln-job">Job</label>
+                            <select class="dtr-edit-field" id="dtr-ln-job">
+                                <option value="">— No Job —</option>
+                                ${(jobs||[]).filter(j => !task.club_id || j.club_id === task.club_id).map(j => `<option value="${j.id}"${task.job_id===j.id?' selected':''}>${escHtml(j.job_name||j.job_number||'Job')}</option>`).join('')}
+                            </select>
+                        </div>
                         ${task.jobs?.job_type ? `<div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding:6px 0">
                             <span class="dtr-info-label">Job Type</span>
                             <span style="font-size:11px;font-weight:600;color:#475569">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
@@ -20552,7 +20577,6 @@
                     </div>
                     <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
                         <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px">Edit</button>
-                        ${(isSuperAdmin || currentUserProfile?.role === 'admin') ? `<button onclick="deleteDesignTask()" style="padding:3px 9px;border:1.5px solid #fca5a5;border-radius:7px;background:#fef2f2;color:#dc2626;font-size:10px;font-weight:700;cursor:pointer">Delete</button>` : ''}
                     </div>
                 </div>
                 <!-- § Job Details (read-only) -->
@@ -20701,6 +20725,15 @@
         }
 
         // ── Save left panel editable fields ───────────────────────────────────
+        function dtrEditClubChanged() {
+            const clubId = document.getElementById('dtr-ln-club')?.value || null;
+            const jobSel = document.getElementById('dtr-ln-job');
+            if (!jobSel) return;
+            const filteredJobs = (jobs||[]).filter(j => !clubId || j.club_id === clubId);
+            jobSel.innerHTML = '<option value="">— No Job —</option>' +
+                filteredJobs.map(j => `<option value="${j.id}">${escHtml(j.job_name||j.job_number||'Job')}</option>`).join('');
+        }
+
         async function saveDTRLeftPanel() {
             if (!currentDesignTaskRecord?.id) return;
             const btn = document.querySelector('.dtr-save-btn');
@@ -20718,6 +20751,8 @@
                     priority:    document.getElementById('dtr-ln-priority')?.value || 'standard',
                     assigned_designer_id:   designerId,
                     assigned_designer_name: designerName,
+                    club_id:     document.getElementById('dtr-ln-club')?.value || null,
+                    job_id:      document.getElementById('dtr-ln-job')?.value || null,
                 };
                 if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
                 const { data, error } = await supabase.from('design_tasks')
@@ -21531,9 +21566,7 @@
                 const b = document.getElementById(`dtr-stage-body-${n}`);
                 if (b) openState[n] = b.style.display !== 'none';
             });
-            stagesInner.innerHTML = `<div style="margin-bottom:12px;padding-top:2px">
-                <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Stages</span>
-            </div>` + buildDTRStagesColumn(s2, s3, s4, s5, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
+            stagesInner.innerHTML = buildDTRStagesColumn(s2, s3, s4, s5, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
             // Restore open/closed state after rebuild (skip for newly-approved stages — let them collapse)
             const stageObjs = { 2: s2, 3: s3, 4: s4, 5: s5 };
             [2, 3, 4, 5].forEach(n => {
@@ -23691,8 +23724,9 @@
 
                 if (btn) btn.textContent = 'Generating CSV…';
 
+                const productStatus = document.querySelector('input[name="sg-product-status"]:checked')?.value || 'draft';
                 currentClub = newClub;
-                await generateShopifyCSVForClub(newClub.id, priceList);
+                await generateShopifyCSVForClub(newClub.id, priceList, productStatus);
                 showToast(`Club "${name}" created — ${successCount} product${successCount !== 1 ? 's' : ''} mapped. CSV downloaded ✓`);
 
                 // Refresh existing-club dropdown with the new club included
@@ -23709,10 +23743,11 @@
         }
 
         async function sgGenerateExisting() {
-            const clubId    = document.getElementById('sg-existing-club')?.value;
-            const priceList = document.getElementById('sg-price-list')?.value || 'retail';
+            const clubId        = document.getElementById('sg-existing-club')?.value;
+            const priceList     = document.getElementById('sg-price-list')?.value || 'retail';
+            const productStatus = document.querySelector('input[name="sg-product-status"]:checked')?.value || 'draft';
             if (!clubId) { showToast('Select a club first', 'error'); return; }
-            await generateShopifyCSVForClub(clubId, priceList);
+            await generateShopifyCSVForClub(clubId, priceList, productStatus);
         }
 
     </script>
