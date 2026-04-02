@@ -23725,8 +23725,8 @@
                 if (btn) btn.textContent = 'Generating CSV…';
 
                 const productStatus = document.querySelector('input[name="sg-product-status"]:checked')?.value || 'draft';
-                currentClub = newClub;
                 await generateShopifyCSVForClub(newClub.id, priceList, productStatus);
+                currentClub = newClub;
                 showToast(`Club "${name}" created — ${successCount} product${successCount !== 1 ? 's' : ''} mapped. CSV downloaded ✓`);
 
                 // Refresh existing-club dropdown with the new club included
