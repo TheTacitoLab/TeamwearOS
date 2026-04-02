@@ -277,11 +277,13 @@
         .sales-stage-tab.active .tab-count { background: rgba(109,40,217,0.12); color: #6d28d9; }
 
         /* ── Sales Home Split-Screen ─────────────────────────────────────── */
-        .sh-wrapper { display: flex; height: calc(100vh - 112px); min-height: 0; overflow: hidden; }
+        .sh-topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:1px solid #e2e8f0; background:#fff; flex-shrink:0; gap:12px; }
+        .sh-topbar-right { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+        .sh-wrapper { display: flex; height: calc(100vh - 160px); min-height: 0; overflow: hidden; }
         .sh-left { display: flex; flex-direction: column; flex: 0 0 75%; width: 75%; border-right: 1px solid #e2e8f0; background: #f8fafc; overflow: hidden; }
         .sh-right { flex: 0 0 25%; width: 25%; min-width: 256px; overflow-y: auto; background: #ffffff; }
         .sh-header { padding: 14px 16px 0; flex-shrink: 0; }
-        .sh-tabs { display: flex; gap: 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 10px; }
+        .sh-tabs { display: flex; gap: 0; }
         .sh-tab { display: flex; align-items: center; gap: 6px; padding: 7px 14px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: #94a3b8; border: none; background: none; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
         .sh-tab:hover { color: #475569; }
         .sh-tab.active { color: #6d28d9; border-bottom-color: #6d28d9; }
@@ -377,6 +379,83 @@
             .sh-left { flex: none; width: 100%; height: 55vh; border-right: none; border-bottom: 1px solid #e2e8f0; }
             .sh-right { flex: none; width: 100%; min-height: 45vh; }
         }
+
+        /* ── GTM Dashboard ───────────────────────────────────────────────── */
+        .gtm-panel { height:calc(100vh - 160px); overflow-y:auto; background:#f4f6f8; padding:16px; box-sizing:border-box; display:flex; flex-direction:column; gap:14px; }
+        .gtm-stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; flex-shrink:0; }
+        .gtm-stat-card { background:#fff; border-radius:12px; border:1px solid #e2e8f0; padding:14px 18px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+        .gtm-stat-label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#94a3b8; margin-bottom:4px; }
+        .gtm-stat-value { font-size:22px; font-weight:800; color:#0f172a; line-height:1; }
+        .gtm-stat-sub { font-size:11px; color:#94a3b8; margin-top:4px; }
+        .gtm-body { display:flex; gap:14px; flex:1; min-height:0; }
+        .gtm-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:14px; }
+        .gtm-sidebar { width:22%; flex-shrink:0; display:flex; flex-direction:column; gap:14px; }
+        /* Card base */
+        .gtm-card { background:#fff; border-radius:12px; border:1px solid #dde3ea; box-shadow:0 1px 2px rgba(15,23,42,0.04), 0 2px 8px rgba(15,23,42,0.04); }
+        .gtm-card-hdr { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid #f1f5f9; }
+        .gtm-card-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0f172a; }
+        .gtm-card-body { padding:0; }
+        /* Next Steps table */
+        .gtm-ns-row { display:grid; grid-template-columns:1fr 140px 90px 80px 80px 36px; gap:0; align-items:center; padding:9px 16px; border-bottom:1px solid #f8fafc; transition:background 0.1s; }
+        .gtm-ns-row:hover { background:#f8fafc; }
+        .gtm-ns-row.done { opacity:0.45; }
+        .gtm-ns-head { background:#f8fafc; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#94a3b8; padding:7px 16px; border-bottom:1px solid #e2e8f0; display:grid; grid-template-columns:1fr 140px 90px 80px 80px 36px; gap:0; }
+        .gtm-ns-job { font-size:12px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .gtm-ns-step { font-size:11px; color:#374151; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .gtm-ns-contact { font-size:11px; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .gtm-ns-age { font-size:11px; font-weight:600; color:#f59e0b; }
+        .gtm-ns-due { font-size:11px; font-weight:600; }
+        .gtm-ns-check { width:20px; height:20px; border-radius:5px; border:1.5px solid #d1d5db; background:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all 0.12s; }
+        .gtm-ns-check:hover { border-color:#0f172a; background:#f1f5f9; }
+        .gtm-ns-check.done { background:#0f172a; border-color:#0f172a; color:#fff; }
+        .gtm-overdue { color:#ef4444; }
+        .gtm-due-soon { color:#f59e0b; }
+        .gtm-due-ok { color:#059669; }
+        /* Notes */
+        .gtm-note-entry { border-bottom:1px solid #f1f5f9; padding:10px 16px; }
+        .gtm-note-entry:last-child { border-bottom:none; }
+        .gtm-note-date { font-size:10px; color:#94a3b8; font-weight:600; margin-bottom:4px; }
+        .gtm-note-text { font-size:12px; color:#374151; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+        .gtm-note-composer { padding:10px 16px; border-top:1px solid #f1f5f9; display:flex; flex-direction:column; gap:6px; }
+        .gtm-note-input { width:100%; padding:8px 10px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; resize:none; font-family:inherit; color:#0f172a; outline:none; box-sizing:border-box; line-height:1.55; }
+        .gtm-note-input:focus { border-color:#0f172a; }
+        .gtm-note-actions { display:flex; gap:6px; justify-content:flex-end; }
+        /* Todo sidebar */
+        .gtm-list-toggle { display:flex; background:#f1f5f9; border-radius:8px; overflow:hidden; margin:12px 16px 0; }
+        .gtm-list-btn { flex:1; padding:5px 8px; font-size:11px; font-weight:700; border:none; cursor:pointer; transition:all 0.12s; background:transparent; color:#64748b; }
+        .gtm-list-btn.active { background:#0f172a; color:#fff; }
+        .gtm-todo-add { display:flex; gap:6px; padding:10px 16px; }
+        .gtm-todo-input { flex:1; padding:7px 10px; border:1px solid #e2e8f0; border-radius:8px; font-size:12px; color:#0f172a; outline:none; background:#fff; font-family:inherit; }
+        .gtm-todo-input:focus { border-color:#0f172a; }
+        .gtm-todo-list { overflow-y:auto; flex:1; }
+        .gtm-todo-item { display:flex; align-items:flex-start; gap:8px; padding:8px 16px; border-bottom:1px solid #f8fafc; cursor:default; transition:background 0.1s; }
+        .gtm-todo-item:hover { background:#f8fafc; }
+        .gtm-todo-item.completed .gtm-todo-title { text-decoration:line-through; color:#94a3b8; }
+        .gtm-todo-cb { width:16px; height:16px; border-radius:4px; border:1.5px solid #d1d5db; flex-shrink:0; margin-top:1px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; transition:all 0.12s; }
+        .gtm-todo-cb.top3 { border-color:#059669; background:#dcfce7; color:#059669; }
+        .gtm-todo-cb.mustdo { border-color:#ef4444; background:#fee2e2; color:#ef4444; }
+        .gtm-todo-cb.done { background:#0f172a; border-color:#0f172a; color:#fff; }
+        .gtm-todo-title { font-size:12px; color:#0f172a; flex:1; line-height:1.4; }
+        .gtm-todo-meta { display:flex; gap:4px; margin-top:3px; flex-wrap:wrap; }
+        .gtm-priority-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+        .gtm-priority-dot.top3 { background:#059669; }
+        .gtm-priority-dot.mustdo { background:#ef4444; }
+        .gtm-priority-dot.normal { background:#e2e8f0; }
+        .gtm-todo-btn { padding:2px 7px; border-radius:5px; border:1px solid #e2e8f0; font-size:10px; font-weight:600; cursor:pointer; background:#f8fafc; color:#64748b; transition:all 0.12s; }
+        .gtm-todo-btn:hover { border-color:#94a3b8; color:#374151; }
+        .gtm-todo-btn.top3 { background:#dcfce7; border-color:#86efac; color:#059669; }
+        .gtm-todo-btn.mustdo { background:#fee2e2; border-color:#fca5a5; color:#ef4444; }
+        .gtm-subtask-list { padding:4px 0 4px 24px; }
+        .gtm-subtask-row { display:flex; align-items:center; gap:6px; padding:2px 0; }
+        .gtm-subtask-cb { width:13px; height:13px; border-radius:3px; border:1.5px solid #d1d5db; flex-shrink:0; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:900; transition:all 0.12s; }
+        .gtm-subtask-cb.done { background:#0f172a; border-color:#0f172a; color:#fff; }
+        .gtm-subtask-title { font-size:11px; color:#374151; flex:1; }
+        .gtm-subtask-title.done { text-decoration:line-through; color:#94a3b8; }
+        .gtm-add-subtask { padding:2px 8px; border-radius:5px; border:1px dashed #e2e8f0; font-size:10px; background:#fff; color:#94a3b8; cursor:pointer; margin-top:2px; }
+        .gtm-add-subtask:hover { border-color:#0f172a; color:#374151; }
+        /* Design task snapshot */
+        .gtm-dt-stages { display:flex; flex-wrap:wrap; gap:8px; padding:12px 16px; }
+        .gtm-dt-pill { display:flex; align-items:center; gap:6px; padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600; background:#f1f5f9; color:#374151; }
 
         /* Toggle switch */
         .toggle-switch { position: relative; display: inline-block; width: 44px; height: 24px; }
@@ -3503,45 +3582,49 @@
              ============================================================ -->
         <div id="tool-sales" class="hide w-full">
 
-            <!-- Split-screen layout -->
-            <div class="sh-wrapper">
-
-                <!-- ── LEFT PANEL ── -->
-                <div class="sh-left">
-                    <div class="sh-header">
-                        <!-- Leads / Jobs tabs -->
-                        <div class="sh-tabs">
-                            <button id="sh-tab-leads" class="sh-tab active" onclick="switchSalesHomeTab('leads')">
-                                Leads <span id="stab-leads-count" class="sh-count">0</span>
-                            </button>
-                            <button id="sh-tab-jobs" class="sh-tab" onclick="switchSalesHomeTab('jobs')">
-                                Jobs <span id="stab-jobs-count" class="sh-count">0</span>
-                            </button>
-                        </div>
-                        <!-- Context actions -->
-                        <div id="sh-actions-leads" class="sh-actions">
-                            <button onclick="openLeadModal(null)" class="sh-action-btn sh-action-btn-primary">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                Add Lead
-                            </button>
-                            <button onclick="openStageConfig()" class="sh-action-btn sh-action-btn-secondary">Stages</button>
-                            <button onclick="exportLeadsCSV()" class="sh-action-btn sh-action-btn-secondary">Export</button>
-                        </div>
-                        <div id="sh-actions-jobs" class="sh-actions hide">
-                            <button onclick="openNewJobModal()" class="sh-action-btn sh-action-btn-primary">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                New Job
-                            </button>
-                        </div>
+            <!-- ── Top bar: tabs + context actions ── -->
+            <div class="sh-topbar">
+                <div class="sh-tabs">
+                    <button id="sh-tab-leads" class="sh-tab active" onclick="switchSalesHomeTab('leads')">
+                        Leads <span id="stab-leads-count" class="sh-count">0</span>
+                    </button>
+                    <button id="sh-tab-jobs" class="sh-tab" onclick="switchSalesHomeTab('jobs')">
+                        Jobs <span id="stab-jobs-count" class="sh-count">0</span>
+                    </button>
+                    <button id="sh-tab-gtm" class="sh-tab" onclick="switchSalesHomeTab('gtm')">
+                        GTM
+                    </button>
+                </div>
+                <div class="sh-topbar-right">
+                    <div id="sh-actions-leads" class="sh-actions" style="margin:0">
+                        <button onclick="openLeadModal(null)" class="sh-action-btn sh-action-btn-primary">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            Add Lead
+                        </button>
+                        <button onclick="openStageConfig()" class="sh-action-btn sh-action-btn-secondary">Stages</button>
+                        <button onclick="exportLeadsCSV()" class="sh-action-btn sh-action-btn-secondary">Export</button>
                     </div>
+                    <div id="sh-actions-jobs" class="sh-actions hide" style="margin:0">
+                        <button onclick="openNewJobModal()" class="sh-action-btn sh-action-btn-primary">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            New Job
+                        </button>
+                    </div>
+                    <div id="sh-actions-gtm" class="sh-actions hide" style="margin:0">
+                        <button onclick="_gtmRefresh()" class="sh-action-btn sh-action-btn-secondary">↻ Refresh</button>
+                    </div>
+                </div>
+            </div>
 
+            <!-- ── Split-screen layout (Leads / Jobs) ── -->
+            <div class="sh-wrapper" id="sh-kanban-wrapper">
+                <div class="sh-left">
                     <!-- Search -->
                     <div class="sh-search-wrap">
                         <input type="text" id="sh-search" placeholder="Search name or club…"
                             oninput="renderSalesHome()"
                             class="sh-search-input">
                     </div>
-
                     <!-- Kanban board -->
                     <div class="sh-kanban" id="sh-list"></div>
                 </div>
@@ -3557,6 +3640,9 @@
                     <div id="sh-preview" class="hide"></div>
                 </div>
             </div>
+
+            <!-- ── GTM Dashboard ── -->
+            <div id="sh-gtm-panel" class="gtm-panel hide"></div>
 
             <!-- Hidden legacy containers kept for JS compatibility -->
             <div class="hide" aria-hidden="true">
@@ -3938,6 +4024,17 @@
                                 <label class="text-xs text-gray-500 mb-1 block">Phone</label>
                                 <input type="tel" id="job-contact-phone" placeholder="e.g. 07700 900000" class="w-full px-3 py-2 rounded-lg text-sm">
                             </div>
+                        </div>
+                    </div>
+                    <div class="modal-section">
+                        <p class="modal-section-title">Next Step</p>
+                        <div class="mb-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Next Step Description</label>
+                            <input type="text" id="job-next-step" placeholder="e.g. Send initial concepts to client" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500 mb-1 block">Next Step Deadline</label>
+                            <input type="date" id="job-next-step-deadline" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
                     </div>
                     <div class="flex gap-3">
@@ -13087,6 +13184,422 @@
         function updateSalesBadges() { updateSalesTabCounts(); }
 
         // =============================================
+        // GTM DASHBOARD
+        // =============================================
+        let _gtmActiveList = 'todo'; // 'todo' | 'project'
+
+        function _gtmStorageKey(type) {
+            return `gtm_${type}_${currentBrand?.id || 'default'}`;
+        }
+        function _gtmLoadTodos() {
+            try { return JSON.parse(localStorage.getItem(_gtmStorageKey('todos')) || '[]'); } catch { return []; }
+        }
+        function _gtmSaveTodos(arr) {
+            localStorage.setItem(_gtmStorageKey('todos'), JSON.stringify(arr));
+        }
+        function _gtmLoadNotes() {
+            try { return JSON.parse(localStorage.getItem(_gtmStorageKey('notes')) || '[]'); } catch { return []; }
+        }
+        function _gtmSaveNotes(arr) {
+            localStorage.setItem(_gtmStorageKey('notes'), JSON.stringify(arr));
+        }
+        function _gtmUid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+        async function _renderGTMDashboard() {
+            const panel = document.getElementById('sh-gtm-panel');
+            if (!panel) return;
+
+            // ── Stats ──
+            const activeJobs    = (jobs||[]).filter(j => j.stage !== 'completed');
+            const completedJobs = (jobs||[]).filter(j => j.stage === 'completed');
+            const pipelineVal   = activeJobs.reduce((s,j) => s + (j.estimated_revenue||0), 0);
+            const wonRevenue    = completedJobs.reduce((s,j) => s + (j.estimated_revenue||0), 0);
+            const fmt = n => '£' + Number(n).toLocaleString('en-GB', {minimumFractionDigits:0, maximumFractionDigits:0});
+
+            // Design task counts by stage
+            let dtCounts = { brief:0, concepts:0, range:0, finalise:0, upload:0, total:0 };
+            try {
+                const { data: dtRows } = await supabase.from('design_tasks')
+                    .select('id, stage_number, stage2_status, stage3_status, stage4_status')
+                    .eq('brand_id', currentBrand.id)
+                    .neq('stage_number', 5); // exclude completed
+                (dtRows||[]).forEach(t => {
+                    dtCounts.total++;
+                    const sn = t.stage_number || 1;
+                    if (sn <= 1) dtCounts.brief++;
+                    else if (sn === 2) dtCounts.concepts++;
+                    else if (sn === 3) dtCounts.range++;
+                    else if (sn === 4) dtCounts.finalise++;
+                    else dtCounts.upload++;
+                });
+            } catch(e) {}
+
+            // ── Next Steps ──
+            const nsJobs = activeJobs.filter(j => j.next_step).sort((a,b) => {
+                const da = a.next_step_deadline || '9999-12-31';
+                const db = b.next_step_deadline || '9999-12-31';
+                return da < db ? -1 : da > db ? 1 : 0;
+            });
+            const allActiveJobs = activeJobs.slice().sort((a,b) => {
+                const da = a.next_step_deadline || a.deadline_date || '9999-12-31';
+                const db = b.next_step_deadline || b.deadline_date || '9999-12-31';
+                return da < db ? -1 : da > db ? 1 : 0;
+            });
+            const displayJobs = nsJobs.length ? nsJobs : allActiveJobs;
+
+            const today = new Date(); today.setHours(0,0,0,0);
+            function dueCls(dateStr) {
+                if (!dateStr) return '';
+                const d = new Date(dateStr); d.setHours(0,0,0,0);
+                const diff = Math.round((d - today) / 86400000);
+                if (diff < 0) return 'gtm-overdue';
+                if (diff <= 3) return 'gtm-due-soon';
+                return 'gtm-due-ok';
+            }
+            function fmtDate(ds) {
+                if (!ds) return '—';
+                const d = new Date(ds); d.setHours(0,0,0,0);
+                const diff = Math.round((d - today) / 86400000);
+                if (diff === 0) return 'Today';
+                if (diff === 1) return 'Tomorrow';
+                if (diff === -1) return 'Yesterday';
+                return d.toLocaleDateString('en-GB', {day:'numeric', month:'short'});
+            }
+            function ageStr(createdAt) {
+                if (!createdAt) return '';
+                const d = new Date(createdAt);
+                const days = Math.round((today - d) / 86400000);
+                if (days === 0) return 'Today';
+                if (days === 1) return '1d';
+                if (days < 7) return `${days}d`;
+                return `${Math.floor(days/7)}w`;
+            }
+
+            const nsRows = displayJobs.map(j => {
+                const deadlineDue = j.next_step_deadline || j.deadline_date;
+                const dueCl = dueCls(deadlineDue);
+                const stageLbl = (JOB_STAGES||[]).find(s => s.key === j.stage)?.label || j.stage || '';
+                const step = j.next_step || stageLbl;
+                return `<div class="gtm-ns-row" id="ns-row-${j.id}">
+                    <div>
+                        <div class="gtm-ns-job">${escHtml(j.job_name||j.job_number||'Job')}</div>
+                        <div class="gtm-ns-step">${escHtml(step)}</div>
+                    </div>
+                    <div class="gtm-ns-contact" title="${escHtml(j.contact_email||'')}">
+                        ${escHtml(j.contact_name||'—')}
+                        ${j.contact_phone ? `<div style="font-size:10px;color:#94a3b8">${escHtml(j.contact_phone)}</div>` : ''}
+                    </div>
+                    <div class="gtm-ns-contact">${escHtml(stageLbl)}</div>
+                    <div class="gtm-ns-age">${ageStr(j.created_at)}</div>
+                    <div class="gtm-ns-due ${dueCl}">${fmtDate(deadlineDue)}</div>
+                    <div class="gtm-ns-check${j._ns_done ? ' done' : ''}" onclick="gtmCheckNS('${j.id}',this)" title="Mark next step done">
+                        ${j._ns_done ? '✓' : ''}
+                    </div>
+                </div>`;
+            }).join('');
+
+            // ── Notes ──
+            const notes = _gtmLoadNotes().filter(n => !n.closed);
+            const notesHtml = notes.length ? notes.map(n => `
+                <div class="gtm-note-entry" id="gnote-${n.id}">
+                    <div class="gtm-note-date">${new Date(n.created_at).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>
+                    <div class="gtm-note-text">${escHtml(n.content)}</div>
+                    <div style="display:flex;gap:6px;margin-top:6px">
+                        <button onclick="gtmCloseNote('${n.id}')" class="sh-action-btn sh-action-btn-secondary" style="font-size:10px;padding:3px 8px">Archive</button>
+                    </div>
+                </div>`).join('')
+                : '<p style="font-size:12px;color:#94a3b8;padding:12px 16px;margin:0">No notes today — write one below.</p>';
+
+            // ── Todo list ──
+            const todosHtml = _gtmBuildTodoList();
+
+            // ── Design task pills ──
+            const dtPills = [
+                { label: 'Brief', count: dtCounts.brief, color: '#94a3b8' },
+                { label: 'Concepts', count: dtCounts.concepts, color: '#2563eb' },
+                { label: 'Range', count: dtCounts.range, color: '#d97706' },
+                { label: 'Finalise', count: dtCounts.finalise, color: '#7c3aed' },
+                { label: 'Uploading', count: dtCounts.upload, color: '#059669' },
+            ].map(p => p.count > 0 ? `<div class="gtm-dt-pill"><span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>${p.label}: <strong>${p.count}</strong></div>` : '').join('');
+
+            panel.innerHTML = `
+                <!-- Stats row -->
+                <div class="gtm-stats-row">
+                    <div class="gtm-stat-card">
+                        <div class="gtm-stat-label">Pipeline Value</div>
+                        <div class="gtm-stat-value">${fmt(pipelineVal)}</div>
+                        <div class="gtm-stat-sub">${activeJobs.length} active job${activeJobs.length!==1?'s':''}</div>
+                    </div>
+                    <div class="gtm-stat-card">
+                        <div class="gtm-stat-label">Won Revenue</div>
+                        <div class="gtm-stat-value" style="color:#059669">${fmt(wonRevenue)}</div>
+                        <div class="gtm-stat-sub">${completedJobs.length} completed job${completedJobs.length!==1?'s':''}</div>
+                    </div>
+                    <div class="gtm-stat-card">
+                        <div class="gtm-stat-label">Next Steps</div>
+                        <div class="gtm-stat-value" style="color:#6d28d9">${displayJobs.length}</div>
+                        <div class="gtm-stat-sub">${nsJobs.length} with set steps</div>
+                    </div>
+                    <div class="gtm-stat-card">
+                        <div class="gtm-stat-label">Design Tasks</div>
+                        <div class="gtm-stat-value" style="color:#d97706">${dtCounts.total}</div>
+                        <div class="gtm-stat-sub">outstanding</div>
+                    </div>
+                </div>
+
+                <!-- Body: main 78% + sidebar 22% -->
+                <div class="gtm-body">
+                    <div class="gtm-main">
+
+                        <!-- Sales Next Steps -->
+                        <div class="gtm-card">
+                            <div class="gtm-card-hdr">
+                                <span class="gtm-card-title">Sales Next Steps</span>
+                                <span style="font-size:11px;color:#94a3b8">${displayJobs.length} job${displayJobs.length!==1?'s':''} · sorted by deadline</span>
+                            </div>
+                            ${displayJobs.length ? `
+                            <div class="gtm-ns-head">
+                                <div>Job / Next Step</div>
+                                <div>Contact</div>
+                                <div>Stage</div>
+                                <div>Age</div>
+                                <div>Due</div>
+                                <div></div>
+                            </div>
+                            <div>${nsRows}</div>` : '<p style="font-size:12px;color:#94a3b8;padding:16px;margin:0">No active jobs. Add jobs from the Jobs tab.</p>'}
+                        </div>
+
+                        <!-- Daily Notes -->
+                        <div class="gtm-card">
+                            <div class="gtm-card-hdr">
+                                <span class="gtm-card-title">Daily Notes</span>
+                                <span style="font-size:11px;color:#94a3b8" id="gtm-note-hist-btn" onclick="gtmViewNoteHistory()" style="cursor:pointer;text-decoration:underline;cursor:pointer">View History</span>
+                            </div>
+                            <div id="gtm-notes-list">${notesHtml}</div>
+                            <div class="gtm-note-composer">
+                                <textarea id="gtm-note-input" class="gtm-note-input" rows="3" placeholder="Write a note…"></textarea>
+                                <div class="gtm-note-actions">
+                                    <button onclick="gtmSaveNote()" class="sh-action-btn sh-action-btn-primary" style="font-size:11px">Save Note</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Design Task Snapshot -->
+                        <div class="gtm-card">
+                            <div class="gtm-card-hdr">
+                                <span class="gtm-card-title">Design Tasks</span>
+                                <span style="font-size:11px;color:#94a3b8">${dtCounts.total} outstanding</span>
+                            </div>
+                            <div class="gtm-dt-stages">
+                                ${dtPills || '<p style="font-size:12px;color:#94a3b8;margin:0">No outstanding design tasks.</p>'}
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Sidebar: To-Do / Projects -->
+                    <div class="gtm-sidebar">
+                        <div class="gtm-card" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+                            <div class="gtm-card-hdr" style="border-bottom:none;padding-bottom:0">
+                                <span class="gtm-card-title">Daily To-Do</span>
+                                <button onclick="gtmAddTodo()" class="sh-action-btn sh-action-btn-primary" style="font-size:10px;padding:3px 8px">+ Add</button>
+                            </div>
+                            <div class="gtm-list-toggle">
+                                <button id="gtm-list-btn-todo"    class="gtm-list-btn${_gtmActiveList==='todo'?' active':''}"    onclick="gtmSwitchList('todo')">To-Do</button>
+                                <button id="gtm-list-btn-project" class="gtm-list-btn${_gtmActiveList==='project'?' active':''}" onclick="gtmSwitchList('project')">Projects</button>
+                            </div>
+                            <div class="gtm-todo-add" style="padding:10px 16px 6px">
+                                <input id="gtm-todo-input" class="gtm-todo-input" placeholder="Add item…" onkeydown="if(event.key==='Enter')gtmAddTodo()">
+                            </div>
+                            <div id="gtm-todo-list" class="gtm-todo-list">${todosHtml}</div>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        function _gtmBuildTodoList() {
+            const todos = _gtmLoadTodos().filter(t => t.type === _gtmActiveList);
+            if (!todos.length) return `<p style="font-size:12px;color:#94a3b8;padding:12px 16px;margin:0">No ${_gtmActiveList === 'todo' ? 'to-dos' : 'projects'} yet.</p>`;
+            // Sort: mustdo first, then top3, then normal; completed last
+            const sorted = [...todos].sort((a,b) => {
+                if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                const order = { mustdo: 0, top3: 1, normal: 2 };
+                return (order[a.priority]||2) - (order[b.priority]||2);
+            });
+            return sorted.map(t => {
+                const p = t.priority || 'normal';
+                const subtasksHtml = (t.subtasks||[]).map(st => `
+                    <div class="gtm-subtask-row">
+                        <div class="gtm-subtask-cb${st.completed?' done':''}" onclick="gtmToggleSubtask('${t.id}','${st.id}')">${st.completed?'✓':''}</div>
+                        <div class="gtm-subtask-title${st.completed?' done':''}">${escHtml(st.title)}</div>
+                        <div onclick="gtmDeleteSubtask('${t.id}','${st.id}')" style="cursor:pointer;color:#cbd5e1;font-size:11px;padding:0 4px">✕</div>
+                    </div>`).join('');
+                return `<div class="gtm-todo-item${t.completed?' completed':''}">
+                    <div class="gtm-priority-dot ${p}"></div>
+                    <div style="flex:1;min-width:0">
+                        <div class="gtm-todo-title">${escHtml(t.title)}</div>
+                        ${subtasksHtml ? `<div class="gtm-subtask-list">${subtasksHtml}</div>` : ''}
+                        <div class="gtm-todo-meta">
+                            <button onclick="gtmToggleTodoDone('${t.id}')" class="gtm-todo-btn${t.completed?' done':''}">${t.completed?'✓ Done':'Done'}</button>
+                            <button onclick="gtmSetPriority('${t.id}','top3')" class="gtm-todo-btn${p==='top3'?' top3':''}">Top 3</button>
+                            <button onclick="gtmSetPriority('${t.id}','mustdo')" class="gtm-todo-btn${p==='mustdo'?' mustdo':''}">Must Do</button>
+                            <button onclick="gtmAddSubtask('${t.id}')" class="gtm-todo-btn">+ Sub</button>
+                            <button onclick="gtmDeleteTodo('${t.id}')" class="gtm-todo-btn" style="color:#ef4444;border-color:#fca5a5">✕</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function gtmSwitchList(type) {
+            _gtmActiveList = type;
+            document.getElementById('gtm-list-btn-todo')?.classList.toggle('active', type === 'todo');
+            document.getElementById('gtm-list-btn-project')?.classList.toggle('active', type === 'project');
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmAddTodo() {
+            const inp = document.getElementById('gtm-todo-input');
+            const title = (inp?.value || '').trim();
+            if (!title) { inp?.focus(); return; }
+            const todos = _gtmLoadTodos();
+            todos.push({ id: _gtmUid(), title, type: _gtmActiveList, priority: 'normal', completed: false, subtasks: [], created_at: new Date().toISOString() });
+            _gtmSaveTodos(todos);
+            if (inp) inp.value = '';
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmToggleTodoDone(id) {
+            const todos = _gtmLoadTodos();
+            const t = todos.find(x => x.id === id);
+            if (t) t.completed = !t.completed;
+            _gtmSaveTodos(todos);
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmSetPriority(id, p) {
+            const todos = _gtmLoadTodos();
+            const t = todos.find(x => x.id === id);
+            if (t) t.priority = (t.priority === p) ? 'normal' : p; // toggle off if already set
+            _gtmSaveTodos(todos);
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmDeleteTodo(id) {
+            const todos = _gtmLoadTodos().filter(x => x.id !== id);
+            _gtmSaveTodos(todos);
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmAddSubtask(todoId) {
+            const title = prompt('Subtask:');
+            if (!title?.trim()) return;
+            const todos = _gtmLoadTodos();
+            const t = todos.find(x => x.id === todoId);
+            if (t) { if (!t.subtasks) t.subtasks = []; t.subtasks.push({ id: _gtmUid(), title: title.trim(), completed: false }); }
+            _gtmSaveTodos(todos);
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmToggleSubtask(todoId, stId) {
+            const todos = _gtmLoadTodos();
+            const t = todos.find(x => x.id === todoId);
+            if (t) { const st = (t.subtasks||[]).find(s => s.id === stId); if (st) st.completed = !st.completed; }
+            _gtmSaveTodos(todos);
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmDeleteSubtask(todoId, stId) {
+            const todos = _gtmLoadTodos();
+            const t = todos.find(x => x.id === todoId);
+            if (t) t.subtasks = (t.subtasks||[]).filter(s => s.id !== stId);
+            _gtmSaveTodos(todos);
+            const list = document.getElementById('gtm-todo-list');
+            if (list) list.innerHTML = _gtmBuildTodoList();
+        }
+
+        function gtmSaveNote() {
+            const inp = document.getElementById('gtm-note-input');
+            const content = (inp?.value || '').trim();
+            if (!content) return;
+            const notes = _gtmLoadNotes();
+            notes.unshift({ id: _gtmUid(), content, closed: false, created_at: new Date().toISOString() });
+            _gtmSaveNotes(notes);
+            if (inp) inp.value = '';
+            const list = document.getElementById('gtm-notes-list');
+            if (list) {
+                const active = notes.filter(n => !n.closed);
+                list.innerHTML = active.length ? active.map(n => `
+                    <div class="gtm-note-entry" id="gnote-${n.id}">
+                        <div class="gtm-note-date">${new Date(n.created_at).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>
+                        <div class="gtm-note-text">${escHtml(n.content)}</div>
+                        <div style="display:flex;gap:6px;margin-top:6px">
+                            <button onclick="gtmCloseNote('${n.id}')" class="sh-action-btn sh-action-btn-secondary" style="font-size:10px;padding:3px 8px">Archive</button>
+                        </div>
+                    </div>`).join('')
+                    : '<p style="font-size:12px;color:#94a3b8;padding:12px 16px;margin:0">No notes today — write one below.</p>';
+            }
+        }
+
+        function gtmCloseNote(id) {
+            const notes = _gtmLoadNotes();
+            const n = notes.find(x => x.id === id);
+            if (n) n.closed = true;
+            _gtmSaveNotes(notes);
+            document.getElementById(`gnote-${id}`)?.remove();
+            const list = document.getElementById('gtm-notes-list');
+            if (list && !list.querySelector('.gtm-note-entry')) {
+                list.innerHTML = '<p style="font-size:12px;color:#94a3b8;padding:12px 16px;margin:0">No notes today — write one below.</p>';
+            }
+        }
+
+        function gtmViewNoteHistory() {
+            const notes = _gtmLoadNotes().filter(n => n.closed);
+            if (!notes.length) { showToast('No archived notes yet'); return; }
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:24px';
+            modal.onclick = e => { if (e.target === modal) modal.remove(); };
+            modal.innerHTML = `<div style="background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.25)">
+                <div style="padding:16px 20px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:14px;font-weight:700;color:#0f172a">Archived Notes</span>
+                    <button onclick="this.closest('[style]').remove()" style="width:28px;height:28px;border-radius:6px;border:none;background:#f1f5f9;color:#64748b;cursor:pointer;font-size:14px">✕</button>
+                </div>
+                <div style="overflow-y:auto;padding:8px 0">
+                    ${notes.map(n => `<div style="padding:12px 20px;border-bottom:1px solid #f1f5f9">
+                        <div style="font-size:10px;color:#94a3b8;font-weight:600;margin-bottom:3px">${new Date(n.created_at).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</div>
+                        <div style="font-size:12px;color:#374151;white-space:pre-wrap">${escHtml(n.content)}</div>
+                    </div>`).join('')}
+                </div>
+            </div>`;
+            document.body.appendChild(modal);
+        }
+
+        async function gtmCheckNS(jobId, el) {
+            // Clear the next_step on the job
+            const job = jobs.find(j => j.id === jobId);
+            if (!job) return;
+            el.classList.add('done');
+            el.textContent = '✓';
+            const row = document.getElementById(`ns-row-${jobId}`);
+            if (row) row.classList.add('done');
+            const { error } = await supabase.from('jobs').update({ next_step: null, next_step_deadline: null }).eq('id', jobId);
+            if (error) { showToast('Error clearing next step', 'error'); return; }
+            job.next_step = null;
+            job.next_step_deadline = null;
+            showToast('Next step marked done');
+            setTimeout(() => { if (row) row.style.display = 'none'; }, 600);
+        }
+
+        function _gtmRefresh() { _renderGTMDashboard(); }
+
+        // =============================================
         // SALES HOME — SPLIT-SCREEN KANBAN
         // =============================================
         let _shActiveTab = 'leads';
@@ -13103,14 +13616,21 @@
             _shForceOpen.clear();
 
             // Tabs
-            document.getElementById('sh-tab-leads')?.classList.toggle('active', tab === 'leads');
-            document.getElementById('sh-tab-jobs')?.classList.toggle('active', tab === 'jobs');
+            ['leads','jobs','gtm'].forEach(t => document.getElementById(`sh-tab-${t}`)?.classList.toggle('active', t === tab));
 
             // Actions
             const aL = document.getElementById('sh-actions-leads');
             const aJ = document.getElementById('sh-actions-jobs');
+            const aG = document.getElementById('sh-actions-gtm');
             if (aL) aL.classList.toggle('hide', tab !== 'leads');
             if (aJ) aJ.classList.toggle('hide', tab !== 'jobs');
+            if (aG) aG.classList.toggle('hide', tab !== 'gtm');
+
+            // Show/hide split-screen vs GTM panel
+            const kanbanWrapper = document.getElementById('sh-kanban-wrapper');
+            const gtmPanel = document.getElementById('sh-gtm-panel');
+            if (kanbanWrapper) kanbanWrapper.classList.toggle('hide', tab === 'gtm');
+            if (gtmPanel) gtmPanel.classList.toggle('hide', tab !== 'gtm');
 
             // Reset preview
             const previewEmpty = document.getElementById('sh-preview-empty');
@@ -13170,6 +13690,7 @@
         }
 
         function renderSalesHome() {
+            if (_shActiveTab === 'gtm') { _renderGTMDashboard(); return; }
             const board = document.getElementById('sh-list');
             if (!board) return;
             const search = (document.getElementById('sh-search')?.value || '').toLowerCase().trim();
@@ -13672,6 +14193,8 @@
             document.getElementById('job-contact-role').value = currentJob.contact_role || '';
             document.getElementById('job-contact-email').value = currentJob.contact_email || '';
             document.getElementById('job-contact-phone').value = currentJob.contact_phone || '';
+            document.getElementById('job-next-step').value = currentJob.next_step || '';
+            document.getElementById('job-next-step-deadline').value = currentJob.next_step_deadline || '';
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
                 clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
@@ -13706,7 +14229,9 @@
                 contact_name: document.getElementById('job-contact-name')?.value.trim() || null,
                 contact_role: document.getElementById('job-contact-role')?.value.trim() || null,
                 contact_email: document.getElementById('job-contact-email')?.value.trim() || null,
-                contact_phone: document.getElementById('job-contact-phone')?.value.trim() || null
+                contact_phone: document.getElementById('job-contact-phone')?.value.trim() || null,
+                next_step: document.getElementById('job-next-step')?.value.trim() || null,
+                next_step_deadline: document.getElementById('job-next-step-deadline')?.value || null
             };
 
             if (jobId) {
