@@ -1262,7 +1262,7 @@
         /* ── Stages column (middle canvas) ── */
         .dtr-stages-col { flex:1; min-width:0; overflow:hidden; display:flex; flex-direction:column; background:#f4f6f8; border-right:1px solid #e2e8f0; }
         .dtr-stages-col.stage-col-collapsed { flex:none; width:36px; }
-        .dtr-stages-inner { flex:1; overflow-y:auto; padding:14px 18px; scrollbar-width:thin; scrollbar-color:#d8dde4 transparent; }
+        .dtr-stages-inner { flex:1; overflow-y:auto; padding:0 14px 14px; scrollbar-width:thin; scrollbar-color:#d8dde4 transparent; }
         .dtr-stages-inner::-webkit-scrollbar { width:4px; }
         .dtr-stages-inner::-webkit-scrollbar-thumb { background:#d8dde4; border-radius:2px; }
         .dtr-stages-strip { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:12px; flex:1; overflow:hidden; background:#f4f6f8; }
@@ -3982,22 +3982,32 @@
             </div>
         </div>
 
-        <!-- MODAL: Job Product Picker (select from club catalogue only) -->
+        <!-- MODAL: Job Product Picker (club products + full catalogue) -->
         <div id="job-product-picker-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)">
-            <div class="glass rounded-2xl w-full max-w-lg">
-                <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-bold">Add Products to Job</h3>
-                        <p class="text-xs text-gray-500 mt-0.5">Choose from this club's product catalogue only</p>
-                    </div>
-                    <button onclick="closeJobProductPicker()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg">✕</button>
+            <div style="background:#fff;border-radius:20px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,0.25)">
+                <!-- Header -->
+                <div style="padding:20px 24px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+                    <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0">Add Products</h3>
+                    <button onclick="closeJobProductPicker()" style="width:32px;height:32px;border-radius:8px;border:none;background:#f1f5f9;color:#64748b;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
                 </div>
-                <div class="p-5">
-                    <div id="job-product-picker-list" class="space-y-2 max-h-72 overflow-y-auto mb-4"></div>
-                    <p id="job-product-picker-empty" class="text-gray-500 text-sm text-center py-6 hide">All club products are already on this job, or the club has no products yet.<br><span class="text-xs mt-1 block">Add products to the club via the Club Record first.</span></p>
-                    <div class="flex gap-3">
-                        <button onclick="closeJobProductPicker()" class="flex-1 btn-secondary py-2.5">Cancel</button>
-                        <button onclick="addSelectedJobProducts()" class="flex-1 btn-primary py-2.5">Add Selected</button>
+                <!-- Source toggle + search -->
+                <div style="padding:16px 24px 12px;border-bottom:1px solid #f1f5f9;flex-shrink:0">
+                    <div class="dtr-source-toggle" style="margin-bottom:12px">
+                        <button id="jpick-btn-club" class="dtr-source-btn active" onclick="switchJobProdSource('club')">Club Products</button>
+                        <button id="jpick-btn-catalogue" class="dtr-source-btn" onclick="switchJobProdSource('catalogue')">All Products</button>
+                    </div>
+                    <input id="jpick-search" type="text" placeholder="Search products..." class="dtr-prod-search" style="width:100%;box-sizing:border-box" oninput="_renderJobProdGrid(this.value)">
+                </div>
+                <!-- Grid -->
+                <div id="jpick-grid" style="flex:1;overflow-y:auto;padding:16px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;align-content:start"></div>
+                <!-- Empty state -->
+                <p id="jpick-empty" class="hide" style="flex:1;text-align:center;color:#94a3b8;font-size:13px;padding:40px 24px">No products found.</p>
+                <!-- Footer -->
+                <div style="padding:16px 24px;border-top:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px">
+                    <span id="jpick-count" style="font-size:13px;color:#64748b">0 selected</span>
+                    <div style="display:flex;gap:10px">
+                        <button onclick="closeJobProductPicker()" style="padding:9px 20px;border-radius:10px;border:1px solid #e2e8f0;background:#fff;color:#374151;font-size:13px;font-weight:600;cursor:pointer">Cancel</button>
+                        <button onclick="addSelectedJobProducts()" id="jpick-add-btn" style="padding:9px 20px;border-radius:10px;border:none;background:#0f172a;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Add Products</button>
                     </div>
                 </div>
             </div>
@@ -5354,9 +5364,8 @@
                             </div>
                             <div style="display:flex;align-items:center;gap:8px">
                                 <div class="dtr-source-toggle" style="margin-bottom:0">
-                                    <button id="cdt-src-catalogue" class="dtr-source-btn active" onclick="cdtSwitchProdSource('catalogue')">Catalogue</button>
-                                    <button id="cdt-src-club"      class="dtr-source-btn"        onclick="cdtSwitchProdSource('club')">Club</button>
-                                    <button id="cdt-src-job"       class="dtr-source-btn"        onclick="cdtSwitchProdSource('job')">Job</button>
+                                    <button id="cdt-src-job"       class="dtr-source-btn active" onclick="cdtSwitchProdSource('job')">Job</button>
+                                    <button id="cdt-src-catalogue" class="dtr-source-btn"        onclick="cdtSwitchProdSource('catalogue')">Catalogue</button>
                                 </div>
                                 <input id="cdt-prod-search" type="text" placeholder="Search…" oninput="cdtFilterProducts(this.value)" style="padding:5px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;outline:none;width:130px">
                             </div>
@@ -14155,46 +14164,127 @@
             }).join('');
         }
 
-        let _jobProductSelections = new Set();
+        let _jobProductSelections = new Set(); // Set of {type:'club'|'catalogue', id:string}
+        let _jobProdSource = 'club';
+        let _jobClubProducts = [];       // [{id, custom_name, products:{item_name,product_code,image_url}}]
+        let _jobCatalogueProducts = [];  // [{id, item_name, product_code, image_url}]
+        let _jobExistingClubProdIds = new Set();
 
         async function showJobProductPicker() {
             if (!currentJob?.club_id) { showToast('Link a club to this job first', 'error'); return; }
-            // Fetch club's product catalogue
+            _jobProductSelections = new Set();
+            _jobProdSource = 'club';
+
+            // Fetch existing job products to exclude them
+            const { data: existing } = await supabase
+                .from('job_products')
+                .select('club_product_id')
+                .eq('job_id', currentJobId);
+            _jobExistingClubProdIds = new Set((existing || []).map(jp => jp.club_product_id));
+
+            // Fetch club products
             const { data: clubProds } = await supabase
                 .from('club_products')
                 .select('*, products(*)')
                 .eq('club_id', currentJob.club_id)
                 .eq('is_active', true);
-            // Fetch products already on this job
-            const { data: existing } = await supabase
-                .from('job_products')
-                .select('club_product_id')
-                .eq('job_id', currentJobId);
-            const existingIds = new Set((existing || []).map(jp => jp.club_product_id));
-            const available = (clubProds || []).filter(cp => !existingIds.has(cp.id));
-            _jobProductSelections = new Set();
-            const listEl = document.getElementById('job-product-picker-list');
-            const emptyEl = document.getElementById('job-product-picker-empty');
-            if (!available.length) {
-                listEl.innerHTML = '';
-                emptyEl.classList.remove('hide');
-            } else {
-                emptyEl.classList.add('hide');
-                listEl.innerHTML = available.map(cp => `
-                    <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition hover:bg-white/5" style="border:1px solid rgba(255,255,255,0.07)">
-                        <input type="checkbox" value="${cp.id}" onchange="toggleJobProductSelection('${cp.id}', this.checked)" class="w-4 h-4 flex-shrink-0">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-semibold leading-tight">${escHtml(cp.custom_name)}</p>
-                            <p class="text-xs text-gray-500">${escHtml(cp.products?.product_code || '')} · ${escHtml(cp.products?.item_name || '')}</p>
-                        </div>
-                    </label>`).join('');
-            }
+            _jobClubProducts = (clubProds || []).filter(cp => !_jobExistingClubProdIds.has(cp.id));
+
+            // Fetch full catalogue
+            const { data: catProds } = await supabase
+                .from('products')
+                .select('id, item_name, product_code, image_url')
+                .eq('brand_id', currentBrand.id)
+                .order('item_name');
+            _jobCatalogueProducts = catProds || [];
+
+            // Reset UI
+            document.getElementById('jpick-search').value = '';
+            document.getElementById('jpick-btn-club').classList.add('active');
+            document.getElementById('jpick-btn-catalogue').classList.remove('active');
+            _renderJobProdGrid('');
             document.getElementById('job-product-picker-modal').classList.remove('hide');
         }
 
-        function toggleJobProductSelection(cpId, checked) {
-            if (checked) _jobProductSelections.add(cpId);
-            else _jobProductSelections.delete(cpId);
+        function switchJobProdSource(src) {
+            _jobProdSource = src;
+            document.getElementById('jpick-btn-club').classList.toggle('active', src === 'club');
+            document.getElementById('jpick-btn-catalogue').classList.toggle('active', src === 'catalogue');
+            document.getElementById('jpick-search').value = '';
+            _renderJobProdGrid('');
+        }
+
+        function _renderJobProdGrid(search) {
+            const q = (search || '').toLowerCase();
+            const grid = document.getElementById('jpick-grid');
+            const empty = document.getElementById('jpick-empty');
+
+            let items;
+            if (_jobProdSource === 'club') {
+                items = _jobClubProducts.filter(cp => {
+                    const name = (cp.custom_name || cp.products?.item_name || '').toLowerCase();
+                    const code = (cp.products?.product_code || '').toLowerCase();
+                    return !q || name.includes(q) || code.includes(q);
+                }).map(cp => ({
+                    key: 'club:' + cp.id,
+                    id: cp.id,
+                    name: cp.custom_name || cp.products?.item_name || '',
+                    code: cp.products?.product_code || '',
+                    img: cp.products?.image_url || ''
+                }));
+            } else {
+                items = _jobCatalogueProducts.filter(p => {
+                    const name = (p.item_name || '').toLowerCase();
+                    const code = (p.product_code || '').toLowerCase();
+                    return !q || name.includes(q) || code.includes(q);
+                }).map(p => ({
+                    key: 'catalogue:' + p.id,
+                    id: p.id,
+                    name: p.item_name || '',
+                    code: p.product_code || '',
+                    img: p.image_url || ''
+                }));
+            }
+
+            if (!items.length) {
+                grid.innerHTML = '';
+                grid.style.display = 'none';
+                empty.classList.remove('hide');
+            } else {
+                empty.classList.add('hide');
+                grid.style.display = 'grid';
+                grid.innerHTML = items.map(item => {
+                    const sel = _jobProductSelections.has(item.key);
+                    return `<div class="ds-prod-card${sel ? ' selected' : ''}" onclick="toggleJobProdCard('${item.key}', this)">
+                        <div class="ds-prod-check">${sel ? '✓' : ''}</div>
+                        <div class="ds-prod-img">${item.img ? `<img src="${escHtml(item.img)}" style="width:100%;height:100%;object-fit:cover">` : `<div style="width:100%;height:100%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:22px">◻</div>`}</div>
+                        <div style="padding:8px">
+                            <div class="ds-prod-name">${escHtml(item.name)}</div>
+                            ${item.code ? `<div class="ds-prod-code">${escHtml(item.code)}</div>` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+            _updateJobPickerCount();
+        }
+
+        function toggleJobProdCard(key, el) {
+            if (_jobProductSelections.has(key)) {
+                _jobProductSelections.delete(key);
+                el.classList.remove('selected');
+                el.querySelector('.ds-prod-check').textContent = '';
+            } else {
+                _jobProductSelections.add(key);
+                el.classList.add('selected');
+                el.querySelector('.ds-prod-check').textContent = '✓';
+            }
+            _updateJobPickerCount();
+        }
+
+        function _updateJobPickerCount() {
+            const n = _jobProductSelections.size;
+            document.getElementById('jpick-count').textContent = n === 0 ? '0 selected' : `${n} selected`;
+            document.getElementById('jpick-add-btn').textContent = n === 0 ? 'Add Products' : `Add ${n} Product${n !== 1 ? 's' : ''}`;
         }
 
         function closeJobProductPicker() {
@@ -14204,9 +14294,43 @@
 
         async function addSelectedJobProducts() {
             if (_jobProductSelections.size === 0) { showToast('Select at least one product', 'error'); return; }
-            const inserts = [..._jobProductSelections].map(cpId => ({ job_id: currentJobId, club_product_id: cpId }));
+            const btn = document.getElementById('jpick-add-btn');
+            btn.disabled = true;
+            btn.textContent = 'Adding...';
+
+            const inserts = [];
+            for (const key of _jobProductSelections) {
+                const [type, id] = key.split(':');
+                if (type === 'club') {
+                    inserts.push({ job_id: currentJobId, club_product_id: id });
+                } else {
+                    // catalogue product — find or create club_product record
+                    const { data: existing } = await supabase
+                        .from('club_products')
+                        .select('id')
+                        .eq('club_id', currentJob.club_id)
+                        .eq('product_id', id)
+                        .maybeSingle();
+                    let clubProdId;
+                    if (existing) {
+                        clubProdId = existing.id;
+                    } else {
+                        const prod = _jobCatalogueProducts.find(p => p.id === id);
+                        const { data: newCp, error: cpErr } = await supabase
+                            .from('club_products')
+                            .insert({ brand_id: currentBrand.id, club_id: currentJob.club_id, product_id: id, custom_name: prod?.item_name || '', is_active: true })
+                            .select('id')
+                            .single();
+                        if (cpErr) { showToast('Error linking product: ' + cpErr.message, 'error'); btn.disabled = false; _updateJobPickerCount(); return; }
+                        clubProdId = newCp.id;
+                    }
+                    inserts.push({ job_id: currentJobId, club_product_id: clubProdId });
+                }
+            }
+
             const { error } = await supabase.from('job_products').insert(inserts);
-            if (error) { showToast('Error adding products: ' + error.message, 'error'); return; }
+            btn.disabled = false;
+            if (error) { showToast('Error adding products: ' + error.message, 'error'); _updateJobPickerCount(); return; }
             closeJobProductPicker();
             await renderJobProducts();
             showToast(`${inserts.length} product${inserts.length !== 1 ? 's' : ''} added to job`);
@@ -17382,10 +17506,11 @@
                 _cdtSelectedProducts = [];
                 _cdtAllProducts = [];
                 _cdtClubFilter = null;
-                _cdtProdSource = 'catalogue';
+                _cdtProdSource = 'job';
                 _cdtJobProds = [];
                 const prodSearch = document.getElementById('cdt-prod-search');
                 if (prodSearch) prodSearch.value = '';
+                ['job','catalogue'].forEach(s => document.getElementById(`cdt-src-${s}`)?.classList.toggle('active', s === 'job'));
 
                 // Populate club dropdown
                 const clubSel = document.getElementById('cdt-club-id');
@@ -17514,11 +17639,7 @@
                     : 'No products on the linked job.';
             } else {
                 list = _cdtAllProducts;
-                if (_cdtProdSource === 'club') {
-                    if (!clubId) { emptyMsg = 'Select a club above to see its products.'; list = []; }
-                    else list = list.filter(p => p.club_id === clubId);
-                }
-                emptyMsg = emptyMsg || (_cdtAllProducts.length ? 'No products match your search.' : 'No products found for this brand.');
+                emptyMsg = _cdtAllProducts.length ? 'No products match your search.' : 'No products found for this brand.';
             }
 
             if (search) list = list.filter(p => (p.nm||'').toLowerCase().includes(search));
@@ -17550,7 +17671,7 @@
 
         function cdtSwitchProdSource(src) {
             _cdtProdSource = src;
-            ['catalogue', 'club', 'job'].forEach(s => {
+            ['catalogue', 'job'].forEach(s => {
                 document.getElementById(`cdt-src-${s}`)?.classList.toggle('active', s === src);
             });
             _cdtRenderProducts(_cdtClubFilter);
@@ -20630,12 +20751,6 @@
                     </div>`;
                 };
 
-                const clubCards = !task.club_id
-                    ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">Link a club to see its products.</p>`
-                    : !clubProds.length
-                        ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No products in club catalogue.</p>`
-                        : clubProds.map(makeProdCard).join('');
-
                 const jobCards = !task.job_id
                     ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No job linked to this task.</p>`
                     : !jobProds.length
@@ -20647,12 +20762,10 @@
                         <div class="dtr-ro-section-title">Products Required <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:9px">(click to toggle)</span></div>
                         <input class="dtr-prod-search" id="dtr-prod-search" placeholder="Search products…" oninput="dtrFilterProds(this.value)" style="margin-bottom:8px">
                         <div class="dtr-source-toggle">
-                            <button class="dtr-source-btn active" id="dtr-src-club"      onclick="dtrSwitchProdSource('club')">Club</button>
-                            <button class="dtr-source-btn"        id="dtr-src-job"       onclick="dtrSwitchProdSource('job')">Job</button>
+                            <button class="dtr-source-btn active" id="dtr-src-job"       onclick="dtrSwitchProdSource('job')">Job</button>
                             <button class="dtr-source-btn"        id="dtr-src-catalogue" onclick="dtrSwitchProdSource('catalogue')">Catalogue</button>
                         </div>
-                        <div id="dtr-prod-grid-club">      <div class="dtr-mini-prod-grid" id="dtr-mini-grid-club">${clubCards}</div></div>
-                        <div id="dtr-prod-grid-job" style="display:none">  <div class="dtr-mini-prod-grid" id="dtr-mini-grid-job">${jobCards}</div></div>
+                        <div id="dtr-prod-grid-job">  <div class="dtr-mini-prod-grid" id="dtr-mini-grid-job">${jobCards}</div></div>
                         <div id="dtr-prod-grid-catalogue" style="display:none"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-master"><div style="grid-column:1/-1;font-size:11px;color:#94a3b8;padding:6px 0">Loading catalogue…</div></div></div>
                     </div>
                     <div class="dtr-save-bar">
@@ -21726,7 +21839,7 @@
 
         function dtrFilterProds(searchTerm) {
             _dtrProdSearchTerm = (searchTerm || '').toLowerCase();
-            ['dtr-mini-grid-club', 'dtr-mini-grid-job', 'dtr-mini-grid-master'].forEach(id => {
+            ['dtr-mini-grid-job', 'dtr-mini-grid-master'].forEach(id => {
                 const grid = document.getElementById(id);
                 if (grid) Array.from(grid.querySelectorAll('.dtr-mini-prod-card')).forEach(card => {
                     card.style.display = (!_dtrProdSearchTerm || (card.title||'').toLowerCase().includes(_dtrProdSearchTerm)) ? '' : 'none';
@@ -21735,10 +21848,9 @@
         }
 
         async function dtrSwitchProdSource(source) {
-            const sources = ['club', 'job', 'catalogue'];
+            const sources = ['job', 'catalogue'];
             sources.forEach(s => {
-                const gridId = s === 'catalogue' ? 'dtr-prod-grid-catalogue' : `dtr-prod-grid-${s}`;
-                const grid = document.getElementById(gridId);
+                const grid = document.getElementById(`dtr-prod-grid-${s}`);
                 if (grid) grid.style.display = s === source ? '' : 'none';
                 document.getElementById(`dtr-src-${s}`)?.classList.toggle('active', s === source);
             });
