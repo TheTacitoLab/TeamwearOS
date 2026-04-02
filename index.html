@@ -14196,11 +14196,12 @@
             _jobClubProducts = (clubProds || []).filter(cp => !_jobExistingClubProdIds.has(cp.id));
 
             // Fetch full catalogue
-            const { data: catProds } = await supabase
+            const { data: catProds, error: catErr } = await supabase
                 .from('products')
-                .select('id, item_name, product_code, image_url')
+                .select('id, item_name, product_code, range_name, category')
                 .eq('brand_id', currentBrand.id)
-                .order('item_name');
+                .order('range_name').order('item_name');
+            if (catErr) console.error('Job picker catalogue fetch error:', catErr);
             _jobCatalogueProducts = catProds || [];
 
             // Reset UI
@@ -14254,23 +14255,26 @@
             } else {
                 // Catalogue — simple searchable text list, no images
                 const items = _jobCatalogueProducts.filter(p => {
-                    const name = (p.item_name || '').toLowerCase();
-                    const code = (p.product_code || '').toLowerCase();
-                    return !q || name.includes(q) || code.includes(q);
+                    const name   = (p.item_name   || '').toLowerCase();
+                    const code   = (p.product_code || '').toLowerCase();
+                    const range  = (p.range_name   || '').toLowerCase();
+                    const cat    = (p.category     || '').toLowerCase();
+                    return !q || name.includes(q) || code.includes(q) || range.includes(q) || cat.includes(q);
                 });
                 if (!items.length) {
                     grid.innerHTML = ''; grid.style.display = 'none'; empty.classList.remove('hide');
                 } else {
                     empty.classList.add('hide');
-                    grid.style.cssText = 'flex:1;overflow-y:auto;padding:8px 24px;display:block';
+                    grid.style.cssText = 'flex:1;overflow-y:auto;padding:4px 24px 12px;display:block';
                     grid.innerHTML = items.map(p => {
                         const key = 'catalogue:' + p.id;
                         const sel = _jobProductSelections.has(key);
+                        const sub = [p.product_code, p.range_name].filter(Boolean).join(' · ');
                         return `<div class="jpick-list-row${sel ? ' selected' : ''}" onclick="toggleJobProdCard('${key}',this)">
                             <div class="jpick-list-check">${sel ? '✓' : ''}</div>
                             <div style="flex:1;min-width:0">
                                 <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.item_name||'')}</div>
-                                ${p.product_code ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px;font-family:monospace">${escHtml(p.product_code)}</div>` : ''}
+                                ${sub ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px;font-family:monospace">${escHtml(sub)}</div>` : ''}
                             </div>
                         </div>`;
                     }).join('');
