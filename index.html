@@ -1028,6 +1028,13 @@
         .ds-prod-name { font-size:11px; font-weight:700; color:#0f172a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
         .ds-prod-code { font-size:10px; color:#94a3b8; font-family:monospace; }
         .ds-prod-range { font-size:10px; color:#3b82f6; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; margin-top:3px; }
+        /* Catalogue list rows inside job product picker */
+        .jpick-list-row { display:flex; align-items:center; gap:10px; padding:9px 2px; cursor:pointer; border-bottom:1px solid #f1f5f9; transition:background 0.1s; }
+        .jpick-list-row:last-child { border-bottom:none; }
+        .jpick-list-row:hover { background:#f8fafc; }
+        .jpick-list-row.selected { background:#f0fdf4; }
+        .jpick-list-check { width:18px; height:18px; flex-shrink:0; border-radius:4px; border:1.5px solid #d1d5db; background:#fff; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:900; color:#fff; transition:all 0.12s; }
+        .jpick-list-row.selected .jpick-list-check { background:#0f172a; border-color:#0f172a; }
 
         /* Asset upload */
         .ds-asset-dz { border:2px dashed #cbd5e1; border-radius:12px; padding:28px 24px; text-align:center; cursor:pointer; transition:all 0.2s; background:#fafbfc; }
@@ -3997,7 +4004,7 @@
                     <input id="jpick-search" type="text" placeholder="Search products..." class="dtr-prod-search" style="width:100%;box-sizing:border-box" oninput="_renderJobProdGrid(this.value)">
                 </div>
                 <!-- Grid -->
-                <div id="jpick-grid" style="flex:1;overflow-y:auto;padding:16px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;align-content:start"></div>
+                <div id="jpick-grid" style="flex:1;overflow-y:auto;padding:16px 24px;display:none"></div>
                 <!-- Empty state -->
                 <p id="jpick-empty" class="hide" style="flex:1;text-align:center;color:#94a3b8;font-size:13px;padding:40px 24px">No products found.</p>
                 <!-- Footer -->
@@ -14217,64 +14224,71 @@
             const grid = document.getElementById('jpick-grid');
             const empty = document.getElementById('jpick-empty');
 
-            let items;
             if (_jobProdSource === 'club') {
-                items = _jobClubProducts.filter(cp => {
+                const items = _jobClubProducts.filter(cp => {
                     const name = (cp.custom_name || cp.products?.item_name || '').toLowerCase();
                     const code = (cp.products?.product_code || '').toLowerCase();
                     return !q || name.includes(q) || code.includes(q);
-                }).map(cp => ({
-                    key: 'club:' + cp.id,
-                    id: cp.id,
-                    name: cp.custom_name || cp.products?.item_name || '',
-                    code: cp.products?.product_code || '',
-                    img: cp.products?.image_url || ''
-                }));
+                });
+                if (!items.length) {
+                    grid.innerHTML = ''; grid.style.display = 'none'; empty.classList.remove('hide');
+                } else {
+                    empty.classList.add('hide');
+                    grid.style.cssText = 'flex:1;overflow-y:auto;padding:16px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;align-content:start';
+                    grid.innerHTML = items.map(cp => {
+                        const key = 'club:' + cp.id;
+                        const sel = _jobProductSelections.has(key);
+                        const nm = escHtml(cp.custom_name || cp.products?.item_name || '');
+                        const code = cp.products?.product_code || '';
+                        const img = cp.products?.image_url || '';
+                        return `<div class="ds-prod-card${sel ? ' selected' : ''}" onclick="toggleJobProdCard('${key}', this)">
+                            <div class="ds-prod-check">${sel ? '✓' : ''}</div>
+                            <div class="ds-prod-img">${img ? `<img src="${escHtml(img)}" style="width:100%;height:100%;object-fit:cover">` : `<div style="width:100%;height:100%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:22px">◻</div>`}</div>
+                            <div style="padding:8px">
+                                <div class="ds-prod-name">${nm}</div>
+                                ${code ? `<div class="ds-prod-code">${escHtml(code)}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
             } else {
-                items = _jobCatalogueProducts.filter(p => {
+                // Catalogue — simple searchable text list, no images
+                const items = _jobCatalogueProducts.filter(p => {
                     const name = (p.item_name || '').toLowerCase();
                     const code = (p.product_code || '').toLowerCase();
                     return !q || name.includes(q) || code.includes(q);
-                }).map(p => ({
-                    key: 'catalogue:' + p.id,
-                    id: p.id,
-                    name: p.item_name || '',
-                    code: p.product_code || '',
-                    img: p.image_url || ''
-                }));
-            }
-
-            if (!items.length) {
-                grid.innerHTML = '';
-                grid.style.display = 'none';
-                empty.classList.remove('hide');
-            } else {
-                empty.classList.add('hide');
-                grid.style.display = 'grid';
-                grid.innerHTML = items.map(item => {
-                    const sel = _jobProductSelections.has(item.key);
-                    return `<div class="ds-prod-card${sel ? ' selected' : ''}" onclick="toggleJobProdCard('${item.key}', this)">
-                        <div class="ds-prod-check">${sel ? '✓' : ''}</div>
-                        <div class="ds-prod-img">${item.img ? `<img src="${escHtml(item.img)}" style="width:100%;height:100%;object-fit:cover">` : `<div style="width:100%;height:100%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#cbd5e1;font-size:22px">◻</div>`}</div>
-                        <div style="padding:8px">
-                            <div class="ds-prod-name">${escHtml(item.name)}</div>
-                            ${item.code ? `<div class="ds-prod-code">${escHtml(item.code)}</div>` : ''}
-                        </div>
-                    </div>`;
-                }).join('');
+                });
+                if (!items.length) {
+                    grid.innerHTML = ''; grid.style.display = 'none'; empty.classList.remove('hide');
+                } else {
+                    empty.classList.add('hide');
+                    grid.style.cssText = 'flex:1;overflow-y:auto;padding:8px 24px;display:block';
+                    grid.innerHTML = items.map(p => {
+                        const key = 'catalogue:' + p.id;
+                        const sel = _jobProductSelections.has(key);
+                        return `<div class="jpick-list-row${sel ? ' selected' : ''}" onclick="toggleJobProdCard('${key}',this)">
+                            <div class="jpick-list-check">${sel ? '✓' : ''}</div>
+                            <div style="flex:1;min-width:0">
+                                <div style="font-size:13px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(p.item_name||'')}</div>
+                                ${p.product_code ? `<div style="font-size:11px;color:#94a3b8;margin-top:1px;font-family:monospace">${escHtml(p.product_code)}</div>` : ''}
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
             }
             _updateJobPickerCount();
         }
 
         function toggleJobProdCard(key, el) {
+            const checkEl = el.querySelector('.ds-prod-check, .jpick-list-check');
             if (_jobProductSelections.has(key)) {
                 _jobProductSelections.delete(key);
                 el.classList.remove('selected');
-                el.querySelector('.ds-prod-check').textContent = '';
+                if (checkEl) checkEl.textContent = '';
             } else {
                 _jobProductSelections.add(key);
                 el.classList.add('selected');
-                el.querySelector('.ds-prod-check').textContent = '✓';
+                if (checkEl) checkEl.textContent = '✓';
             }
             _updateJobPickerCount();
         }
@@ -20733,8 +20747,12 @@
         function _buildDTRProductsTab(task, clubProds, jobProds) {
             jobProds = jobProds || _dtrCachedJobProds || [];
             const selectedIds = new Set(task.products_required || []);
-            // For read-only, show selected from any source
-            const allAvailable = [...clubProds, ...jobProds.filter(jp => !clubProds.find(cp => cp.id === jp.id))];
+            // Auto-populate from job if no products have been explicitly set yet
+            if (selectedIds.size === 0 && jobProds.length > 0) {
+                jobProds.forEach(jp => selectedIds.add(jp.id));
+            }
+            // For read-only, show selected from combined pool
+            const allAvailable = [...jobProds, ...clubProds.filter(cp => !jobProds.find(jp => jp.id === cp.id))];
             const selectedProds = allAvailable.filter(cp => selectedIds.has(cp.id));
 
             if (_dtrEditMode) {
@@ -20755,16 +20773,22 @@
                         ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No products on the linked job.</p>`
                         : jobProds.map(makeProdCard).join('');
 
+                const clubCards = !task.club_id
+                    ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No club linked to this task.</p>`
+                    : !clubProds.length
+                        ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No products in club catalogue.</p>`
+                        : clubProds.map(makeProdCard).join('');
+
                 return `
                     <div class="dtr-ro-section">
                         <div class="dtr-ro-section-title">Products Required <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:9px">(click to toggle)</span></div>
                         <input class="dtr-prod-search" id="dtr-prod-search" placeholder="Search products…" oninput="dtrFilterProds(this.value)" style="margin-bottom:8px">
                         <div class="dtr-source-toggle">
-                            <button class="dtr-source-btn active" id="dtr-src-job"       onclick="dtrSwitchProdSource('job')">Job</button>
-                            <button class="dtr-source-btn"        id="dtr-src-catalogue" onclick="dtrSwitchProdSource('catalogue')">Catalogue</button>
+                            <button class="dtr-source-btn active" id="dtr-src-job"  onclick="dtrSwitchProdSource('job')">Job Products</button>
+                            <button class="dtr-source-btn"        id="dtr-src-club" onclick="dtrSwitchProdSource('club')">Club Products</button>
                         </div>
-                        <div id="dtr-prod-grid-job">  <div class="dtr-mini-prod-grid" id="dtr-mini-grid-job">${jobCards}</div></div>
-                        <div id="dtr-prod-grid-catalogue" style="display:none"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-master"><div style="grid-column:1/-1;font-size:11px;color:#94a3b8;padding:6px 0">Loading catalogue…</div></div></div>
+                        <div id="dtr-prod-grid-job"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-job">${jobCards}</div></div>
+                        <div id="dtr-prod-grid-club" style="display:none"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-club">${clubCards}</div></div>
                     </div>
                     <div class="dtr-save-bar">
                         <button class="dtr-save-btn" onclick="saveDTRLeftPanel()">Save Changes</button>
@@ -21837,7 +21861,7 @@
 
         function dtrFilterProds(searchTerm) {
             _dtrProdSearchTerm = (searchTerm || '').toLowerCase();
-            ['dtr-mini-grid-job', 'dtr-mini-grid-master'].forEach(id => {
+            ['dtr-mini-grid-job', 'dtr-mini-grid-club'].forEach(id => {
                 const grid = document.getElementById(id);
                 if (grid) Array.from(grid.querySelectorAll('.dtr-mini-prod-card')).forEach(card => {
                     card.style.display = (!_dtrProdSearchTerm || (card.title||'').toLowerCase().includes(_dtrProdSearchTerm)) ? '' : 'none';
@@ -21845,36 +21869,12 @@
             });
         }
 
-        async function dtrSwitchProdSource(source) {
-            const sources = ['job', 'catalogue'];
-            sources.forEach(s => {
+        function dtrSwitchProdSource(source) {
+            ['job', 'club'].forEach(s => {
                 const grid = document.getElementById(`dtr-prod-grid-${s}`);
                 if (grid) grid.style.display = s === source ? '' : 'none';
                 document.getElementById(`dtr-src-${s}`)?.classList.toggle('active', s === source);
             });
-            if (source === 'catalogue' && !_dtrMasterProdsLoaded) {
-                _dtrMasterProdsLoaded = true;
-                const masterInner = document.getElementById('dtr-mini-grid-master');
-                if (masterInner) masterInner.innerHTML = '<div style="grid-column:1/-1;font-size:11px;color:#94a3b8;padding:6px 0">Loading…</div>';
-                const { data: cpRows } = await supabase.from('club_products')
-                    .select('id, custom_name, image_url, image_urls, products(id, product_code, item_name, range_name, category)')
-                    .in('club_id', (clubs || []).map(c => c.id))
-                    .eq('is_active', true)
-                    .order('created_at');
-                const seen = new Set();
-                _dtrMasterProdsData = (cpRows || []).filter(cp => {
-                    const nm = cp.custom_name || cp.products?.item_name || '';
-                    if (seen.has(nm)) return false;
-                    seen.add(nm);
-                    return true;
-                }).map(cp => ({
-                    id: cp.id,
-                    item_name: cp.custom_name || cp.products?.item_name || 'Product',
-                    image_url: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
-                    product_code: cp.products?.product_code || '',
-                }));
-                _dtrRenderMasterGrid(masterInner);
-            }
         }
 
         function _dtrRenderMasterGrid(container) {
