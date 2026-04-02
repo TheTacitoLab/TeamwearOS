@@ -1171,8 +1171,8 @@
         .dtr-left-inner { width:380px; overflow-y:auto; flex:1; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; display:flex; flex-direction:column; }
         .dtr-left-inner::-webkit-scrollbar { width:4px; }
         .dtr-left-inner::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
-        .dtr-left-tabs { display:flex; border-bottom:1.5px solid #e8ecf0; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:3; }
-        .dtr-left-tab { flex:1; padding:10px 6px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; border:none; border-bottom:2px solid transparent; background:transparent; cursor:pointer; color:#94a3b8; transition:all 0.15s; margin-bottom:-1.5px; }
+        .dtr-left-tabs { display:flex; border-bottom:1.5px solid #e8ecf0; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:3; height:36px; }
+        .dtr-left-tab { flex:1; padding:0 6px; height:36px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; border:none; border-bottom:2px solid transparent; background:transparent; cursor:pointer; color:#94a3b8; transition:all 0.15s; margin-bottom:-1.5px; }
         .dtr-left-tab.active { color:#0f172a; border-bottom-color:#0f172a; }
         .dtr-left-tab:hover:not(.active) { color:#475569; background:#f8fafc; }
         .dtr-left-tab-content { flex:1; }
@@ -1258,9 +1258,10 @@
         .dtr-save-btn:hover { opacity:0.85; }
 
         /* ── Stage section cards ── */
-        .dtr-stages-col { flex:1; min-width:0; overflow:hidden; display:flex; flex-direction:column; transition:width 0.25s ease, flex 0.25s ease; border-right:1px solid #e8ecf0; }
+        .dtr-stages-col { flex:1; min-width:0; overflow:hidden; display:flex; flex-direction:column; transition:width 0.25s ease, flex 0.25s ease; border-right:1px solid #e8ecf0; background:#f0f2f5; }
         .dtr-stages-col.stage-col-collapsed { flex:none; width:36px; }
-        .dtr-stages-inner { flex:1; overflow-y:auto; padding:8px 20px; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
+        .dtr-stages-header { background:#fff; border-bottom:1.5px solid #e8ecf0; flex-shrink:0; padding:0 20px; height:36px; display:flex; align-items:center; }
+        .dtr-stages-inner { flex:1; overflow-y:auto; padding:12px 20px; scrollbar-width:thin; scrollbar-color:#e2e8f0 transparent; }
         .dtr-stages-inner::-webkit-scrollbar { width:4px; }
         .dtr-stages-inner::-webkit-scrollbar-thumb { background:#e2e8f0; border-radius:2px; }
         .dtr-stages-strip { width:36px; display:flex; flex-direction:column; align-items:center; padding-top:12px; flex:1; overflow:hidden; background:#f8fafc; }
@@ -1372,8 +1373,8 @@
 
         /* ── Activity column (right) ── */
         .dtr-activity-col { width:320px; flex-shrink:0; background:#fff; border-left:1px solid #e8ecf0; display:flex; flex-direction:column; position:sticky; top:138px; max-height:calc(100vh - 138px); align-self:flex-start; overflow:hidden; }
-        .dtr-activity-header { padding:14px 16px 0; border-bottom:1px solid #f1f5f9; flex-shrink:0; background:#fff; }
-        .dtr-activity-header h4 { font-size:13px; font-weight:700; color:#0f172a; margin:0 0 10px; }
+        .dtr-activity-header { padding:0 16px; height:36px; border-bottom:1.5px solid #e8ecf0; flex-shrink:0; background:#fff; display:flex; align-items:center; }
+        .dtr-activity-header h4 { font-size:13px; font-weight:700; color:#0f172a; margin:0; }
         .dtr-act-filter-row { display:flex; gap:3px; padding-bottom:1px; }
         .dtr-act-filter-btn { padding:5px 12px; border-radius:20px; font-size:11px; font-weight:600; border:1.5px solid transparent; cursor:pointer; color:#64748b; background:transparent; transition:all 0.12s; }
         .dtr-act-filter-btn:hover { background:#f1f5f9; }
@@ -20257,6 +20258,7 @@
                         </div>
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
+                        <div class="dtr-stages-header" id="dtr-stages-header"></div>
                         <div id="dtr-stages-inner" class="dtr-stages-inner">
                             ${buildDTRStagesColumn(stage2, stage3, stage4, conceptUploads, rangeUploads, finaliseUploads)}
                         </div>
@@ -20264,7 +20266,7 @@
                     <div class="dtr-activity-col" id="dtr-activity-col">
                         <div id="dtr-activity-inner" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
                             <div class="dtr-activity-header">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                                <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
                                     <h4>Activity</h4>
                                     <select id="dtr-act-filter-select" onchange="filterDTRActivity(null,this.value)" style="font-size:11px;font-weight:600;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:3px 8px;background:#f8fafc;cursor:pointer;outline:none">
                                         <option value="all">All Active</option>
