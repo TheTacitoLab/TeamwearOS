@@ -4042,6 +4042,10 @@
                             <input type="date" id="job-next-step-deadline" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
                     </div>
+                    <div class="modal-section">
+                        <p class="modal-section-title">Owner</p>
+                        <div class="owner-dp" id="owner-dp-job-modal"></div>
+                    </div>
                     <div class="flex gap-3">
                         <button onclick="saveJob()" class="btn-primary">Save Job</button>
                         <button onclick="closeJobModal()" class="btn-secondary">Cancel</button>
@@ -4177,102 +4181,40 @@
         <!-- ============================================================
              TOOL: CLUB DETAIL DASHBOARD
              ============================================================ -->
-        <div id="tool-club-detail" class="hide w-full p-6 md:p-8 lg:px-12">
-            <div class="flex items-center gap-3 mb-6 flex-wrap">
-                <button onclick="goBack()" id="club-detail-back-btn" class="nav-back-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    <span id="club-detail-back-label">Back to Clubs</span>
-                </button>
-                <div id="club-breadcrumb" class="breadcrumb-trail"></div>
+        <div id="tool-club-detail" class="hide w-full" style="padding:20px 32px 32px">
+
+            <!-- Club header bar -->
+            <div style="display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid #e2e8f0;margin-bottom:14px">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#dbeafe">
+                    <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
+                </div>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 id="club-detail-name" class="text-base font-bold leading-tight truncate"></h2>
+                        <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                    </div>
+                    <div class="flex gap-3 mt-0.5">
+                        <p id="club-detail-sport" class="text-xs text-gray-500"></p>
+                        <p id="club-detail-suffix" class="text-xs text-gray-500 font-mono"></p>
+                    </div>
+                </div>
+                <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit Club</button>
             </div>
 
-            <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (timeline+content) | right (activity) -->
-            <div class="jr-three-col">
+            <!-- Horizontal tab navigation -->
+            <div id="club-record-nav" style="display:flex;gap:4px;padding:0 0 12px;border-bottom:1px solid #e2e8f0;margin-bottom:16px;overflow-x:auto;flex-wrap:wrap">
+                <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')" style="width:auto;padding:8px 14px">Overview</button>
+                <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')" style="width:auto;padding:8px 14px">Teams</button>
+                <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')" style="width:auto;padding:8px 14px">Club Products</button>
+                <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')" style="width:auto;padding:8px 14px">Order Forms</button>
+                <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')" style="width:auto;padding:8px 14px">Jobs</button>
+                <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')" style="width:auto;padding:8px 14px">Onboarding</button>
+            </div>
 
-                <!-- ── Column 1: Collapsible info card + nav ── -->
-                <div class="jr-left-col" id="jr-left-col">
-                    <!-- Collapse toggle — always visible -->
-                    <div style="display:flex;justify-content:flex-end;padding-bottom:6px">
-                        <button class="jr-left-collapse-btn" onclick="toggleClubLeftCol()" id="jr-left-collapse-btn" title="Collapse navigation">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                        </button>
-                    </div>
-                    <!-- Content wrapper (collapsed state swaps glass+nav for icon-only nav) -->
-                    <div class="jr-left-col-inner">
-                        <!-- Icon-only nav shown when collapsed -->
-                        <div class="jr-left-icon-nav" id="jr-left-icon-nav">
-                            <button onclick="showClubTab('overview')" id="icon-tab-overview" title="Overview">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                            </button>
-                            <button onclick="showClubTab('teams')" id="icon-tab-teams" title="Teams">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </button>
-                            <button onclick="showClubTab('products')" id="icon-tab-products" title="Club Products">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            </button>
-                            <button onclick="showClubTab('orderforms')" id="icon-tab-orderforms" title="Order Forms">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            </button>
-                            <button onclick="showClubTab('jobs')" id="icon-tab-jobs" title="Jobs">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            </button>
-                            <button onclick="showClubTab('onboarding')" id="icon-tab-onboarding" title="Onboarding">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                            </button>
-                        </div>
-                        <!-- Compact club info card -->
-                        <div class="glass rounded-2xl p-4">
-                            <div class="flex items-start justify-between gap-3 mb-3">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#dbeafe">
-                                        <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h2 id="club-detail-name" class="text-sm font-bold leading-tight truncate"></h2>
-                                        <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                                            <span id="club-detail-partner-badge" class="badge text-xs"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
-                            </div>
-                            <div class="pt-3 border-t border-gray-800 space-y-2">
-                                <div><span class="text-xs text-gray-600">Sport</span><p id="club-detail-sport" class="text-xs font-semibold mt-0.5">—</p></div>
-                                <div><span class="text-xs text-gray-600">Suffix</span><p id="club-detail-suffix" class="text-xs font-semibold font-mono mt-0.5">—</p></div>
-                            </div>
-                        </div>
-                        <!-- Sticky navigation menu -->
-                        <div class="record-side-nav" id="club-record-nav">
-                            <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                                Overview
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                Teams
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                Club Products
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                Order Forms
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                Jobs
-                            </button>
-                            <div class="record-nav-divider"></div>
-                            <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                                Onboarding
-                            </button>
-                        </div>
-                    </div><!-- end jr-left-col-inner -->
-                </div>
+            <!-- 2-column layout: content | activity -->
+            <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
 
-                <!-- ── Column 2: Timeline at top + tab content ── -->
+                <!-- ── Column 1: Timeline at top + tab content ── -->
                 <div class="jr-middle-col">
                     <!-- Onboarding timeline (slim at top, same width as content) -->
                     <div class="record-timeline" style="margin-bottom:16px" id="club-record-timeline">
@@ -4712,7 +4654,7 @@
                     </div>
                 </div><!-- /jr-activity-sidebar -->
 
-            </div><!-- /jr-three-col -->
+            </div><!-- /2-col grid -->
         </div>
 
         <!-- ============================================================
@@ -4918,6 +4860,12 @@
 
                 <!-- Hidden legacy partner checkbox for JS compatibility -->
                 <input type="hidden" id="club-is-partner" value="false">
+
+                <!-- Owner -->
+                <div class="modal-section mt-4">
+                    <p class="modal-section-title">Owner</p>
+                    <div class="owner-dp" id="owner-dp-club-modal"></div>
+                </div>
 
                 <div class="flex gap-3 mt-4">
                     <button onclick="hideCreateClubModal()" class="flex-1 btn-secondary py-3">Cancel</button>
@@ -10692,6 +10640,8 @@
             const logoExisting = document.getElementById('club-logo-url-existing');
             if (logoPreview) logoPreview.innerHTML = logoSrc ? `<img src="${escHtml(logoSrc)}" class="w-full h-full object-contain rounded-xl">` : '<svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>';
             if (logoExisting) logoExisting.value = logoSrc || '';
+            renderOwnerDropdown('club-modal',
+                currentClub?.assigned_user_ids || (currentClub?.assigned_user_id ? [currentClub.assigned_user_id] : []));
             document.getElementById('create-club-modal').classList.remove('hide');
         }
 
@@ -10886,7 +10836,11 @@
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
-                logo_url: logoUrl
+                logo_url: logoUrl,
+                ...(() => {
+                    const ownerIds = getOwnerDropdownIds('club-modal');
+                    return { assigned_user_id: ownerIds[0] || null, assigned_user_ids: ownerIds };
+                })()
             };
             let result;
             if (clubId) {
@@ -10902,6 +10856,9 @@
                     currentClub = clubs.find(c => c.id === clubId);
                     updateClubDetailHeader();
                     renderClubOverviewInfo();
+                    // Refresh the overview owner dropdown
+                    renderOwnerDropdown('club',
+                        currentClub?.assigned_user_ids || (currentClub?.assigned_user_id ? [currentClub.assigned_user_id] : []));
                 }
                 // If we opened edit from within a job record, refresh the job's club tab
                 if (window._editClubFromJob) {
@@ -14229,6 +14186,8 @@
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
                 clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
+            renderOwnerDropdown('job-modal',
+                currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []));
             document.getElementById('job-modal').classList.remove('hide');
         }
 
@@ -14262,7 +14221,11 @@
                 contact_email: document.getElementById('job-contact-email')?.value.trim() || null,
                 contact_phone: document.getElementById('job-contact-phone')?.value.trim() || null,
                 next_step: document.getElementById('job-next-step')?.value.trim() || null,
-                next_step_deadline: document.getElementById('job-next-step-deadline')?.value || null
+                next_step_deadline: document.getElementById('job-next-step-deadline')?.value || null,
+                ...(document.getElementById('owner-dp-job-modal') ? (() => {
+                    const ownerIds = getOwnerDropdownIds('job-modal');
+                    return { assigned_user_id: ownerIds[0] || null, assigned_user_ids: ownerIds };
+                })() : {})
             };
 
             if (jobId) {
@@ -14307,6 +14270,9 @@
                 currentJob = jobs.find(j => j.id === currentJobId);
                 renderJobHeader();
                 showJobTab(currentJobTab);
+                // Refresh sidebar owner dropdown to reflect saved changes
+                renderOwnerDropdown('job',
+                    currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []));
             } else {
                 showSalesTab('jobs');
             }
@@ -17901,16 +17867,39 @@
             if (!wrapper) return;
             if (wrapper.classList.contains('open')) {
                 closeOwnerDropdown(scope);
-            } else {
-                _ownerDpOpen.forEach(s => { if (s !== scope) closeOwnerDropdown(s); });
-                wrapper.classList.add('open');
-                _ownerDpOpen.add(scope);
+                return;
             }
+            _ownerDpOpen.forEach(s => { if (s !== scope) closeOwnerDropdown(s); });
+            // Use fixed positioning to escape overflow-hidden ancestors
+            const btn = wrapper.querySelector('.owner-dp-btn');
+            const panel = wrapper.querySelector('.owner-dp-panel');
+            if (btn && panel) {
+                const rect = btn.getBoundingClientRect();
+                panel.style.position = 'fixed';
+                panel.style.left = rect.left + 'px';
+                panel.style.width = rect.width + 'px';
+                panel.style.right = 'auto';
+                panel.style.top = 'auto';
+                panel.style.bottom = 'auto';
+                // Show above if not enough space below
+                const spaceBelow = window.innerHeight - rect.bottom - 8;
+                if (spaceBelow < 200 && rect.top > 200) {
+                    panel.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+                } else {
+                    panel.style.top = (rect.bottom + 4) + 'px';
+                }
+            }
+            wrapper.classList.add('open');
+            _ownerDpOpen.add(scope);
         }
 
         function closeOwnerDropdown(scope) {
             const wrapper = document.getElementById('owner-dp-' + scope);
-            if (wrapper) wrapper.classList.remove('open');
+            if (wrapper) {
+                wrapper.classList.remove('open');
+                const panel = wrapper.querySelector('.owner-dp-panel');
+                if (panel) { panel.style.position = ''; panel.style.top = ''; panel.style.bottom = ''; panel.style.left = ''; panel.style.width = ''; }
+            }
             _ownerDpOpen.delete(scope);
         }
 
@@ -21192,6 +21181,8 @@
                 const task = currentDesignTaskRecord;
                 const club = task.clubs || {};
                 content.innerHTML = _dtrBuildTabContent(_dtrCurrentLeftTab, task, club, _dtrCachedAssets, _dtrCachedClubProds, _dtrCachedJobProds);
+                // Re-render owner dropdown after content is set
+                if (_dtrEditMode) renderOwnerDropdown('design-task', task.owner_ids || []);
             }
         }
 
@@ -21370,8 +21361,12 @@
                             </div>
                         </div>
                         <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-designer">Owner</label>
+                            <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
                             <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
+                        </div>
+                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
+                            <label class="dtr-edit-label">Owner(s)</label>
+                            <div style="flex:1"><div class="owner-dp" id="owner-dp-design-task"></div></div>
                         </div>
                         <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
                             <label class="dtr-edit-label" for="dtr-ln-club">Club</label>
@@ -21634,6 +21629,7 @@
                     club_id:     document.getElementById('dtr-ln-club')?.value || null,
                     job_id:      document.getElementById('dtr-ln-job')?.value || null,
                     custom_colours: hasColour ? savedCols : null,
+                    owner_ids:   getOwnerDropdownIds('design-task'),
                 };
                 if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
                 const { data, error } = await supabase.from('design_tasks')
