@@ -392,7 +392,7 @@
         .gtm-target-input { width:70px; padding:2px 6px; border:1px solid #e2e8f0; border-radius:5px; font-size:12px; font-weight:700; color:#0f172a; background:#f8fafc; outline:none; text-align:right; }
         .gtm-target-input:focus { border-color:#6d28d9; }
         .gtm-target-pct { font-size:11px; font-weight:700; padding:2px 7px; border-radius:10px; }
-        .gtm-body { display:grid; grid-template-columns:1fr 1fr 260px; gap:12px; flex:1; min-height:0; }
+        .gtm-body { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; flex:1; min-height:0; }
         .gtm-card { background:#fff; border-radius:12px; border:1px solid #dde3ea; box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04); display:flex; flex-direction:column; overflow:hidden; }
         .gtm-card-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid #f1f5f9; flex-shrink:0; }
         .gtm-card-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0f172a; }
@@ -402,6 +402,26 @@
         .gtm-feed-btn.active { background:#6d28d9; border-color:#6d28d9; color:#fff; }
         .gtm-feed-item { display:flex; gap:10px; align-items:flex-start; padding:9px 14px; border-bottom:1px solid #f8fafc; transition:background 0.1s; }
         .gtm-feed-item:hover { background:#f8fafc; }
+        /* ── Owner dropdown ── */
+        .owner-dp { position:relative; }
+        .owner-dp-btn { display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;min-height:36px;width:100%;box-sizing:border-box;text-align:left; }
+        .owner-dp-arrow { margin-left:auto;color:#94a3b8;font-size:10px;transition:transform 0.15s;flex-shrink:0; }
+        .owner-dp.open .owner-dp-arrow { transform:rotate(180deg); }
+        .owner-dp-panel { position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 4px 16px rgba(15,23,42,0.12);z-index:300;overflow:hidden;display:none; }
+        .owner-dp.open .owner-dp-panel { display:block; }
+        .owner-dp-list { max-height:160px;overflow-y:auto;padding:4px 0; }
+        .owner-dp-item { display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;transition:background 0.1s; }
+        .owner-dp-item:hover { background:#f8fafc; }
+        .owner-dp-item input[type=checkbox] { width:15px;height:15px;accent-color:#6d28d9;cursor:pointer;flex-shrink:0; }
+        .owner-dp-item span { font-size:12px;color:#334155;flex:1; }
+        .owner-dp-footer { padding:6px 10px;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end; }
+        .owner-dp-done { padding:4px 14px;border-radius:7px;font-size:12px;font-weight:700;background:#6d28d9;color:#fff;border:none;cursor:pointer; }
+        .owner-dp-done:hover { background:#5b21b6; }
+        .owner-dp.dark .owner-dp-btn { border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#e2e8f0; }
+        .owner-dp.dark .owner-dp-panel { background:#1e293b;border-color:rgba(255,255,255,0.12);box-shadow:0 4px 20px rgba(0,0,0,0.5); }
+        .owner-dp.dark .owner-dp-item:hover { background:rgba(255,255,255,0.06); }
+        .owner-dp.dark .owner-dp-item span { color:#cbd5e1; }
+        .owner-dp.dark .owner-dp-footer { border-color:rgba(255,255,255,0.08);background:#1e293b; }
         .gtm-feed-item.done { opacity:0.4; }
         .gtm-feed-type { width:18px; height:18px; border-radius:5px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; cursor:pointer; transition:all 0.12s; }
         .gtm-feed-type.na { background:#fef3c7; color:#d97706; border:1.5px solid #fde68a; }
@@ -3428,13 +3448,13 @@
                         <div class="grid grid-cols-2 gap-4 mb-3">
                             <div>
                                 <label class="text-xs text-gray-500 mb-1 block">Status</label>
-                                <select id="lead-status" class="w-full px-3 py-2 rounded-lg text-sm" onchange="toggleKanbanStageField()">
+                                <select id="lead-status" class="w-full px-3 py-2 rounded-lg text-sm">
                                     <option value="not_contacted">Not Contacted</option>
                                     <option value="in_discussion">In Discussion</option>
                                 </select>
                             </div>
                             <div id="lead-stage-field">
-                                <label class="text-xs text-gray-500 mb-1 block">Kanban Stage</label>
+                                <label class="text-xs text-gray-500 mb-1 block">Pipeline Stage</label>
                                 <select id="lead-stage" class="w-full px-3 py-2 rounded-lg text-sm">
                                     <option value="">Select stage...</option>
                                 </select>
@@ -3442,8 +3462,7 @@
                         </div>
                         <div>
                             <label class="text-xs text-gray-500 mb-1 block">Owner</label>
-                            <div id="lead-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="text-xs text-gray-500">No one assigned</span></div>
-                            <div id="lead-assigned-users-list" style="max-height:160px;overflow-y:auto;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;padding:2px 0"></div>
+                            <div class="owner-dp" id="owner-dp-lead"></div>
                         </div>
                     </div>
 
@@ -3689,11 +3708,10 @@
                             <div><span class="text-xs text-gray-600">Deadline</span><p id="jr-deadline" class="text-xs font-semibold mt-0.5" style="color:#dc2626">—</p></div>
                             <div><span class="text-xs text-gray-600">Order Target</span><p id="jr-order-target" class="text-xs font-semibold mt-0.5" style="color:#d97706">—</p></div>
                         </div>
-                        <!-- Owner (multi-user) -->
+                        <!-- Owner (multi-user dropdown) -->
                         <div class="mt-3 pt-3 border-t border-gray-800">
                             <span class="text-xs text-gray-600 block mb-1.5">Owner</span>
-                            <div id="jr-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="text-xs text-gray-500">No one assigned</span></div>
-                            <div id="jr-assigned-users-list" style="max-height:160px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);padding:2px 0"></div>
+                            <div class="owner-dp dark" id="owner-dp-job"></div>
                         </div>
                         <!-- Next Action -->
                         <div id="jr-next-action" class="mt-3 pt-3 border-t border-gray-800"></div>
@@ -4292,11 +4310,10 @@
                             <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:#f1f5f9">Edit</button>
                         </div>
                         <div id="club-overview-info"><!-- Populated by JS --></div>
-                        <!-- Owner assignment (multi-user) -->
+                        <!-- Owner assignment (multi-user dropdown) -->
                         <div class="mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.06)">
                             <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
-                            <div id="club-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="text-xs text-gray-500">No one assigned</span></div>
-                            <div id="club-assigned-users-list" style="max-height:160px;overflow-y:auto;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;padding:2px 0"></div>
+                            <div class="owner-dp dark" id="owner-dp-club"></div>
                         </div>
                     </div>
                     <!-- Branding card -->
@@ -11326,8 +11343,8 @@
             }
             const dlBtn = document.getElementById('club-logo-download-btn');
             if (dlBtn) { if (logoSrc) dlBtn.classList.remove('hide'); else dlBtn.classList.add('hide'); }
-            // Populate assignment dropdown
-            populateMultiUserAssign('club-assigned-users-list', 'club-owner-chips',
+            // Populate owner dropdown
+            renderOwnerDropdown('club',
                 currentClub?.assigned_user_ids || (currentClub?.assigned_user_id ? [currentClub.assigned_user_id] : []));
             // Populate inline colour editors
             const mainHex = currentClub.pantone_main || '#3b82f6';
@@ -14131,7 +14148,8 @@
             const clubName = hasClub ? job.clubs.name : '⚠ No club linked';
             const clubStyle = hasClub ? '' : 'color:#dc2626;font-weight:700';
             const days = Math.floor((new Date() - new Date(job.created_at)) / 86400000);
-            const ownerName = getUserDisplayName(job.created_by);
+            const assignedIds = job.assigned_user_ids?.length ? job.assigned_user_ids : (job.assigned_user_id ? [job.assigned_user_id] : []);
+            const ownerName = assignedIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ') || '—';
             const noClubClass = hasClub ? '' : ' job-card-no-club';
             return `<div class="job-card${noClubClass}" onclick="openJobRecord('${job.id}')">
                 ${!hasClub ? `<div class="flex items-center gap-1 mb-2 px-2 py-1 rounded-lg" style="background:#fee2e2;border:1px solid #fca5a5"><svg class="w-3 h-3" fill="none" stroke="#dc2626" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><span style="font-size:10px;font-weight:700;color:#dc2626">No club linked</span></div>` : ''}
@@ -14349,8 +14367,8 @@
             showJobTab('overview');
             // Load activity log, user assignment, and design pipeline in parallel
             await Promise.all([loadJobActivity(), loadBrandUsers(), loadJobDesignPipeline(jobId)]);
-            // Populate multi-user owner checklist in sidebar
-            populateMultiUserAssign('jr-assigned-users-list', 'jr-owner-chips',
+            // Populate owner dropdown in sidebar
+            renderOwnerDropdown('job',
                 currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []));
             // Keep hidden compat single-select populated
             populateUserAssignDropdown('jr-assigned-user', currentJob?.assigned_user_id);
@@ -16693,11 +16711,14 @@
                 return;
             }
 
-            container.innerHTML = filtered.map(lead => `
+            container.innerHTML = filtered.map(lead => {
+                const ownerIds = lead.assigned_user_ids?.length ? lead.assigned_user_ids : (lead.assigned_to ? [lead.assigned_to] : []);
+                const ownerNames = ownerIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ');
+                return `
                 <div class="lead-row" onclick="openLeadModal('${lead.id}')">
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-sm truncate">${escHtml(lead.lead_name)}</p>
-                        <p class="text-xs text-gray-500 truncate">${escHtml(lead.club_name)}${lead.location ? ' · ' + escHtml(lead.location) : ''}</p>
+                        <p class="text-xs text-gray-500 truncate">${escHtml(lead.club_name)}${lead.location ? ' · ' + escHtml(lead.location) : ''}${ownerNames ? ' · 👤 ' + escHtml(ownerNames) : ''}</p>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         ${lead.sport ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>` : ''}
@@ -16854,7 +16875,8 @@
                 const moveOpts = kanbanStages.filter(s => s.id !== stage.id)
                     .map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('');
                 const cards = stageLeads.map(lead => {
-                    const salesperson = lead.assigned_to ? escHtml(getUserDisplayName(lead.assigned_to)) : '';
+                    const ownerIds = lead.assigned_user_ids?.length ? lead.assigned_user_ids : (lead.assigned_to ? [lead.assigned_to] : []);
+                    const ownerNames = ownerIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ');
                     return `<div class="kanban-card"
                         draggable="true"
                         ondragstart="onKanbanDragStart(event,'${lead.id}')"
@@ -16867,7 +16889,7 @@
                             ${lead.county  ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
                         </div>
                         <div class="kanban-card-footer">
-                            ${salesperson ? `<span class="kanban-salesperson">${salesperson}</span>` : '<span></span>'}
+                            ${ownerNames ? `<span class="kanban-salesperson">👤 ${escHtml(ownerNames)}</span>` : '<span></span>'}
                             <div style="display:flex;align-items:center;gap:5px">
                                 <select onchange="kanbanMoveCard('${lead.id}',this.value);this.value=''" onclick="event.stopPropagation()"
                                     style="font-size:10px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 5px;background:#f8fafc;color:#64748b;cursor:pointer;max-width:80px;height:24px">
@@ -16930,6 +16952,8 @@
                     .map(s => `<option value="${s.key}">${escHtml(s.label)}</option>`).join('');
                 const cards = stageJobs.map(job => {
                     const clubName  = escHtml(job.clubs?.name || '—');
+                    const jobOwnerIds = job.assigned_user_ids?.length ? job.assigned_user_ids : (job.assigned_user_id ? [job.assigned_user_id] : []);
+                    const jobOwnerNames = jobOwnerIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ');
                     const shopifyHtml = job.shopify_draft_order_url
                         ? `<a href="${escHtml(job.shopify_draft_order_url)}" target="_blank" rel="noopener"
                                onclick="event.stopPropagation()"
@@ -16942,6 +16966,7 @@
                         <div class="kanban-card-title">${escHtml(job.job_name)}</div>
                         <div class="kanban-card-club">${clubName}</div>
                         ${job.job_number ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">${escHtml(job.job_number)}</div>` : ''}
+                        ${jobOwnerNames ? `<div style="font-size:11px;color:#6d28d9;font-weight:600;margin-bottom:4px">👤 ${escHtml(jobOwnerNames)}</div>` : ''}
                         ${shopifyHtml}
                         <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
                             <select onchange="kanbanMoveJob('${job.id}',this.value);this.value=''" onclick="event.stopPropagation()"
@@ -17103,11 +17128,7 @@
         }
 
         function toggleKanbanStageField() {
-            const status = document.getElementById('lead-status')?.value;
-            const stageField = document.getElementById('lead-stage-field');
-            if (stageField) {
-                stageField.style.display = status === 'in_discussion' ? '' : 'none';
-            }
+            // Stage field is always visible — all stages available regardless of status
         }
 
         // =============================================
@@ -17140,7 +17161,7 @@
                 document.getElementById('lead-notes').value = lead.notes || '';
                 document.getElementById('lead-status').value = lead.status || 'not_contacted';
                 document.getElementById('lead-stage').value = lead.kanban_stage_id || '';
-                populateMultiUserAssign('lead-assigned-users-list', 'lead-owner-chips',
+                renderOwnerDropdown('lead',
                     lead?.assigned_user_ids || (lead?.assigned_to ? [lead.assigned_to] : []));
                 dangerActions.style.removeProperty('display');
                 // Show convert banner only if not already converted
@@ -17177,7 +17198,7 @@
                 document.getElementById('lead-notes').value = '';
                 document.getElementById('lead-status').value = defaultStatus;
                 document.getElementById('lead-stage').value = defaultStatus === 'in_discussion' ? (kanbanStages[0]?.id || '') : '';
-                populateMultiUserAssign('lead-assigned-users-list', 'lead-owner-chips', []);
+                renderOwnerDropdown('lead', []);
                 dangerActions.style.display = 'none';
                 const convertBanner = document.getElementById('lead-convert-banner');
                 if (convertBanner) convertBanner.classList.add('hide');
@@ -17267,7 +17288,7 @@
 
             const status = document.getElementById('lead-status').value;
             const stageId = document.getElementById('lead-stage').value || null;
-            const ownerIds = getSelectedUserIds('lead-assigned-users-list');
+            const ownerIds = getOwnerDropdownIds('lead');
             const payload = {
                 brand_id: currentBrand.id,
                 lead_name: leadName,
@@ -17279,7 +17300,7 @@
                 amount_of_teams: parseInt(document.getElementById('lead-teams').value) || null,
                 notes: document.getElementById('lead-notes').value.trim() || null,
                 status,
-                kanban_stage_id: status === 'in_discussion' ? stageId : null,
+                kanban_stage_id: stageId,
                 assigned_to: ownerIds[0] || null,
                 assigned_user_ids: ownerIds
             };
@@ -17836,6 +17857,86 @@
             }
             showToast('Assignment saved');
         }
+
+        // =============================================
+        // OWNER DROPDOWN
+        // =============================================
+        const _ownerDpOpen = new Set();
+
+        function renderOwnerDropdown(scope, currentIds) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (!wrapper) return;
+            const assigned = currentIds || [];
+            wrapper.innerHTML = `
+                <div class="owner-dp-btn" onclick="toggleOwnerDropdown('${scope}')">
+                    <div id="owner-dp-chips-${scope}" style="display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0">${_ownerDpChipsHtml(assigned)}</div>
+                    <span class="owner-dp-arrow">▾</span>
+                </div>
+                <div class="owner-dp-panel">
+                    <div class="owner-dp-list">
+                        ${brandUsers.map(u => `<label class="owner-dp-item">
+                            <input type="checkbox" value="${u.id}" ${assigned.includes(u.id) ? 'checked' : ''}
+                                onchange="onOwnerCheckboxChange('${scope}')">
+                            <span>${escHtml(userDisplayName(u))}</span>
+                        </label>`).join('')}
+                    </div>
+                    <div class="owner-dp-footer">
+                        <button class="owner-dp-done" onclick="closeOwnerDropdown('${scope}')">Done</button>
+                    </div>
+                </div>`;
+        }
+
+        function _ownerDpChipsHtml(userIds) {
+            if (!userIds || userIds.length === 0)
+                return `<span style="font-size:12px;color:#94a3b8">No owner assigned</span>`;
+            return userIds.map(uid => {
+                const u = brandUsers.find(b => b.id === uid);
+                return `<span class="user-chip">${escHtml(u ? userDisplayName(u) : 'Unknown')}</span>`;
+            }).join('');
+        }
+
+        function toggleOwnerDropdown(scope) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (!wrapper) return;
+            if (wrapper.classList.contains('open')) {
+                closeOwnerDropdown(scope);
+            } else {
+                _ownerDpOpen.forEach(s => { if (s !== scope) closeOwnerDropdown(s); });
+                wrapper.classList.add('open');
+                _ownerDpOpen.add(scope);
+            }
+        }
+
+        function closeOwnerDropdown(scope) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (wrapper) wrapper.classList.remove('open');
+            _ownerDpOpen.delete(scope);
+        }
+
+        function onOwnerCheckboxChange(scope) {
+            const ids = getOwnerDropdownIds(scope);
+            const chipsEl = document.getElementById('owner-dp-chips-' + scope);
+            if (chipsEl) chipsEl.innerHTML = _ownerDpChipsHtml(ids);
+            // Auto-save (lead saves on explicit "Save Lead" click, but also auto-saves when editing existing)
+            const typeMap = { 'job':'job', 'club':'club', 'lead':'lead', 'design-task':'design-task' };
+            const type = typeMap[scope];
+            if (type) saveMultiUserAssignment(type, ids);
+        }
+
+        function getOwnerDropdownIds(scope) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (!wrapper) return [];
+            return Array.from(wrapper.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (_ownerDpOpen.size === 0) return;
+            _ownerDpOpen.forEach(scope => {
+                const wrapper = document.getElementById('owner-dp-' + scope);
+                if (wrapper && !wrapper.contains(e.target)) closeOwnerDropdown(scope);
+            });
+        });
 
         // =============================================
         // UTILITY
@@ -20573,10 +20674,9 @@
 
             if (stageNum === 1) {
                 panel.innerHTML = await buildStage1Panel(stage);
-                // Populate multi-user owner checklist after HTML is in the DOM
+                // Populate owner dropdown after HTML is in the DOM
                 await loadBrandUsers();
-                populateMultiUserAssign('dt-owner-users-list', 'dt-owner-chips',
-                    currentDesignTaskRecord?.owner_ids || []);
+                renderOwnerDropdown('design-task', currentDesignTaskRecord?.owner_ids || []);
             } else if (stageNum === 2 || stageNum === 3) {
                 panel.innerHTML = await buildVersionStagePanel(stage);
                 // Load per-version comment threads
@@ -20618,17 +20718,16 @@
             const cc = task.custom_colours || {};
             const selectedIds = new Set(task.products_required || []);
 
-            // ── Colour data (mode-aware) ────────────────────────────────────
-            // Club mode: hex comes from club record; Custom mode: hex from custom_colours
+            // ── Colour data (custom takes priority; falls back to club colours) ───
             const cols = [
                 { key:'primary',   label:'Primary',
-                  hex:     useClub ? (club.hex_main        || '') : (cc.primary?.hex   || ''),
+                  hex:     cc.primary?.hex   || (useClub ? (club.hex_main        || '') : ''),
                   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
                 { key:'secondary', label:'Secondary',
-                  hex:     useClub ? (club.hex_secondary   || '') : (cc.secondary?.hex || ''),
+                  hex:     cc.secondary?.hex || (useClub ? (club.hex_secondary   || '') : ''),
                   pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
                 { key:'accent',    label:'Accent',
-                  hex:     useClub ? (club.hex_accent      || '') : (cc.accent?.hex    || ''),
+                  hex:     cc.accent?.hex    || (useClub ? (club.hex_accent      || '') : ''),
                   pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
@@ -20756,8 +20855,7 @@
                                 </div>
                                 <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;grid-column:span 3">
                                     <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Owner</div>
-                                    <div id="dt-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span style="font-size:11px;color:#94a3b8">No one assigned</span></div>
-                                    <div id="dt-owner-users-list" style="max-height:150px;overflow-y:auto;border-radius:6px;border:1px solid #e2e8f0;background:#fff;padding:2px 0"></div>
+                                    <div class="owner-dp" id="owner-dp-design-task"></div>
                                 </div>
                             </div>
                         </div>
@@ -20808,14 +20906,14 @@
                                         ${!useClub ? `<div style="margin-bottom:6px">
                                             <div style="font-size:9px;color:#94a3b8;font-weight:600;margin-bottom:2px">HEX</div>
                                             <input class="ds-colour-input" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB"
-                                                onblur="briefColourSave('${c.key}','hex',this.value)"
+                                                oninput="briefColourSave('${c.key}','hex',this.value)"
                                                 style="padding:4px 8px;font-size:11px;font-family:monospace;width:100%;box-sizing:border-box">
                                         </div>` : `<div style="margin-bottom:6px;font-size:11px;color:#475569;font-family:monospace;font-weight:600">${escHtml(c.hex) || '<span style="color:#94a3b8;font-weight:400">—</span>'}</div>`}
                                         <!-- Pantone (always editable) -->
                                         <div>
                                             <div style="font-size:9px;color:#94a3b8;font-weight:600;margin-bottom:2px">PANTONE</div>
                                             <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C"
-                                                onblur="briefColourSave('${c.key}','pantone',this.value)"
+                                                oninput="briefColourSave('${c.key}','pantone',this.value)"
                                                 style="padding:4px 8px;font-size:11px;width:100%;box-sizing:border-box">
                                         </div>
                                     </div>`;
@@ -21120,9 +21218,9 @@
 
             // Colour swatches
             const colPairs = [
-                { key:'primary',   label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
-                { key:'secondary', label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
-                { key:'accent',    label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+                { key:'primary',   label:'Primary',   hex: cc.primary?.hex   || (useClub ? (club.hex_main||'')       : ''), pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { key:'secondary', label:'Secondary', hex: cc.secondary?.hex || (useClub ? (club.hex_secondary||'')  : ''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { key:'accent',    label:'Accent',    hex: cc.accent?.hex    || (useClub ? (club.hex_accent||'')     : ''), pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
             // Mini product cards
@@ -21212,9 +21310,9 @@
             const JTL = typeof JOB_TYPE_LABELS !== 'undefined' ? JOB_TYPE_LABELS : {};
 
             const colPairs = [
-                { key:'primary',   label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
-                { key:'secondary', label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
-                { key:'accent',    label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+                { key:'primary',   label:'Primary',   hex: cc.primary?.hex   || (useClub ? (club.hex_main||'')       : ''), pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { key:'secondary', label:'Secondary', hex: cc.secondary?.hex || (useClub ? (club.hex_secondary||'')  : ''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { key:'accent',    label:'Accent',    hex: cc.accent?.hex    || (useClub ? (club.hex_accent||'')     : ''), pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
             // Edit mode: show form fields
@@ -21314,7 +21412,7 @@
                                 </div>
                                 <span style="font-size:10px;color:#64748b;font-weight:600;width:40px;flex-shrink:0">${c.label}</span>
                                 <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C"
-                                    onblur="briefColourSave('${c.key}','pantone',this.value)"
+                                    oninput="briefColourSave('${c.key}','pantone',this.value)"
                                     style="flex:1;padding:3px 7px;font-size:11px;font-family:monospace">
                             </div>`).join('')}
                         </div>
@@ -21344,6 +21442,7 @@
                 <!-- § Job Details (read-only) -->
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Job Details</div>
+                    ${task.jobs ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Linked Job</span><span class="dtr-ro-value">${escHtml(task.jobs.job_name || task.jobs.job_number || '—')}</span></div>` : ''}
                     ${task.sport ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport)}</span></div>` : ''}
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
@@ -21360,6 +21459,7 @@
                     ${task.team ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Team</span><span class="dtr-ro-value">${escHtml(task.team)}</span></div>` : ''}
                     ${task.season_event ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Season</span><span class="dtr-ro-value">${escHtml(task.season_event)}</span></div>` : ''}
                     ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
+                    ${task.assigned_designer_name ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Designer</span><span class="dtr-ro-value">${escHtml(task.assigned_designer_name)}</span></div>` : ''}
                 </div>
                 <!-- § Design Brief (read-only) -->
                 <div class="dtr-ro-section">
@@ -21514,6 +21614,13 @@
                 const dsnSel = document.getElementById('dtr-ln-designer');
                 const designerId   = dsnSel?.value || null;
                 const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+                // Capture current custom_colours state, reading pantone inputs directly
+                const savedCols = JSON.parse(JSON.stringify(currentDesignTaskRecord.custom_colours || {}));
+                ['primary','secondary','accent'].forEach(k => {
+                    const panEl = document.getElementById(`dspan-${k}`);
+                    if (panEl) { if (!savedCols[k]) savedCols[k] = {}; savedCols[k].pantone = panEl.value; }
+                });
+                const hasColour = ['primary','secondary','accent'].some(k => savedCols[k]?.hex || savedCols[k]?.pantone);
                 const payload = {
                     task_name:   document.getElementById('dtr-ln-task-name')?.value?.trim() || currentDesignTaskRecord.task_name,
                     sport:       document.getElementById('dtr-ln-sport')?.value?.trim() || null,
@@ -21525,6 +21632,7 @@
                     assigned_designer_name: designerName,
                     club_id:     document.getElementById('dtr-ln-club')?.value || null,
                     job_id:      document.getElementById('dtr-ln-job')?.value || null,
+                    custom_colours: hasColour ? savedCols : null,
                 };
                 if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
                 const { data, error } = await supabase.from('design_tasks')
