@@ -3442,9 +3442,8 @@
                         </div>
                         <div>
                             <label class="text-xs text-gray-500 mb-1 block">Owner</label>
-                            <select id="lead-assigned-to" class="w-full px-3 py-2 rounded-lg text-sm">
-                                <option value="">Unassigned</option>
-                            </select>
+                            <div id="lead-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="text-xs text-gray-500">No one assigned</span></div>
+                            <div id="lead-assigned-users-list" style="max-height:160px;overflow-y:auto;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;padding:2px 0"></div>
                         </div>
                     </div>
 
@@ -3690,12 +3689,11 @@
                             <div><span class="text-xs text-gray-600">Deadline</span><p id="jr-deadline" class="text-xs font-semibold mt-0.5" style="color:#dc2626">—</p></div>
                             <div><span class="text-xs text-gray-600">Order Target</span><p id="jr-order-target" class="text-xs font-semibold mt-0.5" style="color:#d97706">—</p></div>
                         </div>
-                        <!-- Owner -->
+                        <!-- Owner (multi-user) -->
                         <div class="mt-3 pt-3 border-t border-gray-800">
                             <span class="text-xs text-gray-600 block mb-1.5">Owner</span>
-                            <select id="jr-owner-sidebar" onchange="saveJobAssignment(this.value)" style="width:100%;font-size:12px;font-weight:500;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#e2e8f0;outline:none;cursor:pointer">
-                                <option value="">Unassigned</option>
-                            </select>
+                            <div id="jr-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="text-xs text-gray-500">No one assigned</span></div>
+                            <div id="jr-assigned-users-list" style="max-height:160px;overflow-y:auto;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);padding:2px 0"></div>
                         </div>
                         <!-- Next Action -->
                         <div id="jr-next-action" class="mt-3 pt-3 border-t border-gray-800"></div>
@@ -3766,12 +3764,8 @@
             <div id="jt-content-overview">
                 <div class="glass rounded-2xl p-4">
                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Job Details</h4>
-                    <!-- Hidden compat elements (owner is now in sidebar dropdown) -->
-                    <div class="hide">
-                        <div id="jr-assigned-users-list"></div>
-                        <div id="jr-assigned-users-chips"></div>
-                        <select id="jr-assigned-user"><option value="">Unassigned</option></select>
-                    </div>
+                    <!-- Compat: hidden legacy single-select (kept for any legacy save callers) -->
+                    <div class="hide"><select id="jr-assigned-user"><option value="">Unassigned</option></select></div>
                     <div id="jr-overview-description"></div>
                     <div id="jr-overview-contact" style="margin-top:16px"></div>
                     <div id="jr-overview-details" style="margin-top:16px"></div>
@@ -4298,12 +4292,11 @@
                             <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:#f1f5f9">Edit</button>
                         </div>
                         <div id="club-overview-info"><!-- Populated by JS --></div>
-                        <!-- Owner assignment -->
+                        <!-- Owner assignment (multi-user) -->
                         <div class="mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.06)">
                             <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
-                            <select id="club-assigned-user" class="w-full px-3 py-2 rounded-lg text-sm" onchange="saveClubAssignment(this.value)">
-                                <option value="">Unassigned</option>
-                            </select>
+                            <div id="club-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span class="text-xs text-gray-500">No one assigned</span></div>
+                            <div id="club-assigned-users-list" style="max-height:160px;overflow-y:auto;border-radius:8px;border:1px solid #e2e8f0;background:#f8fafc;padding:2px 0"></div>
                         </div>
                     </div>
                     <!-- Branding card -->
@@ -11334,7 +11327,8 @@
             const dlBtn = document.getElementById('club-logo-download-btn');
             if (dlBtn) { if (logoSrc) dlBtn.classList.remove('hide'); else dlBtn.classList.add('hide'); }
             // Populate assignment dropdown
-            populateUserAssignDropdown('club-assigned-user', currentClub.assigned_user_id);
+            populateMultiUserAssign('club-assigned-users-list', 'club-owner-chips',
+                currentClub?.assigned_user_ids || (currentClub?.assigned_user_id ? [currentClub.assigned_user_id] : []));
             // Populate inline colour editors
             const mainHex = currentClub.pantone_main || '#3b82f6';
             const secHex  = currentClub.pantone_secondary || '#64748b';
@@ -14355,9 +14349,10 @@
             showJobTab('overview');
             // Load activity log, user assignment, and design pipeline in parallel
             await Promise.all([loadJobActivity(), loadBrandUsers(), loadJobDesignPipeline(jobId)]);
-            // Populate owner sidebar dropdown
-            populateUserAssignDropdown('jr-owner-sidebar', currentJob?.assigned_user_id);
-            // Keep hidden compat elements populated
+            // Populate multi-user owner checklist in sidebar
+            populateMultiUserAssign('jr-assigned-users-list', 'jr-owner-chips',
+                currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []));
+            // Keep hidden compat single-select populated
             populateUserAssignDropdown('jr-assigned-user', currentJob?.assigned_user_id);
             // Reset activity tab
             jobActivityTabFilter = 'all';
@@ -17145,7 +17140,8 @@
                 document.getElementById('lead-notes').value = lead.notes || '';
                 document.getElementById('lead-status').value = lead.status || 'not_contacted';
                 document.getElementById('lead-stage').value = lead.kanban_stage_id || '';
-                populateUserAssignDropdown('lead-assigned-to', lead.assigned_to);
+                populateMultiUserAssign('lead-assigned-users-list', 'lead-owner-chips',
+                    lead?.assigned_user_ids || (lead?.assigned_to ? [lead.assigned_to] : []));
                 dangerActions.style.removeProperty('display');
                 // Show convert banner only if not already converted
                 const convertBanner = document.getElementById('lead-convert-banner');
@@ -17181,7 +17177,7 @@
                 document.getElementById('lead-notes').value = '';
                 document.getElementById('lead-status').value = defaultStatus;
                 document.getElementById('lead-stage').value = defaultStatus === 'in_discussion' ? (kanbanStages[0]?.id || '') : '';
-                populateUserAssignDropdown('lead-assigned-to', null);
+                populateMultiUserAssign('lead-assigned-users-list', 'lead-owner-chips', []);
                 dangerActions.style.display = 'none';
                 const convertBanner = document.getElementById('lead-convert-banner');
                 if (convertBanner) convertBanner.classList.add('hide');
@@ -17271,7 +17267,7 @@
 
             const status = document.getElementById('lead-status').value;
             const stageId = document.getElementById('lead-stage').value || null;
-            const assignedTo = document.getElementById('lead-assigned-to')?.value || null;
+            const ownerIds = getSelectedUserIds('lead-assigned-users-list');
             const payload = {
                 brand_id: currentBrand.id,
                 lead_name: leadName,
@@ -17284,7 +17280,8 @@
                 notes: document.getElementById('lead-notes').value.trim() || null,
                 status,
                 kanban_stage_id: status === 'in_discussion' ? stageId : null,
-                assigned_to: assignedTo || null
+                assigned_to: ownerIds[0] || null,
+                assigned_user_ids: ownerIds
             };
 
             let leadId = currentLeadId;
@@ -17591,33 +17588,60 @@
         async function loadHomeActivityFeed() {
             if (!currentUser || !currentBrand) return;
             try {
-                // Get jobs assigned to current user (via assigned_user_ids OR assigned_user_id)
-                const { data: assignedJobs } = await supabase
-                    .from('jobs')
-                    .select('id, job_name, job_number')
-                    .eq('brand_id', currentBrand.id)
-                    .or(`assigned_user_id.eq.${currentUser.id},assigned_user_ids.cs.{"${currentUser.id}"}`);
+                const uid = currentUser.id;
+                const brandId = currentBrand.id;
+                const csFilter = `{"${uid}"}`;
+
+                // Fetch owned records from all 4 types in parallel
+                const [
+                    { data: assignedJobs },
+                    { data: assignedDesignTasks },
+                    { data: assignedLeads },
+                    { data: assignedClubs }
+                ] = await Promise.all([
+                    supabase.from('jobs').select('id, job_name, job_number')
+                        .eq('brand_id', brandId)
+                        .or(`assigned_user_id.eq.${uid},assigned_user_ids.cs.${csFilter}`),
+                    supabase.from('design_tasks').select('id, task_name, task_ref')
+                        .eq('brand_id', brandId)
+                        .or(`owner_id.eq.${uid},owner_ids.cs.${csFilter}`),
+                    supabase.from('leads').select('id, lead_name')
+                        .eq('brand_id', brandId)
+                        .or(`assigned_to.eq.${uid},assigned_user_ids.cs.${csFilter}`),
+                    supabase.from('clubs').select('id, name')
+                        .eq('brand_id', brandId)
+                        .or(`assigned_user_id.eq.${uid},assigned_user_ids.cs.${csFilter}`)
+                ]);
 
                 const jobIds = (assignedJobs || []).map(j => j.id);
-                if (jobIds.length === 0) {
+                const dtIds  = (assignedDesignTasks || []).map(d => d.id);
+                const leadIds = (assignedLeads || []).map(l => l.id);
+                const clubIds = (assignedClubs || []).map(c => c.id);
+
+                // Fetch activities from all owned records in parallel
+                const activityQueries = [];
+                if (jobIds.length)
+                    activityQueries.push(supabase.from('job_activity').select('*, jobs(id,job_name,job_number)').in('job_id', jobIds).order('created_at', { ascending: false }).limit(20));
+                if (dtIds.length)
+                    activityQueries.push(supabase.from('design_task_activity').select('*, design_tasks(id,task_name,task_ref)').in('design_task_id', dtIds).order('created_at', { ascending: false }).limit(20));
+                if (leadIds.length)
+                    activityQueries.push(supabase.from('lead_activity').select('*, leads(id,lead_name)').in('lead_id', leadIds).order('created_at', { ascending: false }).limit(20));
+                if (clubIds.length)
+                    activityQueries.push(supabase.from('club_activity').select('*, clubs(id,name)').in('club_id', clubIds).order('created_at', { ascending: false }).limit(20));
+
+                if (!activityQueries.length) {
                     homeActivityFeed = [];
                     renderHomeActivityFeed();
                     return;
                 }
 
-                const { data: activities } = await supabase
-                    .from('job_activity')
-                    .select('*, jobs(id,job_name,job_number)')
-                    .in('job_id', jobIds)
-                    .order('created_at', { ascending: false })
-                    .limit(30);
+                const results = await Promise.all(activityQueries);
+                const allActivities = results.flatMap(r => r.data || []);
 
-                homeActivityFeed = (activities || []).filter(a => {
-                    // Exclude activities added by the current user themselves (optional)
-                    // Also exclude if dismissed by current user
-                    const dismissed = a.dismissed_by || [];
-                    return !dismissed.includes(currentUser.id);
-                });
+                homeActivityFeed = allActivities
+                    .filter(a => !(a.dismissed_by || []).includes(uid))
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 40);
 
                 renderHomeActivityFeed();
             } catch(e) {
@@ -17744,11 +17768,16 @@
 
         function onUserAssignChange(containerId, chipsId) {
             updateAssignChips(containerId, chipsId);
-            // Auto-save
+            // Auto-save — route to the correct record type
             const selected = getSelectedUserIds(containerId);
-            if (containerId === 'jr-assigned-users-list') {
-                saveMultiUserAssignment('job', selected);
-            }
+            const typeMap = {
+                'jr-assigned-users-list':    'job',
+                'club-assigned-users-list':  'club',
+                'lead-assigned-users-list':  'lead',
+                'dt-owner-users-list':       'design-task',
+            };
+            const type = typeMap[containerId];
+            if (type) saveMultiUserAssignment(type, selected);
         }
 
         function getSelectedUserIds(containerId) {
@@ -17773,16 +17802,38 @@
         }
 
         async function saveMultiUserAssignment(type, userIds) {
-            if (!currentJobId && type === 'job') return;
             const primaryUserId = userIds[0] || null; // backward compat: first user = primary
-            const { error } = await supabase.from('jobs').update({
-                assigned_user_id: primaryUserId,
-                assigned_user_ids: userIds
-            }).eq('id', currentJobId);
-            if (error) { showToast('Error saving assignment', 'error'); return; }
-            if (currentJob) {
-                currentJob.assigned_user_id = primaryUserId;
-                currentJob.assigned_user_ids = userIds;
+            if (type === 'job') {
+                if (!currentJobId) return;
+                const { error } = await supabase.from('jobs').update({
+                    assigned_user_id: primaryUserId,
+                    assigned_user_ids: userIds
+                }).eq('id', currentJobId);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+                if (currentJob) { currentJob.assigned_user_id = primaryUserId; currentJob.assigned_user_ids = userIds; }
+            } else if (type === 'club') {
+                if (!currentClub?.id) return;
+                const { error } = await supabase.from('clubs').update({
+                    assigned_user_id: primaryUserId,
+                    assigned_user_ids: userIds
+                }).eq('id', currentClub.id);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+                if (currentClub) { currentClub.assigned_user_id = primaryUserId; currentClub.assigned_user_ids = userIds; }
+            } else if (type === 'lead') {
+                if (!currentLeadId) return;
+                const { error } = await supabase.from('leads').update({
+                    assigned_to: primaryUserId,
+                    assigned_user_ids: userIds
+                }).eq('id', currentLeadId);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+            } else if (type === 'design-task') {
+                if (!currentDesignTaskRecord?.id) return;
+                const { error } = await supabase.from('design_tasks').update({
+                    owner_id: primaryUserId,
+                    owner_ids: userIds
+                }).eq('id', currentDesignTaskRecord.id);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+                if (currentDesignTaskRecord) { currentDesignTaskRecord.owner_id = primaryUserId; currentDesignTaskRecord.owner_ids = userIds; }
             }
             showToast('Assignment saved');
         }
@@ -18064,6 +18115,7 @@
                     const pan = document.getElementById(`cdt-pan-${k}`); if (pan) pan.value = '';
                 });
                 _cdtSelectedProducts = [];
+                _cdtSelectedCatalogueProducts = [];
                 _cdtAllProducts = [];
                 _cdtClubFilter = null;
                 _cdtProdSource = 'job';
@@ -18126,6 +18178,7 @@
         async function cdtClubChanged(preselectJobId) {
             const clubId = document.getElementById('cdt-club-id')?.value;
             _cdtSelectedProducts = [];
+            _cdtSelectedCatalogueProducts = [];
             const countEl = document.getElementById('cdt-prod-count');
             if (countEl) countEl.textContent = '';
 
@@ -18149,29 +18202,30 @@
             await _cdtLoadAndRenderProducts(clubId || null);
         }
 
-        let _cdtAllProducts = [];   // all loaded products for create modal
-        let _cdtClubFilter = null;  // currently selected club id for filtering
-        let _cdtProdSource = 'catalogue'; // active product source tab: 'catalogue'|'club'|'job'
-        let _cdtJobProds = [];      // products from the selected job
+        let _cdtAllProducts = [];          // master catalogue products (products table)
+        let _cdtClubFilter = null;         // currently selected club id
+        let _cdtProdSource = 'job';        // active product source tab: 'job'|'catalogue'
+        let _cdtJobProds = [];             // club_products from the selected job
+        let _cdtSelectedCatalogueProducts = []; // master product IDs selected from catalogue tab
 
         async function _cdtLoadAndRenderProducts(clubId) {
             const grid = document.getElementById('cdt-products-grid');
             if (!grid) return;
             _cdtClubFilter = clubId || null;
 
-            // Load all brand club_products once
+            // Load master catalogue once (from products table, not club_products)
             if (!_cdtAllProducts.length) {
                 grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading…</div>';
-                const { data: cpRows } = await supabase.from('club_products')
-                    .select('id, club_id, custom_name, image_url, image_urls, products(product_code, item_name)')
-                    .in('club_id', (clubs || []).map(c => c.id))
-                    .order('created_at');
-                _cdtAllProducts = (cpRows || []).map(cp => ({
-                    id: cp.id,
-                    club_id: cp.club_id,
-                    nm: cp.custom_name || cp.products?.item_name || 'Product',
-                    img: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
-                    code: cp.products?.product_code || '',
+                const { data: prodRows } = await supabase.from('products')
+                    .select('id, product_code, item_name, range_name, category')
+                    .eq('brand_id', currentBrand.id)
+                    .order('range_name').order('item_name');
+                _cdtAllProducts = (prodRows || []).map(p => ({
+                    id: p.id,
+                    nm: p.item_name || 'Product',
+                    code: p.product_code || '',
+                    range: p.range_name || p.category || '',
+                    img: '',
                 }));
             }
             _cdtRenderProducts(clubId);
@@ -18186,23 +18240,23 @@
             let list;
             let emptyMsg;
             if (_cdtProdSource === 'job') {
-                // Normalise job prods (come from club_products rows directly)
+                // Job source: show club_products from the linked job
                 list = _cdtJobProds.map(cp => ({
                     id: cp.id,
-                    club_id: cp.club_id,
                     nm: cp.custom_name || cp.products?.item_name || 'Product',
                     img: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
                     code: cp.products?.product_code || '',
                 }));
                 emptyMsg = !document.getElementById('cdt-job-id')?.value
                     ? 'Select a job above to see its products.'
-                    : 'No products on the linked job.';
+                    : 'No products on the linked job. Use Catalogue to browse all products.';
             } else {
+                // Catalogue source: show master products table
                 list = _cdtAllProducts;
-                emptyMsg = _cdtAllProducts.length ? 'No products match your search.' : 'No products found for this brand.';
+                emptyMsg = _cdtAllProducts.length ? 'No products match your search.' : 'No products found in this brand\'s catalogue.';
             }
 
-            if (search) list = list.filter(p => (p.nm||'').toLowerCase().includes(search));
+            if (search) list = list.filter(p => (p.nm||'').toLowerCase().includes(search) || (p.code||'').toLowerCase().includes(search) || (p.range||'').toLowerCase().includes(search));
 
             if (!list.length) {
                 grid.innerHTML = `<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">${emptyMsg}</div>`;
@@ -18210,8 +18264,11 @@
             }
             grid.innerHTML = list.map(cp => {
                 const nm  = escHtml(cp.nm);
-                const img = cp.img;
-                const sel = _cdtSelectedProducts.includes(cp.id);
+                const img = cp.img || '';
+                // Check correct selection array based on source
+                const sel = _cdtProdSource === 'job'
+                    ? _cdtSelectedProducts.includes(cp.id)
+                    : _cdtSelectedCatalogueProducts.includes(cp.id);
                 return `<div class="ds-prod-card${sel?' selected':''}" id="cdtprod-${cp.id}" onclick="cdtToggleProduct('${cp.id}',this)" style="cursor:pointer">
                     <div class="ds-prod-check">✓</div>
                     <div class="ds-prod-img">
@@ -18220,6 +18277,7 @@
                     <div class="ds-prod-info">
                         <div class="ds-prod-name" title="${nm}">${nm}</div>
                         ${cp.code ? `<div class="ds-prod-code">${escHtml(cp.code)}</div>` : ''}
+                        ${cp.range ? `<div class="ds-prod-range">${escHtml(cp.range)}</div>` : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -18251,11 +18309,14 @@
         }
 
         function cdtToggleProduct(id, el) {
-            const idx = _cdtSelectedProducts.indexOf(id);
-            if (idx === -1) { _cdtSelectedProducts.push(id); el.classList.add('selected'); }
-            else { _cdtSelectedProducts.splice(idx, 1); el.classList.remove('selected'); }
+            // Use separate arrays for job (club_product IDs) vs catalogue (master product IDs)
+            const arr = _cdtProdSource === 'catalogue' ? _cdtSelectedCatalogueProducts : _cdtSelectedProducts;
+            const idx = arr.indexOf(id);
+            if (idx === -1) { arr.push(id); el.classList.add('selected'); }
+            else { arr.splice(idx, 1); el.classList.remove('selected'); }
+            const total = _cdtSelectedProducts.length + _cdtSelectedCatalogueProducts.length;
             const countEl = document.getElementById('cdt-prod-count');
-            if (countEl) countEl.textContent = _cdtSelectedProducts.length ? `${_cdtSelectedProducts.length} selected` : '';
+            if (countEl) countEl.textContent = total ? `${total} selected` : '';
         }
 
         function hideCreateDesignTaskModal() {
@@ -18288,6 +18349,31 @@
                 const designerId   = dsnSel?.value || null;
                 const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
 
+                // Resolve master catalogue selections → club_product IDs
+                let catalogueClubProdIds = [];
+                if (_cdtSelectedCatalogueProducts.length) {
+                    const resolveClubId = clubId || (linkedJobId ? (jobs||[]).find(j=>j.id===linkedJobId)?.club_id : null);
+                    if (!resolveClubId) {
+                        showToast('Link a club or job to save catalogue products', 'warning');
+                    } else {
+                        for (const prodId of _cdtSelectedCatalogueProducts) {
+                            const { data: existing } = await supabase.from('club_products')
+                                .select('id').eq('club_id', resolveClubId).eq('product_id', prodId).maybeSingle();
+                            if (existing) {
+                                catalogueClubProdIds.push(existing.id);
+                            } else {
+                                const masterProd = _cdtAllProducts.find(p => p.id === prodId);
+                                const { data: newCp, error: cpErr } = await supabase.from('club_products').insert({
+                                    brand_id: currentBrand.id, club_id: resolveClubId, product_id: prodId,
+                                    custom_name: masterProd?.nm || '', is_active: true
+                                }).select('id').single();
+                                if (!cpErr && newCp) catalogueClubProdIds.push(newCp.id);
+                            }
+                        }
+                    }
+                }
+                const productsRequired = [..._cdtSelectedProducts, ...catalogueClubProdIds];
+
                 const payload = {
                     brand_id: currentBrand.id,
                     task_name: name,
@@ -18308,7 +18394,7 @@
                     design_brief: document.getElementById('cdt-design-brief')?.value?.trim() || null,
                     custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
                     key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
-                    products_required: _cdtSelectedProducts.length ? _cdtSelectedProducts : [],
+                    products_required: productsRequired,
                     use_club_colours: true
                 };
 
@@ -20488,6 +20574,11 @@
 
             if (stageNum === 1) {
                 panel.innerHTML = await buildStage1Panel(stage);
+                // Populate multi-user owner checklist after HTML is in the DOM
+                await loadBrandUsers();
+                populateMultiUserAssign('dt-owner-users-list', 'dt-owner-chips',
+                    currentDesignTaskRecord?.owner_ids ||
+                    (currentDesignTaskRecord?.owner_id ? [currentDesignTaskRecord.owner_id] : []));
             } else if (stageNum === 2 || stageNum === 3) {
                 panel.innerHTML = await buildVersionStagePanel(stage);
                 // Load per-version comment threads
@@ -20509,18 +20600,18 @@
             const club = task.clubs || {};
 
             // Parallel data loads
-            const [logRes, assetsRes, prodsRes] = await Promise.all([
+            const [logRes, assetsRes, jobProdsRes] = await Promise.all([
                 supabase.from('stage_status_log').select('*').eq('stage_id', stage.id).order('created_at'),
                 supabase.from('design_task_assets').select('*').eq('design_task_id', stage.task_id).order('created_at'),
-                task.club_id
-                    ? supabase.from('club_products')
-                        .select('id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category)')
-                        .eq('club_id', task.club_id).eq('is_active', true).order('created_at')
+                task.job_id
+                    ? supabase.from('job_products')
+                        .select('club_products(id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category))')
+                        .eq('job_id', task.job_id)
                     : Promise.resolve({ data: [] })
             ]);
 
             const assets   = assetsRes.data || [];
-            const clubProds = prodsRes.data || [];
+            const jobProds  = (jobProdsRes.data || []).map(jp => jp.club_products).filter(Boolean);
             const logHtml  = buildCommentLog(logRes.data || []);
             const isApproved  = stage.status === 'approved';
             const isDeclined  = stage.status === 'declined';
@@ -20543,12 +20634,12 @@
                   pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
-            // ── Product cards ───────────────────────────────────────────────
-            const prodCardsHtml = !task.club_id
-                ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">Link a club to this task to see products.</p>`
-                : !clubProds.length
-                    ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">No products in this club's catalogue.</p>`
-                    : clubProds.map(cp => {
+            // ── Product cards (Job tab) ──────────────────────────────────────
+            const prodCardsHtml = !task.job_id
+                ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">Link a job to this task to see its products. Use the Catalogue tab to browse all products.</p>`
+                : !jobProds.length
+                    ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">No products on the linked job yet. Add products to the job first, or use the Catalogue tab.</p>`
+                    : jobProds.map(cp => {
                         const sel = selectedIds.has(cp.id);
                         const nm  = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
                         const cod = cp.products?.product_code || '';
@@ -20666,11 +20757,9 @@
                                     <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${dueDate}${dueExtra}</div>
                                 </div>
                                 <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;grid-column:span 3">
-                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:4px">Owner</div>
-                                    <select onchange="saveDesignTaskOwner(this.value)" style="width:100%;border:none;background:transparent;font-size:12px;font-weight:600;color:#0f172a;outline:none;cursor:pointer;padding:0">
-                                        <option value="">— Unassigned —</option>
-                                        ${brandUsers.map(u => `<option value="${u.id}" ${u.id === task.owner_id ? 'selected' : ''}>${escHtml(userDisplayName(u))}</option>`).join('')}
-                                    </select>
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Owner</div>
+                                    <div id="dt-owner-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px"><span style="font-size:11px;color:#94a3b8">No one assigned</span></div>
+                                    <div id="dt-owner-users-list" style="max-height:150px;overflow-y:auto;border-radius:6px;border:1px solid #e2e8f0;background:#fff;padding:2px 0"></div>
                                 </div>
                             </div>
                         </div>
@@ -20749,8 +20838,8 @@
                         </div>
                         <!-- Source toggle -->
                         <div style="display:flex;align-items:center;gap:0;border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:10px;width:fit-content">
-                            <button id="prdtab-club" onclick="switchProdTab('club')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#0f172a;color:#fff;border-right:1px solid #e2e8f0;transition:all 0.15s">Club Catalogue</button>
-                            <button id="prdtab-master" onclick="switchProdTab('master')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#64748b;transition:all 0.15s">All Products</button>
+                            <button id="prdtab-club" onclick="switchProdTab('club')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#0f172a;color:#fff;border-right:1px solid #e2e8f0;transition:all 0.15s">Job</button>
+                            <button id="prdtab-master" onclick="switchProdTab('master')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#64748b;transition:all 0.15s">Catalogue</button>
                         </div>
                         <div id="brprod-club"><div class="ds-prod-grid">${prodCardsHtml}</div></div>
                         <div id="brprod-master" class="hide">
@@ -21260,11 +21349,19 @@
                     ${task.sport ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport)}</span></div>` : ''}
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${escHtml(designerName)}</span></div>
-                    ${task.order_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${(() => {
+                        const ownerIds = task.owner_ids || (task.owner_id ? [task.owner_id] : []);
+                        if (ownerIds.length && brandUsers.length) {
+                            const names = ownerIds.map(id => { const u = brandUsers.find(u => u.id === id); return u ? userDisplayName(u) : null; }).filter(Boolean);
+                            if (names.length) return escHtml(names.join(', '));
+                        }
+                        return escHtml(designerName);
+                    })()}</span></div>
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${task.order_type ? escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</span></div>
+                    ${task.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Task Type</span><span class="dtr-ro-value">${escHtml(Object.fromEntries(DS_JOB_TYPES.map(t=>[t.key,t.label]))[task.job_type] || task.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
                     ${task.team ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Team</span><span class="dtr-ro-value">${escHtml(task.team)}</span></div>` : ''}
                     ${task.season_event ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Season</span><span class="dtr-ro-value">${escHtml(task.season_event)}</span></div>` : ''}
-                    ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span></div>` : ''}
+                    ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
                 </div>
                 <!-- § Design Brief (read-only) -->
                 <div class="dtr-ro-section">
@@ -22622,11 +22719,35 @@
             }
         }
 
-        async function briefToggleProduct(productId, cardEl) {
+        async function briefToggleProduct(productId, cardEl, isMasterCatalogue = false) {
             if (!currentDesignTaskRecord) return;
+            let resolvedId = productId;
+
+            // If this is a master catalogue product, find or create a club_product record first
+            if (isMasterCatalogue) {
+                const clubId = currentDesignTaskRecord.club_id;
+                if (!clubId) {
+                    showToast('Link a club to this task to add catalogue products', 'warning');
+                    return;
+                }
+                const { data: existing } = await supabase.from('club_products')
+                    .select('id').eq('club_id', clubId).eq('product_id', productId).maybeSingle();
+                if (existing) {
+                    resolvedId = existing.id;
+                } else {
+                    const prod = (_masterProdsData || []).find(p => p.id === productId);
+                    const { data: newCp, error } = await supabase.from('club_products').insert({
+                        brand_id: currentBrand.id, club_id: clubId, product_id: productId,
+                        custom_name: prod?.item_name || '', is_active: true
+                    }).select('id').single();
+                    if (error) { showToast('Error linking product to club', 'error'); return; }
+                    resolvedId = newCp.id;
+                }
+            }
+
             const arr = [...(currentDesignTaskRecord.products_required || [])];
-            const idx = arr.indexOf(productId);
-            if (idx === -1) arr.push(productId);
+            const idx = arr.indexOf(resolvedId);
+            if (idx === -1) arr.push(resolvedId);
             else arr.splice(idx, 1);
             currentDesignTaskRecord.products_required = arr;
             cardEl.classList.toggle('selected', idx === -1);
@@ -22716,7 +22837,7 @@
                         <div class="ds-prod-name" title="${escHtml(p.item_name||'')}">${escHtml(p.item_name||'Product')}</div>
                         ${p.product_code ? `<div class="ds-prod-code">${escHtml(p.product_code)}</div>` : ''}
                     </div>`;
-                card.addEventListener('click', () => briefToggleProduct(p.id, card));
+                card.addEventListener('click', () => briefToggleProduct(p.id, card, true));
                 gridEl.appendChild(card);
             });
             container.innerHTML = '';
