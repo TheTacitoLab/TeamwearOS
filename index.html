@@ -392,7 +392,7 @@
         .gtm-target-input { width:70px; padding:2px 6px; border:1px solid #e2e8f0; border-radius:5px; font-size:12px; font-weight:700; color:#0f172a; background:#f8fafc; outline:none; text-align:right; }
         .gtm-target-input:focus { border-color:#6d28d9; }
         .gtm-target-pct { font-size:11px; font-weight:700; padding:2px 7px; border-radius:10px; }
-        .gtm-body { display:grid; grid-template-columns:1fr 1fr 260px; gap:12px; flex:1; min-height:0; }
+        .gtm-body { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; flex:1; min-height:0; }
         .gtm-card { background:#fff; border-radius:12px; border:1px solid #dde3ea; box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04); display:flex; flex-direction:column; overflow:hidden; }
         .gtm-card-hdr { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid #f1f5f9; flex-shrink:0; }
         .gtm-card-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#0f172a; }
@@ -402,6 +402,25 @@
         .gtm-feed-btn.active { background:#6d28d9; border-color:#6d28d9; color:#fff; }
         .gtm-feed-item { display:flex; gap:10px; align-items:flex-start; padding:9px 14px; border-bottom:1px solid #f8fafc; transition:background 0.1s; }
         .gtm-feed-item:hover { background:#f8fafc; }
+        /* ── Owner dropdown ── */
+        .owner-dp-btn { display:flex;align-items:center;gap:6px;cursor:pointer;padding:7px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;min-height:36px;width:100%;box-sizing:border-box;text-align:left; }
+        .owner-dp-arrow { margin-left:auto;color:#94a3b8;font-size:10px;transition:transform 0.15s;flex-shrink:0; }
+        .owner-dp.open .owner-dp-arrow { transform:rotate(180deg); }
+        .owner-dp-panel { margin-top:4px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 2px 8px rgba(15,23,42,0.1);overflow:hidden;display:none; }
+        .owner-dp.open .owner-dp-panel { display:block; }
+        .owner-dp-list { max-height:160px;overflow-y:auto;padding:4px 0; }
+        .owner-dp-item { display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;transition:background 0.1s; }
+        .owner-dp-item:hover { background:#f8fafc; }
+        .owner-dp-item input[type=checkbox] { width:15px;height:15px;accent-color:#6d28d9;cursor:pointer;flex-shrink:0; }
+        .owner-dp-item span { font-size:12px;color:#334155;flex:1; }
+        .owner-dp-footer { padding:6px 10px;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end; }
+        .owner-dp-done { padding:4px 14px;border-radius:7px;font-size:12px;font-weight:700;background:#6d28d9;color:#fff;border:none;cursor:pointer; }
+        .owner-dp-done:hover { background:#5b21b6; }
+        .owner-dp.dark .owner-dp-btn { border-color:rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#e2e8f0; }
+        .owner-dp.dark .owner-dp-panel { background:#1e293b;border-color:rgba(255,255,255,0.12);box-shadow:0 4px 20px rgba(0,0,0,0.5); }
+        .owner-dp.dark .owner-dp-item:hover { background:rgba(255,255,255,0.06); }
+        .owner-dp.dark .owner-dp-item span { color:#cbd5e1; }
+        .owner-dp.dark .owner-dp-footer { border-color:rgba(255,255,255,0.08);background:#1e293b; }
         .gtm-feed-item.done { opacity:0.4; }
         .gtm-feed-type { width:18px; height:18px; border-radius:5px; flex-shrink:0; margin-top:1px; display:flex; align-items:center; justify-content:center; font-size:9px; font-weight:900; cursor:pointer; transition:all 0.12s; }
         .gtm-feed-type.na { background:#fef3c7; color:#d97706; border:1.5px solid #fde68a; }
@@ -3428,13 +3447,13 @@
                         <div class="grid grid-cols-2 gap-4 mb-3">
                             <div>
                                 <label class="text-xs text-gray-500 mb-1 block">Status</label>
-                                <select id="lead-status" class="w-full px-3 py-2 rounded-lg text-sm" onchange="toggleKanbanStageField()">
+                                <select id="lead-status" class="w-full px-3 py-2 rounded-lg text-sm">
                                     <option value="not_contacted">Not Contacted</option>
                                     <option value="in_discussion">In Discussion</option>
                                 </select>
                             </div>
                             <div id="lead-stage-field">
-                                <label class="text-xs text-gray-500 mb-1 block">Kanban Stage</label>
+                                <label class="text-xs text-gray-500 mb-1 block">Pipeline Stage</label>
                                 <select id="lead-stage" class="w-full px-3 py-2 rounded-lg text-sm">
                                     <option value="">Select stage...</option>
                                 </select>
@@ -3442,9 +3461,7 @@
                         </div>
                         <div>
                             <label class="text-xs text-gray-500 mb-1 block">Owner</label>
-                            <select id="lead-assigned-to" class="w-full px-3 py-2 rounded-lg text-sm">
-                                <option value="">Unassigned</option>
-                            </select>
+                            <div class="owner-dp" id="owner-dp-lead"></div>
                         </div>
                     </div>
 
@@ -3664,21 +3681,33 @@
              TOOL: JOB RECORD (Full page, 7 tabs)
              ============================================================ -->
         <div id="tool-job-record" class="hide job-record-page">
-            <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (pipelines+content) | right (activity) -->
-            <div class="jr-three-col" style="padding-top:20px">
+            <!-- ── Top header bar: white card with name pill + nav pill + edit button ── -->
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+                <!-- Job identity pill -->
+                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;flex-shrink:0;min-width:80px">
+                    <span id="jr-job-number" class="text-xs font-mono block mb-0.5" style="color:#94a3b8"></span>
+                    <h2 id="jr-job-name" class="text-sm font-bold leading-tight" style="color:#0f172a">Job Name</h2>
+                </div>
+                <!-- Nav pill -->
+                <div style="flex:1;display:flex;gap:2px;overflow-x:auto;min-width:0" id="job-record-nav">
+                    <button class="record-nav-item active" onclick="showJobTab('overview')" id="jt-overview" style="width:auto;padding:7px 12px;font-size:12px">Overview</button>
+                    <button class="record-nav-item" onclick="showJobTab('products')" id="jt-products" style="width:auto;padding:7px 12px;font-size:12px">Products</button>
+                    <button class="record-nav-item" onclick="showJobTab('club')" id="jt-club" style="width:auto;padding:7px 12px;font-size:12px">Club Record</button>
+                    <button class="record-nav-item" onclick="showJobTab('team')" id="jt-team" style="width:auto;padding:7px 12px;font-size:12px">Team</button>
+                    <button class="record-nav-item" onclick="showJobTab('design')" id="jt-design" style="width:auto;padding:7px 12px;font-size:12px">Design Studio</button>
+                    <button class="record-nav-item" onclick="showJobTab('orderform')" id="jt-orderform" style="width:auto;padding:7px 12px;font-size:12px">Order Form</button>
+                    <button class="record-nav-item" onclick="showJobTab('production')" id="jt-production" style="width:auto;padding:7px 12px;font-size:12px">Production</button>
+                </div>
+                <button onclick="openEditJobModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit Job</button>
+            </div>
+            <!-- 3-COLUMN LAYOUT: left (info) | middle (pipelines+content) | right (activity) -->
+            <div class="jr-three-col">
 
-                <!-- ── Column 1: Job info card + sticky nav menu ── -->
+                <!-- ── Column 1: Job info card ── -->
                 <div class="jr-left-col">
                     <!-- Compact job info card -->
                     <div class="glass rounded-2xl p-4">
-                        <div class="flex items-start justify-between gap-3 mb-3">
-                            <div class="min-w-0">
-                                <span id="jr-job-number" class="text-xs text-gray-600 font-mono block mb-1"></span>
-                                <h2 id="jr-job-name" class="text-lg font-bold mb-1 leading-tight">Job Name</h2>
-                                <p id="jr-job-desc" class="text-gray-500 text-xs leading-relaxed"></p>
-                            </div>
-                            <button onclick="openEditJobModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
-                        </div>
+                        <p id="jr-job-desc" class="text-gray-500 text-xs leading-relaxed mb-3"></p>
                         <div class="grid grid-cols-2 gap-y-2 pt-3 border-t border-gray-800" id="jr-meta-row">
                             <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-xs font-semibold mt-0.5">—</p></div>
                             <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-xs font-semibold mt-0.5">—</p></div>
@@ -3690,54 +3719,20 @@
                             <div><span class="text-xs text-gray-600">Deadline</span><p id="jr-deadline" class="text-xs font-semibold mt-0.5" style="color:#dc2626">—</p></div>
                             <div><span class="text-xs text-gray-600">Order Target</span><p id="jr-order-target" class="text-xs font-semibold mt-0.5" style="color:#d97706">—</p></div>
                         </div>
-                        <!-- Owner -->
+                        <!-- Owner (multi-user dropdown) -->
                         <div class="mt-3 pt-3 border-t border-gray-800">
                             <span class="text-xs text-gray-600 block mb-1.5">Owner</span>
-                            <select id="jr-owner-sidebar" onchange="saveJobAssignment(this.value)" style="width:100%;font-size:12px;font-weight:500;padding:5px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#e2e8f0;outline:none;cursor:pointer">
-                                <option value="">Unassigned</option>
-                            </select>
+                            <div class="owner-dp dark" id="owner-dp-job"></div>
                         </div>
                         <!-- Next Action -->
                         <div id="jr-next-action" class="mt-3 pt-3 border-t border-gray-800"></div>
-                    </div>
-                    <!-- Sticky navigation menu -->
-                    <div class="record-side-nav" id="job-record-nav">
-                        <button class="record-nav-item active" onclick="showJobTab('overview')" id="jt-overview">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                            Overview
-                        </button>
-                        <button class="record-nav-item" onclick="showJobTab('products')" id="jt-products">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            Products
-                        </button>
-                        <button class="record-nav-item" onclick="showJobTab('club')" id="jt-club">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                            Club Record
-                        </button>
-                        <button class="record-nav-item" onclick="showJobTab('team')" id="jt-team">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            Team
-                        </button>
-                        <div class="record-nav-divider"></div>
-                        <button class="record-nav-item" onclick="showJobTab('design')" id="jt-design">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                            Design Studio
-                        </button>
-                        <button class="record-nav-item" onclick="showJobTab('orderform')" id="jt-orderform">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Order Form
-                        </button>
-                        <button class="record-nav-item" onclick="showJobTab('production')" id="jt-production">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
-                            Production
-                        </button>
                     </div>
                 </div>
 
                 <!-- ── Column 2: Pipeline rows + tab content ── -->
                 <div class="jr-middle-col">
-                    <!-- Pipeline cards (slim at top) -->
-                    <div class="jr-pipelines-col">
+                    <!-- Pipeline cards (slim at top, overview tab only) -->
+                    <div class="jr-pipelines-col" id="jr-pipelines-col">
                         <!-- Job Stage Pipeline -->
                         <div class="glass rounded-2xl p-4">
                             <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Job Stage</span>
@@ -3766,12 +3761,8 @@
             <div id="jt-content-overview">
                 <div class="glass rounded-2xl p-4">
                     <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Job Details</h4>
-                    <!-- Hidden compat elements (owner is now in sidebar dropdown) -->
-                    <div class="hide">
-                        <div id="jr-assigned-users-list"></div>
-                        <div id="jr-assigned-users-chips"></div>
-                        <select id="jr-assigned-user"><option value="">Unassigned</option></select>
-                    </div>
+                    <!-- Compat: hidden legacy single-select (kept for any legacy save callers) -->
+                    <div class="hide"><select id="jr-assigned-user"><option value="">Unassigned</option></select></div>
                     <div id="jr-overview-description"></div>
                     <div id="jr-overview-contact" style="margin-top:16px"></div>
                     <div id="jr-overview-details" style="margin-top:16px"></div>
@@ -4030,6 +4021,10 @@
                             <input type="date" id="job-next-step-deadline" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
                     </div>
+                    <div class="modal-section">
+                        <p class="modal-section-title">Owner</p>
+                        <div class="owner-dp" id="owner-dp-job-modal"></div>
+                    </div>
                     <div class="flex gap-3">
                         <button onclick="saveJob()" class="btn-primary">Save Job</button>
                         <button onclick="closeJobModal()" class="btn-secondary">Cancel</button>
@@ -4165,102 +4160,42 @@
         <!-- ============================================================
              TOOL: CLUB DETAIL DASHBOARD
              ============================================================ -->
-        <div id="tool-club-detail" class="hide w-full p-6 md:p-8 lg:px-12">
-            <div class="flex items-center gap-3 mb-6 flex-wrap">
-                <button onclick="goBack()" id="club-detail-back-btn" class="nav-back-btn">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                    <span id="club-detail-back-label">Back to Clubs</span>
-                </button>
-                <div id="club-breadcrumb" class="breadcrumb-trail"></div>
+        <div id="tool-club-detail" class="hide w-full" style="padding:20px 32px 32px">
+
+            <!-- Club header bar + nav (white card with identity pill + nav pill) -->
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
+                <!-- Club identity pill -->
+                <div style="display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;flex-shrink:0;min-width:100px">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#fff;border:1px solid #e2e8f0">
+                        <span id="club-detail-initials" class="text-brand-400 font-bold text-xs"></span>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <h2 id="club-detail-name" class="text-sm font-bold leading-tight truncate" style="color:#0f172a"></h2>
+                            <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                        </div>
+                        <div class="flex gap-2 mt-0.5">
+                            <p id="club-detail-sport" class="text-xs text-gray-500"></p>
+                            <p id="club-detail-suffix" class="text-xs font-mono" style="color:#94a3b8"></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Nav pill -->
+                <div id="club-record-nav" style="flex:1;display:flex;gap:2px;overflow-x:auto;min-width:0">
+                    <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')" style="width:auto;padding:7px 12px;font-size:12px">Overview</button>
+                    <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')" style="width:auto;padding:7px 12px;font-size:12px">Teams</button>
+                    <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')" style="width:auto;padding:7px 12px;font-size:12px">Club Products</button>
+                    <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')" style="width:auto;padding:7px 12px;font-size:12px">Order Forms</button>
+                    <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')" style="width:auto;padding:7px 12px;font-size:12px">Jobs</button>
+                    <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')" style="width:auto;padding:7px 12px;font-size:12px">Onboarding</button>
+                </div>
+                <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit Club</button>
             </div>
 
-            <!-- 3-COLUMN LAYOUT: left (info+nav) | middle (timeline+content) | right (activity) -->
-            <div class="jr-three-col">
+            <!-- 2-column layout: content | activity -->
+            <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
 
-                <!-- ── Column 1: Collapsible info card + nav ── -->
-                <div class="jr-left-col" id="jr-left-col">
-                    <!-- Collapse toggle — always visible -->
-                    <div style="display:flex;justify-content:flex-end;padding-bottom:6px">
-                        <button class="jr-left-collapse-btn" onclick="toggleClubLeftCol()" id="jr-left-collapse-btn" title="Collapse navigation">
-                            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                        </button>
-                    </div>
-                    <!-- Content wrapper (collapsed state swaps glass+nav for icon-only nav) -->
-                    <div class="jr-left-col-inner">
-                        <!-- Icon-only nav shown when collapsed -->
-                        <div class="jr-left-icon-nav" id="jr-left-icon-nav">
-                            <button onclick="showClubTab('overview')" id="icon-tab-overview" title="Overview">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                            </button>
-                            <button onclick="showClubTab('teams')" id="icon-tab-teams" title="Teams">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            </button>
-                            <button onclick="showClubTab('products')" id="icon-tab-products" title="Club Products">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                            </button>
-                            <button onclick="showClubTab('orderforms')" id="icon-tab-orderforms" title="Order Forms">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            </button>
-                            <button onclick="showClubTab('jobs')" id="icon-tab-jobs" title="Jobs">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                            </button>
-                            <button onclick="showClubTab('onboarding')" id="icon-tab-onboarding" title="Onboarding">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                            </button>
-                        </div>
-                        <!-- Compact club info card -->
-                        <div class="glass rounded-2xl p-4">
-                            <div class="flex items-start justify-between gap-3 mb-3">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#dbeafe">
-                                        <span id="club-detail-initials" class="text-brand-400 font-bold text-sm"></span>
-                                    </div>
-                                    <div class="min-w-0">
-                                        <h2 id="club-detail-name" class="text-sm font-bold leading-tight truncate"></h2>
-                                        <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                                            <span id="club-detail-partner-badge" class="badge text-xs"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit</button>
-                            </div>
-                            <div class="pt-3 border-t border-gray-800 space-y-2">
-                                <div><span class="text-xs text-gray-600">Sport</span><p id="club-detail-sport" class="text-xs font-semibold mt-0.5">—</p></div>
-                                <div><span class="text-xs text-gray-600">Suffix</span><p id="club-detail-suffix" class="text-xs font-semibold font-mono mt-0.5">—</p></div>
-                            </div>
-                        </div>
-                        <!-- Sticky navigation menu -->
-                        <div class="record-side-nav" id="club-record-nav">
-                            <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
-                                Overview
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                Teams
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                                Club Products
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                Order Forms
-                            </button>
-                            <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                Jobs
-                            </button>
-                            <div class="record-nav-divider"></div>
-                            <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-                                Onboarding
-                            </button>
-                        </div>
-                    </div><!-- end jr-left-col-inner -->
-                </div>
-
-                <!-- ── Column 2: Timeline at top + tab content ── -->
+                <!-- ── Column 1: Timeline at top + tab content ── -->
                 <div class="jr-middle-col">
                     <!-- Onboarding timeline (slim at top, same width as content) -->
                     <div class="record-timeline" style="margin-bottom:16px" id="club-record-timeline">
@@ -4298,12 +4233,10 @@
                             <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:#f1f5f9">Edit</button>
                         </div>
                         <div id="club-overview-info"><!-- Populated by JS --></div>
-                        <!-- Owner assignment -->
+                        <!-- Owner assignment (multi-user dropdown) -->
                         <div class="mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.06)">
                             <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
-                            <select id="club-assigned-user" class="w-full px-3 py-2 rounded-lg text-sm" onchange="saveClubAssignment(this.value)">
-                                <option value="">Unassigned</option>
-                            </select>
+                            <div class="owner-dp dark" id="owner-dp-club"></div>
                         </div>
                     </div>
                     <!-- Branding card -->
@@ -4702,7 +4635,7 @@
                     </div>
                 </div><!-- /jr-activity-sidebar -->
 
-            </div><!-- /jr-three-col -->
+            </div><!-- /2-col grid -->
         </div>
 
         <!-- ============================================================
@@ -4908,6 +4841,12 @@
 
                 <!-- Hidden legacy partner checkbox for JS compatibility -->
                 <input type="hidden" id="club-is-partner" value="false">
+
+                <!-- Owner -->
+                <div class="modal-section mt-4">
+                    <p class="modal-section-title">Owner</p>
+                    <div class="owner-dp" id="owner-dp-club-modal"></div>
+                </div>
 
                 <div class="flex gap-3 mt-4">
                     <button onclick="hideCreateClubModal()" class="flex-1 btn-secondary py-3">Cancel</button>
@@ -10682,6 +10621,8 @@
             const logoExisting = document.getElementById('club-logo-url-existing');
             if (logoPreview) logoPreview.innerHTML = logoSrc ? `<img src="${escHtml(logoSrc)}" class="w-full h-full object-contain rounded-xl">` : '<svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>';
             if (logoExisting) logoExisting.value = logoSrc || '';
+            renderOwnerDropdown('club-modal',
+                currentClub?.assigned_user_ids || (currentClub?.assigned_user_id ? [currentClub.assigned_user_id] : []));
             document.getElementById('create-club-modal').classList.remove('hide');
         }
 
@@ -10876,7 +10817,11 @@
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
-                logo_url: logoUrl
+                logo_url: logoUrl,
+                ...(() => {
+                    const ownerIds = getOwnerDropdownIds('club-modal');
+                    return { assigned_user_id: ownerIds[0] || null, assigned_user_ids: ownerIds };
+                })()
             };
             let result;
             if (clubId) {
@@ -10892,6 +10837,9 @@
                     currentClub = clubs.find(c => c.id === clubId);
                     updateClubDetailHeader();
                     renderClubOverviewInfo();
+                    // Refresh the overview owner dropdown
+                    renderOwnerDropdown('club',
+                        currentClub?.assigned_user_ids || (currentClub?.assigned_user_id ? [currentClub.assigned_user_id] : []));
                 }
                 // If we opened edit from within a job record, refresh the job's club tab
                 if (window._editClubFromJob) {
@@ -10996,12 +10944,13 @@
             if (!currentClub) return;
             const initials = ((currentClub.suffix || currentClub.name.substring(0, 2))).substring(0, 2);
             const avatarEl = document.getElementById('club-detail-avatar');
-            const initialsEl = document.getElementById('club-detail-initials');
             const logoUrl = currentClub.club_crest_url || currentClub.logo_url || '';
-            if (logoUrl && avatarEl) {
-                avatarEl.innerHTML = `<img src="${escHtml(logoUrl)}" alt="" style="width:100%;height:100%;object-fit:cover">`;
-            } else if (initialsEl) {
-                initialsEl.textContent = initials;
+            if (avatarEl) {
+                if (logoUrl) {
+                    avatarEl.innerHTML = `<img src="${escHtml(logoUrl)}" alt="" style="width:100%;height:100%;object-fit:cover">`;
+                } else {
+                    avatarEl.innerHTML = `<span id="club-detail-initials" class="text-brand-400 font-bold text-sm">${escHtml(initials)}</span>`;
+                }
             }
             document.getElementById('club-detail-name').textContent = currentClub.name;
             document.getElementById('club-detail-sport').textContent = currentClub.sport || '';
@@ -11333,8 +11282,9 @@
             }
             const dlBtn = document.getElementById('club-logo-download-btn');
             if (dlBtn) { if (logoSrc) dlBtn.classList.remove('hide'); else dlBtn.classList.add('hide'); }
-            // Populate assignment dropdown
-            populateUserAssignDropdown('club-assigned-user', currentClub.assigned_user_id);
+            // Populate owner dropdown
+            renderOwnerDropdown('club',
+                currentClub?.assigned_user_ids || (currentClub?.assigned_user_id ? [currentClub.assigned_user_id] : []));
             // Populate inline colour editors
             const mainHex = currentClub.pantone_main || '#3b82f6';
             const secHex  = currentClub.pantone_secondary || '#64748b';
@@ -14137,7 +14087,8 @@
             const clubName = hasClub ? job.clubs.name : '⚠ No club linked';
             const clubStyle = hasClub ? '' : 'color:#dc2626;font-weight:700';
             const days = Math.floor((new Date() - new Date(job.created_at)) / 86400000);
-            const ownerName = getUserDisplayName(job.created_by);
+            const assignedIds = job.assigned_user_ids?.length ? job.assigned_user_ids : (job.assigned_user_id ? [job.assigned_user_id] : []);
+            const ownerName = assignedIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ') || '—';
             const noClubClass = hasClub ? '' : ' job-card-no-club';
             return `<div class="job-card${noClubClass}" onclick="openJobRecord('${job.id}')">
                 ${!hasClub ? `<div class="flex items-center gap-1 mb-2 px-2 py-1 rounded-lg" style="background:#fee2e2;border:1px solid #fca5a5"><svg class="w-3 h-3" fill="none" stroke="#dc2626" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg><span style="font-size:10px;font-weight:700;color:#dc2626">No club linked</span></div>` : ''}
@@ -14217,6 +14168,8 @@
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
                 clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
+            renderOwnerDropdown('job-modal',
+                currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []));
             document.getElementById('job-modal').classList.remove('hide');
         }
 
@@ -14250,7 +14203,11 @@
                 contact_email: document.getElementById('job-contact-email')?.value.trim() || null,
                 contact_phone: document.getElementById('job-contact-phone')?.value.trim() || null,
                 next_step: document.getElementById('job-next-step')?.value.trim() || null,
-                next_step_deadline: document.getElementById('job-next-step-deadline')?.value || null
+                next_step_deadline: document.getElementById('job-next-step-deadline')?.value || null,
+                ...(document.getElementById('owner-dp-job-modal') ? (() => {
+                    const ownerIds = getOwnerDropdownIds('job-modal');
+                    return { assigned_user_id: ownerIds[0] || null, assigned_user_ids: ownerIds };
+                })() : {})
             };
 
             if (jobId) {
@@ -14295,6 +14252,9 @@
                 currentJob = jobs.find(j => j.id === currentJobId);
                 renderJobHeader();
                 showJobTab(currentJobTab);
+                // Refresh sidebar owner dropdown to reflect saved changes
+                renderOwnerDropdown('job',
+                    currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []));
             } else {
                 showSalesTab('jobs');
             }
@@ -14355,9 +14315,10 @@
             showJobTab('overview');
             // Load activity log, user assignment, and design pipeline in parallel
             await Promise.all([loadJobActivity(), loadBrandUsers(), loadJobDesignPipeline(jobId)]);
-            // Populate owner sidebar dropdown
-            populateUserAssignDropdown('jr-owner-sidebar', currentJob?.assigned_user_id);
-            // Keep hidden compat elements populated
+            // Populate owner dropdown in sidebar
+            renderOwnerDropdown('job',
+                currentJob?.assigned_user_ids || (currentJob?.assigned_user_id ? [currentJob.assigned_user_id] : []));
+            // Keep hidden compat single-select populated
             populateUserAssignDropdown('jr-assigned-user', currentJob?.assigned_user_id);
             // Reset activity tab
             jobActivityTabFilter = 'all';
@@ -14582,6 +14543,9 @@
             });
             document.getElementById(`jt-content-${tab}`)?.classList.remove('hide');
             document.getElementById(`jt-${tab}`)?.classList.add('active');
+            // Pipelines only show on Overview tab
+            const pipelinesEl = document.getElementById('jr-pipelines-col');
+            if (pipelinesEl) pipelinesEl.classList.toggle('hide', tab !== 'overview');
 
             switch(tab) {
                 case 'overview':   renderJobOverview(); break;
@@ -16698,11 +16662,14 @@
                 return;
             }
 
-            container.innerHTML = filtered.map(lead => `
+            container.innerHTML = filtered.map(lead => {
+                const ownerIds = lead.assigned_user_ids?.length ? lead.assigned_user_ids : (lead.assigned_to ? [lead.assigned_to] : []);
+                const ownerNames = ownerIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ');
+                return `
                 <div class="lead-row" onclick="openLeadModal('${lead.id}')">
                     <div class="flex-1 min-w-0">
                         <p class="font-semibold text-sm truncate">${escHtml(lead.lead_name)}</p>
-                        <p class="text-xs text-gray-500 truncate">${escHtml(lead.club_name)}${lead.location ? ' · ' + escHtml(lead.location) : ''}</p>
+                        <p class="text-xs text-gray-500 truncate">${escHtml(lead.club_name)}${lead.location ? ' · ' + escHtml(lead.location) : ''}${ownerNames ? ' · 👤 ' + escHtml(ownerNames) : ''}</p>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         ${lead.sport ? `<span class="lead-sport-badge">${escHtml(lead.sport)}</span>` : ''}
@@ -16730,7 +16697,8 @@
                         </button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function populateCountyFilter() {
@@ -16859,7 +16827,8 @@
                 const moveOpts = kanbanStages.filter(s => s.id !== stage.id)
                     .map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('');
                 const cards = stageLeads.map(lead => {
-                    const salesperson = lead.assigned_to ? escHtml(getUserDisplayName(lead.assigned_to)) : '';
+                    const ownerIds = lead.assigned_user_ids?.length ? lead.assigned_user_ids : (lead.assigned_to ? [lead.assigned_to] : []);
+                    const ownerNames = ownerIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ');
                     return `<div class="kanban-card"
                         draggable="true"
                         ondragstart="onKanbanDragStart(event,'${lead.id}')"
@@ -16872,7 +16841,7 @@
                             ${lead.county  ? `<span class="lead-county-badge">${escHtml(lead.county)}</span>` : ''}
                         </div>
                         <div class="kanban-card-footer">
-                            ${salesperson ? `<span class="kanban-salesperson">${salesperson}</span>` : '<span></span>'}
+                            ${ownerNames ? `<span class="kanban-salesperson">👤 ${escHtml(ownerNames)}</span>` : '<span></span>'}
                             <div style="display:flex;align-items:center;gap:5px">
                                 <select onchange="kanbanMoveCard('${lead.id}',this.value);this.value=''" onclick="event.stopPropagation()"
                                     style="font-size:10px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 5px;background:#f8fafc;color:#64748b;cursor:pointer;max-width:80px;height:24px">
@@ -16935,6 +16904,8 @@
                     .map(s => `<option value="${s.key}">${escHtml(s.label)}</option>`).join('');
                 const cards = stageJobs.map(job => {
                     const clubName  = escHtml(job.clubs?.name || '—');
+                    const jobOwnerIds = job.assigned_user_ids?.length ? job.assigned_user_ids : (job.assigned_user_id ? [job.assigned_user_id] : []);
+                    const jobOwnerNames = jobOwnerIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ');
                     const shopifyHtml = job.shopify_draft_order_url
                         ? `<a href="${escHtml(job.shopify_draft_order_url)}" target="_blank" rel="noopener"
                                onclick="event.stopPropagation()"
@@ -16947,6 +16918,7 @@
                         <div class="kanban-card-title">${escHtml(job.job_name)}</div>
                         <div class="kanban-card-club">${clubName}</div>
                         ${job.job_number ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">${escHtml(job.job_number)}</div>` : ''}
+                        ${jobOwnerNames ? `<div style="font-size:11px;color:#6d28d9;font-weight:600;margin-bottom:4px">👤 ${escHtml(jobOwnerNames)}</div>` : ''}
                         ${shopifyHtml}
                         <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
                             <select onchange="kanbanMoveJob('${job.id}',this.value);this.value=''" onclick="event.stopPropagation()"
@@ -17108,11 +17080,7 @@
         }
 
         function toggleKanbanStageField() {
-            const status = document.getElementById('lead-status')?.value;
-            const stageField = document.getElementById('lead-stage-field');
-            if (stageField) {
-                stageField.style.display = status === 'in_discussion' ? '' : 'none';
-            }
+            // Stage field is always visible — all stages available regardless of status
         }
 
         // =============================================
@@ -17145,7 +17113,8 @@
                 document.getElementById('lead-notes').value = lead.notes || '';
                 document.getElementById('lead-status').value = lead.status || 'not_contacted';
                 document.getElementById('lead-stage').value = lead.kanban_stage_id || '';
-                populateUserAssignDropdown('lead-assigned-to', lead.assigned_to);
+                renderOwnerDropdown('lead',
+                    lead?.assigned_user_ids || (lead?.assigned_to ? [lead.assigned_to] : []));
                 dangerActions.style.removeProperty('display');
                 // Show convert banner only if not already converted
                 const convertBanner = document.getElementById('lead-convert-banner');
@@ -17181,7 +17150,7 @@
                 document.getElementById('lead-notes').value = '';
                 document.getElementById('lead-status').value = defaultStatus;
                 document.getElementById('lead-stage').value = defaultStatus === 'in_discussion' ? (kanbanStages[0]?.id || '') : '';
-                populateUserAssignDropdown('lead-assigned-to', null);
+                renderOwnerDropdown('lead', []);
                 dangerActions.style.display = 'none';
                 const convertBanner = document.getElementById('lead-convert-banner');
                 if (convertBanner) convertBanner.classList.add('hide');
@@ -17271,7 +17240,7 @@
 
             const status = document.getElementById('lead-status').value;
             const stageId = document.getElementById('lead-stage').value || null;
-            const assignedTo = document.getElementById('lead-assigned-to')?.value || null;
+            const ownerIds = getOwnerDropdownIds('lead');
             const payload = {
                 brand_id: currentBrand.id,
                 lead_name: leadName,
@@ -17283,8 +17252,9 @@
                 amount_of_teams: parseInt(document.getElementById('lead-teams').value) || null,
                 notes: document.getElementById('lead-notes').value.trim() || null,
                 status,
-                kanban_stage_id: status === 'in_discussion' ? stageId : null,
-                assigned_to: assignedTo || null
+                kanban_stage_id: stageId,
+                assigned_to: ownerIds[0] || null,
+                assigned_user_ids: ownerIds
             };
 
             let leadId = currentLeadId;
@@ -17591,33 +17561,60 @@
         async function loadHomeActivityFeed() {
             if (!currentUser || !currentBrand) return;
             try {
-                // Get jobs assigned to current user (via assigned_user_ids OR assigned_user_id)
-                const { data: assignedJobs } = await supabase
-                    .from('jobs')
-                    .select('id, job_name, job_number')
-                    .eq('brand_id', currentBrand.id)
-                    .or(`assigned_user_id.eq.${currentUser.id},assigned_user_ids.cs.{"${currentUser.id}"}`);
+                const uid = currentUser.id;
+                const brandId = currentBrand.id;
+                const csFilter = `{"${uid}"}`;
+
+                // Fetch owned records from all 4 types in parallel
+                const [
+                    { data: assignedJobs },
+                    { data: assignedDesignTasks },
+                    { data: assignedLeads },
+                    { data: assignedClubs }
+                ] = await Promise.all([
+                    supabase.from('jobs').select('id, job_name, job_number')
+                        .eq('brand_id', brandId)
+                        .or(`assigned_user_id.eq.${uid},assigned_user_ids.cs.${csFilter}`),
+                    supabase.from('design_tasks').select('id, task_name, task_ref')
+                        .eq('brand_id', brandId)
+                        .contains('owner_ids', [uid]),
+                    supabase.from('leads').select('id, lead_name')
+                        .eq('brand_id', brandId)
+                        .or(`assigned_to.eq.${uid},assigned_user_ids.cs.${csFilter}`),
+                    supabase.from('clubs').select('id, name')
+                        .eq('brand_id', brandId)
+                        .or(`assigned_user_id.eq.${uid},assigned_user_ids.cs.${csFilter}`)
+                ]);
 
                 const jobIds = (assignedJobs || []).map(j => j.id);
-                if (jobIds.length === 0) {
+                const dtIds  = (assignedDesignTasks || []).map(d => d.id);
+                const leadIds = (assignedLeads || []).map(l => l.id);
+                const clubIds = (assignedClubs || []).map(c => c.id);
+
+                // Fetch activities from all owned records in parallel
+                const activityQueries = [];
+                if (jobIds.length)
+                    activityQueries.push(supabase.from('job_activity').select('*, jobs(id,job_name,job_number)').in('job_id', jobIds).order('created_at', { ascending: false }).limit(20));
+                if (dtIds.length)
+                    activityQueries.push(supabase.from('design_task_activity').select('*, design_tasks(id,task_name,task_ref)').in('design_task_id', dtIds).order('created_at', { ascending: false }).limit(20));
+                if (leadIds.length)
+                    activityQueries.push(supabase.from('lead_activity').select('*, leads(id,lead_name)').in('lead_id', leadIds).order('created_at', { ascending: false }).limit(20));
+                if (clubIds.length)
+                    activityQueries.push(supabase.from('club_activity').select('*, clubs(id,name)').in('club_id', clubIds).order('created_at', { ascending: false }).limit(20));
+
+                if (!activityQueries.length) {
                     homeActivityFeed = [];
                     renderHomeActivityFeed();
                     return;
                 }
 
-                const { data: activities } = await supabase
-                    .from('job_activity')
-                    .select('*, jobs(id,job_name,job_number)')
-                    .in('job_id', jobIds)
-                    .order('created_at', { ascending: false })
-                    .limit(30);
+                const results = await Promise.all(activityQueries);
+                const allActivities = results.flatMap(r => r.data || []);
 
-                homeActivityFeed = (activities || []).filter(a => {
-                    // Exclude activities added by the current user themselves (optional)
-                    // Also exclude if dismissed by current user
-                    const dismissed = a.dismissed_by || [];
-                    return !dismissed.includes(currentUser.id);
-                });
+                homeActivityFeed = allActivities
+                    .filter(a => !(a.dismissed_by || []).includes(uid))
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                    .slice(0, 40);
 
                 renderHomeActivityFeed();
             } catch(e) {
@@ -17744,11 +17741,16 @@
 
         function onUserAssignChange(containerId, chipsId) {
             updateAssignChips(containerId, chipsId);
-            // Auto-save
+            // Auto-save — route to the correct record type
             const selected = getSelectedUserIds(containerId);
-            if (containerId === 'jr-assigned-users-list') {
-                saveMultiUserAssignment('job', selected);
-            }
+            const typeMap = {
+                'jr-assigned-users-list':    'job',
+                'club-assigned-users-list':  'club',
+                'lead-assigned-users-list':  'lead',
+                'dt-owner-users-list':       'design-task',
+            };
+            const type = typeMap[containerId];
+            if (type) saveMultiUserAssignment(type, selected);
         }
 
         function getSelectedUserIds(containerId) {
@@ -17773,19 +17775,120 @@
         }
 
         async function saveMultiUserAssignment(type, userIds) {
-            if (!currentJobId && type === 'job') return;
             const primaryUserId = userIds[0] || null; // backward compat: first user = primary
-            const { error } = await supabase.from('jobs').update({
-                assigned_user_id: primaryUserId,
-                assigned_user_ids: userIds
-            }).eq('id', currentJobId);
-            if (error) { showToast('Error saving assignment', 'error'); return; }
-            if (currentJob) {
-                currentJob.assigned_user_id = primaryUserId;
-                currentJob.assigned_user_ids = userIds;
+            if (type === 'job') {
+                if (!currentJobId) return;
+                const { error } = await supabase.from('jobs').update({
+                    assigned_user_id: primaryUserId,
+                    assigned_user_ids: userIds
+                }).eq('id', currentJobId);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+                if (currentJob) { currentJob.assigned_user_id = primaryUserId; currentJob.assigned_user_ids = userIds; }
+            } else if (type === 'club') {
+                if (!currentClub?.id) return;
+                const { error } = await supabase.from('clubs').update({
+                    assigned_user_id: primaryUserId,
+                    assigned_user_ids: userIds
+                }).eq('id', currentClub.id);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+                if (currentClub) { currentClub.assigned_user_id = primaryUserId; currentClub.assigned_user_ids = userIds; }
+            } else if (type === 'lead') {
+                if (!currentLeadId) return;
+                const { error } = await supabase.from('leads').update({
+                    assigned_to: primaryUserId,
+                    assigned_user_ids: userIds
+                }).eq('id', currentLeadId);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+            } else if (type === 'design-task') {
+                if (!currentDesignTaskRecord?.id) return;
+                const { error } = await supabase.from('design_tasks').update({
+                    owner_ids: userIds
+                }).eq('id', currentDesignTaskRecord.id);
+                if (error) { showToast('Error saving assignment', 'error'); return; }
+                if (currentDesignTaskRecord) { currentDesignTaskRecord.owner_ids = userIds; }
             }
             showToast('Assignment saved');
         }
+
+        // =============================================
+        // OWNER DROPDOWN
+        // =============================================
+        const _ownerDpOpen = new Set();
+
+        function renderOwnerDropdown(scope, currentIds) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (!wrapper) return;
+            const assigned = currentIds || [];
+            wrapper.innerHTML = `
+                <div class="owner-dp-btn" onclick="toggleOwnerDropdown('${scope}')">
+                    <div id="owner-dp-chips-${scope}" style="display:flex;flex-wrap:wrap;gap:4px;flex:1;min-width:0">${_ownerDpChipsHtml(assigned)}</div>
+                    <span class="owner-dp-arrow">▾</span>
+                </div>
+                <div class="owner-dp-panel">
+                    <div class="owner-dp-list">
+                        ${brandUsers.map(u => `<label class="owner-dp-item">
+                            <input type="checkbox" value="${u.id}" ${assigned.includes(u.id) ? 'checked' : ''}
+                                onchange="onOwnerCheckboxChange('${scope}')">
+                            <span>${escHtml(userDisplayName(u))}</span>
+                        </label>`).join('')}
+                    </div>
+                    <div class="owner-dp-footer">
+                        <button class="owner-dp-done" onclick="closeOwnerDropdown('${scope}')">Done</button>
+                    </div>
+                </div>`;
+        }
+
+        function _ownerDpChipsHtml(userIds) {
+            if (!userIds || userIds.length === 0)
+                return `<span style="font-size:12px;color:#94a3b8">No owner assigned</span>`;
+            return userIds.map(uid => {
+                const u = brandUsers.find(b => b.id === uid);
+                return `<span class="user-chip">${escHtml(u ? userDisplayName(u) : 'Unknown')}</span>`;
+            }).join('');
+        }
+
+        function toggleOwnerDropdown(scope) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (!wrapper) return;
+            if (wrapper.classList.contains('open')) {
+                closeOwnerDropdown(scope);
+                return;
+            }
+            _ownerDpOpen.forEach(s => { if (s !== scope) closeOwnerDropdown(s); });
+            wrapper.classList.add('open');
+            _ownerDpOpen.add(scope);
+        }
+
+        function closeOwnerDropdown(scope) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (wrapper) wrapper.classList.remove('open');
+            _ownerDpOpen.delete(scope);
+        }
+
+        function onOwnerCheckboxChange(scope) {
+            const ids = getOwnerDropdownIds(scope);
+            const chipsEl = document.getElementById('owner-dp-chips-' + scope);
+            if (chipsEl) chipsEl.innerHTML = _ownerDpChipsHtml(ids);
+            // Auto-save (lead saves on explicit "Save Lead" click, but also auto-saves when editing existing)
+            const typeMap = { 'job':'job', 'club':'club', 'lead':'lead', 'design-task':'design-task' };
+            const type = typeMap[scope];
+            if (type) saveMultiUserAssignment(type, ids);
+        }
+
+        function getOwnerDropdownIds(scope) {
+            const wrapper = document.getElementById('owner-dp-' + scope);
+            if (!wrapper) return [];
+            return Array.from(wrapper.querySelectorAll('input[type=checkbox]:checked')).map(cb => cb.value);
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (_ownerDpOpen.size === 0) return;
+            _ownerDpOpen.forEach(scope => {
+                const wrapper = document.getElementById('owner-dp-' + scope);
+                if (wrapper && !wrapper.contains(e.target)) closeOwnerDropdown(scope);
+            });
+        });
 
         // =============================================
         // UTILITY
@@ -18064,6 +18167,7 @@
                     const pan = document.getElementById(`cdt-pan-${k}`); if (pan) pan.value = '';
                 });
                 _cdtSelectedProducts = [];
+                _cdtSelectedCatalogueProducts = [];
                 _cdtAllProducts = [];
                 _cdtClubFilter = null;
                 _cdtProdSource = 'job';
@@ -18126,6 +18230,7 @@
         async function cdtClubChanged(preselectJobId) {
             const clubId = document.getElementById('cdt-club-id')?.value;
             _cdtSelectedProducts = [];
+            _cdtSelectedCatalogueProducts = [];
             const countEl = document.getElementById('cdt-prod-count');
             if (countEl) countEl.textContent = '';
 
@@ -18149,29 +18254,30 @@
             await _cdtLoadAndRenderProducts(clubId || null);
         }
 
-        let _cdtAllProducts = [];   // all loaded products for create modal
-        let _cdtClubFilter = null;  // currently selected club id for filtering
-        let _cdtProdSource = 'catalogue'; // active product source tab: 'catalogue'|'club'|'job'
-        let _cdtJobProds = [];      // products from the selected job
+        let _cdtAllProducts = [];          // master catalogue products (products table)
+        let _cdtClubFilter = null;         // currently selected club id
+        let _cdtProdSource = 'job';        // active product source tab: 'job'|'catalogue'
+        let _cdtJobProds = [];             // club_products from the selected job
+        let _cdtSelectedCatalogueProducts = []; // master product IDs selected from catalogue tab
 
         async function _cdtLoadAndRenderProducts(clubId) {
             const grid = document.getElementById('cdt-products-grid');
             if (!grid) return;
             _cdtClubFilter = clubId || null;
 
-            // Load all brand club_products once
+            // Load master catalogue once (from products table, not club_products)
             if (!_cdtAllProducts.length) {
                 grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading…</div>';
-                const { data: cpRows } = await supabase.from('club_products')
-                    .select('id, club_id, custom_name, image_url, image_urls, products(product_code, item_name)')
-                    .in('club_id', (clubs || []).map(c => c.id))
-                    .order('created_at');
-                _cdtAllProducts = (cpRows || []).map(cp => ({
-                    id: cp.id,
-                    club_id: cp.club_id,
-                    nm: cp.custom_name || cp.products?.item_name || 'Product',
-                    img: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
-                    code: cp.products?.product_code || '',
+                const { data: prodRows } = await supabase.from('products')
+                    .select('id, product_code, item_name, range_name, category')
+                    .eq('brand_id', currentBrand.id)
+                    .order('range_name').order('item_name');
+                _cdtAllProducts = (prodRows || []).map(p => ({
+                    id: p.id,
+                    nm: p.item_name || 'Product',
+                    code: p.product_code || '',
+                    range: p.range_name || p.category || '',
+                    img: '',
                 }));
             }
             _cdtRenderProducts(clubId);
@@ -18186,23 +18292,23 @@
             let list;
             let emptyMsg;
             if (_cdtProdSource === 'job') {
-                // Normalise job prods (come from club_products rows directly)
+                // Job source: show club_products from the linked job
                 list = _cdtJobProds.map(cp => ({
                     id: cp.id,
-                    club_id: cp.club_id,
                     nm: cp.custom_name || cp.products?.item_name || 'Product',
                     img: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
                     code: cp.products?.product_code || '',
                 }));
                 emptyMsg = !document.getElementById('cdt-job-id')?.value
                     ? 'Select a job above to see its products.'
-                    : 'No products on the linked job.';
+                    : 'No products on the linked job. Use Catalogue to browse all products.';
             } else {
+                // Catalogue source: show master products table
                 list = _cdtAllProducts;
-                emptyMsg = _cdtAllProducts.length ? 'No products match your search.' : 'No products found for this brand.';
+                emptyMsg = _cdtAllProducts.length ? 'No products match your search.' : 'No products found in this brand\'s catalogue.';
             }
 
-            if (search) list = list.filter(p => (p.nm||'').toLowerCase().includes(search));
+            if (search) list = list.filter(p => (p.nm||'').toLowerCase().includes(search) || (p.code||'').toLowerCase().includes(search) || (p.range||'').toLowerCase().includes(search));
 
             if (!list.length) {
                 grid.innerHTML = `<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">${emptyMsg}</div>`;
@@ -18210,8 +18316,11 @@
             }
             grid.innerHTML = list.map(cp => {
                 const nm  = escHtml(cp.nm);
-                const img = cp.img;
-                const sel = _cdtSelectedProducts.includes(cp.id);
+                const img = cp.img || '';
+                // Check correct selection array based on source
+                const sel = _cdtProdSource === 'job'
+                    ? _cdtSelectedProducts.includes(cp.id)
+                    : _cdtSelectedCatalogueProducts.includes(cp.id);
                 return `<div class="ds-prod-card${sel?' selected':''}" id="cdtprod-${cp.id}" onclick="cdtToggleProduct('${cp.id}',this)" style="cursor:pointer">
                     <div class="ds-prod-check">✓</div>
                     <div class="ds-prod-img">
@@ -18220,6 +18329,7 @@
                     <div class="ds-prod-info">
                         <div class="ds-prod-name" title="${nm}">${nm}</div>
                         ${cp.code ? `<div class="ds-prod-code">${escHtml(cp.code)}</div>` : ''}
+                        ${cp.range ? `<div class="ds-prod-range">${escHtml(cp.range)}</div>` : ''}
                     </div>
                 </div>`;
             }).join('');
@@ -18251,11 +18361,14 @@
         }
 
         function cdtToggleProduct(id, el) {
-            const idx = _cdtSelectedProducts.indexOf(id);
-            if (idx === -1) { _cdtSelectedProducts.push(id); el.classList.add('selected'); }
-            else { _cdtSelectedProducts.splice(idx, 1); el.classList.remove('selected'); }
+            // Use separate arrays for job (club_product IDs) vs catalogue (master product IDs)
+            const arr = _cdtProdSource === 'catalogue' ? _cdtSelectedCatalogueProducts : _cdtSelectedProducts;
+            const idx = arr.indexOf(id);
+            if (idx === -1) { arr.push(id); el.classList.add('selected'); }
+            else { arr.splice(idx, 1); el.classList.remove('selected'); }
+            const total = _cdtSelectedProducts.length + _cdtSelectedCatalogueProducts.length;
             const countEl = document.getElementById('cdt-prod-count');
-            if (countEl) countEl.textContent = _cdtSelectedProducts.length ? `${_cdtSelectedProducts.length} selected` : '';
+            if (countEl) countEl.textContent = total ? `${total} selected` : '';
         }
 
         function hideCreateDesignTaskModal() {
@@ -18288,6 +18401,31 @@
                 const designerId   = dsnSel?.value || null;
                 const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
 
+                // Resolve master catalogue selections → club_product IDs
+                let catalogueClubProdIds = [];
+                if (_cdtSelectedCatalogueProducts.length) {
+                    const resolveClubId = clubId || (linkedJobId ? (jobs||[]).find(j=>j.id===linkedJobId)?.club_id : null);
+                    if (!resolveClubId) {
+                        showToast('Link a club or job to save catalogue products', 'warning');
+                    } else {
+                        for (const prodId of _cdtSelectedCatalogueProducts) {
+                            const { data: existing } = await supabase.from('club_products')
+                                .select('id').eq('club_id', resolveClubId).eq('product_id', prodId).maybeSingle();
+                            if (existing) {
+                                catalogueClubProdIds.push(existing.id);
+                            } else {
+                                const masterProd = _cdtAllProducts.find(p => p.id === prodId);
+                                const { data: newCp, error: cpErr } = await supabase.from('club_products').insert({
+                                    brand_id: currentBrand.id, club_id: resolveClubId, product_id: prodId,
+                                    custom_name: masterProd?.nm || '', is_active: true
+                                }).select('id').single();
+                                if (!cpErr && newCp) catalogueClubProdIds.push(newCp.id);
+                            }
+                        }
+                    }
+                }
+                const productsRequired = [..._cdtSelectedProducts, ...catalogueClubProdIds];
+
                 const payload = {
                     brand_id: currentBrand.id,
                     task_name: name,
@@ -18308,7 +18446,7 @@
                     design_brief: document.getElementById('cdt-design-brief')?.value?.trim() || null,
                     custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
                     key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
-                    products_required: _cdtSelectedProducts.length ? _cdtSelectedProducts : [],
+                    products_required: productsRequired,
                     use_club_colours: true
                 };
 
@@ -20488,6 +20626,9 @@
 
             if (stageNum === 1) {
                 panel.innerHTML = await buildStage1Panel(stage);
+                // Populate owner dropdown after HTML is in the DOM
+                await loadBrandUsers();
+                renderOwnerDropdown('design-task', currentDesignTaskRecord?.owner_ids || []);
             } else if (stageNum === 2 || stageNum === 3) {
                 panel.innerHTML = await buildVersionStagePanel(stage);
                 // Load per-version comment threads
@@ -20509,18 +20650,18 @@
             const club = task.clubs || {};
 
             // Parallel data loads
-            const [logRes, assetsRes, prodsRes] = await Promise.all([
+            const [logRes, assetsRes, jobProdsRes] = await Promise.all([
                 supabase.from('stage_status_log').select('*').eq('stage_id', stage.id).order('created_at'),
                 supabase.from('design_task_assets').select('*').eq('design_task_id', stage.task_id).order('created_at'),
-                task.club_id
-                    ? supabase.from('club_products')
-                        .select('id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category)')
-                        .eq('club_id', task.club_id).eq('is_active', true).order('created_at')
+                task.job_id
+                    ? supabase.from('job_products')
+                        .select('club_products(id, custom_name, image_url, image_urls, products(product_code, item_name, range_name, category))')
+                        .eq('job_id', task.job_id)
                     : Promise.resolve({ data: [] })
             ]);
 
             const assets   = assetsRes.data || [];
-            const clubProds = prodsRes.data || [];
+            const jobProds  = (jobProdsRes.data || []).map(jp => jp.club_products).filter(Boolean);
             const logHtml  = buildCommentLog(logRes.data || []);
             const isApproved  = stage.status === 'approved';
             const isDeclined  = stage.status === 'declined';
@@ -20529,26 +20670,25 @@
             const cc = task.custom_colours || {};
             const selectedIds = new Set(task.products_required || []);
 
-            // ── Colour data (mode-aware) ────────────────────────────────────
-            // Club mode: hex comes from club record; Custom mode: hex from custom_colours
+            // ── Colour data (custom takes priority; falls back to club colours) ───
             const cols = [
                 { key:'primary',   label:'Primary',
-                  hex:     useClub ? (club.hex_main        || '') : (cc.primary?.hex   || ''),
+                  hex:     cc.primary?.hex   || (useClub ? (club.hex_main        || '') : ''),
                   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
                 { key:'secondary', label:'Secondary',
-                  hex:     useClub ? (club.hex_secondary   || '') : (cc.secondary?.hex || ''),
+                  hex:     cc.secondary?.hex || (useClub ? (club.hex_secondary   || '') : ''),
                   pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
                 { key:'accent',    label:'Accent',
-                  hex:     useClub ? (club.hex_accent      || '') : (cc.accent?.hex    || ''),
+                  hex:     cc.accent?.hex    || (useClub ? (club.hex_accent      || '') : ''),
                   pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
-            // ── Product cards ───────────────────────────────────────────────
-            const prodCardsHtml = !task.club_id
-                ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">Link a club to this task to see products.</p>`
-                : !clubProds.length
-                    ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">No products in this club's catalogue.</p>`
-                    : clubProds.map(cp => {
+            // ── Product cards (Job tab) ──────────────────────────────────────
+            const prodCardsHtml = !task.job_id
+                ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">Link a job to this task to see its products. Use the Catalogue tab to browse all products.</p>`
+                : !jobProds.length
+                    ? `<p style="color:#94a3b8;font-size:13px;grid-column:1/-1">No products on the linked job yet. Add products to the job first, or use the Catalogue tab.</p>`
+                    : jobProds.map(cp => {
                         const sel = selectedIds.has(cp.id);
                         const nm  = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
                         const cod = cp.products?.product_code || '';
@@ -20666,11 +20806,8 @@
                                     <div class="brief-cell-val" style="font-size:12px;font-weight:600;color:#0f172a">${dueDate}${dueExtra}</div>
                                 </div>
                                 <div style="padding:7px 10px;border:1px solid #f1f5f9;border-radius:8px;background:#fafbfc;grid-column:span 3">
-                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:4px">Owner</div>
-                                    <select onchange="saveDesignTaskOwner(this.value)" style="width:100%;border:none;background:transparent;font-size:12px;font-weight:600;color:#0f172a;outline:none;cursor:pointer;padding:0">
-                                        <option value="">— Unassigned —</option>
-                                        ${brandUsers.map(u => `<option value="${u.id}" ${u.id === task.owner_id ? 'selected' : ''}>${escHtml(userDisplayName(u))}</option>`).join('')}
-                                    </select>
+                                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Owner</div>
+                                    <div class="owner-dp" id="owner-dp-design-task"></div>
                                 </div>
                             </div>
                         </div>
@@ -20721,14 +20858,14 @@
                                         ${!useClub ? `<div style="margin-bottom:6px">
                                             <div style="font-size:9px;color:#94a3b8;font-weight:600;margin-bottom:2px">HEX</div>
                                             <input class="ds-colour-input" id="dshex-${c.key}" value="${escHtml(c.hex)}" placeholder="#RRGGBB"
-                                                onblur="briefColourSave('${c.key}','hex',this.value)"
+                                                oninput="briefColourSave('${c.key}','hex',this.value)"
                                                 style="padding:4px 8px;font-size:11px;font-family:monospace;width:100%;box-sizing:border-box">
                                         </div>` : `<div style="margin-bottom:6px;font-size:11px;color:#475569;font-family:monospace;font-weight:600">${escHtml(c.hex) || '<span style="color:#94a3b8;font-weight:400">—</span>'}</div>`}
                                         <!-- Pantone (always editable) -->
                                         <div>
                                             <div style="font-size:9px;color:#94a3b8;font-weight:600;margin-bottom:2px">PANTONE</div>
                                             <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C"
-                                                onblur="briefColourSave('${c.key}','pantone',this.value)"
+                                                oninput="briefColourSave('${c.key}','pantone',this.value)"
                                                 style="padding:4px 8px;font-size:11px;width:100%;box-sizing:border-box">
                                         </div>
                                     </div>`;
@@ -20749,8 +20886,8 @@
                         </div>
                         <!-- Source toggle -->
                         <div style="display:flex;align-items:center;gap:0;border:1.5px solid #e2e8f0;border-radius:8px;overflow:hidden;margin-bottom:10px;width:fit-content">
-                            <button id="prdtab-club" onclick="switchProdTab('club')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#0f172a;color:#fff;border-right:1px solid #e2e8f0;transition:all 0.15s">Club Catalogue</button>
-                            <button id="prdtab-master" onclick="switchProdTab('master')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#64748b;transition:all 0.15s">All Products</button>
+                            <button id="prdtab-club" onclick="switchProdTab('club')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#0f172a;color:#fff;border-right:1px solid #e2e8f0;transition:all 0.15s">Job</button>
+                            <button id="prdtab-master" onclick="switchProdTab('master')" style="padding:5px 14px;font-size:11px;font-weight:600;border:none;cursor:pointer;background:#fff;color:#64748b;transition:all 0.15s">Catalogue</button>
                         </div>
                         <div id="brprod-club"><div class="ds-prod-grid">${prodCardsHtml}</div></div>
                         <div id="brprod-master" class="hide">
@@ -21006,6 +21143,8 @@
                 const task = currentDesignTaskRecord;
                 const club = task.clubs || {};
                 content.innerHTML = _dtrBuildTabContent(_dtrCurrentLeftTab, task, club, _dtrCachedAssets, _dtrCachedClubProds, _dtrCachedJobProds);
+                // Re-render owner dropdown after content is set
+                if (_dtrEditMode) renderOwnerDropdown('design-task', task.owner_ids || []);
             }
         }
 
@@ -21033,9 +21172,9 @@
 
             // Colour swatches
             const colPairs = [
-                { key:'primary',   label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
-                { key:'secondary', label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
-                { key:'accent',    label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+                { key:'primary',   label:'Primary',   hex: cc.primary?.hex   || (useClub ? (club.hex_main||'')       : ''), pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { key:'secondary', label:'Secondary', hex: cc.secondary?.hex || (useClub ? (club.hex_secondary||'')  : ''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { key:'accent',    label:'Accent',    hex: cc.accent?.hex    || (useClub ? (club.hex_accent||'')     : ''), pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
             // Mini product cards
@@ -21125,9 +21264,9 @@
             const JTL = typeof JOB_TYPE_LABELS !== 'undefined' ? JOB_TYPE_LABELS : {};
 
             const colPairs = [
-                { key:'primary',   label:'Primary',   hex: useClub ? (club.hex_main||'')       : (cc.primary?.hex||''),   pantone: cc.primary?.pantone   || club.pantone_main      || '' },
-                { key:'secondary', label:'Secondary', hex: useClub ? (club.hex_secondary||'')  : (cc.secondary?.hex||''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
-                { key:'accent',    label:'Accent',    hex: useClub ? (club.hex_accent||'')     : (cc.accent?.hex||''),    pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
+                { key:'primary',   label:'Primary',   hex: cc.primary?.hex   || (useClub ? (club.hex_main||'')       : ''), pantone: cc.primary?.pantone   || club.pantone_main      || '' },
+                { key:'secondary', label:'Secondary', hex: cc.secondary?.hex || (useClub ? (club.hex_secondary||'')  : ''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
+                { key:'accent',    label:'Accent',    hex: cc.accent?.hex    || (useClub ? (club.hex_accent||'')     : ''), pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
             // Edit mode: show form fields
@@ -21184,8 +21323,12 @@
                             </div>
                         </div>
                         <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-designer">Owner</label>
+                            <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
                             <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
+                        </div>
+                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
+                            <label class="dtr-edit-label">Owner(s)</label>
+                            <div style="flex:1"><div class="owner-dp" id="owner-dp-design-task"></div></div>
                         </div>
                         <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
                             <label class="dtr-edit-label" for="dtr-ln-club">Club</label>
@@ -21227,7 +21370,7 @@
                                 </div>
                                 <span style="font-size:10px;color:#64748b;font-weight:600;width:40px;flex-shrink:0">${c.label}</span>
                                 <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C"
-                                    onblur="briefColourSave('${c.key}','pantone',this.value)"
+                                    oninput="briefColourSave('${c.key}','pantone',this.value)"
                                     style="flex:1;padding:3px 7px;font-size:11px;font-family:monospace">
                             </div>`).join('')}
                         </div>
@@ -21257,14 +21400,24 @@
                 <!-- § Job Details (read-only) -->
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Job Details</div>
+                    ${task.jobs ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Linked Job</span><span class="dtr-ro-value">${escHtml(task.jobs.job_name || task.jobs.job_number || '—')}</span></div>` : ''}
                     ${task.sport ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport)}</span></div>` : ''}
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${escHtml(designerName)}</span></div>
-                    ${task.order_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${(() => {
+                        const ownerIds = task.owner_ids || [];
+                        if (ownerIds.length && brandUsers.length) {
+                            const names = ownerIds.map(id => { const u = brandUsers.find(u => u.id === id); return u ? userDisplayName(u) : null; }).filter(Boolean);
+                            if (names.length) return escHtml(names.join(', '));
+                        }
+                        return escHtml(designerName);
+                    })()}</span></div>
+                    <div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${task.order_type ? escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</span></div>
+                    ${task.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Task Type</span><span class="dtr-ro-value">${escHtml(Object.fromEntries(DS_JOB_TYPES.map(t=>[t.key,t.label]))[task.job_type] || task.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
                     ${task.team ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Team</span><span class="dtr-ro-value">${escHtml(task.team)}</span></div>` : ''}
                     ${task.season_event ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Season</span><span class="dtr-ro-value">${escHtml(task.season_event)}</span></div>` : ''}
-                    ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span></div>` : ''}
+                    ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
+                    ${task.assigned_designer_name ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Designer</span><span class="dtr-ro-value">${escHtml(task.assigned_designer_name)}</span></div>` : ''}
                 </div>
                 <!-- § Design Brief (read-only) -->
                 <div class="dtr-ro-section">
@@ -21419,6 +21572,13 @@
                 const dsnSel = document.getElementById('dtr-ln-designer');
                 const designerId   = dsnSel?.value || null;
                 const designerName = dsnSel?.options[dsnSel.selectedIndex]?.dataset?.name || null;
+                // Capture current custom_colours state, reading pantone inputs directly
+                const savedCols = JSON.parse(JSON.stringify(currentDesignTaskRecord.custom_colours || {}));
+                ['primary','secondary','accent'].forEach(k => {
+                    const panEl = document.getElementById(`dspan-${k}`);
+                    if (panEl) { if (!savedCols[k]) savedCols[k] = {}; savedCols[k].pantone = panEl.value; }
+                });
+                const hasColour = ['primary','secondary','accent'].some(k => savedCols[k]?.hex || savedCols[k]?.pantone);
                 const payload = {
                     task_name:   document.getElementById('dtr-ln-task-name')?.value?.trim() || currentDesignTaskRecord.task_name,
                     sport:       document.getElementById('dtr-ln-sport')?.value?.trim() || null,
@@ -21430,6 +21590,8 @@
                     assigned_designer_name: designerName,
                     club_id:     document.getElementById('dtr-ln-club')?.value || null,
                     job_id:      document.getElementById('dtr-ln-job')?.value || null,
+                    custom_colours: hasColour ? savedCols : null,
+                    owner_ids:   getOwnerDropdownIds('design-task'),
                 };
                 if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
                 const { data, error } = await supabase.from('design_tasks')
@@ -22622,11 +22784,35 @@
             }
         }
 
-        async function briefToggleProduct(productId, cardEl) {
+        async function briefToggleProduct(productId, cardEl, isMasterCatalogue = false) {
             if (!currentDesignTaskRecord) return;
+            let resolvedId = productId;
+
+            // If this is a master catalogue product, find or create a club_product record first
+            if (isMasterCatalogue) {
+                const clubId = currentDesignTaskRecord.club_id;
+                if (!clubId) {
+                    showToast('Link a club to this task to add catalogue products', 'warning');
+                    return;
+                }
+                const { data: existing } = await supabase.from('club_products')
+                    .select('id').eq('club_id', clubId).eq('product_id', productId).maybeSingle();
+                if (existing) {
+                    resolvedId = existing.id;
+                } else {
+                    const prod = (_masterProdsData || []).find(p => p.id === productId);
+                    const { data: newCp, error } = await supabase.from('club_products').insert({
+                        brand_id: currentBrand.id, club_id: clubId, product_id: productId,
+                        custom_name: prod?.item_name || '', is_active: true
+                    }).select('id').single();
+                    if (error) { showToast('Error linking product to club', 'error'); return; }
+                    resolvedId = newCp.id;
+                }
+            }
+
             const arr = [...(currentDesignTaskRecord.products_required || [])];
-            const idx = arr.indexOf(productId);
-            if (idx === -1) arr.push(productId);
+            const idx = arr.indexOf(resolvedId);
+            if (idx === -1) arr.push(resolvedId);
             else arr.splice(idx, 1);
             currentDesignTaskRecord.products_required = arr;
             cardEl.classList.toggle('selected', idx === -1);
@@ -22716,7 +22902,7 @@
                         <div class="ds-prod-name" title="${escHtml(p.item_name||'')}">${escHtml(p.item_name||'Product')}</div>
                         ${p.product_code ? `<div class="ds-prod-code">${escHtml(p.product_code)}</div>` : ''}
                     </div>`;
-                card.addEventListener('click', () => briefToggleProduct(p.id, card));
+                card.addEventListener('click', () => briefToggleProduct(p.id, card, true));
                 gridEl.appendChild(card);
             });
             container.innerHTML = '';
@@ -23711,10 +23897,11 @@
         const _origSaveDesignTaskOverview = saveDesignTaskOverview;
         async function saveDesignTaskOwner(userId) {
             if (!currentDesignTaskRecord?.id) return;
+            const ids = userId ? [userId] : [];
             const { error } = await supabase.from('design_tasks')
-                .update({ owner_id: userId || null }).eq('id', currentDesignTaskRecord.id);
+                .update({ owner_ids: ids }).eq('id', currentDesignTaskRecord.id);
             if (error) { showToast('Error saving owner', 'error'); return; }
-            if (currentDesignTaskRecord) currentDesignTaskRecord.owner_id = userId || null;
+            if (currentDesignTaskRecord) currentDesignTaskRecord.owner_ids = ids;
             showToast('Owner updated ✓');
         }
 
