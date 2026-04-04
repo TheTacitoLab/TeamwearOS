@@ -17604,7 +17604,7 @@
                         .or(`assigned_user_id.eq.${uid},assigned_user_ids.cs.${csFilter}`),
                     supabase.from('design_tasks').select('id, task_name, task_ref')
                         .eq('brand_id', brandId)
-                        .or(`owner_id.eq.${uid},owner_ids.cs.${csFilter}`),
+                        .contains('owner_ids', [uid]),
                     supabase.from('leads').select('id, lead_name')
                         .eq('brand_id', brandId)
                         .or(`assigned_to.eq.${uid},assigned_user_ids.cs.${csFilter}`),
@@ -17829,11 +17829,10 @@
             } else if (type === 'design-task') {
                 if (!currentDesignTaskRecord?.id) return;
                 const { error } = await supabase.from('design_tasks').update({
-                    owner_id: primaryUserId,
                     owner_ids: userIds
                 }).eq('id', currentDesignTaskRecord.id);
                 if (error) { showToast('Error saving assignment', 'error'); return; }
-                if (currentDesignTaskRecord) { currentDesignTaskRecord.owner_id = primaryUserId; currentDesignTaskRecord.owner_ids = userIds; }
+                if (currentDesignTaskRecord) { currentDesignTaskRecord.owner_ids = userIds; }
             }
             showToast('Assignment saved');
         }
@@ -20577,8 +20576,7 @@
                 // Populate multi-user owner checklist after HTML is in the DOM
                 await loadBrandUsers();
                 populateMultiUserAssign('dt-owner-users-list', 'dt-owner-chips',
-                    currentDesignTaskRecord?.owner_ids ||
-                    (currentDesignTaskRecord?.owner_id ? [currentDesignTaskRecord.owner_id] : []));
+                    currentDesignTaskRecord?.owner_ids || []);
             } else if (stageNum === 2 || stageNum === 3) {
                 panel.innerHTML = await buildVersionStagePanel(stage);
                 // Load per-version comment threads
@@ -21350,7 +21348,7 @@
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
                     <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${(() => {
-                        const ownerIds = task.owner_ids || (task.owner_id ? [task.owner_id] : []);
+                        const ownerIds = task.owner_ids || [];
                         if (ownerIds.length && brandUsers.length) {
                             const names = ownerIds.map(id => { const u = brandUsers.find(u => u.id === id); return u ? userDisplayName(u) : null; }).filter(Boolean);
                             if (names.length) return escHtml(names.join(', '));
@@ -23832,10 +23830,11 @@
         const _origSaveDesignTaskOverview = saveDesignTaskOverview;
         async function saveDesignTaskOwner(userId) {
             if (!currentDesignTaskRecord?.id) return;
+            const ids = userId ? [userId] : [];
             const { error } = await supabase.from('design_tasks')
-                .update({ owner_id: userId || null }).eq('id', currentDesignTaskRecord.id);
+                .update({ owner_ids: ids }).eq('id', currentDesignTaskRecord.id);
             if (error) { showToast('Error saving owner', 'error'); return; }
-            if (currentDesignTaskRecord) currentDesignTaskRecord.owner_id = userId || null;
+            if (currentDesignTaskRecord) currentDesignTaskRecord.owner_ids = ids;
             showToast('Owner updated ✓');
         }
 

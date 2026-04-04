@@ -6,9 +6,3 @@ ALTER TABLE design_tasks ADD COLUMN IF NOT EXISTS owner_ids UUID[] DEFAULT '{}';
 
 CREATE INDEX IF NOT EXISTS idx_design_tasks_owner_ids
     ON design_tasks USING GIN(owner_ids);
-
--- Backfill: copy existing owner_id into the new array so no data is lost
-UPDATE design_tasks
-SET owner_ids = ARRAY[owner_id]
-WHERE owner_id IS NOT NULL
-  AND (owner_ids IS NULL OR owner_ids = '{}');
