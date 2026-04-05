@@ -3529,35 +3529,69 @@
             </div>
         </div>
 
-        <!-- MODAL: Stage Config -->
+        <!-- MODAL: Stage Config (Leads + Jobs tabs) -->
         <div id="stage-config-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 hide" style="background:rgba(0,0,0,0.7);backdrop-filter:blur(8px)">
             <div class="glass rounded-2xl w-full max-w-md">
                 <div class="p-5 border-b border-white border-opacity-5 flex items-center justify-between">
                     <h3 class="text-lg font-bold">Sales Job Kanban Pipeline</h3>
                     <button onclick="closeStageConfig()" class="text-gray-500 hover:text-white w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white hover:bg-opacity-5">✕</button>
                 </div>
-                <div class="p-5">
-                    <p class="text-gray-500 text-sm mb-4">Customise your lead pipeline stages. Drag to reorder.</p>
-                    <div id="stages-list" class="space-y-2 mb-4">
-                        <!-- Populated by JS -->
-                    </div>
-                    <div id="add-stage-form" class="hide mb-4" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
-                        <div class="flex gap-3 items-end">
-                            <div class="flex-1">
-                                <label class="text-xs text-gray-500 mb-1 block">Stage Name</label>
-                                <input type="text" id="new-stage-name" placeholder="e.g. Proposal Sent" class="w-full px-3 py-2 rounded-lg text-sm">
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-500 mb-1 block">Colour</label>
-                                <input type="color" id="new-stage-color" value="#3b82f6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#f8fafc;border:1px solid #e2e8f0">
-                            </div>
-                            <button onclick="saveNewStage()" class="btn-primary text-sm py-2">Add</button>
-                        </div>
-                    </div>
-                    <button id="add-stage-btn" onclick="showAddStageForm()" class="btn-secondary text-sm w-full flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        Add Stage
+                <!-- Tabs -->
+                <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.07);padding:0 20px;gap:4px">
+                    <button id="scm-tab-leads" onclick="switchStageConfigTab('leads')"
+                        style="padding:10px 14px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid #00e5cc;color:#fff;transition:all 0.15s">
+                        Leads Pipeline
                     </button>
+                    <button id="scm-tab-jobs" onclick="switchStageConfigTab('jobs')"
+                        style="padding:10px 14px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#64748b;transition:all 0.15s">
+                        Jobs Pipeline
+                    </button>
+                </div>
+                <div class="p-5">
+                    <!-- Leads panel -->
+                    <div id="scm-panel-leads">
+                        <p class="text-gray-500 text-sm mb-4">Customise your leads pipeline stages.</p>
+                        <div id="stages-list" class="space-y-2 mb-4"><!-- Populated by JS --></div>
+                        <div id="add-stage-form" class="hide mb-4" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
+                            <div class="flex gap-3 items-end">
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-500 mb-1 block">Stage Name</label>
+                                    <input type="text" id="new-stage-name" placeholder="e.g. Proposal Sent" class="w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Colour</label>
+                                    <input type="color" id="new-stage-color" value="#3b82f6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#f8fafc;border:1px solid #e2e8f0">
+                                </div>
+                                <button onclick="saveNewStage()" class="btn-primary text-sm py-2">Add</button>
+                            </div>
+                        </div>
+                        <button id="add-stage-btn" onclick="showAddStageForm()" class="btn-secondary text-sm w-full flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Stage
+                        </button>
+                    </div>
+                    <!-- Jobs panel -->
+                    <div id="scm-panel-jobs" class="hide">
+                        <p class="text-gray-500 text-sm mb-4">Customise your jobs pipeline stages. Changes reflect in the Job Record pipeline.</p>
+                        <div id="job-stages-list" class="space-y-2 mb-4"><!-- Populated by JS --></div>
+                        <div id="job-add-stage-form" class="hide mb-4" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px">
+                            <div class="flex gap-3 items-end">
+                                <div class="flex-1">
+                                    <label class="text-xs text-gray-500 mb-1 block">Stage Name</label>
+                                    <input type="text" id="new-job-stage-name" placeholder="e.g. Sampling" class="w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div>
+                                    <label class="text-xs text-gray-500 mb-1 block">Colour</label>
+                                    <input type="color" id="new-job-stage-color" value="#3b82f6" class="h-10 w-12 rounded-lg cursor-pointer" style="padding:2px;background:#f8fafc;border:1px solid #e2e8f0">
+                                </div>
+                                <button onclick="saveNewJobStage()" class="btn-primary text-sm py-2">Add</button>
+                            </div>
+                        </div>
+                        <button id="job-add-stage-btn" onclick="showAddJobStageForm()" class="btn-secondary text-sm w-full flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            Add Stage
+                        </button>
+                    </div>
                     <div class="mt-4 text-right">
                         <button onclick="closeStageConfig()" class="btn-primary text-sm">Done</button>
                     </div>
@@ -3619,6 +3653,7 @@
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                             New Job
                         </button>
+                        <button onclick="openJobStageConfig()" class="sh-action-btn sh-action-btn-secondary">Stages</button>
                     </div>
                     <div id="sh-actions-gtm" class="sh-actions hide" style="margin:0">
                         <button onclick="_gtmRefresh()" class="sh-action-btn sh-action-btn-secondary">↻ Refresh</button>
@@ -6496,7 +6531,7 @@
                     loadPoTracker();
                     break;
                 case 'sales':
-                    Promise.all([loadLeads(), loadKanbanStages(), loadJobs()]).then(() => {
+                    Promise.all([loadLeads(), loadKanbanStages(), loadJobs(), loadJobKanbanStages()]).then(() => {
                         switchSalesHomeTab(_shActiveTab || 'leads');
                         updateSalesTabCounts();
                     });
@@ -13811,10 +13846,22 @@
                 j.job_number?.toLowerCase().includes(search)
             );
 
-            const cols = JOB_STAGES.map(stage => {
-                const stageJobs = allJobs.filter(j => j.stage === stage.key);
-                // Auto-collapse empty stages (user can click to expand)
-                if (stageJobs.length === 0 && !_shForceOpen.has(stage.key)) _shCollapsed.add(stage.key);
+            if (jobKanbanStages.length === 0) {
+                board.innerHTML = `<div style="padding:32px;color:#94a3b8;font-size:13px">No stages configured. Click "Stages" to get started.</div>`;
+                return;
+            }
+
+            // Match job to stage — prefer job_kanban_stage_id, fall back to legacy stage text
+            const _jobMatchesStage = (job, stage) => {
+                if (job.job_kanban_stage_id) return job.job_kanban_stage_id === stage.id;
+                // Legacy fallback: match by name (case-insensitive)
+                const legacyName = _JOB_LEGACY_MAP[job.stage] || job.stage || '';
+                return legacyName.toLowerCase() === stage.name.toLowerCase();
+            };
+
+            const cols = jobKanbanStages.map(stage => {
+                const stageJobs = allJobs.filter(j => _jobMatchesStage(j, stage));
+                if (stageJobs.length === 0 && !_shForceOpen.has(stage.id)) _shCollapsed.add(stage.id);
                 const stageTotal = stageJobs.reduce((s, j) => s + (j.estimated_revenue || 0), 0);
                 const stageSubtitle = stageTotal > 0 ? `£${stageTotal.toLocaleString('en-GB')}` : '';
                 const cards = stageJobs.map(job => {
@@ -13827,7 +13874,7 @@
                     const orderTargetTag = ot ? `<span class="sh-card-tag" style="background:rgba(217,119,6,0.1);color:#d97706" title="Order target date (7 weeks before deadline)">Order by ${ot.toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</span>` : '';
                     return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + rev + orderTargetTag + shopify, sel);
                 }).join('');
-                return _shKanbanCol(stage.key, stage.color, escHtml(stage.label), stageJobs.length, cards, stageSubtitle);
+                return _shKanbanCol(stage.id, stage.color, escHtml(stage.name), stageJobs.length, cards, stageSubtitle);
             });
 
             board.innerHTML = cols.join('');
@@ -14465,18 +14512,17 @@
         function renderJobStagePills() {
             const container = document.getElementById('jr-stage-pills');
             if (!container) return;
-            container.innerHTML = JOB_STAGES.map(s => {
-                const active = (currentJob?.stage || 'discovery') === s.key;
-                const c = JOB_STAGE_COLORS[s.key] || '#888';
-                const isCompleted = s.key === 'completed';
-                let style = '';
-                if (active && isCompleted) {
-                    style = `background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;border-color:#15803d;box-shadow:0 4px 14px rgba(22,163,74,0.35);font-weight:800;`;
-                } else if (active) {
-                    style = `color:${c};border-color:${c};background:${c}18;`;
-                }
-                return `<button onclick="updateJobStage('${s.key}')" class="stage-pill-btn${active ? ' active' : ''}"
-                    style="${style}">${s.label}</button>`;
+            // Use configurable job kanban stages; fall back to hardcoded if not yet loaded
+            const stages = jobKanbanStages.length > 0 ? jobKanbanStages : JOB_STAGES.map(s => ({ id: s.key, name: s.label, color: s.color }));
+            const activeStageId = currentJob?.job_kanban_stage_id ||
+                // Legacy fallback: match by name
+                stages.find(s => s.name.toLowerCase() === (_JOB_LEGACY_MAP[currentJob?.stage] || currentJob?.stage || '').toLowerCase())?.id;
+            container.innerHTML = stages.map(s => {
+                const active = activeStageId === s.id;
+                const c = s.color || '#64748b';
+                let style = active ? `color:${c};border-color:${c};background:${c}18;` : '';
+                return `<button onclick="updateJobStage('${s.id}')" class="stage-pill-btn${active ? ' active' : ''}"
+                    style="${style}">${escHtml(s.name)}</button>`;
             }).join('');
         }
 
@@ -14579,15 +14625,17 @@
             renderDesignStagePills();
         }
 
-        async function updateJobStage(newStage) {
+        async function updateJobStage(newStageId) {
             if (!currentJobId) return;
-            const { error } = await supabase.from('jobs').update({ stage: newStage }).eq('id', currentJobId);
+            const stage = jobKanbanStages.find(s => s.id === newStageId);
+            const { error } = await supabase.from('jobs').update({ job_kanban_stage_id: newStageId }).eq('id', currentJobId);
             if (error) { showToast('Error updating stage: ' + error.message, 'error'); return; }
-            currentJob = { ...currentJob, stage: newStage };
+            currentJob = { ...currentJob, job_kanban_stage_id: newStageId };
+            renderJobStagePills();
             renderJobHeader();
             await loadJobs();
             updateSalesBadges();
-            showToast('Stage updated to ' + JOB_STAGES.find(s => s.key === newStage)?.label);
+            showToast('Stage updated to ' + (stage?.name || 'stage'));
         }
 
         // =============================================
@@ -16948,63 +16996,7 @@
         function renderJobsKanban() {
             const board = document.getElementById('jobs-kanban-board');
             if (!board) return;
-
-            const activeStages = JOB_STAGES.filter(s => s.key !== 'completed');
-            const activeJobs   = jobs.filter(j => j.stage !== 'completed' &&
-                (viewScope !== 'mine' || !currentUser || j.created_by === currentUser.id));
-
-            const labelEl = document.getElementById('jobs-kanban-filter-label');
-            if (labelEl) labelEl.textContent = `${activeJobs.length} active job${activeJobs.length !== 1 ? 's' : ''}`;
-
-            board.innerHTML = activeStages.map(stage => {
-                const stageJobs = activeJobs.filter(j => j.stage === stage.key);
-                const jobMoveOpts = activeStages.filter(s => s.key !== stage.key)
-                    .map(s => `<option value="${s.key}">${escHtml(s.label)}</option>`).join('');
-                const cards = stageJobs.map(job => {
-                    const clubName  = escHtml(job.clubs?.name || '—');
-                    const jobOwnerIds = job.assigned_user_ids?.length ? job.assigned_user_ids : (job.assigned_user_id ? [job.assigned_user_id] : []);
-                    const jobOwnerNames = jobOwnerIds.map(id => getUserDisplayName(id)).filter(n => n && n !== '—').join(', ');
-                    const shopifyHtml = job.shopify_draft_order_url
-                        ? `<a href="${escHtml(job.shopify_draft_order_url)}" target="_blank" rel="noopener"
-                               onclick="event.stopPropagation()"
-                               class="kanban-shopify-link">
-                               <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                               Shopify Draft
-                           </a>`
-                        : '';
-                    return `<div class="kanban-card" onclick="openJobRecord('${job.id}')">
-                        <div class="kanban-card-title">${escHtml(job.job_name)}</div>
-                        <div class="kanban-card-club">${clubName}</div>
-                        ${job.job_number ? `<div style="font-size:11px;color:#94a3b8;margin-bottom:4px">${escHtml(job.job_number)}</div>` : ''}
-                        ${jobOwnerNames ? `<div style="font-size:11px;color:#6d28d9;font-weight:600;margin-bottom:4px">👤 ${escHtml(jobOwnerNames)}</div>` : ''}
-                        ${shopifyHtml}
-                        <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
-                            <select onchange="kanbanMoveJob('${job.id}',this.value);this.value=''" onclick="event.stopPropagation()"
-                                style="font-size:10px;border:1px solid #e2e8f0;border-radius:6px;padding:2px 5px;background:#f8fafc;color:#64748b;cursor:pointer;max-width:120px;height:24px">
-                                <option value="">Move →</option>${jobMoveOpts}
-                            </select>
-                        </div>
-                    </div>`;
-                }).join('');
-
-                if (stageJobs.length === 0) {
-                    return `<div class="kanban-column kc-empty">
-                        <div style="height:100%;min-height:200px;display:flex;align-items:center;justify-content:center">
-                            <span style="writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:${stage.color}">${escHtml(stage.label)}</span>
-                        </div>
-                    </div>`;
-                }
-
-                return `<div class="kanban-column">
-                    <div class="kanban-col-header">
-                        <span class="kanban-col-title" style="color:${stage.color}">${escHtml(stage.label)}</span>
-                        <span class="kanban-count">${stageJobs.length}</span>
-                    </div>
-                    ${cards}
-                </div>`;
-            }).join('');
-
-            // Keep Sales Home in sync
+            // Legacy board — delegate to Sales Home renderer
             if (document.getElementById('sh-list')) renderSalesHome();
         }
 
@@ -17048,21 +17040,21 @@
             await loadLeads();
             renderKanban();
         }
-        async function kanbanMoveJob(jobId, stageKey) {
-            if (!stageKey) return;
-            const { error } = await supabase.from('jobs').update({ stage: stageKey }).eq('id', jobId);
+        async function kanbanMoveJob(jobId, stageId) {
+            if (!stageId) return;
+            const stage = jobKanbanStages.find(s => s.id === stageId);
+            const { error } = await supabase.from('jobs').update({ job_kanban_stage_id: stageId }).eq('id', jobId);
             if (error) { showToast('Error moving job', 'error'); return; }
-            const stageName = JOB_STAGES.find(s => s.key === stageKey)?.label || '';
-            showToast(`Moved to ${stageName} ✓`);
+            showToast(`Moved to ${stage?.name || 'stage'} ✓`);
             await loadJobs();
-            renderJobsKanban();
+            renderSalesHome();
         }
 
         // =============================================
         // PROSPECTING — KANBAN STAGE CONFIG
         // =============================================
         function openStageConfig() {
-            renderStagesList();
+            switchStageConfigTab('leads');
             document.getElementById('stage-config-modal').classList.remove('hide');
         }
         function closeStageConfig() {
@@ -17107,6 +17099,143 @@
             const stage = kanbanStages.find(s => s.id === stageId);
             if (!stage) return;
             const { error } = await supabase.from('kanban_stages').update({ color: newColor }).eq('id', stageId);
+            if (error) { showToast('Error updating stage colour: ' + error.message, 'error'); return; }
+            stage.color = newColor;
+        }
+
+        // =============================================
+        // JOB KANBAN STAGES
+        // =============================================
+        let jobKanbanStages = [];
+
+        // Legacy key → display name mapping for migrating existing jobs
+        const _JOB_LEGACY_MAP = {
+            'discovery':     'Discovery',
+            'concepts':      'Concepts',
+            'final_mockups': 'Final Mock-ups',
+            'order_details': 'Order Details',
+            'quoted':        'Quoted',
+            'completed':     'Completed',
+        };
+
+        async function loadJobKanbanStages() {
+            if (!currentBrand) return;
+            const { data } = await supabase
+                .from('job_kanban_stages')
+                .select('*')
+                .eq('brand_id', currentBrand.id)
+                .order('position');
+            jobKanbanStages = data || [];
+            if (jobKanbanStages.length === 0) {
+                await seedDefaultJobStages();
+            }
+        }
+
+        async function seedDefaultJobStages() {
+            if (!currentBrand) return;
+            const defaults = [
+                { brand_id: currentBrand.id, name: 'Discovery',      color: '#64748b', position: 0 },
+                { brand_id: currentBrand.id, name: 'Concepts',       color: '#2563eb', position: 1 },
+                { brand_id: currentBrand.id, name: 'Final Mock-ups', color: '#d97706', position: 2 },
+                { brand_id: currentBrand.id, name: 'Order Details',  color: '#7c3aed', position: 3 },
+                { brand_id: currentBrand.id, name: 'Quoted',         color: '#059669', position: 4 },
+                { brand_id: currentBrand.id, name: 'Completed',      color: '#16a34a', position: 5 },
+            ];
+            const { data } = await supabase.from('job_kanban_stages').insert(defaults).select();
+            jobKanbanStages = data || [];
+        }
+
+        // Stage config modal tab switching
+        let _scmActiveTab = 'leads';
+        function switchStageConfigTab(tab) {
+            _scmActiveTab = tab;
+            document.getElementById('scm-panel-leads')?.classList.toggle('hide', tab !== 'leads');
+            document.getElementById('scm-panel-jobs')?.classList.toggle('hide', tab !== 'jobs');
+            const btnLeads = document.getElementById('scm-tab-leads');
+            const btnJobs  = document.getElementById('scm-tab-jobs');
+            if (btnLeads) { btnLeads.style.borderBottomColor = tab === 'leads' ? '#00e5cc' : 'transparent'; btnLeads.style.color = tab === 'leads' ? '#fff' : '#64748b'; }
+            if (btnJobs)  { btnJobs.style.borderBottomColor  = tab === 'jobs'  ? '#00e5cc' : 'transparent'; btnJobs.style.color  = tab === 'jobs'  ? '#fff' : '#64748b'; }
+            if (tab === 'leads') renderStagesList();
+            else                 renderJobStagesList();
+        }
+
+        function openJobStageConfig() {
+            switchStageConfigTab('jobs');
+            document.getElementById('stage-config-modal').classList.remove('hide');
+        }
+
+        function renderJobStagesList() {
+            const container = document.getElementById('job-stages-list');
+            if (!container) return;
+            if (jobKanbanStages.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">No stages yet. Add your first stage below.</p>';
+            } else {
+                container.innerHTML = jobKanbanStages.map(stage => `
+                    <div class="flex items-center gap-3 p-3 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <input type="color" value="${stage.color}" onchange="renameJobStageColor('${stage.id}',this.value)" class="h-6 w-6 rounded cursor-pointer flex-shrink-0" style="padding:1px;border:1px solid #e2e8f0;background:#f8fafc">
+                        <input type="text" value="${escHtml(stage.name)}" id="job-stage-name-input-${stage.id}"
+                            style="flex:1;padding:4px 8px;font-size:13px;font-weight:500;border:1.5px solid #e2e8f0;border-radius:7px;outline:none;background:#fff;transition:border-color 0.15s"
+                            onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0';renameJobStage('${stage.id}',this.value)">
+                        <span class="text-xs text-gray-600 flex-shrink-0">${(jobs||[]).filter(j=>j.job_kanban_stage_id===stage.id).length} jobs</span>
+                        <button onclick="deleteJobStage('${stage.id}')" class="text-red-500 hover:text-red-400 text-xs px-2 py-1 rounded flex-shrink-0" style="background:rgba(239,68,68,0.08)">Remove</button>
+                    </div>
+                `).join('');
+            }
+            const addBtn = document.getElementById('job-add-stage-btn');
+            if (addBtn) addBtn.style.display = '';
+            document.getElementById('job-add-stage-form')?.classList.add('hide');
+        }
+
+        function showAddJobStageForm() {
+            document.getElementById('job-add-stage-form').classList.remove('hide');
+            document.getElementById('job-add-stage-btn').style.display = 'none';
+            document.getElementById('new-job-stage-name').value = '';
+            document.getElementById('new-job-stage-color').value = '#3b82f6';
+        }
+
+        async function saveNewJobStage() {
+            if (!currentBrand) { showToast('Brand not loaded — please refresh', 'error'); return; }
+            const name  = document.getElementById('new-job-stage-name').value.trim();
+            const color = document.getElementById('new-job-stage-color').value;
+            if (!name) { showToast('Stage name is required', 'error'); return; }
+            const { data, error } = await supabase.from('job_kanban_stages').insert({
+                brand_id: currentBrand.id, name, color, position: jobKanbanStages.length
+            }).select().single();
+            if (error) { showToast('Error creating stage: ' + error.message, 'error'); return; }
+            jobKanbanStages.push(data);
+            renderJobStagesList();
+            showToast('Stage added');
+        }
+
+        async function deleteJobStage(stageId) {
+            const count = (jobs||[]).filter(j => j.job_kanban_stage_id === stageId).length;
+            const msg = count > 0 ? `This stage has ${count} job(s). Jobs will be unassigned. Continue?` : 'Delete this stage?';
+            if (!confirm(msg)) return;
+            const { error } = await supabase.from('job_kanban_stages').delete().eq('id', stageId);
+            if (error) { showToast('Error deleting stage: ' + error.message, 'error'); return; }
+            jobKanbanStages = jobKanbanStages.filter(s => s.id !== stageId);
+            await loadJobs();
+            renderJobStagesList();
+            showToast('Stage removed');
+        }
+
+        async function renameJobStage(stageId, newName) {
+            newName = newName.trim();
+            if (!newName) return;
+            const stage = jobKanbanStages.find(s => s.id === stageId);
+            if (!stage || stage.name === newName) return;
+            const { error } = await supabase.from('job_kanban_stages').update({ name: newName }).eq('id', stageId);
+            if (error) { showToast('Error renaming stage: ' + error.message, 'error'); return; }
+            stage.name = newName;
+            // Re-render Job Record stage pills if a job is open
+            if (typeof renderJobStagePills === 'function') renderJobStagePills();
+            renderSalesHome();
+        }
+
+        async function renameJobStageColor(stageId, newColor) {
+            const stage = jobKanbanStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const { error } = await supabase.from('job_kanban_stages').update({ color: newColor }).eq('id', stageId);
             if (error) { showToast('Error updating stage colour: ' + error.message, 'error'); return; }
             stage.color = newColor;
         }
@@ -21549,24 +21678,9 @@
                         </div>
                     </div>
 
-                    <!-- § Factory Requirements (edit) -->
+                    <!-- § Colours -->
                     <div class="dtr-brief-section">
-                        <div class="dtr-brief-section-title">Factory Requirements</div>
-                        <div style="margin-top:4px">
-                            ${frEditHtml}
-                        </div>
-                        <script>
-                            (function(){
-                                var lf = document.getElementById('dtr-fr-logo_files');
-                                var subs = document.getElementById('dtr-fr-subs-logo_files');
-                                if(lf && subs) lf.addEventListener('change', function(){ subs.style.opacity = this.checked?'1':'0.4'; subs.style.pointerEvents = this.checked?'':'none'; });
-                            })();
-                        <\/script>
-                    </div>
-
-                    <!-- § Brand Colours -->
-                    <div class="dtr-brief-section" style="border-bottom:none">
-                        <div class="dtr-brief-section-title">Brand Colours</div>
+                        <div class="dtr-brief-section-title">Colours</div>
                         <div style="display:flex;flex-direction:column;gap:6px">
                             ${colPairs.map(c => `<div style="display:flex;align-items:center;gap:7px">
                                 <div id="dtr-sw-${c.key}" style="position:relative;width:22px;height:22px;border-radius:5px;background:${c.hex||'#e8ecf0'};border:1px solid rgba(0,0,0,0.12);flex-shrink:0;cursor:pointer;overflow:hidden" onclick="document.getElementById('dtr-cp-${c.key}').click()" title="Pick colour">
@@ -21578,6 +21692,21 @@
                                     style="flex:1;padding:3px 7px;font-size:11px;font-family:monospace">
                             </div>`).join('')}
                         </div>
+                    </div>
+
+                    <!-- § Factory Requirements (edit) -->
+                    <div class="dtr-brief-section" style="border-bottom:none">
+                        <div class="dtr-brief-section-title">Factory Requirements</div>
+                        <div style="margin-top:4px">
+                            ${frEditHtml}
+                        </div>
+                        <script>
+                            (function(){
+                                var lf = document.getElementById('dtr-fr-logo_files');
+                                var subs = document.getElementById('dtr-fr-subs-logo_files');
+                                if(lf && subs) lf.addEventListener('change', function(){ subs.style.opacity = this.checked?'1':'0.4'; subs.style.pointerEvents = this.checked?'':'none'; });
+                            })();
+                        <\/script>
                     </div>
                     <div class="dtr-save-bar">
                         <button class="dtr-save-btn" onclick="saveDTRLeftPanel()">Save Changes</button>
@@ -21681,15 +21810,9 @@
                     </div>` : ''}
                 </div>
 
-                <!-- § Factory Requirements (read-only) -->
+                <!-- § Colours (read-only) -->
                 <div class="dtr-ro-section">
-                    <div class="dtr-ro-section-title">Factory Requirements</div>
-                    <div style="margin-top:4px">${frReadHtml}</div>
-                </div>
-
-                <!-- § Brand Colours (read-only) -->
-                <div class="dtr-ro-section" style="border-bottom:none">
-                    <div class="dtr-ro-section-title">Brand Colours</div>
+                    <div class="dtr-ro-section-title">Colours</div>
                     <div style="display:flex;gap:5px;flex-wrap:wrap">
                         ${colPairs.filter(c => c.hex || c.pantone).map(c => `
                             <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px 3px 5px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc">
@@ -21698,6 +21821,12 @@
                             </div>`).join('')}
                         ${colPairs.every(c => !c.hex && !c.pantone) ? `<span style="font-size:11px;color:#94a3b8">No colours set</span>` : ''}
                     </div>
+                </div>
+
+                <!-- § Factory Requirements (read-only) -->
+                <div class="dtr-ro-section" style="border-bottom:none">
+                    <div class="dtr-ro-section-title">Factory Requirements</div>
+                    <div style="margin-top:4px">${frReadHtml}</div>
                 </div>`;
         }
 
