@@ -25,6 +25,13 @@ ALTER TABLE design_tasks
 ALTER TABLE design_task_assets
     ADD COLUMN IF NOT EXISTS asset_category TEXT;
 
--- Remove the database-level 3-stage limit if it exists
--- (the limit was enforced in application code only; this is a no-op safety guard)
--- No schema constraint existed for stage count — enforced in JS only.
+-- ──────────────────────────────────────────
+-- Factory Requirements
+-- JSONB checklist stored on the design task.
+-- Keys: web_images, tech_packs, pattern_artwork,
+--       logo_files, logo_files_sponsor,
+--       logo_files_team_crest, font_files
+-- ──────────────────────────────────────────
+
+ALTER TABLE design_tasks
+    ADD COLUMN IF NOT EXISTS factory_requirements JSONB DEFAULT '{}'::jsonb;

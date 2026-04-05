@@ -5414,6 +5414,36 @@
                                 <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Key Notes / Constraints</label>
                                 <textarea id="cdt-key-notes" placeholder="e.g. Must include sponsor logo zone on chest, no white in the design" rows="2" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
                             </div>
+
+                            <!-- Factory Requirements -->
+                            <div>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:8px">Factory Requirements</label>
+                                <div style="border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;background:#fafbfc">
+                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
+                                        <input type="checkbox" id="cdt-fr-web_images" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Web Images
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
+                                        <input type="checkbox" id="cdt-fr-tech_packs" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Tech Packs
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
+                                        <input type="checkbox" id="cdt-fr-pattern_artwork" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Pattern Artwork
+                                    </label>
+                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0" id="cdt-fr-logo-label">
+                                        <input type="checkbox" id="cdt-fr-logo_files" onchange="document.getElementById('cdt-fr-logo-subs').style.display=this.checked?'block':'none'" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Logo Files
+                                    </label>
+                                    <div id="cdt-fr-logo-subs" style="display:none;margin-left:22px;display:flex;flex-direction:column;gap:1px">
+                                        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:#475569;padding:2px 0">
+                                            <input type="checkbox" id="cdt-fr-logo_files_sponsor" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0"> Sponsor
+                                        </label>
+                                        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:#475569;padding:2px 0">
+                                            <input type="checkbox" id="cdt-fr-logo_files_team_crest" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0"> Team Crest
+                                        </label>
+                                    </div>
+                                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
+                                        <input type="checkbox" id="cdt-fr-font_files" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Font Files
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -18496,6 +18526,15 @@
                     brief_player_embellishments: document.getElementById('cdt-brief-player-embellishments')?.value?.trim() || null,
                     brief_colour_application:    document.getElementById('cdt-brief-colour-application')?.value?.trim() || null,
                     brief_piping:                document.getElementById('cdt-brief-piping')?.value?.trim() || null,
+                    factory_requirements: {
+                        web_images:            !!(document.getElementById('cdt-fr-web_images')?.checked),
+                        tech_packs:            !!(document.getElementById('cdt-fr-tech_packs')?.checked),
+                        pattern_artwork:       !!(document.getElementById('cdt-fr-pattern_artwork')?.checked),
+                        logo_files:            !!(document.getElementById('cdt-fr-logo_files')?.checked),
+                        logo_files_sponsor:    !!(document.getElementById('cdt-fr-logo_files_sponsor')?.checked),
+                        logo_files_team_crest: !!(document.getElementById('cdt-fr-logo_files_team_crest')?.checked),
+                        font_files:            !!(document.getElementById('cdt-fr-font_files')?.checked),
+                    },
                     custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
                     key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
                     products_required: productsRequired,
@@ -21300,6 +21339,37 @@
             return _buildDTRBriefTab(task, club);
         }
 
+        // ── Brief tab state ────────────────────────────────────────────────────
+        let _dtrJobDetailsOpen = true;
+        function toggleDTRJobDetails() {
+            _dtrJobDetailsOpen = !_dtrJobDetailsOpen;
+            const body = document.getElementById('dtr-job-details-body');
+            const arrow = document.getElementById('dtr-job-details-arrow');
+            if (body)  body.style.display  = _dtrJobDetailsOpen ? '' : 'none';
+            if (arrow) arrow.style.transform = _dtrJobDetailsOpen ? 'rotate(0deg)' : 'rotate(-90deg)';
+        }
+
+        const _DTR_FR_ITEMS = [
+            { key: 'web_images',          label: 'Web Images' },
+            { key: 'tech_packs',          label: 'Tech Packs' },
+            { key: 'pattern_artwork',     label: 'Pattern Artwork' },
+            { key: 'logo_files',          label: 'Logo Files', subs: [
+                { key: 'logo_files_sponsor',     label: 'Sponsor' },
+                { key: 'logo_files_team_crest',  label: 'Team Crest' },
+            ]},
+            { key: 'font_files',          label: 'Font Files' },
+        ];
+
+        function _dtrReadFactoryReqs() {
+            const keys = ['web_images','tech_packs','pattern_artwork','logo_files','logo_files_sponsor','logo_files_team_crest','font_files'];
+            const obj = {};
+            keys.forEach(k => {
+                const el = document.getElementById(`dtr-fr-${k}`);
+                if (el) obj[k] = el.checked;
+            });
+            return obj;
+        }
+
         // ── Brief tab ──────────────────────────────────────────────────────────
         function _buildDTRBriefTab(task, club) {
             const useClub = task.use_club_colours !== false;
@@ -21321,7 +21391,19 @@
                 { key:'accent',    label:'Accent',    hex: cc.accent?.hex    || (useClub ? (club.hex_accent||'')     : ''), pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
 
-            // Edit mode: show form fields
+            // ── shared helpers ─────────────────────────────────────────────────
+            const fr = task.factory_requirements || {};
+            // Section-title with collapse toggle
+            const _collapseSectionTitle = (label, id) => `
+                <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none" onclick="toggleDTRJobDetails()">
+                    <span class="dtr-ro-section-title" style="margin-bottom:0">${label}</span>
+                    <svg id="dtr-job-details-arrow" width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"
+                        style="flex-shrink:0;transition:transform 0.2s;transform:rotate(${_dtrJobDetailsOpen?'0':'-90'}deg)">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </div>`;
+
+            // ── EDIT MODE ──────────────────────────────────────────────────────
             if (_dtrEditMode) {
                 const designerOpts = `<option value="">— Unassigned —</option>` +
                     (typeof brandUsers !== 'undefined' && brandUsers?.length
@@ -21331,6 +21413,21 @@
                             return `<option value="${u.id}" data-name="${escHtml(n)}"${sel}>${escHtml(n)}</option>`;
                         }).join('')
                         : (task.assigned_designer_id ? `<option value="${task.assigned_designer_id}" selected>${escHtml(task.assigned_designer_name||'Current Designer')}</option>` : ''));
+
+                const frEditHtml = _DTR_FR_ITEMS.map(item => `
+                    <label style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;cursor:pointer;font-size:12px;font-weight:500;color:#374151">
+                        <input type="checkbox" id="dtr-fr-${item.key}" ${fr[item.key]?'checked':''} style="margin-top:2px;accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0">
+                        ${escHtml(item.label)}
+                    </label>
+                    ${item.subs ? `<div id="dtr-fr-subs-${item.key}" style="margin-left:22px;${fr[item.key]?'':'opacity:0.4;pointer-events:none'}">
+                        ${item.subs.map(sub => `
+                            <label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;font-size:11px;color:#475569">
+                                <input type="checkbox" id="dtr-fr-${sub.key}" ${fr[sub.key]?'checked':''} style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0">
+                                ${escHtml(sub.label)}
+                            </label>`).join('')}
+                    </div>` : ''}
+                `).join('');
+
                 return `
                     <!-- Club identity header -->
                     <div class="dtr-brief-summary">
@@ -21343,64 +21440,77 @@
                         </div>
                         <button onclick="toggleDTREditMode()" class="dt-edit-btn active" style="font-size:10px;padding:3px 9px;flex-shrink:0">Done</button>
                     </div>
-                    <!-- § Job Details -->
+
+                    <!-- § Job Details (collapsible) -->
                     <div class="dtr-brief-section">
-                        <div class="dtr-brief-section-title">Job Details</div>
-                        <div class="dtr-edit-row">
-                            <label class="dtr-edit-label" for="dtr-ln-task-name">Task Name</label>
-                            <input class="dtr-edit-field" id="dtr-ln-task-name" type="text" value="${escHtml(task.task_name||'')}" placeholder="Task name…">
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                            <div class="dtr-edit-row" style="margin-bottom:0">
-                                <label class="dtr-edit-label" for="dtr-ln-sport">Sport</label>
-                                <input class="dtr-edit-field" id="dtr-ln-sport" type="text" value="${escHtml(task.sport||'')}" placeholder="Football…">
+                        ${_collapseSectionTitle('Job Details','dtr-job-details-body')}
+                        <div id="dtr-job-details-body" style="${_dtrJobDetailsOpen?'':'display:none'}">
+                            <!-- Task name — full width -->
+                            <div class="dtr-edit-row" style="margin-top:8px">
+                                <label class="dtr-edit-label" for="dtr-ln-task-name">Task Name</label>
+                                <input class="dtr-edit-field" id="dtr-ln-task-name" type="text" value="${escHtml(task.task_name||'')}" placeholder="Task name…">
                             </div>
-                            <div class="dtr-edit-row" style="margin-bottom:0">
-                                <label class="dtr-edit-label" for="dtr-ln-priority">Priority</label>
-                                <select class="dtr-edit-field" id="dtr-ln-priority">
-                                    <option value="standard"${(task.priority||'standard')==='standard'?' selected':''}>⚪ Standard</option>
-                                    <option value="high"${task.priority==='high'?' selected':''}>🟠 High</option>
-                                    <option value="urgent"${task.priority==='urgent'?' selected':''}>🔴 Urgent</option>
-                                </select>
+                            <!-- Sport + Priority -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                                <div class="dtr-edit-row" style="margin-bottom:0">
+                                    <label class="dtr-edit-label" for="dtr-ln-sport">Sport</label>
+                                    <input class="dtr-edit-field" id="dtr-ln-sport" type="text" value="${escHtml(task.sport||'')}" placeholder="Football…">
+                                </div>
+                                <div class="dtr-edit-row" style="margin-bottom:0">
+                                    <label class="dtr-edit-label" for="dtr-ln-priority">Priority</label>
+                                    <select class="dtr-edit-field" id="dtr-ln-priority">
+                                        <option value="standard"${(task.priority||'standard')==='standard'?' selected':''}>⚪ Standard</option>
+                                        <option value="high"${task.priority==='high'?' selected':''}>🟠 High</option>
+                                        <option value="urgent"${task.priority==='urgent'?' selected':''}>🔴 Urgent</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-                            <div class="dtr-edit-row" style="margin-bottom:0">
-                                <label class="dtr-edit-label" for="dtr-ln-due-date">Deadline</label>
-                                <input class="dtr-edit-field" id="dtr-ln-due-date" type="date" value="${task.due_date ? task.due_date.substring(0,10) : ''}">
+                            <!-- Deadline -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                                <div class="dtr-edit-row" style="margin-bottom:0">
+                                    <label class="dtr-edit-label" for="dtr-ln-due-date">Deadline</label>
+                                    <input class="dtr-edit-field" id="dtr-ln-due-date" type="date" value="${task.due_date ? task.due_date.substring(0,10) : ''}">
+                                </div>
+                                <div class="dtr-edit-row" style="margin-bottom:0">
+                                    <label class="dtr-edit-label">Due</label>
+                                    <div style="font-size:12px;font-weight:600;color:${daysLeft !== null && daysLeft < 0 ? '#dc2626' : daysLeft !== null && daysLeft <= 7 ? '#c2410c' : '#0f172a'};padding:6px 0 5px">${dueDate}</div>
+                                </div>
                             </div>
-                            <div class="dtr-edit-row" style="margin-bottom:0">
-                                <label class="dtr-edit-label">Due</label>
-                                <div style="font-size:12px;font-weight:600;color:${daysLeft !== null && daysLeft < 0 ? '#dc2626' : daysLeft !== null && daysLeft <= 7 ? '#c2410c' : '#0f172a'};padding:6px 0 5px">${dueDate}</div>
+                            <!-- Designer + Owner on same row -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                                <div class="dtr-edit-row" style="margin-bottom:0">
+                                    <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
+                                    <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
+                                </div>
+                                <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:2px">
+                                    <label class="dtr-edit-label">Owner(s)</label>
+                                    <div style="flex:1"><div class="owner-dp" id="owner-dp-design-task"></div></div>
+                                </div>
                             </div>
+                            <!-- Club + Job on same row -->
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                                <div class="dtr-edit-row" style="margin-bottom:0">
+                                    <label class="dtr-edit-label" for="dtr-ln-club">Club</label>
+                                    <select class="dtr-edit-field" id="dtr-ln-club" onchange="dtrEditClubChanged()">
+                                        <option value="">— No Club —</option>
+                                        ${(clubs||[]).map(c => `<option value="${c.id}"${task.club_id===c.id?' selected':''}>${escHtml(c.name)}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="dtr-edit-row" style="margin-bottom:0">
+                                    <label class="dtr-edit-label" for="dtr-ln-job">Job</label>
+                                    <select class="dtr-edit-field" id="dtr-ln-job">
+                                        <option value="">— No Job —</option>
+                                        ${(jobs||[]).filter(j => !task.club_id || j.club_id === task.club_id).map(j => `<option value="${j.id}"${task.job_id===j.id?' selected':''}>${escHtml(j.job_name||j.job_number||'Job')}</option>`).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            ${task.jobs?.job_type ? `<div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+                                <span class="dtr-info-label">Job Type</span>
+                                <span style="font-size:11px;font-weight:600;color:#475569">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
+                            </div>` : ''}
                         </div>
-                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
-                            <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
-                        </div>
-                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label">Owner(s)</label>
-                            <div style="flex:1"><div class="owner-dp" id="owner-dp-design-task"></div></div>
-                        </div>
-                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-club">Club</label>
-                            <select class="dtr-edit-field" id="dtr-ln-club" onchange="dtrEditClubChanged()">
-                                <option value="">— No Club —</option>
-                                ${(clubs||[]).map(c => `<option value="${c.id}"${task.club_id===c.id?' selected':''}>${escHtml(c.name)}</option>`).join('')}
-                            </select>
-                        </div>
-                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-job">Job</label>
-                            <select class="dtr-edit-field" id="dtr-ln-job">
-                                <option value="">— No Job —</option>
-                                ${(jobs||[]).filter(j => !task.club_id || j.club_id === task.club_id).map(j => `<option value="${j.id}"${task.job_id===j.id?' selected':''}>${escHtml(j.job_name||j.job_number||'Job')}</option>`).join('')}
-                            </select>
-                        </div>
-                        ${task.jobs?.job_type ? `<div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding:6px 0">
-                            <span class="dtr-info-label">Job Type</span>
-                            <span style="font-size:11px;font-weight:600;color:#475569">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' '))}</span>
-                        </div>` : ''}
                     </div>
+
                     <!-- § Design Brief -->
                     <div class="dtr-brief-section">
                         <div class="dtr-brief-section-title">Design Brief</div>
@@ -21438,6 +21548,22 @@
                             <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Important reminders…" style="min-height:54px">${escHtml(task.key_notes||'')}</textarea>
                         </div>
                     </div>
+
+                    <!-- § Factory Requirements (edit) -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Factory Requirements</div>
+                        <div style="margin-top:4px">
+                            ${frEditHtml}
+                        </div>
+                        <script>
+                            (function(){
+                                var lf = document.getElementById('dtr-fr-logo_files');
+                                var subs = document.getElementById('dtr-fr-subs-logo_files');
+                                if(lf && subs) lf.addEventListener('change', function(){ subs.style.opacity = this.checked?'1':'0.4'; subs.style.pointerEvents = this.checked?'':'none'; });
+                            })();
+                        <\/script>
+                    </div>
+
                     <!-- § Brand Colours -->
                     <div class="dtr-brief-section" style="border-bottom:none">
                         <div class="dtr-brief-section-title">Brand Colours</div>
@@ -21459,8 +21585,54 @@
                     </div>`;
             }
 
-            // Read-only (view) mode
+            // ── READ-ONLY MODE ─────────────────────────────────────────────────
             const designerName = task.assigned_designer_name || (task.designers?.full_name) || '—';
+            const ownerDisplay = (() => {
+                const ownerIds = task.owner_ids || [];
+                if (ownerIds.length && typeof brandUsers !== 'undefined' && brandUsers.length) {
+                    const names = ownerIds.map(id => { const u = brandUsers.find(u => u.id === id); return u ? userDisplayName(u) : null; }).filter(Boolean);
+                    if (names.length) return escHtml(names.join(', '));
+                }
+                return escHtml(designerName);
+            })();
+
+            // Brief questions — show all, use dash when empty
+            const briefQRows = [
+                ['Team Crests',            task.brief_team_crests],
+                ['Brand Logos',            task.brief_brand_logos],
+                ['Sponsor Logo Type',      task.brief_sponsor_logo_type],
+                ['Player Embellishments',  task.brief_player_embellishments],
+                ['Colour Application',     task.brief_colour_application],
+                ['Piping',                 task.brief_piping],
+            ].map(([label, val]) => `
+                <div style="margin-top:7px">
+                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#94a3b8;margin-bottom:2px">${label}</div>
+                    <p class="dtr-ro-text" style="margin:0;${!val?'color:#cbd5e1;font-style:italic':''}">${val ? escHtml(val) : '—'}</p>
+                </div>`).join('');
+
+            // Factory Requirements — checklist display
+            const frReadHtml = _DTR_FR_ITEMS.map(item => {
+                const checked = !!fr[item.key];
+                const rowHtml = `<div style="display:flex;align-items:center;gap:7px;padding:3px 0">
+                    <div style="width:15px;height:15px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+                        background:${checked?'#00e5cc':'#f1f5f9'};border:1.5px solid ${checked?'#00b89f':'#cbd5e1'}">
+                        ${checked?'<svg width="9" height="9" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>':''}
+                    </div>
+                    <span style="font-size:12px;font-weight:${checked?'600':'400'};color:${checked?'#0f172a':'#94a3b8'}">${escHtml(item.label)}</span>
+                </div>`;
+                const subsHtml = item.subs ? item.subs.map(sub => {
+                    const sc = !!fr[sub.key];
+                    return `<div style="display:flex;align-items:center;gap:6px;padding:2px 0;margin-left:22px">
+                        <div style="width:13px;height:13px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+                            background:${sc?'#e0f2fe':'#f8fafc'};border:1.5px solid ${sc?'#7dd3fc':'#e2e8f0'}">
+                            ${sc?'<svg width="8" height="8" fill="none" stroke="#0369a1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>':''}
+                        </div>
+                        <span style="font-size:11px;color:${sc?'#0369a1':'#94a3b8'};font-weight:${sc?'600':'400'}">${escHtml(sub.label)}</span>
+                    </div>`;
+                }).join('') : '';
+                return rowHtml + subsHtml;
+            }).join('');
+
             return `
                 <!-- Club identity header -->
                 <div class="dtr-brief-summary">
@@ -21475,51 +21647,46 @@
                         <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px">Edit</button>
                     </div>
                 </div>
-                <!-- § Job Details (read-only) -->
+
+                <!-- § Job Details — collapsible -->
                 <div class="dtr-ro-section">
-                    <div class="dtr-ro-section-title">Job Details</div>
-                    ${task.jobs ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Linked Job</span><span class="dtr-ro-value">${escHtml(task.jobs.job_name || task.jobs.job_number || '—')}</span></div>` : ''}
-                    ${task.sport ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport)}</span></div>` : ''}
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${daysLeft !== null ? ` <span style="font-size:9px;font-weight:700;margin-left:4px;${daysLeft < 0 ? 'color:#dc2626' : daysLeft <= 7 ? 'color:#c2410c' : 'color:#94a3b8'}">${dueExtra}</span>` : ''}</span></div>
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Owner</span><span class="dtr-ro-value">${(() => {
-                        const ownerIds = task.owner_ids || [];
-                        if (ownerIds.length && brandUsers.length) {
-                            const names = ownerIds.map(id => { const u = brandUsers.find(u => u.id === id); return u ? userDisplayName(u) : null; }).filter(Boolean);
-                            if (names.length) return escHtml(names.join(', '));
-                        }
-                        return escHtml(designerName);
-                    })()}</span></div>
-                    <div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${task.order_type ? escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</span></div>
-                    ${task.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Task Type</span><span class="dtr-ro-value">${escHtml(Object.fromEntries(DS_JOB_TYPES.map(t=>[t.key,t.label]))[task.job_type] || task.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
-                    ${task.team ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Team</span><span class="dtr-ro-value">${escHtml(task.team)}</span></div>` : ''}
-                    ${task.season_event ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Season</span><span class="dtr-ro-value">${escHtml(task.season_event)}</span></div>` : ''}
-                    ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
-                    ${task.assigned_designer_name ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Designer</span><span class="dtr-ro-value">${escHtml(task.assigned_designer_name)}</span></div>` : ''}
+                    ${_collapseSectionTitle('Job Details')}
+                    <div id="dtr-job-details-body" style="${_dtrJobDetailsOpen?'':'display:none'}">
+                        <div class="dtr-ro-row" style="margin-top:6px"><span class="dtr-ro-label">Task Name</span><span class="dtr-ro-value">${escHtml(task.task_name||'—')}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Club</span><span class="dtr-ro-value">${escHtml(club.name||'—')}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Linked Job</span><span class="dtr-ro-value">${escHtml(task.jobs?.job_name || task.jobs?.job_number || '—')}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Sport</span><span class="dtr-ro-value">${escHtml(task.sport||'—')}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Priority</span><span class="dtr-ro-value">${pri.dot} ${pri.label}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${dueExtra}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${task.order_type ? escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Task Type</span><span class="dtr-ro-value">${task.job_type ? escHtml((typeof DS_JOB_TYPES!=='undefined'?Object.fromEntries(DS_JOB_TYPES.map(t=>[t.key,t.label])):{} )[task.job_type] || task.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Team</span><span class="dtr-ro-value">${escHtml(task.team||'—')}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Season</span><span class="dtr-ro-value">${escHtml(task.season_event||'—')}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Designer</span><span class="dtr-ro-value">${escHtml(task.assigned_designer_name||'—')}</span></div>
+                        <div class="dtr-ro-row"><span class="dtr-ro-label">Owner(s)</span><span class="dtr-ro-value">${ownerDisplay}</span></div>
+                        ${task.jobs?.job_type ? `<div class="dtr-ro-row"><span class="dtr-ro-label">Job Type</span><span class="dtr-ro-value">${escHtml(JTL[task.jobs.job_type] || task.jobs.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase()))}</span></div>` : ''}
+                    </div>
                 </div>
+
                 <!-- § Design Brief (read-only) -->
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Design Brief</div>
                     ${briefText
                         ? `<p class="dtr-ro-text">${escHtml(briefText)}</p>`
-                        : `<p style="font-size:12px;color:#94a3b8;font-style:italic;margin:0">No brief entered yet.</p>`}
-                    ${[
-                        ['Team Crests', task.brief_team_crests],
-                        ['Brand Logos', task.brief_brand_logos],
-                        ['Sponsor Logo Type', task.brief_sponsor_logo_type],
-                        ['Player Embellishments', task.brief_player_embellishments],
-                        ['Colour Application', task.brief_colour_application],
-                        ['Piping', task.brief_piping],
-                    ].filter(([,v]) => v).map(([label,val]) => `
-                        <div style="margin-top:8px">
-                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#94a3b8;margin-bottom:2px">${label}</div>
-                            <p class="dtr-ro-text" style="margin:0">${escHtml(val)}</p>
-                        </div>`).join('')}
+                        : `<p style="font-size:12px;color:#cbd5e1;font-style:italic;margin:0">No brief entered yet.</p>`}
+                    ${briefQRows}
                     ${task.key_notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
                         <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#92400e;margin-bottom:3px">Key Notes</div>
                         <p class="dtr-ro-text" style="color:#78350f;font-size:11px">${escHtml(task.key_notes)}</p>
                     </div>` : ''}
                 </div>
+
+                <!-- § Factory Requirements (read-only) -->
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Factory Requirements</div>
+                    <div style="margin-top:4px">${frReadHtml}</div>
+                </div>
+
                 <!-- § Brand Colours (read-only) -->
                 <div class="dtr-ro-section" style="border-bottom:none">
                     <div class="dtr-ro-section-title">Brand Colours</div>
@@ -21695,6 +21862,7 @@
                     brief_player_embellishments: document.getElementById('dtr-ln-player-embellishments')?.value?.trim() || null,
                     brief_colour_application:    document.getElementById('dtr-ln-colour-application')?.value?.trim() || null,
                     brief_piping:                document.getElementById('dtr-ln-piping')?.value?.trim() || null,
+                    factory_requirements: _dtrReadFactoryReqs(),
                     key_notes:   document.getElementById('dtr-ln-key-notes')?.value?.trim() || null,
                     priority:    document.getElementById('dtr-ln-priority')?.value || 'standard',
                     assigned_designer_id:   designerId,
