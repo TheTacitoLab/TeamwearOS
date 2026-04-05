@@ -3734,6 +3734,7 @@
                     <button class="record-nav-item" onclick="showJobTab('production')" id="jt-production" style="width:auto;padding:7px 12px;font-size:12px">Production</button>
                 </div>
                 <button onclick="openEditJobModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit Job</button>
+                <button onclick="deleteJob(currentJobId)" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5" style="color:#dc2626;border-color:#fca5a5" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">Delete</button>
             </div>
             <!-- 3-COLUMN LAYOUT: left (info) | middle (pipelines+content) | right (activity) -->
             <div class="jr-three-col">
@@ -3742,7 +3743,7 @@
                 <div class="jr-left-col">
                     <!-- Compact job info card -->
                     <div class="glass rounded-2xl p-4">
-                        <p id="jr-job-desc" class="text-gray-500 text-xs leading-relaxed mb-3"></p>
+                        <p id="jr-job-desc" class="text-gray-300 text-xs leading-relaxed mb-3"></p>
                         <div class="grid grid-cols-2 gap-y-2 pt-3 border-t border-gray-800" id="jr-meta-row">
                             <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-xs font-semibold mt-0.5">—</p></div>
                             <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-xs font-semibold mt-0.5">—</p></div>
@@ -4046,13 +4047,13 @@
                         </div>
                     </div>
                     <div class="modal-section">
-                        <p class="modal-section-title">Next Step</p>
+                        <p class="modal-section-title">Next Action</p>
                         <div class="mb-3">
-                            <label class="text-xs text-gray-500 mb-1 block">Next Step Description</label>
+                            <label class="text-xs text-gray-500 mb-1 block">Next Action</label>
                             <input type="text" id="job-next-step" placeholder="e.g. Send initial concepts to client" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
                         <div>
-                            <label class="text-xs text-gray-500 mb-1 block">Next Step Deadline</label>
+                            <label class="text-xs text-gray-500 mb-1 block">Due Date</label>
                             <input type="date" id="job-next-step-deadline" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
                     </div>
@@ -14050,18 +14051,11 @@
             </div>`;
         }
 
-        // Shared helper: render next action in job record left card
+        // Shared helper: render next action in job record left card (interactive)
         function _renderJobNextAction(container, job) {
             if (!container) return;
             if (!job) { container.innerHTML = ''; return; }
-            const hasAction = !!job.next_action;
-            if (!hasAction) { container.innerHTML = `<div class="text-xs text-gray-600 mb-1">Next Action</div><p class="text-xs text-gray-500 italic">None set</p>`; return; }
-            const dueDate = job.next_action_due_date;
-            const dueFmt = dueDate ? new Date(dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short' }) : null;
-            const isOverdue = dueDate && new Date(dueDate) < new Date();
-            container.innerHTML = `<div class="text-xs text-gray-600 mb-1">Next Action</div>
-                <p class="text-xs font-semibold">${escHtml(job.next_action)}</p>
-                ${dueFmt ? `<p class="text-xs mt-0.5" style="color:${isOverdue ? '#dc2626' : '#d97706'}">${isOverdue ? '⚠ Overdue · ' : ''}Due ${dueFmt}</p>` : ''}`;
+            container.innerHTML = _buildNextActionHtml(job);
         }
 
         async function saveNextAction(jobId) {
@@ -14101,6 +14095,19 @@
             showToast('Action marked complete ✓', 'success');
             const preview = document.getElementById('sh-preview');
             if (preview && !preview.classList.contains('hide') && _shSelectedId === jobId) _renderJobPreview(preview, jobId);
+        }
+
+        async function deleteJob(jobId) {
+            if (!jobId) return;
+            if (!confirm('Delete this job? This cannot be undone.')) return;
+            const { error } = await supabase.from('jobs').delete().eq('id', jobId);
+            if (error) { showToast('Error deleting job: ' + error.message, 'error'); return; }
+            showToast('Job deleted');
+            jobs = jobs.filter(j => j.id !== jobId);
+            currentJobId = null;
+            currentJob = null;
+            showSalesTab('jobs');
+            renderSalesHome();
         }
 
         // =============================================
@@ -14268,8 +14275,8 @@
             document.getElementById('job-contact-role').value = currentJob.contact_role || '';
             document.getElementById('job-contact-email').value = currentJob.contact_email || '';
             document.getElementById('job-contact-phone').value = currentJob.contact_phone || '';
-            document.getElementById('job-next-step').value = currentJob.next_step || '';
-            document.getElementById('job-next-step-deadline').value = currentJob.next_step_deadline || '';
+            document.getElementById('job-next-step').value = currentJob.next_action || '';
+            document.getElementById('job-next-step-deadline').value = currentJob.next_action_due_date || '';
             const sel = document.getElementById('job-club-id');
             sel.innerHTML = '<option value="">— No club linked —</option>' +
                 clubs.map(c => `<option value="${c.id}" ${c.id === currentJob.club_id ? 'selected' : ''}>${escHtml(c.name)}</option>`).join('');
@@ -14307,8 +14314,8 @@
                 contact_role: document.getElementById('job-contact-role')?.value.trim() || null,
                 contact_email: document.getElementById('job-contact-email')?.value.trim() || null,
                 contact_phone: document.getElementById('job-contact-phone')?.value.trim() || null,
-                next_step: document.getElementById('job-next-step')?.value.trim() || null,
-                next_step_deadline: document.getElementById('job-next-step-deadline')?.value || null,
+                next_action: document.getElementById('job-next-step')?.value.trim() || null,
+                next_action_due_date: document.getElementById('job-next-step-deadline')?.value || null,
                 ...(document.getElementById('owner-dp-job-modal') ? (() => {
                     const ownerIds = getOwnerDropdownIds('job-modal');
                     return { assigned_user_id: ownerIds[0] || null, assigned_user_ids: ownerIds };
@@ -14708,7 +14715,7 @@
                 descEl.innerHTML = `<div class="mb-4">
                     <span class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Description</span>
                     ${currentJob.job_description
-                        ? `<p class="text-sm leading-relaxed" style="color:#cbd5e1">${escHtml(currentJob.job_description)}</p>`
+                        ? `<p class="text-sm leading-relaxed" style="color:#f1f5f9">${escHtml(currentJob.job_description)}</p>`
                         : `<p class="text-xs italic" style="color:#475569">No description added. Click Edit to add one.</p>`}
                 </div>`;
             }
