@@ -20,7 +20,8 @@ CREATE TABLE IF NOT EXISTS job_kanban_stages (
 
 ALTER TABLE job_kanban_stages ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "brand_read_job_kanban_stages" ON job_kanban_stages
+DROP POLICY IF EXISTS "brand_read_job_kanban_stages" ON job_kanban_stages;
+CREATE POLICY "brand_read_job_kanban_stages" ON job_kanban_stages
     FOR SELECT USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
@@ -29,7 +30,8 @@ CREATE POLICY IF NOT EXISTS "brand_read_job_kanban_stages" ON job_kanban_stages
         )
     ));
 
-CREATE POLICY IF NOT EXISTS "brand_write_job_kanban_stages" ON job_kanban_stages
+DROP POLICY IF EXISTS "brand_write_job_kanban_stages" ON job_kanban_stages;
+CREATE POLICY "brand_write_job_kanban_stages" ON job_kanban_stages
     FOR ALL USING (brand_id IN (
         SELECT brand_id FROM user_profiles WHERE id = auth.uid()
         UNION
