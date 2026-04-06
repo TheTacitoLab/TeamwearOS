@@ -5376,40 +5376,39 @@
                         </div>
 
                         <!-- RIGHT: Design brief + notes -->
-                        <div style="display:flex;flex-direction:column;gap:12px">
+                        <div style="display:flex;flex-direction:column;gap:12px;position:relative">
                             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:2px">Design Brief</div>
 
-                            <div>
-                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Design Description</label>
-                                <textarea id="cdt-design-brief" placeholder="Describe the creative direction, style references, heritage elements…" rows="3" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.6" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                            <div style="position:relative">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                                    <label style="font-size:11px;color:#64748b;font-weight:600">Design Description</label>
+                                    <button type="button" onclick="openBriefAssistant()" title="Brief Assistant — guided questions" style="display:flex;align-items:center;gap:4px;padding:3px 8px;border:1.5px solid #00e5cc;border-radius:6px;background:#f0fdfb;color:#0891b2;font-size:10px;font-weight:700;cursor:pointer;line-height:1" onmouseover="this.style.background='#ccfbf1'" onmouseout="this.style.background='#f0fdfb'">? Brief Assistant</button>
+                                </div>
+                                <textarea id="cdt-design-brief" placeholder="Describe the creative direction, style references, heritage elements… or use the Brief Assistant to build it step by step." rows="5" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.6" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
                             </div>
 
-                            <!-- Brief questions -->
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-                                <div>
-                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Team Crests</label>
-                                    <textarea id="cdt-brief-team-crests" placeholder="Describe team crests…" rows="2" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                            <!-- Brief assistant panel (slide-in overlay) -->
+                            <div id="brief-assistant-panel" style="display:none;position:absolute;top:0;right:0;width:50%;height:100%;background:#fff;border-left:1.5px solid #e2e8f0;z-index:10;overflow-y:auto;padding:20px;box-sizing:border-box;box-shadow:-4px 0 20px rgba(0,0,0,0.08)">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+                                    <div>
+                                        <div style="font-size:13px;font-weight:700;color:#0f172a">Brief Assistant</div>
+                                        <div style="font-size:11px;color:#64748b;margin-top:2px">Answer the prompts below — we'll write your brief.</div>
+                                    </div>
+                                    <button type="button" onclick="closeBriefAssistant()" style="padding:4px 8px;border:1px solid #e2e8f0;border-radius:6px;background:#f8fafc;color:#64748b;font-size:11px;cursor:pointer">✕ Close</button>
                                 </div>
-                                <div>
-                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Brand Logos</label>
-                                    <textarea id="cdt-brief-brand-logos" placeholder="Describe brand logos…" rows="2" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                                <div style="display:flex;flex-direction:column;gap:10px" id="brief-assistant-qs">
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">1. Overall look and feel?</label><textarea id="ba-q1" rows="2" placeholder="e.g. bold and modern, heritage, clean and minimal" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">2. How should the team crest be applied?</label><textarea id="ba-q2" rows="2" placeholder="e.g. placement, size, embroidery or print" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">3. Brand logos — where and how?</label><textarea id="ba-q3" rows="2" placeholder="e.g. placement, size, single or full colour" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">4. Sponsor logos — type and placement?</label><textarea id="ba-q4" rows="2" placeholder="e.g. chest, sleeve, back, naming rights" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">5. Player embellishments?</label><textarea id="ba-q5" rows="2" placeholder="e.g. numbers, names, patches — font style, colour, placement" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">6. Primary colours?</label><textarea id="ba-q6" rows="2" placeholder="e.g. navy, white, gold — ties into colour pickers" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">7. How should colours be applied?</label><textarea id="ba-q7" rows="2" placeholder="e.g. block panels, hoops, stripes, gradient" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">8. Piping, trim or detail elements?</label><textarea id="ba-q8" rows="2" placeholder="e.g. side stripe, shoulder, collar, cuffs" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">9. Fabric, finish or technical requirements?</label><textarea id="ba-q9" rows="2" placeholder="e.g. moisture-wicking, matte, recycled" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
+                                    <div><label style="font-size:11px;font-weight:600;color:#374151;display:block;margin-bottom:3px">10. Anything else the designer needs to know?</label><textarea id="ba-q10" rows="2" placeholder="Any additional notes or references…" style="width:100%;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea></div>
                                 </div>
-                                <div>
-                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Sponsor Logo Type</label>
-                                    <textarea id="cdt-brief-sponsor-logo-type" placeholder="e.g. embroidered, print…" rows="2" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-                                </div>
-                                <div>
-                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Player Embellishments</label>
-                                    <textarea id="cdt-brief-player-embellishments" placeholder="e.g. name, number, initials…" rows="2" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-                                </div>
-                                <div>
-                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Colour Application</label>
-                                    <textarea id="cdt-brief-colour-application" placeholder="How should colours be applied…" rows="2" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-                                </div>
-                                <div>
-                                    <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Piping</label>
-                                    <textarea id="cdt-brief-piping" placeholder="e.g. side stripe, shoulder tape…" rows="2" style="width:100%;padding:7px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:12px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-                                </div>
+                                <button type="button" onclick="buildBriefFromAnswers()" style="width:100%;margin-top:14px;padding:10px;border:none;border-radius:9px;background:#00e5cc;color:#0f172a;font-size:12px;font-weight:700;cursor:pointer" onmouseover="this.style.background='#00ccb4'" onmouseout="this.style.background='#00e5cc'">Build Brief →</button>
                             </div>
 
                             <div>
@@ -18593,6 +18592,41 @@
             document.getElementById('create-design-task-modal')?.classList.add('hide');
         }
 
+        function openBriefAssistant() {
+            const panel = document.getElementById('brief-assistant-panel');
+            if (panel) panel.style.display = 'block';
+        }
+
+        function closeBriefAssistant() {
+            const panel = document.getElementById('brief-assistant-panel');
+            if (panel) panel.style.display = 'none';
+        }
+
+        function buildBriefFromAnswers() {
+            const get = id => (document.getElementById(id)?.value?.trim() || '');
+            const q1 = get('ba-q1'), q2 = get('ba-q2'), q3 = get('ba-q3'), q4 = get('ba-q4'),
+                  q5 = get('ba-q5'), q6 = get('ba-q6'), q7 = get('ba-q7'), q8 = get('ba-q8'),
+                  q9 = get('ba-q9'), q10 = get('ba-q10');
+            const parts = [];
+            if (q1)  parts.push(q1);
+            if (q2)  parts.push(`Team crests: ${q2}.`);
+            if (q3)  parts.push(`Brand logos: ${q3}.`);
+            if (q4)  parts.push(`Sponsor logos: ${q4}.`);
+            if (q5)  parts.push(`Player embellishments: ${q5}.`);
+            if (q6 && q7) parts.push(`Colours (${q6}) applied as: ${q7}.`);
+            else if (q6) parts.push(`Colours: ${q6}.`);
+            else if (q7) parts.push(`Colour application: ${q7}.`);
+            if (q8)  parts.push(`Trim/piping: ${q8}.`);
+            if (q9)  parts.push(`Technical: ${q9}.`);
+            if (q10) parts.push(`Additional: ${q10}.`);
+            if (!parts.length) { showToast('Please answer at least one question', 'warning'); return; }
+            const brief = parts.join(' ');
+            const ta = document.getElementById('cdt-design-brief');
+            if (ta) ta.value = brief;
+            closeBriefAssistant();
+            showToast('Brief built successfully', 'success');
+        }
+
         async function saveNewDesignTask() {
             const name = document.getElementById('cdt-name')?.value?.trim();
             if (!name) { showToast('Please enter a task name', 'warning'); return; }
@@ -18662,12 +18696,6 @@
                     sport:        document.getElementById('cdt-sport')?.value?.trim() || null,
                     priority:     document.getElementById('cdt-priority')?.value || 'standard',
                     design_brief: document.getElementById('cdt-design-brief')?.value?.trim() || null,
-                    brief_team_crests:           document.getElementById('cdt-brief-team-crests')?.value?.trim() || null,
-                    brief_brand_logos:           document.getElementById('cdt-brief-brand-logos')?.value?.trim() || null,
-                    brief_sponsor_logo_type:     document.getElementById('cdt-brief-sponsor-logo-type')?.value?.trim() || null,
-                    brief_player_embellishments: document.getElementById('cdt-brief-player-embellishments')?.value?.trim() || null,
-                    brief_colour_application:    document.getElementById('cdt-brief-colour-application')?.value?.trim() || null,
-                    brief_piping:                document.getElementById('cdt-brief-piping')?.value?.trim() || null,
                     factory_requirements: {
                         web_images:            !!(document.getElementById('cdt-fr-web_images')?.checked),
                         tech_packs:            !!(document.getElementById('cdt-fr-tech_packs')?.checked),
@@ -21291,12 +21319,7 @@
                 <div class="dtr-body${isEmbedded ? ' dtr-embedded' : ''}">
                     <div class="dtr-left-panel" id="dtr-left-panel">
                         <div class="dtr-left-inner" id="dtr-left-inner">
-                            <div class="dtr-left-tabs">
-                                <button class="dtr-left-tab active" id="dtr-ltab-brief" onclick="dtrSwitchLeftTab('brief')">Brief</button>
-                                <button class="dtr-left-tab" id="dtr-ltab-products" onclick="dtrSwitchLeftTab('products')">Products</button>
-                                <button class="dtr-left-tab" id="dtr-ltab-assets" onclick="dtrSwitchLeftTab('assets')">Assets${assets.length > 0 ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;padding:0 4px;margin-left:5px;border-radius:8px;background:#0369a1;color:#fff;font-size:9px;font-weight:700;line-height:1">${assets.length}</span>` : ''}</button>
-                            </div>
-                            <div class="dtr-left-tab-content" id="dtr-left-tab-content">
+                            <div class="dtr-left-tab-content" id="dtr-left-tab-content" style="overflow-y:auto;flex:1">
                                 ${buildDTRLeftColumn(task, club, assets, clubProds, jobProds)}
                             </div>
                         </div>
@@ -21367,16 +21390,13 @@
 
         function toggleDTREditMode() {
             _dtrEditMode = !_dtrEditMode;
-            // Update edit button in full-page header if present
             const btn = document.getElementById('dt-edit-btn');
             if (btn) { btn.textContent = _dtrEditMode ? 'Done' : 'Edit'; btn.classList.toggle('active', _dtrEditMode); }
-            // Re-render current tab in new mode
             const content = document.getElementById('dtr-left-tab-content');
             if (content && currentDesignTaskRecord) {
                 const task = currentDesignTaskRecord;
                 const club = task.clubs || {};
-                content.innerHTML = _dtrBuildTabContent(_dtrCurrentLeftTab, task, club, _dtrCachedAssets, _dtrCachedClubProds, _dtrCachedJobProds);
-                // Re-render owner dropdown after content is set
+                content.innerHTML = buildDTRLeftColumn(task, club, _dtrCachedAssets, _dtrCachedClubProds, _dtrCachedJobProds);
                 if (_dtrEditMode) renderOwnerDropdown('design-task', task.owner_ids || []);
             }
         }
@@ -21387,19 +21407,23 @@
             return _buildDTRBriefTab(task, club);
         }
 
-        // ── Left column ────────────────────────────────────────────────────────
+        // ── Left column (single scrollable column — no tabs) ──────────────────
         function buildDTRLeftColumn(task, club, assets, clubProds, jobProds) {
-            const selectedIds = new Set(task.products_required || []);
+            assets    = assets    || _dtrCachedAssets    || [];
+            clubProds = clubProds || _dtrCachedClubProds || [];
+            jobProds  = jobProds  || _dtrCachedJobProds  || [];
+
             const logoUrl = club.club_crest_url || club.logo_url || '';
             const useClub = task.use_club_colours !== false;
             const cc = task.custom_colours || {};
+            const fr = task.factory_requirements || {};
             const PRI = { standard:{ label:'Standard', dot:'⚪' }, high:{ label:'High', dot:'🟠' }, urgent:{ label:'Urgent', dot:'🔴' } };
             const pri = PRI[task.priority || 'standard'] || PRI.standard;
             const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
             const daysLeft = task.due_date ? Math.ceil((new Date(task.due_date) - new Date()) / 86400000) : null;
             const dueExtra = daysLeft !== null
-                ? daysLeft < 0 ? ` <span style="color:#dc2626;font-size:9px;font-weight:700">(${Math.abs(daysLeft)}d overdue)</span>`
-                : daysLeft <= 7 ? ` <span style="color:#c2410c;font-size:9px;font-weight:700">(${daysLeft}d left)</span>` : '' : '';
+                ? daysLeft < 0 ? ` <span style="color:#dc2626;font-size:9px;font-weight:700">${Math.abs(daysLeft)}d overdue</span>`
+                : daysLeft <= 7 ? ` <span style="color:#c2410c;font-size:9px;font-weight:700">${daysLeft}d left</span>` : '' : '';
             const briefText = task.design_brief || task.design_summary || '';
             const JTL = typeof JOB_TYPE_LABELS !== 'undefined' ? JOB_TYPE_LABELS : {};
 
@@ -21477,8 +21501,8 @@
                     }).join('')
                     : (task.assigned_designer_id ? `<option value="${task.assigned_designer_id}" selected>${escHtml(task.assigned_designer_name||'Current Designer')}</option>` : ''));
 
-            // Return initial tab content for brief tab
-            return _buildDTRBriefTab(task, club);
+            // Return full single-column panel
+            return _buildDTRBriefTab(task, club, assets, clubProds, jobProds);
         }
 
         // ── Brief tab state ────────────────────────────────────────────────────
@@ -21512,8 +21536,12 @@
             return obj;
         }
 
-        // ── Brief tab ──────────────────────────────────────────────────────────
-        function _buildDTRBriefTab(task, club) {
+        // ── Brief tab (now renders full single-column left panel) ──────────────
+        function _buildDTRBriefTab(task, club, assets, clubProds, jobProds) {
+            assets    = assets    || _dtrCachedAssets    || [];
+            clubProds = clubProds || _dtrCachedClubProds || [];
+            jobProds  = jobProds  || _dtrCachedJobProds  || [];
+
             const useClub = task.use_club_colours !== false;
             const cc = task.custom_colours || {};
             const PRI = { standard:{ label:'Standard', dot:'⚪' }, high:{ label:'High', dot:'🟠' }, urgent:{ label:'Urgent', dot:'🔴' } };
@@ -21532,6 +21560,34 @@
                 { key:'secondary', label:'Secondary', hex: cc.secondary?.hex || (useClub ? (club.hex_secondary||'')  : ''), pantone: cc.secondary?.pantone || club.pantone_secondary || '' },
                 { key:'accent',    label:'Accent',    hex: cc.accent?.hex    || (useClub ? (club.hex_accent||'')     : ''), pantone: cc.accent?.pantone    || club.pantone_accent    || '' },
             ];
+
+            // Products data
+            const _selIds = new Set(task.products_required || []);
+            if (_selIds.size === 0 && jobProds.length > 0) jobProds.forEach(jp => _selIds.add(jp.id));
+            const _allAvail = [...jobProds, ...clubProds.filter(cp => !jobProds.find(jp => jp.id === cp.id))];
+            const _makeProdCard = cp => {
+                const sel = _selIds.has(cp.id);
+                const nm  = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                const img = (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '';
+                return `<div class="dtr-mini-prod-card${sel ? ' selected' : ''}" onclick="dtrToggleProd('${cp.id}',this)" title="${nm}">
+                    <div class="dtr-mini-check">✓</div>
+                    <div class="dtr-mini-prod-img">${img ? `<img src="${escHtml(img)}" alt="" loading="lazy">` : `<svg width="20" height="20" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}</div>
+                    <div class="dtr-mini-prod-name">${nm}</div>
+                </div>`;
+            };
+            const _jobCards = !task.job_id ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No job linked.</p>` : !jobProds.length ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No products on linked job.</p>` : jobProds.map(_makeProdCard).join('');
+            const _clubCards = !task.club_id ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No club linked.</p>` : !clubProds.length ? `<p style="font-size:11px;color:#94a3b8;padding:4px 0;margin:0;grid-column:1/-1">No products in club catalogue.</p>` : clubProds.map(_makeProdCard).join('');
+            const _selectedProds = _allAvail.filter(cp => _selIds.has(cp.id));
+            const _selProdsHtml = _selectedProds.length ? _selectedProds.map(cp => {
+                const nm = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                const imgs = Array.isArray(cp.image_urls) ? cp.image_urls : [];
+                const img = imgs[0] || cp.image_url || '';
+                return `<div class="dtr-selected-list-item">
+                    ${img ? `<div style="width:28px;height:28px;flex-shrink:0;border-radius:5px;background:#f8fafc;border:1px solid #e2e8f0;overflow:hidden;display:flex;align-items:center;justify-content:center"><img src="${escHtml(img)}" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>` : ''}
+                    <div class="dtr-sel-prod-name" title="${nm}">${nm}</div>
+                    ${img ? `<button class="dtr-sel-prod-eye" onclick="dtrPreviewProdImage('${escHtml(img)}','${nm}')" title="Preview"><svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>` : ''}
+                </div>`;
+            }).join('') : `<p style="font-size:12px;color:#94a3b8;margin:0;padding:4px 0">No products selected.</p>`;
 
             // ── shared helpers ─────────────────────────────────────────────────
             const fr = task.factory_requirements || {};
@@ -21653,37 +21709,22 @@
                         </div>
                     </div>
 
+                    <!-- § Products Required (edit) -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Products Required <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:9px">(click to toggle)</span></div>
+                        <div class="dtr-source-toggle">
+                            <button class="dtr-source-btn active" id="dtr-src-job"  onclick="dtrSwitchProdSource('job')">Job Products</button>
+                            <button class="dtr-source-btn"        id="dtr-src-club" onclick="dtrSwitchProdSource('club')">Club Products</button>
+                        </div>
+                        <div id="dtr-prod-grid-job"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-job">${_jobCards}</div></div>
+                        <div id="dtr-prod-grid-club" style="display:none"><div class="dtr-mini-prod-grid" id="dtr-mini-grid-club">${_clubCards}</div></div>
+                    </div>
+
                     <!-- § Design Brief -->
                     <div class="dtr-brief-section">
                         <div class="dtr-brief-section-title">Design Brief</div>
                         <div class="dtr-edit-row">
-                            <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design vision…" style="min-height:70px">${escHtml(briefText)}</textarea>
-                        </div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-                            <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:3px">
-                                <label class="dtr-edit-label" for="dtr-ln-team-crests">Team Crests</label>
-                                <textarea class="dtr-edit-field textarea" id="dtr-ln-team-crests" placeholder="Describe team crests…" style="min-height:50px">${escHtml(task.brief_team_crests||'')}</textarea>
-                            </div>
-                            <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:3px">
-                                <label class="dtr-edit-label" for="dtr-ln-brand-logos">Brand Logos</label>
-                                <textarea class="dtr-edit-field textarea" id="dtr-ln-brand-logos" placeholder="Describe brand logos…" style="min-height:50px">${escHtml(task.brief_brand_logos||'')}</textarea>
-                            </div>
-                            <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:3px">
-                                <label class="dtr-edit-label" for="dtr-ln-sponsor-logo-type">Sponsor Logo Type</label>
-                                <textarea class="dtr-edit-field textarea" id="dtr-ln-sponsor-logo-type" placeholder="e.g. embroidered, print…" style="min-height:50px">${escHtml(task.brief_sponsor_logo_type||'')}</textarea>
-                            </div>
-                            <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:3px">
-                                <label class="dtr-edit-label" for="dtr-ln-player-embellishments">Player Embellishments</label>
-                                <textarea class="dtr-edit-field textarea" id="dtr-ln-player-embellishments" placeholder="e.g. name, number…" style="min-height:50px">${escHtml(task.brief_player_embellishments||'')}</textarea>
-                            </div>
-                            <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:3px">
-                                <label class="dtr-edit-label" for="dtr-ln-colour-application">Colour Application</label>
-                                <textarea class="dtr-edit-field textarea" id="dtr-ln-colour-application" placeholder="How colours are applied…" style="min-height:50px">${escHtml(task.brief_colour_application||'')}</textarea>
-                            </div>
-                            <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:3px">
-                                <label class="dtr-edit-label" for="dtr-ln-piping">Piping</label>
-                                <textarea class="dtr-edit-field textarea" id="dtr-ln-piping" placeholder="e.g. side stripe, shoulder…" style="min-height:50px">${escHtml(task.brief_piping||'')}</textarea>
-                            </div>
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design vision…" style="min-height:100px">${escHtml(briefText)}</textarea>
                         </div>
                         <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
                             <label class="dtr-edit-label" for="dtr-ln-key-notes">Key Notes</label>
@@ -21705,6 +21746,14 @@
                                     style="flex:1;padding:3px 7px;font-size:11px;font-family:monospace">
                             </div>`).join('')}
                         </div>
+                    </div>
+
+                    <!-- § Uploads (always visible) -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Uploads</div>
+                        ${_buildDTRAssetSection('club-logos','Club Logos','club_logos',assets)}
+                        ${_buildDTRAssetSection('sponsor-logos','Sponsor Logos','sponsor_logos',assets)}
+                        ${_buildDTRAssetSection('kit-inspiration','Kit Inspiration','kit_inspiration',assets)}
                     </div>
 
                     <!-- § Factory Requirements (edit) -->
@@ -21810,13 +21859,18 @@
                     </div>
                 </div>
 
+                <!-- § Products Required (read-only) -->
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Products Required <span style="background:#e0fdf4;color:#065f46;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${_selIds.size}</span></div>
+                    ${_selProdsHtml}
+                </div>
+
                 <!-- § Design Brief (read-only) -->
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Design Brief</div>
                     ${briefText
                         ? `<p class="dtr-ro-text">${escHtml(briefText)}</p>`
                         : `<p style="font-size:12px;color:#cbd5e1;font-style:italic;margin:0">No brief entered yet.</p>`}
-                    ${briefQRows}
                     ${task.key_notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
                         <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#92400e;margin-bottom:3px">Key Notes</div>
                         <p class="dtr-ro-text" style="color:#78350f;font-size:11px">${escHtml(task.key_notes)}</p>
@@ -21834,6 +21888,14 @@
                             </div>`).join('')}
                         ${colPairs.every(c => !c.hex && !c.pantone) ? `<span style="font-size:11px;color:#94a3b8">No colours set</span>` : ''}
                     </div>
+                </div>
+
+                <!-- § Uploads (read-only view with upload zones) -->
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Uploads</div>
+                    ${_buildDTRAssetSection('club-logos','Club Logos','club_logos',assets)}
+                    ${_buildDTRAssetSection('sponsor-logos','Sponsor Logos','sponsor_logos',assets)}
+                    ${_buildDTRAssetSection('kit-inspiration','Kit Inspiration','kit_inspiration',assets)}
                 </div>
 
                 <!-- § Factory Requirements (read-only) -->
@@ -22419,27 +22481,45 @@
             }
 
             // ── Check state ──
-            const hasApprovedConcept = [1,2,3].some(i => conceptStatuses[`concept_${i}`] === 'approved');
-            const isInReview         = stage.status === 'in_review';
-            const isRevisions        = stage.status === 'revisions_required';
-            const hasUploads         = conceptUploads.length > 0;
+            const isInReview  = stage.status === 'in_review';
+            const isRevisions = stage.status === 'revisions_required';
+            const hasUploads  = conceptUploads.length > 0;
 
-            // ── 3 concept tabs ──
-            const tabs = [1,2,3].map(i => {
-                const key    = `concept_${i}`;
-                const cStatus = conceptStatuses[key] || 'pending';
-                const count  = conceptUploads.filter(u => u.section_label === key).length;
-                let cls = 'dtr-ctab';
-                if (i === _dtrConceptTab) cls += ' active';
-                if (cStatus === 'approved')  cls += ' ct-approved';
-                if (cStatus === 'declined')  cls += ' ct-declined';
-                const badge = count ? ` <span style="font-size:9px;font-weight:700;opacity:0.7;margin-left:2px">(${count})</span>` : '';
-                return `<button class="${cls}" id="dtr-ctab-${i}" onclick="dtrSwitchConceptTab(${i})">Concept ${i}${badge}</button>`;
-            }).join('');
+            // ── Single grid: all uploads (concept_1/2/3 legacy + new 'concepts') ──
+            const gridHtml = hasUploads
+                ? `<div class="dtr-concept-images">${conceptUploads.map((u, idx) => {
+                    const isImg = u.file_type?.startsWith('image/');
+                    const isPdf = u.file_type === 'application/pdf' || u.file_name?.toLowerCase().endsWith('.pdf');
+                    const cls   = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : (u.review_comment && u.review_comment !== '__archived__') ? ' ci-revisions' : '';
+                    return `<div class="dtr-cimg-card${cls}" id="dtr-cimg-${u.id}" style="position:relative">
+                        <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
+                        ${isImg
+                            ? `<img class="dtr-cimg-thumb" src="${escHtml(u.file_url)}" alt="" loading="lazy" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">`
+                            : `<div class="dtr-cimg-nothumb" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">${isPdf ? '📄' : '📁'}</div>`}
+                        <div class="dtr-cimg-actions">
+                            <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(u.file_name||'download')}')" title="Download" style="font-size:13px">⬇</button>
+                            <button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickConceptImg('${u.id}','${stage.id}',0)" title="Approve">✓</button>
+                            <button class="dtr-archive-btn" onclick="dtrArchiveConceptImg('${u.id}','${stage.id}',0)" title="Archive">⊗</button>
+                        </div>
+                        ${u.review_comment && u.review_comment !== '__archived__' ? `<div style="position:absolute;top:4px;right:4px;background:#f59e0b;color:#fff;font-size:8px;font-weight:700;border-radius:4px;padding:1px 5px;z-index:3;pointer-events:none">↩</div>` : ''}
+                    </div>`;
+                }).join('')}</div>`
+                : `<p style="font-size:11px;color:#94a3b8;margin:0 0 10px;padding:4px 0">No concepts uploaded yet. Drop files below to get started.</p>`;
 
-            // ── Active tab content ──
-            const activeUploads = conceptUploads.filter(u => u.section_label === `concept_${_dtrConceptTab}`);
-            const tabContent    = buildDTRConceptTabContent(stage, _dtrConceptTab, activeUploads, conceptStatuses);
+            // ── Single upload zone ──
+            const uploadZone = `
+                <div class="dtr-concept-upload${isRevisions ? ' upload-revisions' : ''}"
+                    onclick="document.getElementById('dtr-cpt-input-${stage.id}').click()"
+                    ondragover="event.preventDefault();this.classList.add('drag-over')"
+                    ondragleave="this.classList.remove('drag-over')"
+                    ondrop="dtrConceptImgDrop(event,'${stage.id}',0)">
+                    <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 5px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <p style="font-size:11px;color:#94a3b8;margin:0">Drop concepts or click to upload</p>
+                    <p style="font-size:10px;color:#b0bec5;margin:3px 0 0">PNG · JPG · PDF · AI · EPS · SVG</p>
+                </div>
+                <input type="file" id="dtr-cpt-input-${stage.id}" class="hide" multiple
+                    accept="image/*,.pdf,.ai,.eps,.svg"
+                    onchange="dtrConceptImgSelect(event,'${stage.id}',0)">`;
 
             // ── Deliver bar ──
             const deliverBtn = isInReview
@@ -22471,8 +22551,8 @@
                     ${chevronSvg('dtr-stage-chev-2', stage.status === 'not_started')}
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-2"${stage.status === 'not_started' ? ' style="display:none"' : ''}>
-                    <div class="dtr-concept-tabs">${tabs}</div>
-                    <div id="dtr-concept-tab-content">${tabContent}</div>
+                    ${gridHtml}
+                    ${uploadZone}
                     <div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px">
                         <div>${deliverBtn}</div>
                         <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
@@ -22571,7 +22651,9 @@
             try {
                 const ext      = file.name.split('.').pop();
                 const safeName = file.name.replace(/[^a-z0-9._-]/gi, '_');
-                const path     = `${currentBrand.id}/design-stages/${stageId}/concept_${conceptNum}-${Date.now()}-${safeName}`;
+                const sectionLabel  = conceptNum === 0 ? 'concepts' : `concept_${conceptNum}`;
+                const versionLabel  = conceptNum === 0 ? 'Concept'  : `Concept ${conceptNum}`;
+                const path     = `${currentBrand.id}/design-stages/${stageId}/${sectionLabel}-${Date.now()}-${safeName}`;
                 const { error: upErr } = await supabase.storage.from('design-uploads').upload(path, file, { upsert: false });
                 if (upErr) throw upErr;
                 const { data: { publicUrl } } = supabase.storage.from('design-uploads').getPublicUrl(path);
@@ -22579,7 +22661,7 @@
                 const actorName = currentUserProfile ? `${currentUserProfile.first_name||''} ${currentUserProfile.last_name||''}`.trim() : null;
                 const { error: dbErr } = await supabase.from('stage_uploads').insert({
                     stage_id: stageId, task_id: stage.task_id, brand_id: currentBrand.id,
-                    section_label: `concept_${conceptNum}`, version_label: `Concept ${conceptNum}`,
+                    section_label: sectionLabel, version_label: versionLabel,
                     file_url: publicUrl, file_name: file.name, file_type: file.type, file_size: file.size,
                     status: 'pending', is_archived: false,
                     uploaded_by: actor?.data?.user?.id || null, uploaded_by_name: actorName
