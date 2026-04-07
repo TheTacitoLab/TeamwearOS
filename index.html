@@ -18606,20 +18606,19 @@
             const q1 = get('ba-q1'), q2 = get('ba-q2'), q3 = get('ba-q3'), q4 = get('ba-q4'),
                   q5 = get('ba-q5'), q6 = get('ba-q6'), q7 = get('ba-q7'), q8 = get('ba-q8'),
                   q9 = get('ba-q9'), q10 = get('ba-q10');
-            const parts = [];
-            if (q1)  parts.push(q1);
-            if (q2)  parts.push(`Team crests: ${q2}.`);
-            if (q3)  parts.push(`Brand logos: ${q3}.`);
-            if (q4)  parts.push(`Sponsor logos: ${q4}.`);
-            if (q5)  parts.push(`Player embellishments: ${q5}.`);
-            if (q6 && q7) parts.push(`Colours (${q6}) applied as: ${q7}.`);
-            else if (q6) parts.push(`Colours: ${q6}.`);
-            else if (q7) parts.push(`Colour application: ${q7}.`);
-            if (q8)  parts.push(`Trim/piping: ${q8}.`);
-            if (q9)  parts.push(`Technical: ${q9}.`);
-            if (q10) parts.push(`Additional: ${q10}.`);
-            if (!parts.length) { showToast('Please answer at least one question', 'warning'); return; }
-            const brief = parts.join(' ');
+            const lines = [];
+            if (q1)  lines.push(`**Overall Look & Feel**: ${q1}`);
+            if (q2)  lines.push(`**Team Crests**: ${q2}`);
+            if (q3)  lines.push(`**Brand Logos**: ${q3}`);
+            if (q4)  lines.push(`**Sponsor Logos**: ${q4}`);
+            if (q5)  lines.push(`**Player Embellishments**: ${q5}`);
+            if (q6)  lines.push(`**Primary Colours**: ${q6}`);
+            if (q7)  lines.push(`**Colour Application**: ${q7}`);
+            if (q8)  lines.push(`**Trim & Piping**: ${q8}`);
+            if (q9)  lines.push(`**Technical Requirements**: ${q9}`);
+            if (q10) lines.push(`**Additional Notes**: ${q10}`);
+            if (!lines.length) { showToast('Please answer at least one question', 'warning'); return; }
+            const brief = lines.join('\n');
             const ta = document.getElementById('cdt-design-brief');
             if (ta) ta.value = brief;
             closeBriefAssistant();
@@ -21805,7 +21804,7 @@
                 <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Design Brief</div>
                     ${briefText
-                        ? `<p class="dtr-ro-text">${escHtml(briefText)}</p>`
+                        ? `<p class="dtr-ro-text">${escHtml(briefText).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>`
                         : `<p style="font-size:12px;color:#cbd5e1;font-style:italic;margin:0">No brief entered yet.</p>`}
                     ${task.key_notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
                         <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#92400e;margin-bottom:3px">Key Notes</div>
