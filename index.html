@@ -14961,7 +14961,7 @@
                         const prod = _jobCatalogueProducts.find(p => p.id === id);
                         const { data: newCp, error: cpErr } = await supabase
                             .from('club_products')
-                            .insert({ brand_id: currentBrand.id, club_id: currentJob.club_id, product_id: id, custom_name: prod?.item_name || '', is_active: true })
+                            .insert({ club_id: currentJob.club_id, product_id: id, custom_name: prod?.item_name || '', is_active: true })
                             .select('id')
                             .single();
                         if (cpErr) { showToast('Error linking product: ' + cpErr.message, 'error'); btn.disabled = false; _updateJobPickerCount(); return; }
@@ -16709,7 +16709,7 @@
                 .eq('job_id', jobId).order('created_at', { ascending: false }).limit(1).maybeSingle();
             if (!task) return;
 
-            for (const stageNum of [1, 2]) {
+            for (const stageNum of [2, 3]) {
                 const { data: stages } = await supabase
                     .from('design_stages').select('id, status')
                     .eq('task_id', task.id).eq('stage_number', stageNum);
@@ -16722,8 +16722,10 @@
 
         // Called from approveStage() — auto-unlock hub stage when DTR stage is approved
         async function maybeUnlockHubStage(taskId, stageNum) {
-            // Only handles stages 1 and 2 (stage 3 is manual)
-            if (stageNum > 2) return;
+            // DTR stage → Hub stage mapping: Concepts(2)→Hub1, Range(3)→Hub2
+            const HUB_STAGE_MAP = { 2: 1, 3: 2 };
+            const hubStageNum = HUB_STAGE_MAP[stageNum];
+            if (!hubStageNum) return;
 
             // Get the job_id from the design task
             const { data: task } = await supabase
@@ -16736,7 +16738,7 @@
                 .eq('job_id', task.job_id).maybeSingle();
             if (!kitOrder) return;  // No hub generated yet
 
-            // Get the design_stages IDs for this stage + task
+            // Get the design_stages IDs for this DTR stage + task
             const { data: stages } = await supabase
                 .from('design_stages').select('id')
                 .eq('task_id', taskId).eq('stage_number', stageNum);
@@ -16752,14 +16754,14 @@
             // Check for existing kit_stage_files to avoid duplicates
             const { data: existing } = await supabase
                 .from('kit_stage_files').select('source_upload_id')
-                .eq('order_id', kitOrder.id).eq('stage_number', stageNum);
+                .eq('order_id', kitOrder.id).eq('stage_number', hubStageNum);
             const existingIds = new Set((existing || []).map(e => e.source_upload_id));
 
             const newRows = uploads
                 .filter(u => !existingIds.has(u.id))
                 .map(u => ({
                     order_id: kitOrder.id,
-                    stage_number: stageNum,
+                    stage_number: hubStageNum,
                     file_url: u.file_url,
                     file_name: u.file_name,
                     file_type: u.file_type,
@@ -16771,9 +16773,9 @@
                 await supabase.from('kit_stage_files').insert(newRows);
             }
 
-            // Mark stage as unlocked
+            // Mark hub stage as unlocked
             await supabase.from('kit_orders')
-                .update({ [`stage_${stageNum}_unlocked`]: true })
+                .update({ [`stage_${hubStageNum}_unlocked`]: true })
                 .eq('id', kitOrder.id);
         }
 
@@ -18916,7 +18918,7 @@
                             } else {
                                 const masterProd = _cdtAllProducts.find(p => p.id === prodId);
                                 const { data: newCp, error: cpErr } = await supabase.from('club_products').insert({
-                                    brand_id: currentBrand.id, club_id: resolveClubId, product_id: prodId,
+                                    club_id: resolveClubId, product_id: prodId,
                                     custom_name: masterProd?.nm || '', is_active: true
                                 }).select('id').single();
                                 if (!cpErr && newCp) catalogueClubProdIds.push(newCp.id);
@@ -23029,6 +23031,7 @@
             const ok = await updateStageStatus(stage, 'approved', 'Concepts stage completed');
             if (!ok) return;
             await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: 'Concepts' });
+            maybeUnlockHubStage(stage.task_id, 2).catch(e => console.warn('Hub unlock:', e));
             // Auto-advance stage 3
             const stage3 = currentStages.find(s => s.stage_number === 3);
             if (stage3 && stage3.status === 'not_started') {
@@ -23179,6 +23182,7 @@
                 await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', nextStage.id);
             }
             if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_approved', { label });
+            if (stageNum === 3) maybeUnlockHubStage(currentDesignTaskRecord.id, 3).catch(e => console.warn('Hub unlock:', e));
             await _dtrRefreshStagesCol();
         }
         async function dtrUndeliverConcepts(stageId) {
@@ -23509,7 +23513,7 @@
                 } else {
                     const prod = (_masterProdsData || []).find(p => p.id === productId);
                     const { data: newCp, error } = await supabase.from('club_products').insert({
-                        brand_id: currentBrand.id, club_id: clubId, product_id: productId,
+                        club_id: clubId, product_id: productId,
                         custom_name: prod?.item_name || '', is_active: true
                     }).select('id').single();
                     if (error) { showToast('Error linking product to club', 'error'); return; }
@@ -24000,7 +24004,7 @@
             await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: stage.stage_name });
 
             // Auto-unlock Order Hub stage if a hub exists for this job
-            if (stageNum <= 2) maybeUnlockHubStage(stage.task_id, stageNum).catch(e => console.warn('Hub unlock:', e));
+            if (stageNum === 2 || stageNum === 3) maybeUnlockHubStage(stage.task_id, stageNum).catch(e => console.warn('Hub unlock:', e));
 
             // Auto-advance next stage to in_progress (turns tab orange)
             const nextStage = currentStages.find(s => s.stage_number === stageNum + 1);
