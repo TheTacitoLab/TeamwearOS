@@ -5266,8 +5266,8 @@
         <!-- ============================================================
              MODAL: Create Design Task
              ============================================================ -->
-        <div id="create-design-task-modal" class="fixed inset-0 bg-black/60 z-50 flex items-start justify-center hide" style="padding:24px 16px;overflow-y:auto">
-            <div style="background:#fff;border-radius:16px;width:100%;max-width:1180px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.25);display:flex;flex-direction:column">
+        <div id="create-design-task-modal" class="fixed inset-0 bg-black/60 z-50 flex items-start justify-center hide" style="padding:24px 16px;overflow-y:hidden">
+            <div style="background:#fff;border-radius:16px;width:100%;max-width:1180px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.25);display:flex;flex-direction:column;max-height:calc(100vh - 48px)">
 
                 <!-- Header -->
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 22px;border-bottom:1.5px solid #e2e8f0;flex-shrink:0">
@@ -5282,10 +5282,10 @@
                 </div>
 
                 <!-- Two-column body -->
-                <div style="display:grid;grid-template-columns:1fr 380px;max-height:82vh;overflow:hidden">
+                <div style="flex:1;min-height:0;display:flex;overflow:hidden">
 
                     <!-- LEFT: Full form -->
-                    <div style="overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px">
+                    <div style="flex:1;min-width:0;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px">
 
                         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8">Task Details</div>
 
@@ -5476,7 +5476,7 @@
                     </div><!-- end LEFT -->
 
                     <!-- RIGHT: Brief prompts (always visible, scrollable) -->
-                    <div style="display:flex;flex-direction:column;border-left:1.5px solid #e2e8f0;background:#f8fafc;overflow:hidden">
+                    <div style="width:380px;flex-shrink:0;display:flex;flex-direction:column;border-left:1.5px solid #e2e8f0;background:#f8fafc;overflow:hidden">
                         <div style="padding:16px 18px 12px;border-bottom:1px solid #e2e8f0;flex-shrink:0;background:#fff">
                             <div style="font-size:13px;font-weight:700;color:#0f172a">Brief Prompts</div>
                             <div style="font-size:11px;color:#64748b;margin-top:3px;line-height:1.4">Answer the questions below, then click <strong>Build Brief</strong> to auto-fill the brief on the left.</div>
@@ -21658,12 +21658,21 @@
                         </div>
                     </div>
 
-                    <!-- § Uploads (always visible) -->
+                    <!-- § Uploads (single unified section) -->
                     <div class="dtr-brief-section">
-                        <div class="dtr-brief-section-title">Uploads</div>
-                        ${_buildDTRAssetSection('club-logos','Club Logos','club_logos',assets)}
-                        ${_buildDTRAssetSection('sponsor-logos','Sponsor Logos','sponsor_logos',assets)}
-                        ${_buildDTRAssetSection('kit-inspiration','Kit Inspiration','kit_inspiration',assets)}
+                        <div class="dtr-brief-section-title">Uploads ${assets.length ? `<span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${assets.length}</span>` : ''}</div>
+                        <div id="dtr-asset-list-all">
+                            ${assets.length ? assets.map(_buildDTRAssetRow).join('') : `<p style="font-size:11px;color:#94a3b8;margin:0 0 6px">No files uploaded yet.</p>`}
+                        </div>
+                        <div class="dtr-asset-upload-zone" style="margin-top:6px"
+                            onclick="document.getElementById('dtr-asset-finput-all').click()"
+                            ondragover="event.preventDefault();this.classList.add('drag-over')"
+                            ondragleave="this.classList.remove('drag-over')"
+                            ondrop="event.preventDefault();this.classList.remove('drag-over');Array.from(event.dataTransfer?.files||[]).forEach(f=>_dtrUploadAsset(f,''))">
+                            <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 3px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                            <p style="font-size:10px;color:#94a3b8;margin:0">Drop or click to upload</p>
+                        </div>
+                        <input type="file" id="dtr-asset-finput-all" class="hide" multiple accept=".ai,.svg,image/*,.pdf" onchange="dtrAssetSelect(event)">
                     </div>
 
                     <!-- § Factory Requirements (edit) -->
@@ -21753,15 +21762,36 @@
                 <div class="dtr-ro-section">
                     ${_collapseSectionTitle('Job Details')}
                     <div id="dtr-job-details-body" style="${_dtrJobDetailsOpen?'':'display:none'}">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;margin-top:4px">
-                            <div class="dtr-ro-row" style="padding-right:8px"><span class="dtr-ro-label">Club</span><span class="dtr-ro-value">${escHtml(club.name||'—')}</span></div>
-                            <div class="dtr-ro-row"><span class="dtr-ro-label">Linked Job</span><span class="dtr-ro-value">${escHtml(task.jobs?.job_name || task.jobs?.job_number || '—')}</span></div>
-                            <div class="dtr-ro-row" style="padding-right:8px"><span class="dtr-ro-label">Deadline</span><span class="dtr-ro-value">${dueDate}${dueExtra}</span></div>
-                            <div class="dtr-ro-row"><span class="dtr-ro-label">Order Type</span><span class="dtr-ro-value">${task.order_type ? escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</span></div>
-                            <div class="dtr-ro-row" style="padding-right:8px"><span class="dtr-ro-label">Task Type</span><span class="dtr-ro-value">${task.job_type ? escHtml((typeof DS_JOB_TYPES!=='undefined'?Object.fromEntries(DS_JOB_TYPES.map(t=>[t.key,t.label])):{} )[task.job_type] || task.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</span></div>
-                            <div class="dtr-ro-row"><span class="dtr-ro-label">Designer</span><span class="dtr-ro-value">${escHtml(task.assigned_designer_name||'—')}</span></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+                            <div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Club</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(club.name||'—')}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Linked Job</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.jobs?.job_name || task.jobs?.job_number || '—')}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Deadline</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a">${dueDate}${dueExtra}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Order Type</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a">${task.order_type ? escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Task Type</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a">${task.job_type ? escHtml((typeof DS_JOB_TYPES!=='undefined'?Object.fromEntries(DS_JOB_TYPES.map(t=>[t.key,t.label])):{} )[task.job_type] || task.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Designer</div>
+                                <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.assigned_designer_name||'—')}</div>
+                            </div>
                         </div>
-                        <div class="dtr-ro-row" style="margin-top:2px"><span class="dtr-ro-label">Owner(s)</span><span class="dtr-ro-value">${ownerDisplay}</span></div>
+                        <div style="margin-top:10px">
+                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Owner(s)</div>
+                            <div style="font-size:12px;font-weight:600;color:#0f172a">${ownerDisplay}</div>
+                        </div>
                     </div>
                 </div>
 
@@ -21796,12 +21826,21 @@
                     </div>
                 </div>
 
-                <!-- § Uploads (read-only view with upload zones) -->
+                <!-- § Uploads (single unified section) -->
                 <div class="dtr-ro-section">
-                    <div class="dtr-ro-section-title">Uploads</div>
-                    ${_buildDTRAssetSection('club-logos','Club Logos','club_logos',assets)}
-                    ${_buildDTRAssetSection('sponsor-logos','Sponsor Logos','sponsor_logos',assets)}
-                    ${_buildDTRAssetSection('kit-inspiration','Kit Inspiration','kit_inspiration',assets)}
+                    <div class="dtr-ro-section-title">Uploads ${assets.length ? `<span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${assets.length}</span>` : ''}</div>
+                    <div id="dtr-asset-list-all">
+                        ${assets.length ? assets.map(_buildDTRAssetRow).join('') : `<p style="font-size:11px;color:#94a3b8;margin:0 0 6px">No files uploaded yet.</p>`}
+                    </div>
+                    <div class="dtr-asset-upload-zone" style="margin-top:6px"
+                        onclick="document.getElementById('dtr-asset-finput-all').click()"
+                        ondragover="event.preventDefault();this.classList.add('drag-over')"
+                        ondragleave="this.classList.remove('drag-over')"
+                        ondrop="event.preventDefault();this.classList.remove('drag-over');Array.from(event.dataTransfer?.files||[]).forEach(f=>_dtrUploadAsset(f,''))">
+                        <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 3px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        <p style="font-size:10px;color:#94a3b8;margin:0">Drop or click to upload</p>
+                    </div>
+                    <input type="file" id="dtr-asset-finput-all" class="hide" multiple accept=".ai,.svg,image/*,.pdf" onchange="dtrAssetSelect(event)">
                 </div>
 
                 <!-- § Factory Requirements (read-only) -->
