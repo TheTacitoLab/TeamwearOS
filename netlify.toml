@@ -1,0 +1,16 @@
+[build]
+  publish = "."
+  command = ""
+
+# Serve hub.html with clean URL (optional — /orders/hub works as well as /orders/hub.html)
+[[redirects]]
+  from = "/orders/hub"
+  to   = "/orders/hub.html"
+  status = 200
+
+# Pass query params through (token=xxx must survive the redirect)
+[[headers]]
+  for = "/orders/hub.html"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
