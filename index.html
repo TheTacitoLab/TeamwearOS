@@ -5436,7 +5436,7 @@
                                     <input type="checkbox" id="cdt-fr-tech_packs" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Tech Packs
                                 </label>
                                 <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
-                                    <input type="checkbox" id="cdt-fr-pattern_artwork" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Pattern Artwork
+                                    <input type="checkbox" id="cdt-fr-pattern_artwork" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Pattern Artwork & Pantones
                                 </label>
                                 <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0" id="cdt-fr-logo-label">
                                     <input type="checkbox" id="cdt-fr-logo_files" onchange="document.getElementById('cdt-fr-logo-subs').style.display=this.checked?'flex':'none'" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Logo Files
@@ -5451,6 +5451,9 @@
                                 </div>
                                 <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
                                     <input type="checkbox" id="cdt-fr-font_files" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Font Files
+                                </label>
+                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
+                                    <input type="checkbox" id="cdt-fr-factory_mockup" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Factory Mock-up / Sketch
                                 </label>
                             </div>
                         </div>
@@ -18702,6 +18705,7 @@
                         logo_files_sponsor:    !!(document.getElementById('cdt-fr-logo_files_sponsor')?.checked),
                         logo_files_team_crest: !!(document.getElementById('cdt-fr-logo_files_team_crest')?.checked),
                         font_files:            !!(document.getElementById('cdt-fr-font_files')?.checked),
+                        factory_mockup:        !!(document.getElementById('cdt-fr-factory_mockup')?.checked),
                     },
                     custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
                     key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
@@ -21427,16 +21431,17 @@
         const _DTR_FR_ITEMS = [
             { key: 'web_images',          label: 'Web Images' },
             { key: 'tech_packs',          label: 'Tech Packs' },
-            { key: 'pattern_artwork',     label: 'Pattern Artwork' },
+            { key: 'pattern_artwork',     label: 'Pattern Artwork & Pantones' },
             { key: 'logo_files',          label: 'Logo Files', subs: [
                 { key: 'logo_files_sponsor',     label: 'Sponsor' },
                 { key: 'logo_files_team_crest',  label: 'Team Crest' },
             ]},
             { key: 'font_files',          label: 'Font Files' },
+            { key: 'factory_mockup',      label: 'Factory Mock-up / Sketch' },
         ];
 
         function _dtrReadFactoryReqs() {
-            const keys = ['web_images','tech_packs','pattern_artwork','logo_files','logo_files_sponsor','logo_files_team_crest','font_files'];
+            const keys = ['web_images','tech_packs','pattern_artwork','logo_files','logo_files_sponsor','logo_files_team_crest','font_files','factory_mockup'];
             const obj = {};
             keys.forEach(k => {
                 const el = document.getElementById(`dtr-fr-${k}`);
