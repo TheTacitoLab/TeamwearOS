@@ -6,82 +6,154 @@
     <title>Order Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <style>
         body { background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-        .file-card { transition: box-shadow 0.15s, border-color 0.15s; }
-        .file-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .file-card.approved { border-color: #22c55e !important; background: #f0fdf4; }
-        .file-card.declined { border-color: #ef4444 !important; background: #fef2f2; }
-        .stage-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
-        .stage-complete { background: #f0fdf4; border-color: #86efac; }
-        .btn-approve { background: #22c55e; color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-        .btn-approve:hover { background: #16a34a; }
-        .btn-approve.active { background: #15803d; box-shadow: 0 0 0 3px #bbf7d0; }
-        .btn-decline { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-        .btn-decline:hover { background: #fef2f2; }
-        .btn-decline.active { background: #fef2f2; border-color: #ef4444; box-shadow: 0 0 0 3px #fecaca; }
-        .stage-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
-        .badge-locked { background: #f1f5f9; color: #94a3b8; }
-        .badge-pending { background: #fef9c3; color: #854d0e; }
-        .badge-complete { background: #dcfce7; color: #15803d; }
-        .spinner { width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .btn-primary { background: #14b8a6; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+        .btn-primary:hover { background: #0d9488; }
+        .btn-primary:disabled { background: #99f6e4; cursor: not-allowed; }
+        .btn-secondary { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
+        .input { border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 14px; width: 100%; outline: none; transition: border-color 0.15s; }
+        .input:focus { border-color: #14b8a6; box-shadow: 0 0 0 3px #ccfbf1; }
+        .select { border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 10px; font-size: 13px; outline: none; background: #fff; }
+        .select:focus { border-color: #14b8a6; }
+        .tab { padding: 8px 18px; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; color: #64748b; transition: all 0.15s; }
+        .tab.active { background: #14b8a6; color: #fff; }
+        .spinner { width: 28px; height: 28px; border: 3px solid #e2e8f0; border-top-color: #14b8a6; border-radius: 50%; animation: spin 0.7s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .feedback-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #9a3412; margin-top: 8px; }
-        img.file-preview { width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; z-index: 9999; opacity: 0; transform: translateY(8px); transition: opacity 0.2s, transform 0.2s; pointer-events: none; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .size-input { width: 56px; text-align: center; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px; font-size: 13px; }
+        .size-input:focus { border-color: #14b8a6; outline: none; box-shadow: 0 0 0 2px #ccfbf1; }
+        .player-row td { padding: 6px 8px; font-size: 13px; }
+        .player-row input, .player-row select { font-size: 13px; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; }
+        .player-row input:focus, .player-row select:focus { border-color: #14b8a6; outline: none; }
+        .autosave-dot { width: 6px; height: 6px; border-radius: 50%; background: #e2e8f0; display: inline-block; transition: background 0.3s; }
+        .autosave-dot.saving { background: #fbbf24; }
+        .autosave-dot.saved { background: #22c55e; }
+        .pill { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 600; }
     </style>
 </head>
 <body>
 
-<!-- Header -->
-<div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:12px">
-    <div style="width:32px;height:32px;background:#0f172a;border-radius:8px;display:flex;align-items:center;justify-content:center">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-    </div>
-    <div>
-        <h1 class="text-sm font-bold text-gray-900" id="hub-title">Order Hub</h1>
-        <p class="text-xs text-gray-400" id="hub-subtitle">Loading…</p>
+<div id="toast" class="toast"></div>
+
+<!-- Loading screen -->
+<div id="screen-loading" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+        <div class="spinner mx-auto mb-4"></div>
+        <p class="text-sm text-gray-400">Loading…</p>
     </div>
 </div>
 
-<!-- Main content -->
-<div class="max-w-3xl mx-auto px-4 py-8">
+<!-- Error screen -->
+<div id="screen-error" class="hidden flex items-center justify-center min-h-screen p-4">
+    <div class="card max-w-sm w-full text-center">
+        <p class="text-2xl mb-2">⚠️</p>
+        <h2 class="font-semibold mb-2">Link not found</h2>
+        <p id="error-msg" class="text-sm text-gray-500">This order hub link is invalid or has expired.</p>
+    </div>
+</div>
 
-    <!-- Loading state -->
-    <div id="state-loading" class="flex flex-col items-center py-20 gap-4">
-        <div class="spinner"></div>
-        <p class="text-sm text-gray-400">Loading your order hub…</p>
+<!-- PIN gate screen (manager) -->
+<div id="screen-pin" class="hidden flex items-center justify-center min-h-screen p-4">
+    <div class="card max-w-sm w-full">
+        <div class="text-center mb-6">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3" style="background:#ccfbf1">
+                <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#0d9488" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+            <h2 class="font-semibold text-lg">Order Hub</h2>
+            <p class="text-sm text-gray-500 mt-1">Enter your manager PIN to continue</p>
+        </div>
+        <input id="pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="Enter PIN"
+            class="input text-center text-2xl tracking-widest mb-3" />
+        <p id="pin-error" class="text-xs text-red-500 text-center mb-3 hidden">Incorrect PIN — please try again</p>
+        <button onclick="submitPIN()" class="btn-primary w-full">Enter Hub</button>
+    </div>
+</div>
+
+<!-- Manager main view -->
+<div id="screen-manager" class="hidden max-w-4xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-xl font-bold" id="hub-title">Order Hub</h1>
+            <p class="text-sm text-gray-500" id="hub-subtitle"></p>
+        </div>
+        <div class="flex gap-2 items-center">
+            <span id="complete-badge" class="hidden pill" style="background:#dcfce7;color:#15803d">Completed</span>
+        </div>
     </div>
 
-    <!-- Error state -->
-    <div id="state-error" class="hidden text-center py-20">
-        <div class="text-4xl mb-4">🔒</div>
-        <h2 class="text-lg font-semibold text-gray-800 mb-2">Link not found</h2>
-        <p class="text-sm text-gray-500">This link may have expired or is invalid. Please contact your account manager.</p>
+    <!-- Tabs -->
+    <div class="flex gap-1 mb-6 p-1 rounded-xl w-fit" style="background:#f1f5f9">
+        <button class="tab active" onclick="switchTab('details')" id="tab-details">Products & Details</button>
+        <button class="tab" onclick="switchTab('summary')" id="tab-summary">Summary</button>
     </div>
 
-    <!-- Hub content -->
-    <div id="state-hub" class="hidden">
-        <!-- Intro -->
-        <div class="mb-6">
-            <p class="text-sm text-gray-600">Review each stage below and approve or decline the designs. Once all files in a stage are approved, that stage is complete.</p>
+    <!-- Tab: Products & Details -->
+    <div id="tab-content-details">
+        <div id="products-container">
+            <div class="flex items-center justify-center py-12">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab: Summary -->
+    <div id="tab-content-summary" class="hidden">
+        <div id="summary-container"></div>
+    </div>
+</div>
+
+<!-- Player view -->
+<div id="screen-player" class="hidden max-w-lg mx-auto px-4 py-8">
+    <div class="card">
+        <div class="mb-1">
+            <span class="text-xs font-semibold text-teal-600 uppercase tracking-wide" id="player-product-name"></span>
+        </div>
+        <h2 class="text-lg font-semibold mb-1">Your Kit Details</h2>
+        <p class="text-sm text-gray-500 mb-5">Fill in your personalisation details below. Changes save automatically.</p>
+
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 mb-1 block">Size</label>
+            <p id="player-size" class="text-sm font-medium"></p>
         </div>
 
-        <!-- Stages rendered here -->
-        <div id="hub-stages"></div>
-    </div>
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 mb-1 block">Personalisation Type</label>
+            <select id="player-pers-type" class="select w-full" onchange="playerTypeChanged()">
+                <option value="none">None</option>
+                <option value="name_number">Name & Number</option>
+                <option value="number_only">Number Only</option>
+                <option value="initials_only">Initials Only</option>
+            </select>
+        </div>
 
-</div>
+        <div id="player-name-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Player Name</label>
+            <input type="text" id="player-name" class="input" placeholder="e.g. Jordan Smith" oninput="schedulePlayerSave()" />
+        </div>
 
-<!-- Decline feedback modal -->
-<div id="decline-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-        <h3 class="font-semibold text-gray-900 mb-1">Decline this file</h3>
-        <p class="text-xs text-gray-500 mb-4">Please leave a note so the designer knows what to change.</p>
-        <textarea id="decline-feedback" rows="4" placeholder="e.g. Please change the collar colour to navy…"
-            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:border-blue-400"></textarea>
-        <div class="flex gap-2 mt-4">
-            <button onclick="cancelDecline()" class="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
-            <button onclick="confirmDecline()" class="flex-1 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600">Decline</button>
+        <div id="player-number-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Number</label>
+            <input type="text" id="player-number" class="input" placeholder="e.g. 7" oninput="schedulePlayerSave()" />
+        </div>
+
+        <div id="player-initials-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Initials</label>
+            <input type="text" id="player-initials" class="input" placeholder="e.g. JS" oninput="schedulePlayerSave()" />
+        </div>
+
+        <div class="flex items-center gap-2 mt-2">
+            <span class="autosave-dot" id="player-save-dot"></span>
+            <span class="text-xs text-gray-400" id="player-save-label">Autosave on</span>
         </div>
     </div>
 </div>
@@ -93,212 +165,540 @@
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let order = null;
-    let files = [];
-    let reviews = [];
+    // ── State ──────────────────────────────────────────────
+    let kitOrder = null;
+    let kitProducts = [];
+    let playerDetails = [];
+    let playerSaveTimer = null;
+    let playerRowId = null;   // for player view
 
-    // State for pending decline action
-    let pendingDecline = null;
+    // ── Toast ──────────────────────────────────────────────
+    function toast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 2500);
+    }
 
-    const STAGE_LABELS = { 1: 'Stage 1 — Concept Designs', 2: 'Stage 2 — Full Range', 3: 'Stage 3 — Pre-Production' };
+    // ── Screen helpers ─────────────────────────────────────
+    function showScreen(id) {
+        ['loading', 'error', 'pin', 'manager', 'player'].forEach(s => {
+            document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== id);
+        });
+    }
 
-    // ── Bootstrap ──────────────────────────────────────────────────────────────
+    function showError(msg) {
+        document.getElementById('error-msg').textContent = msg;
+        showScreen('error');
+    }
+
+    // ── PIN hashing ────────────────────────────────────────
+    async function hashPin(pin) {
+        const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+        return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ── Init ───────────────────────────────────────────────
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+    const playerToken = params.get('player');
+
+    if (!token) { showError('No order token found in this link.'); }
+    else { init(); }
+
     async function init() {
-        const token = new URLSearchParams(location.search).get('token');
-        if (!token) { showError(); return; }
+        const { data: order, error } = await db
+            .from('kit_orders').select('*').eq('token', token).maybeSingle();
+        if (error || !order) { showError('This order hub link is invalid or has expired.'); return; }
+        kitOrder = order;
 
-        const { data: ord, error } = await db.from('kit_orders')
-            .select('*').eq('token', token).maybeSingle();
+        if (playerToken) {
+            await initPlayerView();
+        } else {
+            // Check session auth
+            if (sessionStorage.getItem(`hub_auth_${token}`) === 'true') {
+                await initManagerView();
+            } else {
+                showScreen('pin');
+                document.getElementById('pin-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitPIN(); });
+            }
+        }
+    }
 
-        if (error || !ord) { showError(); return; }
-        order = ord;
+    // ── PIN gate ───────────────────────────────────────────
+    window.submitPIN = async function() {
+        const pin = document.getElementById('pin-input').value.trim();
+        if (!pin) return;
+        const hashed = await hashPin(pin);
+        if (hashed !== kitOrder.manager_pin_hash) {
+            document.getElementById('pin-error').classList.remove('hidden');
+            document.getElementById('pin-input').value = '';
+            document.getElementById('pin-input').focus();
+            return;
+        }
+        document.getElementById('pin-error').classList.add('hidden');
+        sessionStorage.setItem(`hub_auth_${token}`, 'true');
+        await initManagerView();
+    };
 
-        // Update header
-        document.getElementById('hub-title').textContent = 'Order Hub';
-        document.getElementById('hub-subtitle').textContent = 'Review and approve your designs below';
+    // ── Manager view ───────────────────────────────────────
+    async function initManagerView() {
+        showScreen('manager');
+        if (kitOrder.completed_at) {
+            document.getElementById('complete-badge').classList.remove('hidden');
+        }
 
-        // Load files + reviews in parallel
-        const [{ data: f }, { data: r }] = await Promise.all([
-            db.from('kit_stage_files').select('*').eq('order_id', order.id).order('uploaded_at'),
-            db.from('kit_file_reviews').select('*').eq('order_id', order.id)
+        // Load products + player rows
+        const [{ data: prods }, { data: rows }] = await Promise.all([
+            db.from('kit_products').select('*').eq('order_id', kitOrder.id).order('created_at'),
+            db.from('kit_player_details').select('*').eq('order_id', kitOrder.id).order('line_order')
         ]);
-        files = f || [];
-        reviews = r || [];
+        kitProducts = prods || [];
+        playerDetails = rows || [];
 
-        showHub();
-        renderStages();
+        renderProducts();
     }
 
-    function showError() {
-        document.getElementById('state-loading').classList.add('hidden');
-        document.getElementById('state-error').classList.remove('hidden');
-    }
+    // ── Tab switching ──────────────────────────────────────
+    window.switchTab = function(tab) {
+        ['details', 'summary'].forEach(t => {
+            document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+            document.getElementById(`tab-content-${t}`).classList.toggle('hidden', t !== tab);
+        });
+        if (tab === 'summary') renderSummary();
+    };
 
-    function showHub() {
-        document.getElementById('state-loading').classList.add('hidden');
-        document.getElementById('state-hub').classList.remove('hidden');
-    }
-
-    // ── Rendering ──────────────────────────────────────────────────────────────
-    function renderStages() {
-        const container = document.getElementById('hub-stages');
-        const unlockedStages = [
-            order.stage_1_unlocked && 1,
-            order.stage_2_unlocked && 2,
-            order.stage_3_unlocked && 3
-        ].filter(Boolean);
-
-        if (unlockedStages.length === 0) {
-            container.innerHTML = `
-                <div class="stage-card text-center py-12">
-                    <div class="text-3xl mb-3">⏳</div>
-                    <p class="text-sm font-medium text-gray-700">No stages are ready yet</p>
-                    <p class="text-xs text-gray-400 mt-1">Your account manager will send you a notification when designs are ready to review.</p>
-                </div>`;
+    // ── Products & Details tab ─────────────────────────────
+    function renderProducts() {
+        const container = document.getElementById('products-container');
+        if (!kitProducts.length) {
+            container.innerHTML = `<div class="card text-center text-sm text-gray-400 py-8">No products loaded for this order.<br>Ask your admin to sync products from the job record.</div>`;
             return;
         }
 
-        container.innerHTML = unlockedStages.map(n => renderStageHTML(n)).join('');
+        container.innerHTML = kitProducts.map(product => {
+            const sizes = (product.sizes || 'S,M,L,XL,2XL').split(',').map(s => s.trim()).filter(Boolean);
+            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
+
+            const sizeInputs = sizes.map(size => {
+                const qty = productRows.filter(r => r.size === size).length;
+                return `
+                <div class="text-center">
+                    <label class="text-xs text-gray-400 block mb-1">${size}</label>
+                    <input type="number" min="0" value="${qty}"
+                        class="size-input"
+                        data-product="${product.id}"
+                        data-size="${size}"
+                        oninput="qtyChanged(this)" />
+                </div>`;
+            }).join('');
+
+            const playerRowsHtml = renderPlayerRowsHtml(product, productRows);
+
+            return `
+            <div class="card mb-5" id="product-block-${product.id}">
+                <h3 class="font-semibold text-base mb-4">${product.product_name}</h3>
+
+                <!-- Size quantity grid -->
+                <div class="mb-3">
+                    <p class="text-xs text-gray-500 mb-2">Enter quantity per size:</p>
+                    <div class="flex flex-wrap gap-3">${sizeInputs}</div>
+                </div>
+
+                <!-- Player rows -->
+                <div id="player-rows-${product.id}">
+                    ${playerRowsHtml}
+                </div>
+            </div>`;
+        }).join('');
     }
 
-    function renderStageHTML(stageNum) {
-        const stageFiles = files.filter(f => f.stage_number === stageNum);
-        const stageReviews = reviews.filter(r => r.stage_number === stageNum);
-        const allApproved = stageFiles.length > 0 && stageFiles.every(f =>
-            stageReviews.find(r => r.file_id === f.id && r.decision === 'approved')
-        );
+    function renderPlayerRowsHtml(product, productRows) {
+        if (!productRows.length) return '';
 
-        const badgeHtml = allApproved
-            ? `<span class="stage-badge badge-complete">✓ Complete</span>`
-            : `<span class="stage-badge badge-pending">● In Review</span>`;
+        const rows = productRows.map(row => {
+            const type = row.personalisation_type || 'none';
+            const showName = type === 'name_number';
+            const showNumber = type === 'name_number' || type === 'number_only';
+            const showInitials = type === 'initials_only';
 
-        const completeBanner = allApproved ? `
-            <div class="flex items-center gap-2 p-3 rounded-xl mb-4" style="background:#f0fdf4;border:1px solid #86efac">
-                <span class="text-green-600 font-semibold text-sm">✓ All designs approved — this stage is complete</span>
-            </div>` : '';
-
-        const filesHtml = stageFiles.length === 0
-            ? `<p class="text-sm text-gray-400">No files uploaded yet.</p>`
-            : `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${stageFiles.map(f => renderFileCardHTML(f, stageNum)).join('')}</div>`;
+            return `
+            <tr class="player-row" id="pr-${row.id}">
+                <td class="font-medium text-gray-700">${row.size || ''}</td>
+                <td>
+                    <select class="select" onchange="saveField('${row.id}', 'personalisation_type', this.value); updateRowFields('${row.id}', this.value)">
+                        <option value="none" ${type === 'none' ? 'selected' : ''}>None</option>
+                        <option value="name_number" ${type === 'name_number' ? 'selected' : ''}>Name & Number</option>
+                        <option value="number_only" ${type === 'number_only' ? 'selected' : ''}>Number Only</option>
+                        <option value="initials_only" ${type === 'initials_only' ? 'selected' : ''}>Initials Only</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" placeholder="Name" value="${row.player_name || ''}"
+                        class="${showName ? '' : 'hidden'} row-name"
+                        oninput="scheduleSave('${row.id}', 'player_name', this.value)" />
+                </td>
+                <td>
+                    <input type="text" placeholder="No." value="${row.player_number || ''}"
+                        class="${showNumber ? '' : 'hidden'} row-number" style="width:56px"
+                        oninput="scheduleSave('${row.id}', 'player_number', this.value)" />
+                </td>
+                <td>
+                    <input type="text" placeholder="Init." value="${row.player_initials || ''}"
+                        class="${showInitials ? '' : 'hidden'} row-initials" style="width:56px"
+                        oninput="scheduleSave('${row.id}', 'player_initials', this.value)" />
+                </td>
+                <td>
+                    <button onclick="sendPlayerLink('${row.id}')" class="btn-secondary btn-sm" title="Copy player link">
+                        Send link
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
 
         return `
-            <div class="stage-card${allApproved ? ' stage-complete' : ''}" id="stage-block-${stageNum}">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="font-semibold text-gray-900 text-base">${STAGE_LABELS[stageNum]}</h2>
-                    ${badgeHtml}
-                </div>
-                ${completeBanner}
-                ${filesHtml}
-            </div>`;
+        <div class="mt-4 overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="text-xs text-gray-400 border-b" style="border-color:#f1f5f9">
+                        <th class="text-left pb-2 pr-2">Size</th>
+                        <th class="text-left pb-2 pr-2">Personalisation</th>
+                        <th class="text-left pb-2 pr-2">Name</th>
+                        <th class="text-left pb-2 pr-2">No.</th>
+                        <th class="text-left pb-2 pr-2">Initials</th>
+                        <th class="text-left pb-2"></th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>`;
     }
 
-    function renderFileCardHTML(file, stageNum) {
-        const review = reviews.find(r => r.file_id === file.id);
-        const decision = review?.decision;
-        const isImg = file.file_type?.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.file_name || '');
-
-        const previewHtml = isImg
-            ? `<img src="${file.file_url}" alt="${file.file_name || 'Design file'}" class="file-preview" loading="lazy">`
-            : `<div class="flex items-center justify-center aspect-video bg-gray-50 rounded-lg border border-gray-200 mb-3">
-                   <div class="text-center">
-                       <div class="text-4xl mb-1">📄</div>
-                       <p class="text-xs text-gray-500">${file.file_name || 'Document'}</p>
-                       <a href="${file.file_url}" target="_blank" class="text-xs text-blue-500 underline">Open file</a>
-                   </div>
-               </div>`;
-
-        const feedbackHtml = decision === 'declined' && review?.feedback
-            ? `<div class="feedback-box"><span class="font-medium">Your feedback:</span> ${escHtml(review.feedback)}</div>`
-            : '';
-
-        const decisionBadge = decision === 'approved'
-            ? `<span class="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Approved</span>`
-            : decision === 'declined'
-            ? `<span class="text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-full">Declined</span>`
-            : '';
-
-        return `
-            <div class="file-card border border-gray-200 rounded-xl p-3 ${decision || ''}" id="file-card-${file.id}">
-                <div class="mb-3">${previewHtml}</div>
-                <p class="text-xs text-gray-500 mb-2 truncate">${escHtml(file.file_name || 'Design file')}</p>
-                <div class="flex items-center gap-2">
-                    <button class="btn-approve flex-1 ${decision === 'approved' ? 'active' : ''}"
-                        onclick="window._hub.handleApprove('${file.id}', ${stageNum})">
-                        ${decision === 'approved' ? '✓ Approved' : 'Approve'}
-                    </button>
-                    <button class="btn-decline flex-1 ${decision === 'declined' ? 'active' : ''}"
-                        onclick="window._hub.handleDecline('${file.id}', ${stageNum})">
-                        ${decision === 'declined' ? '✗ Declined' : 'Decline'}
-                    </button>
-                </div>
-                ${decisionBadge ? `<div class="mt-2 text-center">${decisionBadge}</div>` : ''}
-                ${feedbackHtml}
-            </div>`;
-    }
-
-    function escHtml(str) {
-        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    // ── Actions ────────────────────────────────────────────────────────────────
-    async function handleApprove(fileId, stageNum) {
-        await submitReview(fileId, stageNum, 'approved', null);
-    }
-
-    async function handleDecline(fileId, stageNum) {
-        pendingDecline = { fileId, stageNum };
-        document.getElementById('decline-feedback').value = '';
-        document.getElementById('decline-modal').classList.remove('hidden');
-        document.getElementById('decline-feedback').focus();
-    }
-
-    async function submitReview(fileId, stageNum, decision, feedback) {
-        const existing = reviews.find(r => r.file_id === fileId);
-        if (existing) {
-            const { error } = await db.from('kit_file_reviews')
-                .update({ decision, feedback: feedback || null, reviewed_at: new Date().toISOString() })
-                .eq('id', existing.id);
-            if (error) { console.error(error); return; }
-            existing.decision = decision;
-            existing.feedback = feedback || null;
-        } else {
-            const { data, error } = await db.from('kit_file_reviews')
-                .insert({ file_id: fileId, order_id: order.id, stage_number: stageNum, decision, feedback: feedback || null })
-                .select().single();
-            if (error) { console.error(error); return; }
-            reviews.push(data);
-        }
-        rerenderStage(stageNum);
-    }
-
-    function rerenderStage(stageNum) {
-        const block = document.getElementById(`stage-block-${stageNum}`);
-        if (block) {
-            const newHtml = document.createElement('div');
-            newHtml.innerHTML = renderStageHTML(stageNum);
-            block.replaceWith(newHtml.firstElementChild);
-        }
-    }
-
-    // ── Decline modal ──────────────────────────────────────────────────────────
-    window.cancelDecline = function() {
-        pendingDecline = null;
-        document.getElementById('decline-modal').classList.add('hidden');
+    // ── Qty changed → regenerate rows ─────────────────────
+    const qtyTimers = {};
+    window.qtyChanged = function(input) {
+        const productId = input.dataset.product;
+        clearTimeout(qtyTimers[productId]);
+        qtyTimers[productId] = setTimeout(() => applyQtyChange(productId), 700);
     };
 
-    window.confirmDecline = async function() {
-        if (!pendingDecline) return;
-        const feedback = document.getElementById('decline-feedback').value.trim();
-        document.getElementById('decline-modal').classList.add('hidden');
-        await submitReview(pendingDecline.fileId, pendingDecline.stageNum, 'declined', feedback || null);
-        pendingDecline = null;
+    async function applyQtyChange(productId) {
+        const product = kitProducts.find(p => p.id === productId);
+        if (!product) return;
+        const sizes = (product.sizes || 'S,M,L,XL,2XL').split(',').map(s => s.trim()).filter(Boolean);
+
+        for (const size of sizes) {
+            const input = document.querySelector(`input[data-product="${productId}"][data-size="${size}"]`);
+            const newQty = Math.max(0, parseInt(input?.value || '0', 10));
+            const existingRows = playerDetails.filter(r => r.kit_product_id === productId && r.size === size);
+            const diff = newQty - existingRows.length;
+
+            if (diff > 0) {
+                // Insert new rows
+                const maxOrder = playerDetails.reduce((m, r) => r.line_order > m ? r.line_order : m, 0);
+                const newRows = Array.from({ length: diff }, (_, i) => ({
+                    order_id: kitOrder.id,
+                    kit_product_id: productId,
+                    product_name: product.product_name,
+                    size,
+                    personalisation_type: 'none',
+                    line_order: maxOrder + i + 1
+                }));
+                const { data: inserted, error } = await db.from('kit_player_details').insert(newRows).select();
+                if (!error && inserted) {
+                    playerDetails.push(...inserted);
+                }
+            } else if (diff < 0) {
+                // Delete excess rows (remove last ones that have least data)
+                const toDelete = existingRows.slice(diff); // last |diff| rows
+                const ids = toDelete.map(r => r.id);
+                await db.from('kit_player_details').delete().in('id', ids);
+                playerDetails = playerDetails.filter(r => !ids.includes(r.id));
+            }
+        }
+
+        // Re-render just this product's rows
+        const productRows = playerDetails.filter(r => r.kit_product_id === productId);
+        document.getElementById(`player-rows-${productId}`).innerHTML = renderPlayerRowsHtml(product, productRows);
+    }
+
+    // ── Field autosave ─────────────────────────────────────
+    const saveTimers = {};
+    window.scheduleSave = function(rowId, field, value) {
+        clearTimeout(saveTimers[rowId + field]);
+        saveTimers[rowId + field] = setTimeout(() => saveField(rowId, field, value), 600);
     };
 
-    // Expose action handlers to inline onclick attributes
-    window._hub = { handleApprove, handleDecline };
+    window.saveField = async function(rowId, field, value) {
+        const row = playerDetails.find(r => r.id === rowId);
+        if (row) row[field] = value;
+        await db.from('kit_player_details').update({ [field]: value }).eq('id', rowId);
+    };
 
-    // ── Run ────────────────────────────────────────────────────────────────────
-    init();
+    // ── Show/hide row fields based on type ─────────────────
+    window.updateRowFields = function(rowId, type) {
+        const tr = document.getElementById(`pr-${rowId}`);
+        if (!tr) return;
+        const showName = type === 'name_number';
+        const showNumber = type === 'name_number' || type === 'number_only';
+        const showInitials = type === 'initials_only';
+        tr.querySelector('.row-name')?.classList.toggle('hidden', !showName);
+        tr.querySelector('.row-number')?.classList.toggle('hidden', !showNumber);
+        tr.querySelector('.row-initials')?.classList.toggle('hidden', !showInitials);
+    };
+
+    // ── Send player link ───────────────────────────────────
+    window.sendPlayerLink = async function(rowId) {
+        let row = playerDetails.find(r => r.id === rowId);
+        if (!row) return;
+
+        if (!row.player_token) {
+            const playerToken = crypto.randomUUID();
+            const { error } = await db.from('kit_player_details').update({ player_token: playerToken }).eq('id', rowId);
+            if (error) { toast('Failed to generate player link'); return; }
+            row.player_token = playerToken;
+        }
+
+        const url = `${location.origin}/orders/hub.html?token=${token}&player=${row.player_token}`;
+        await navigator.clipboard.writeText(url);
+        toast('Player link copied to clipboard');
+    };
+
+    // ── Summary tab ────────────────────────────────────────
+    function renderSummary() {
+        const container = document.getElementById('summary-container');
+        const totalRows = playerDetails.length;
+        const filledRows = playerDetails.filter(r => {
+            if (r.personalisation_type === 'none') return true;
+            if (r.personalisation_type === 'name_number') return r.player_name && r.player_number;
+            if (r.personalisation_type === 'number_only') return r.player_number;
+            if (r.personalisation_type === 'initials_only') return r.player_initials;
+            return false;
+        }).length;
+
+        const allFilled = totalRows > 0 && filledRows === totalRows;
+
+        let html = `
+        <div class="card mb-4">
+            <h3 class="font-semibold mb-3">Overview</h3>
+            <div class="flex gap-6 text-sm">
+                <div><span class="text-gray-400">Total rows:</span> <strong>${totalRows}</strong></div>
+                <div><span class="text-gray-400">Filled:</span> <strong>${filledRows}</strong></div>
+                <div><span class="text-gray-400">Remaining:</span> <strong>${totalRows - filledRows}</strong></div>
+            </div>
+            ${totalRows > 0 ? `
+            <div class="w-full rounded-full mt-3" style="background:#e2e8f0;height:8px">
+                <div class="rounded-full" style="background:#14b8a6;height:8px;width:${Math.round((filledRows/totalRows)*100)}%;transition:width 0.3s"></div>
+            </div>` : ''}
+        </div>`;
+
+        // Per-product summary
+        for (const product of kitProducts) {
+            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
+            if (!productRows.length) continue;
+            const sizes = {};
+            productRows.forEach(r => { if (r.size) sizes[r.size] = (sizes[r.size] || 0) + 1; });
+            const sizeList = Object.entries(sizes).map(([s, q]) => `${s}×${q}`).join(', ');
+
+            html += `
+            <div class="card mb-3">
+                <h4 class="font-medium mb-1">${product.product_name}</h4>
+                <p class="text-xs text-gray-400 mb-3">${sizeList || 'No sizes entered'}</p>
+                <table class="w-full text-sm">
+                    <thead><tr class="text-xs text-gray-400 border-b" style="border-color:#f1f5f9">
+                        <th class="text-left pb-1">Size</th>
+                        <th class="text-left pb-1">Type</th>
+                        <th class="text-left pb-1">Name</th>
+                        <th class="text-left pb-1">Number</th>
+                        <th class="text-left pb-1">Initials</th>
+                        <th class="text-left pb-1">Status</th>
+                    </tr></thead>
+                    <tbody>
+                        ${productRows.map(r => {
+                            const filled = r.personalisation_type === 'none' ? true
+                                : r.personalisation_type === 'name_number' ? !!(r.player_name && r.player_number)
+                                : r.personalisation_type === 'number_only' ? !!r.player_number
+                                : r.personalisation_type === 'initials_only' ? !!r.player_initials : false;
+                            return `<tr class="border-b" style="border-color:#f8fafc">
+                                <td class="py-1">${r.size || ''}</td>
+                                <td>${r.personalisation_type === 'none' ? 'None'
+                                    : r.personalisation_type === 'name_number' ? 'Name & No.'
+                                    : r.personalisation_type === 'number_only' ? 'No. Only'
+                                    : 'Initials'}</td>
+                                <td>${r.player_name || '—'}</td>
+                                <td>${r.player_number || '—'}</td>
+                                <td>${r.player_initials || '—'}</td>
+                                <td><span class="pill" style="${filled ? 'background:#dcfce7;color:#15803d' : 'background:#fef9c3;color:#854d0e'}">${filled ? 'Done' : 'Pending'}</span></td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+        }
+
+        if (allFilled) {
+            html += `
+            <div class="card text-center" style="border-color:#86efac;background:#f0fdf4">
+                <p class="text-sm font-semibold text-green-700 mb-3">All details collected!</p>
+                <button onclick="completeAndDownload()" class="btn-primary">Complete & Download PDF</button>
+            </div>`;
+        } else if (totalRows > 0) {
+            html += `
+            <div class="card text-center">
+                <p class="text-sm text-gray-500 mb-3">Fill all rows to unlock the PDF download.</p>
+                <button onclick="downloadPDF()" class="btn-secondary">Download Draft PDF</button>
+            </div>`;
+        }
+
+        container.innerHTML = html;
+    }
+
+    // ── Complete & Download ────────────────────────────────
+    window.completeAndDownload = async function() {
+        if (!kitOrder.completed_at) {
+            await db.from('kit_orders').update({ completed_at: new Date().toISOString() }).eq('id', kitOrder.id);
+            kitOrder.completed_at = new Date().toISOString();
+            document.getElementById('complete-badge').classList.remove('hidden');
+        }
+        downloadPDF();
+    };
+
+    window.downloadPDF = function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(20);
+        doc.setTextColor(20, 184, 166);
+        doc.text('ORDER DETAILS', 20, 22);
+
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
+        if (kitOrder.completed_at) doc.text(`Completed: ${new Date(kitOrder.completed_at).toLocaleDateString()}`, 20, 36);
+
+        let y = 46;
+
+        for (const product of kitProducts) {
+            if (y > 240) { doc.addPage(); y = 20; }
+            doc.setFontSize(11);
+            doc.setTextColor(30);
+            doc.text(product.product_name, 20, y);
+            y += 5;
+
+            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
+            if (!productRows.length) { y += 8; continue; }
+
+            doc.autoTable({
+                startY: y,
+                head: [['Size', 'Type', 'Name', 'Number', 'Initials']],
+                body: productRows.map(r => [
+                    r.size || '',
+                    r.personalisation_type === 'none' ? 'None'
+                        : r.personalisation_type === 'name_number' ? 'Name & Number'
+                        : r.personalisation_type === 'number_only' ? 'Number Only'
+                        : 'Initials Only',
+                    r.player_name || '',
+                    r.player_number || '',
+                    r.player_initials || ''
+                ]),
+                theme: 'grid',
+                headStyles: { fillColor: [20, 184, 166], fontSize: 8 },
+                styles: { fontSize: 8 },
+                margin: { left: 20, right: 20 }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+        }
+
+        // Size summary
+        if (y > 220) { doc.addPage(); y = 20; }
+        doc.setFontSize(11);
+        doc.setTextColor(30);
+        doc.text('Size Summary', 20, y);
+        y += 4;
+
+        const summaryRows = [];
+        for (const product of kitProducts) {
+            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
+            const sizes = {};
+            productRows.forEach(r => { if (r.size) sizes[r.size] = (sizes[r.size] || 0) + 1; });
+            Object.entries(sizes).forEach(([size, qty]) => summaryRows.push([product.product_name, size, qty]));
+        }
+        if (summaryRows.length) {
+            doc.autoTable({
+                startY: y,
+                head: [['Product', 'Size', 'Qty']],
+                body: summaryRows,
+                theme: 'grid',
+                headStyles: { fillColor: [20, 184, 166], fontSize: 8 },
+                styles: { fontSize: 8 },
+                margin: { left: 20, right: 20 }
+            });
+        }
+
+        doc.save(`order-details-${new Date().toISOString().slice(0, 10)}.pdf`);
+        toast('PDF downloaded');
+    };
+
+    // ── Player view ────────────────────────────────────────
+    async function initPlayerView() {
+        const { data: row, error } = await db
+            .from('kit_player_details').select('*, kit_products(product_name)')
+            .eq('player_token', playerToken).maybeSingle();
+
+        if (error || !row) { showError('Player link not found or has expired.'); return; }
+        playerRowId = row.id;
+
+        document.getElementById('player-product-name').textContent = row.kit_products?.product_name || row.product_name || '';
+        document.getElementById('player-size').textContent = row.size || '';
+
+        const typeEl = document.getElementById('player-pers-type');
+        typeEl.value = row.personalisation_type || 'none';
+        document.getElementById('player-name').value = row.player_name || '';
+        document.getElementById('player-number').value = row.player_number || '';
+        document.getElementById('player-initials').value = row.player_initials || '';
+
+        playerTypeChanged();
+        showScreen('player');
+    }
+
+    window.playerTypeChanged = function() {
+        const type = document.getElementById('player-pers-type').value;
+        document.getElementById('player-name-field').classList.toggle('hidden', type !== 'name_number');
+        document.getElementById('player-number-field').classList.toggle('hidden', type !== 'name_number' && type !== 'number_only');
+        document.getElementById('player-initials-field').classList.toggle('hidden', type !== 'initials_only');
+        savePlayerRow();
+    };
+
+    window.schedulePlayerSave = function() {
+        clearTimeout(playerSaveTimer);
+        setDot('saving');
+        playerSaveTimer = setTimeout(savePlayerRow, 600);
+    };
+
+    async function savePlayerRow() {
+        if (!playerRowId) return;
+        setDot('saving');
+        const updates = {
+            personalisation_type: document.getElementById('player-pers-type').value,
+            player_name: document.getElementById('player-name').value,
+            player_number: document.getElementById('player-number').value,
+            player_initials: document.getElementById('player-initials').value
+        };
+        const { error } = await db.from('kit_player_details').update(updates).eq('id', playerRowId);
+        setDot(error ? 'error' : 'saved');
+        if (!error) setTimeout(() => setDot('idle'), 2000);
+    }
+
+    function setDot(state) {
+        const dot = document.getElementById('player-save-dot');
+        const label = document.getElementById('player-save-label');
+        if (!dot) return;
+        dot.className = 'autosave-dot';
+        if (state === 'saving') { dot.classList.add('saving'); label.textContent = 'Saving…'; }
+        else if (state === 'saved') { dot.classList.add('saved'); label.textContent = 'Saved'; }
+        else if (state === 'error') { dot.style.background = '#ef4444'; label.textContent = 'Save failed'; }
+        else { label.textContent = 'Autosave on'; }
+    }
 </script>
 </body>
 </html>
