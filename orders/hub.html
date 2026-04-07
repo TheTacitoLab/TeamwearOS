@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .file-card { transition: box-shadow 0.15s, border-color 0.15s; }
+        .file-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .file-card.approved { border-color: #22c55e !important; background: #f0fdf4; }
+        .file-card.declined { border-color: #ef4444 !important; background: #fef2f2; }
+        .stage-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+        .stage-complete { background: #f0fdf4; border-color: #86efac; }
+        .btn-approve { background: #22c55e; color: #fff; border: none; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+        .btn-approve:hover { background: #16a34a; }
+        .btn-approve.active { background: #15803d; box-shadow: 0 0 0 3px #bbf7d0; }
+        .btn-decline { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+        .btn-decline:hover { background: #fef2f2; }
+        .btn-decline.active { background: #fef2f2; border-color: #ef4444; box-shadow: 0 0 0 3px #fecaca; }
+        .stage-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 99px; font-size: 11px; font-weight: 600; }
+        .badge-locked { background: #f1f5f9; color: #94a3b8; }
+        .badge-pending { background: #fef9c3; color: #854d0e; }
+        .badge-complete { background: #dcfce7; color: #15803d; }
+        .spinner { width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .feedback-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #9a3412; margin-top: 8px; }
+        img.file-preview { width: 100%; aspect-ratio: 4/3; object-fit: contain; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div style="background:#fff;border-bottom:1px solid #e2e8f0;padding:12px 20px;display:flex;align-items:center;gap:12px">
+    <div style="width:32px;height:32px;background:#0f172a;border-radius:8px;display:flex;align-items:center;justify-content:center">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    </div>
+    <div>
+        <h1 class="text-sm font-bold text-gray-900" id="hub-title">Order Hub</h1>
+        <p class="text-xs text-gray-400" id="hub-subtitle">Loading…</p>
+    </div>
+</div>
+
+<!-- Main content -->
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+    <!-- Loading state -->
+    <div id="state-loading" class="flex flex-col items-center py-20 gap-4">
+        <div class="spinner"></div>
+        <p class="text-sm text-gray-400">Loading your order hub…</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="state-error" class="hidden text-center py-20">
+        <div class="text-4xl mb-4">🔒</div>
+        <h2 class="text-lg font-semibold text-gray-800 mb-2">Link not found</h2>
+        <p class="text-sm text-gray-500">This link may have expired or is invalid. Please contact your account manager.</p>
+    </div>
+
+    <!-- Hub content -->
+    <div id="state-hub" class="hidden">
+        <!-- Intro -->
+        <div class="mb-6">
+            <p class="text-sm text-gray-600">Review each stage below and approve or decline the designs. Once all files in a stage are approved, that stage is complete.</p>
+        </div>
+
+        <!-- Stages rendered here -->
+        <div id="hub-stages"></div>
+    </div>
+
+</div>
+
+<!-- Decline feedback modal -->
+<div id="decline-modal" class="hidden fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+        <h3 class="font-semibold text-gray-900 mb-1">Decline this file</h3>
+        <p class="text-xs text-gray-500 mb-4">Please leave a note so the designer knows what to change.</p>
+        <textarea id="decline-feedback" rows="4" placeholder="e.g. Please change the collar colour to navy…"
+            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:border-blue-400"></textarea>
+        <div class="flex gap-2 mt-4">
+            <button onclick="cancelDecline()" class="flex-1 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50">Cancel</button>
+            <button onclick="confirmDecline()" class="flex-1 py-2 rounded-lg bg-red-500 text-white text-sm font-medium hover:bg-red-600">Decline</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    const SUPABASE_URL = 'https://odfpmwgwnyexuxqbusvi.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kZnBtd2d3bnlleHV4cWJ1c3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNzk5ODcsImV4cCI6MjA4NTk1NTk4N30.HWndMOL2InGTbE_Mb96qtcjgcyQPOhV8VnuX6AP_8eM';
+
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let order = null;
+    let files = [];
+    let reviews = [];
+
+    // State for pending decline action
+    let pendingDecline = null;
+
+    const STAGE_LABELS = { 1: 'Stage 1 — Concept Designs', 2: 'Stage 2 — Full Range', 3: 'Stage 3 — Pre-Production' };
+
+    // ── Bootstrap ──────────────────────────────────────────────────────────────
+    async function init() {
+        const token = new URLSearchParams(location.search).get('token');
+        if (!token) { showError(); return; }
+
+        const { data: ord, error } = await db.from('kit_orders')
+            .select('*').eq('token', token).maybeSingle();
+
+        if (error || !ord) { showError(); return; }
+        order = ord;
+
+        // Update header
+        document.getElementById('hub-title').textContent = 'Order Hub';
+        document.getElementById('hub-subtitle').textContent = 'Review and approve your designs below';
+
+        // Load files + reviews in parallel
+        const [{ data: f }, { data: r }] = await Promise.all([
+            db.from('kit_stage_files').select('*').eq('order_id', order.id).order('uploaded_at'),
+            db.from('kit_file_reviews').select('*').eq('order_id', order.id)
+        ]);
+        files = f || [];
+        reviews = r || [];
+
+        showHub();
+        renderStages();
+    }
+
+    function showError() {
+        document.getElementById('state-loading').classList.add('hidden');
+        document.getElementById('state-error').classList.remove('hidden');
+    }
+
+    function showHub() {
+        document.getElementById('state-loading').classList.add('hidden');
+        document.getElementById('state-hub').classList.remove('hidden');
+    }
+
+    // ── Rendering ──────────────────────────────────────────────────────────────
+    function renderStages() {
+        const container = document.getElementById('hub-stages');
+        const unlockedStages = [
+            order.stage_1_unlocked && 1,
+            order.stage_2_unlocked && 2,
+            order.stage_3_unlocked && 3
+        ].filter(Boolean);
+
+        if (unlockedStages.length === 0) {
+            container.innerHTML = `
+                <div class="stage-card text-center py-12">
+                    <div class="text-3xl mb-3">⏳</div>
+                    <p class="text-sm font-medium text-gray-700">No stages are ready yet</p>
+                    <p class="text-xs text-gray-400 mt-1">Your account manager will send you a notification when designs are ready to review.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = unlockedStages.map(n => renderStageHTML(n)).join('');
+    }
+
+    function renderStageHTML(stageNum) {
+        const stageFiles = files.filter(f => f.stage_number === stageNum);
+        const stageReviews = reviews.filter(r => r.stage_number === stageNum);
+        const allApproved = stageFiles.length > 0 && stageFiles.every(f =>
+            stageReviews.find(r => r.file_id === f.id && r.decision === 'approved')
+        );
+
+        const badgeHtml = allApproved
+            ? `<span class="stage-badge badge-complete">✓ Complete</span>`
+            : `<span class="stage-badge badge-pending">● In Review</span>`;
+
+        const completeBanner = allApproved ? `
+            <div class="flex items-center gap-2 p-3 rounded-xl mb-4" style="background:#f0fdf4;border:1px solid #86efac">
+                <span class="text-green-600 font-semibold text-sm">✓ All designs approved — this stage is complete</span>
+            </div>` : '';
+
+        const filesHtml = stageFiles.length === 0
+            ? `<p class="text-sm text-gray-400">No files uploaded yet.</p>`
+            : `<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">${stageFiles.map(f => renderFileCardHTML(f, stageNum)).join('')}</div>`;
+
+        return `
+            <div class="stage-card${allApproved ? ' stage-complete' : ''}" id="stage-block-${stageNum}">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-semibold text-gray-900 text-base">${STAGE_LABELS[stageNum]}</h2>
+                    ${badgeHtml}
+                </div>
+                ${completeBanner}
+                ${filesHtml}
+            </div>`;
+    }
+
+    function renderFileCardHTML(file, stageNum) {
+        const review = reviews.find(r => r.file_id === file.id);
+        const decision = review?.decision;
+        const isImg = file.file_type?.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.file_name || '');
+
+        const previewHtml = isImg
+            ? `<img src="${file.file_url}" alt="${file.file_name || 'Design file'}" class="file-preview" loading="lazy">`
+            : `<div class="flex items-center justify-center aspect-video bg-gray-50 rounded-lg border border-gray-200 mb-3">
+                   <div class="text-center">
+                       <div class="text-4xl mb-1">📄</div>
+                       <p class="text-xs text-gray-500">${file.file_name || 'Document'}</p>
+                       <a href="${file.file_url}" target="_blank" class="text-xs text-blue-500 underline">Open file</a>
+                   </div>
+               </div>`;
+
+        const feedbackHtml = decision === 'declined' && review?.feedback
+            ? `<div class="feedback-box"><span class="font-medium">Your feedback:</span> ${escHtml(review.feedback)}</div>`
+            : '';
+
+        const decisionBadge = decision === 'approved'
+            ? `<span class="text-xs font-semibold text-green-700 bg-green-50 px-2 py-0.5 rounded-full">Approved</span>`
+            : decision === 'declined'
+            ? `<span class="text-xs font-semibold text-red-700 bg-red-50 px-2 py-0.5 rounded-full">Declined</span>`
+            : '';
+
+        return `
+            <div class="file-card border border-gray-200 rounded-xl p-3 ${decision || ''}" id="file-card-${file.id}">
+                <div class="mb-3">${previewHtml}</div>
+                <p class="text-xs text-gray-500 mb-2 truncate">${escHtml(file.file_name || 'Design file')}</p>
+                <div class="flex items-center gap-2">
+                    <button class="btn-approve flex-1 ${decision === 'approved' ? 'active' : ''}"
+                        onclick="window._hub.handleApprove('${file.id}', ${stageNum})">
+                        ${decision === 'approved' ? '✓ Approved' : 'Approve'}
+                    </button>
+                    <button class="btn-decline flex-1 ${decision === 'declined' ? 'active' : ''}"
+                        onclick="window._hub.handleDecline('${file.id}', ${stageNum})">
+                        ${decision === 'declined' ? '✗ Declined' : 'Decline'}
+                    </button>
+                </div>
+                ${decisionBadge ? `<div class="mt-2 text-center">${decisionBadge}</div>` : ''}
+                ${feedbackHtml}
+            </div>`;
+    }
+
+    function escHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── Actions ────────────────────────────────────────────────────────────────
+    async function handleApprove(fileId, stageNum) {
+        await submitReview(fileId, stageNum, 'approved', null);
+    }
+
+    async function handleDecline(fileId, stageNum) {
+        pendingDecline = { fileId, stageNum };
+        document.getElementById('decline-feedback').value = '';
+        document.getElementById('decline-modal').classList.remove('hidden');
+        document.getElementById('decline-feedback').focus();
+    }
+
+    async function submitReview(fileId, stageNum, decision, feedback) {
+        const existing = reviews.find(r => r.file_id === fileId);
+        if (existing) {
+            const { error } = await db.from('kit_file_reviews')
+                .update({ decision, feedback: feedback || null, reviewed_at: new Date().toISOString() })
+                .eq('id', existing.id);
+            if (error) { console.error(error); return; }
+            existing.decision = decision;
+            existing.feedback = feedback || null;
+        } else {
+            const { data, error } = await db.from('kit_file_reviews')
+                .insert({ file_id: fileId, order_id: order.id, stage_number: stageNum, decision, feedback: feedback || null })
+                .select().single();
+            if (error) { console.error(error); return; }
+            reviews.push(data);
+        }
+        rerenderStage(stageNum);
+    }
+
+    function rerenderStage(stageNum) {
+        const block = document.getElementById(`stage-block-${stageNum}`);
+        if (block) {
+            const newHtml = document.createElement('div');
+            newHtml.innerHTML = renderStageHTML(stageNum);
+            block.replaceWith(newHtml.firstElementChild);
+        }
+    }
+
+    // ── Decline modal ──────────────────────────────────────────────────────────
+    window.cancelDecline = function() {
+        pendingDecline = null;
+        document.getElementById('decline-modal').classList.add('hidden');
+    };
+
+    window.confirmDecline = async function() {
+        if (!pendingDecline) return;
+        const feedback = document.getElementById('decline-feedback').value.trim();
+        document.getElementById('decline-modal').classList.add('hidden');
+        await submitReview(pendingDecline.fileId, pendingDecline.stageNum, 'declined', feedback || null);
+        pendingDecline = null;
+    };
+
+    // Expose action handlers to inline onclick attributes
+    window._hub = { handleApprove, handleDecline };
+
+    // ── Run ────────────────────────────────────────────────────────────────────
+    init();
+</script>
+</body>
+</html>
