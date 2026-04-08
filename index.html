@@ -16606,10 +16606,15 @@
                 return;
             }
 
-            // Load products and player details for status summary
+            // Load products (with embellishment settings) and player details for status summary
             const [{ data: kitProducts }, { data: playerDetails }] = await Promise.all([
-                supabase.from('kit_products').select('id, product_name').eq('order_id', kitOrder.id),
-                supabase.from('kit_player_details').select('id, player_name, player_number, player_initials, personalisation_type').eq('order_id', kitOrder.id)
+                supabase.from('kit_products')
+                    .select('id, product_name, allowed_personalisation_types, product_player_token')
+                    .eq('order_id', kitOrder.id)
+                    .order('created_at'),
+                supabase.from('kit_player_details')
+                    .select('id, player_name, player_number, player_initials, personalisation_type')
+                    .eq('order_id', kitOrder.id)
             ]);
             const products = kitProducts || [];
             const rows = playerDetails || [];
@@ -16625,24 +16630,82 @@
             const hubUrl = kitOrder.hub_url || '';
             const hasPIN = !!kitOrder.manager_pin_hash;
             const completedAt = kitOrder.completed_at ? new Date(kitOrder.completed_at).toLocaleDateString() : null;
+            const allPlayerLink = kitOrder.player_order_token
+                ? `${location.origin}/orders/hub.html?all=${kitOrder.player_order_token}`
+                : '';
+            const hubTitle = kitOrder.hub_title || currentJob?.job_name || 'Order Hub';
+
+            // Build per-product embellishment + player link cards
+            const PERS_TYPES = [
+                { value: 'none', label: 'None' },
+                { value: 'name_number', label: 'Name & Number' },
+                { value: 'number_only', label: 'Number Only' },
+                { value: 'initials_only', label: 'Initials Only' }
+            ];
+
+            const productCardsHtml = products.length === 0
+                ? `<p class="text-xs text-gray-400">No products synced yet.</p>`
+                : products.map(p => {
+                    const allowed = (p.allowed_personalisation_types || 'none,name_number,number_only,initials_only').split(',');
+                    const checkboxes = PERS_TYPES.map(t => `
+                        <label class="flex items-center gap-1.5 text-xs cursor-pointer">
+                            <input type="checkbox" ${allowed.includes(t.value) ? 'checked' : ''}
+                                data-pid="${p.id}" data-type="${t.value}"
+                                onchange="updateProductEmbellishments('${p.id}')">
+                            ${t.label}
+                        </label>`).join('');
+                    const productUrl = p.product_player_token
+                        ? `${location.origin}/orders/hub.html?product=${p.product_player_token}`
+                        : '';
+                    return `
+                    <div class="rounded-xl p-4 mb-3" style="background:#f8fafc;border:1px solid #e2e8f0">
+                        <p class="text-sm font-medium mb-3">${p.product_name}</p>
+                        <p class="text-xs text-gray-500 mb-2">Allowed personalisation:</p>
+                        <div class="flex flex-wrap gap-4 mb-3">${checkboxes}</div>
+                        <div class="flex gap-2 flex-wrap">
+                            <button onclick="copyProductPlayerLink('${p.id}')"
+                                class="btn-secondary text-xs px-3 py-1.5">Copy Player Link</button>
+                            ${productUrl
+                                ? `<button onclick="copyPlayerMessage('product', '${productUrl}', '${p.product_name.replace(/'/g, "\\'")}')"
+                                    class="btn-secondary text-xs px-3 py-1.5">Copy Message</button>`
+                                : ''}
+                        </div>
+                    </div>`;
+                }).join('');
 
             el.innerHTML = `
                 <div class="glass rounded-2xl p-6 space-y-5">
                     <div class="flex items-center justify-between">
-                        <h4 class="font-semibold">Order Hub</h4>
+                        <div>
+                            <h4 class="font-semibold">Order Hub</h4>
+                            <p class="text-xs text-gray-400 mt-0.5">${hubTitle}</p>
+                        </div>
                         ${completedAt
                             ? `<span class="text-xs px-2 py-0.5 rounded-full font-medium" style="background:#f0fdf4;color:#15803d">Completed ${completedAt}</span>`
                             : `<span class="text-xs px-2 py-0.5 rounded-full font-medium" style="background:#eff6ff;color:#1d4ed8">Active</span>`}
                     </div>
 
-                    <!-- Hub link -->
+                    <!-- Manager link -->
                     <div>
-                        <label class="text-xs text-gray-500 mb-1 block">Manager Link</label>
+                        <label class="text-xs text-gray-500 mb-1 block">Manager Link (PIN required)</label>
                         <div class="flex gap-2">
                             <input type="text" value="${hubUrl}" readonly id="hub-link-input"
                                 class="flex-1 px-3 py-2 rounded-lg text-xs border border-gray-200 bg-gray-50 font-mono" />
                             <button onclick="copyHubLink()" class="btn-secondary text-xs px-3 py-2">Copy</button>
                             <a href="${hubUrl}" target="_blank" class="btn-secondary text-xs px-3 py-2 no-underline">Preview</a>
+                        </div>
+                    </div>
+
+                    <!-- All-products player link -->
+                    <div>
+                        <label class="text-xs text-gray-500 mb-1 block">Player Link — All Products</label>
+                        <p class="text-xs text-gray-400 mb-2">Send this to players to let them select their size &amp; personalisation for all products in one go.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <input type="text" value="${allPlayerLink}" readonly id="hub-all-player-input"
+                                class="flex-1 px-3 py-2 rounded-lg text-xs border border-gray-200 bg-gray-50 font-mono min-w-0" />
+                            <button onclick="copyAllProductsLink()" class="btn-secondary text-xs px-3 py-2">Copy Link</button>
+                            <button onclick="copyPlayerMessage('all', '${allPlayerLink}', '${hubTitle.replace(/'/g, "\\'")}')"
+                                class="btn-secondary text-xs px-3 py-2">Copy Message</button>
                         </div>
                     </div>
 
@@ -16657,14 +16720,14 @@
                         </button>
                     </div>
 
-                    <!-- Products -->
-                    <div class="flex items-center gap-3">
-                        <div class="flex-1">
-                            <p class="text-xs text-gray-500">Products synced</p>
-                            <p class="text-sm font-medium">${products.length} product${products.length !== 1 ? 's' : ''}</p>
+                    <!-- Products + embellishment settings -->
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-xs font-medium text-gray-700">Products &amp; Personalisation Options</p>
+                            <button onclick="syncKitProducts('${currentJobId}', '${kitOrder.id}').then(() => { showToast('Products synced'); renderJobOrderHub(); })"
+                                class="btn-secondary text-xs px-3 py-1.5">Sync Products</button>
                         </div>
-                        <button onclick="syncKitProducts('${currentJobId}', '${kitOrder.id}').then(() => { showToast('Products synced'); renderJobOrderHub(); })"
-                            class="btn-secondary text-xs px-3 py-2">Sync Products</button>
+                        ${productCardsHtml}
                     </div>
 
                     <!-- Player details status -->
@@ -16710,6 +16773,8 @@
                 club_id: currentJob?.club_id || null,
                 token,
                 hub_url: hubUrl,
+                hub_title: currentJob?.job_name || 'Order Hub',
+                player_order_token: crypto.randomUUID(),
                 manager_pin_hash: pinHash,
                 created_by: (await supabase.auth.getUser()).data?.user?.id || null
             }).select().single();
@@ -16732,7 +16797,8 @@
             showToast('PIN updated');
         }
 
-        // Copies job products into kit_products so the anon hub client can read them
+        // Copies job products into kit_products so the anon hub client can read them.
+        // Smart upsert: preserves allowed_personalisation_types and product_player_token on re-sync.
         async function syncKitProducts(jobId, kitOrderId) {
             const { data: jobProds } = await supabase
                 .from('job_products')
@@ -16740,17 +16806,26 @@
                 .eq('job_id', jobId);
             if (!jobProds?.length) return;
 
-            // Remove any existing rows (re-sync is idempotent)
-            await supabase.from('kit_products').delete().eq('order_id', kitOrderId);
+            const { data: existingProds } = await supabase
+                .from('kit_products').select('id, club_product_id').eq('order_id', kitOrderId);
+            const existingMap = new Map((existingProds || []).map(p => [p.club_product_id, p.id]));
 
-            await supabase.from('kit_products').insert(
-                jobProds.map(jp => ({
-                    order_id: kitOrderId,
-                    club_product_id: jp.club_product_id,
-                    product_name: jp.club_products?.custom_name || 'Product',
-                    sizes: jp.club_products?.products?.sizes || 'S,M,L,XL,2XL'
-                }))
-            );
+            for (const jp of jobProds) {
+                const productName = jp.club_products?.custom_name || 'Product';
+                const sizes = jp.club_products?.products?.sizes || 'S,M,L,XL,2XL';
+                if (existingMap.has(jp.club_product_id)) {
+                    await supabase.from('kit_products')
+                        .update({ product_name: productName, sizes })
+                        .eq('id', existingMap.get(jp.club_product_id));
+                } else {
+                    await supabase.from('kit_products').insert({
+                        order_id: kitOrderId,
+                        club_product_id: jp.club_product_id,
+                        product_name: productName,
+                        sizes
+                    });
+                }
+            }
         }
 
         // Copy hub link to clipboard
@@ -16758,6 +16833,59 @@
             const input = document.getElementById('hub-link-input');
             if (!input) return;
             navigator.clipboard.writeText(input.value).then(() => showToast('Link copied to clipboard'));
+        }
+
+        // Copy all-products player link to clipboard
+        function copyAllProductsLink() {
+            const input = document.getElementById('hub-all-player-input');
+            if (!input || !input.value) { showToast('No player link available'); return; }
+            navigator.clipboard.writeText(input.value).then(() => showToast('All-products link copied'));
+        }
+
+        // Save allowed personalisation types for a product (called by checkbox change)
+        async function updateProductEmbellishments(productId) {
+            const types = ['none', 'name_number', 'number_only', 'initials_only']
+                .filter(t => document.querySelector(`input[data-pid="${productId}"][data-type="${t}"]`)?.checked)
+                .join(',');
+            const { error } = await supabase.from('kit_products')
+                .update({ allowed_personalisation_types: types || 'none' })
+                .eq('id', productId);
+            if (error) { showToast('Failed to save'); console.error(error); return; }
+            showToast('Personalisation options saved');
+        }
+
+        // Generate (if needed) and copy per-product player link
+        async function copyProductPlayerLink(productId) {
+            const { data: prod, error: fetchErr } = await supabase
+                .from('kit_products').select('product_player_token, product_name').eq('id', productId).single();
+            if (fetchErr) { showToast('Error fetching product'); return; }
+
+            let token = prod?.product_player_token;
+            if (!token) {
+                token = crypto.randomUUID();
+                const { error } = await supabase.from('kit_products')
+                    .update({ product_player_token: token }).eq('id', productId);
+                if (error) { showToast('Failed to generate link'); return; }
+            }
+
+            const url = `${location.origin}/orders/hub.html?product=${token}`;
+            await navigator.clipboard.writeText(url);
+            showToast(`Player link copied for ${prod.product_name}`);
+            // Refresh panel so the "Copy Message" button appears
+            renderJobOrderHub();
+        }
+
+        // Copy a pre-written message containing the relevant player link
+        async function copyPlayerMessage(type, url, label) {
+            if (!url) { showToast('No link available'); return; }
+            let msg;
+            if (type === 'all') {
+                msg = `Hi!\n\nPlease use the link below to submit your kit details (size and personalisation) for all products in your order:\n\n${url}\n\nThank you!`;
+            } else {
+                msg = `Hi!\n\nPlease use the link below to submit your details for your ${label}:\n\n${url}\n\nThank you!`;
+            }
+            await navigator.clipboard.writeText(msg);
+            showToast('Message copied to clipboard');
         }
 
         // Download order PDF from the admin Job Record side
@@ -16778,7 +16906,7 @@
 
             doc.setFontSize(9);
             doc.setTextColor(100);
-            const jobName = currentJob?.name || currentJob?.job_number || 'Order';
+            const jobName = kitOrder?.hub_title || currentJob?.job_name || currentJob?.job_number || 'Order';
             doc.text(`Job: ${jobName}`, 20, 30);
             doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 36);
 

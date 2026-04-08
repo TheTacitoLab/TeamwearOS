@@ -68,7 +68,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
             </div>
-            <h2 class="font-semibold text-lg">Order Hub</h2>
+            <h2 class="font-semibold text-lg" id="hub-pin-title">Order Hub</h2>
             <p class="text-sm text-gray-500 mt-1">Enter your manager PIN to continue</p>
         </div>
         <input id="pin-input" type="password" inputmode="numeric" maxlength="8" placeholder="Enter PIN"
@@ -112,7 +112,7 @@
     </div>
 </div>
 
-<!-- Player view -->
+<!-- Player view (per-row: existing behaviour) -->
 <div id="screen-player" class="hidden max-w-lg mx-auto px-4 py-8">
     <div class="card">
         <div class="mb-1">
@@ -158,6 +158,97 @@
     </div>
 </div>
 
+<!-- Product player view (per-product link: player chooses own size + personalisation) -->
+<div id="screen-product-player" class="hidden max-w-lg mx-auto px-4 py-8">
+    <div class="card">
+        <span class="text-xs font-semibold text-teal-600 uppercase tracking-wide" id="pp-product-name"></span>
+        <h2 class="text-lg font-semibold mt-1 mb-1">Your Kit Details</h2>
+        <p class="text-sm text-gray-500 mb-5">Select your size and personalisation below.</p>
+
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 mb-1 block">Size</label>
+            <select id="pp-size" class="select w-full"></select>
+        </div>
+
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 mb-1 block">Personalisation</label>
+            <select id="pp-pers-type" class="select w-full" onchange="ppTypeChanged()"></select>
+        </div>
+
+        <div id="pp-name-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Player Name</label>
+            <input type="text" id="pp-name" class="input" placeholder="e.g. Jordan Smith" />
+        </div>
+
+        <div id="pp-number-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Number</label>
+            <input type="text" id="pp-number" class="input" placeholder="e.g. 7" />
+        </div>
+
+        <div id="pp-initials-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Initials</label>
+            <input type="text" id="pp-initials" class="input" placeholder="e.g. JS" />
+        </div>
+
+        <p id="pp-error" class="text-xs text-red-500 mb-3 hidden"></p>
+        <button onclick="submitProductPlayer()" class="btn-primary w-full mt-2">Submit My Details</button>
+    </div>
+</div>
+
+<!-- All-products player view (step through each product) -->
+<div id="screen-all-player" class="hidden max-w-lg mx-auto px-4 py-8">
+    <div class="card">
+        <div class="flex items-center justify-between mb-1">
+            <p class="text-xs text-gray-400" id="ap-step-label">Product 1 of 1</p>
+            <div class="flex gap-1" id="ap-step-dots"></div>
+        </div>
+        <span class="text-xs font-semibold text-teal-600 uppercase tracking-wide" id="ap-product-name"></span>
+        <h2 class="text-lg font-semibold mt-1 mb-1">Your Kit Details</h2>
+        <p class="text-sm text-gray-500 mb-5">Select your size and personalisation for this product.</p>
+
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 mb-1 block">Size</label>
+            <select id="ap-size" class="select w-full"></select>
+        </div>
+
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 mb-1 block">Personalisation</label>
+            <select id="ap-pers-type" class="select w-full" onchange="apTypeChanged()"></select>
+        </div>
+
+        <div id="ap-name-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Player Name</label>
+            <input type="text" id="ap-name" class="input" placeholder="e.g. Jordan Smith" />
+        </div>
+
+        <div id="ap-number-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Number</label>
+            <input type="text" id="ap-number" class="input" placeholder="e.g. 7" />
+        </div>
+
+        <div id="ap-initials-field" class="mb-4 hidden">
+            <label class="text-xs text-gray-500 mb-1 block">Initials</label>
+            <input type="text" id="ap-initials" class="input" placeholder="e.g. JS" />
+        </div>
+
+        <p id="ap-error" class="text-xs text-red-500 mb-3 hidden"></p>
+        <button onclick="nextAllProductsStep()" class="btn-primary w-full mt-2" id="ap-next-btn">Next</button>
+    </div>
+</div>
+
+<!-- Done screen (shown after player submits all products) -->
+<div id="screen-done" class="hidden flex items-center justify-center min-h-screen p-4">
+    <div class="card max-w-sm w-full text-center">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style="background:#dcfce7">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <h2 class="font-semibold text-lg mb-2">Details Submitted!</h2>
+        <p class="text-sm text-gray-500">Your kit details have been saved. You can close this window.</p>
+    </div>
+</div>
+
 <script type="module">
     const SUPABASE_URL = 'https://odfpmwgwnyexuxqbusvi.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kZnBtd2d3bnlleHV4cWJ1c3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNzk5ODcsImV4cCI6MjA4NTk1NTk4N30.HWndMOL2InGTbE_Mb96qtcjgcyQPOhV8VnuX6AP_8eM';
@@ -182,7 +273,7 @@
 
     // ── Screen helpers ─────────────────────────────────────
     function showScreen(id) {
-        ['loading', 'error', 'pin', 'manager', 'player'].forEach(s => {
+        ['loading', 'error', 'pin', 'manager', 'player', 'product-player', 'all-player', 'done'].forEach(s => {
             document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== id);
         });
     }
@@ -201,9 +292,13 @@
     // ── Init ───────────────────────────────────────────────
     const params = new URLSearchParams(location.search);
     const token = params.get('token');
-    const playerToken = params.get('player');
+    const playerToken = params.get('player');      // per-row player link (existing)
+    const productParam = params.get('product');    // per-product player link (new)
+    const allParam = params.get('all');            // all-products player link (new)
 
-    if (!token) { showError('No order token found in this link.'); }
+    if (productParam) { initProductPlayerView(); }
+    else if (allParam) { initAllProductsPlayerView(); }
+    else if (!token) { showError('No order token found in this link.'); }
     else { init(); }
 
     async function init() {
@@ -211,6 +306,12 @@
             .from('kit_orders').select('*').eq('token', token).maybeSingle();
         if (error || !order) { showError('This order hub link is invalid or has expired.'); return; }
         kitOrder = order;
+
+        // Set hub title from job name
+        const title = kitOrder.hub_title || 'Order Hub';
+        document.title = title;
+        document.getElementById('hub-title').textContent = title;
+        document.getElementById('hub-pin-title').textContent = title;
 
         if (playerToken) {
             await initPlayerView();
@@ -316,21 +417,26 @@
     function renderPlayerRowsHtml(product, productRows) {
         if (!productRows.length) return '';
 
+        // Build the allowed personalisation type options for this product's dropdown
+        const allowedTypes = (product.allowed_personalisation_types || 'none,name_number,number_only,initials_only').split(',');
+        const TYPE_LABELS = { none: 'None', name_number: 'Name & Number', number_only: 'Number Only', initials_only: 'Initials Only' };
+
         const rows = productRows.map(row => {
             const type = row.personalisation_type || 'none';
             const showName = type === 'name_number';
             const showNumber = type === 'name_number' || type === 'number_only';
             const showInitials = type === 'initials_only';
 
+            const typeOptions = allowedTypes
+                .map(v => `<option value="${v}" ${type === v ? 'selected' : ''}>${TYPE_LABELS[v] || v}</option>`)
+                .join('');
+
             return `
             <tr class="player-row" id="pr-${row.id}">
                 <td class="font-medium text-gray-700">${row.size || ''}</td>
                 <td>
                     <select class="select" onchange="saveField('${row.id}', 'personalisation_type', this.value); updateRowFields('${row.id}', this.value)">
-                        <option value="none" ${type === 'none' ? 'selected' : ''}>None</option>
-                        <option value="name_number" ${type === 'name_number' ? 'selected' : ''}>Name & Number</option>
-                        <option value="number_only" ${type === 'number_only' ? 'selected' : ''}>Number Only</option>
-                        <option value="initials_only" ${type === 'initials_only' ? 'selected' : ''}>Initials Only</option>
+                        ${typeOptions}
                     </select>
                 </td>
                 <td>
@@ -699,6 +805,253 @@
         else if (state === 'error') { dot.style.background = '#ef4444'; label.textContent = 'Save failed'; }
         else { label.textContent = 'Autosave on'; }
     }
+
+    // ── Shared helpers ─────────────────────────────────────
+
+    const TYPE_LABELS = { none: 'None', name_number: 'Name & Number', number_only: 'Number Only', initials_only: 'Initials Only' };
+
+    function populateTypeSelect(selectId, allowedCsv) {
+        const allowed = (allowedCsv || 'none,name_number,number_only,initials_only').split(',').map(s => s.trim()).filter(Boolean);
+        const el = document.getElementById(selectId);
+        if (!el) return;
+        el.innerHTML = allowed.map(v => `<option value="${v}">${TYPE_LABELS[v] || v}</option>`).join('');
+    }
+
+    function populateSizeSelect(selectId, sizesCsv) {
+        const sizes = (sizesCsv || 'S,M,L,XL,2XL').split(',').map(s => s.trim()).filter(Boolean);
+        const el = document.getElementById(selectId);
+        if (!el) return;
+        el.innerHTML = sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+    }
+
+    async function checkDuplicatePlayerNumber(kitProductId, number) {
+        if (!number || !number.trim()) return false;
+        const { data } = await db.from('kit_player_details')
+            .select('id').eq('kit_product_id', kitProductId).eq('player_number', number.trim()).limit(1);
+        return !!(data?.length);
+    }
+
+    function updateTypeFields(typeVal, prefix) {
+        const showName = typeVal === 'name_number';
+        const showNumber = typeVal === 'name_number' || typeVal === 'number_only';
+        const showInitials = typeVal === 'initials_only';
+        document.getElementById(`${prefix}-name-field`)?.classList.toggle('hidden', !showName);
+        document.getElementById(`${prefix}-number-field`)?.classList.toggle('hidden', !showNumber);
+        document.getElementById(`${prefix}-initials-field`)?.classList.toggle('hidden', !showInitials);
+    }
+
+    // ── Per-product player view ────────────────────────────
+
+    let ppProduct = null;
+
+    async function initProductPlayerView() {
+        showScreen('loading');
+        const { data: product, error } = await db.from('kit_products')
+            .select('id, product_name, sizes, allowed_personalisation_types, order_id')
+            .eq('product_player_token', productParam).maybeSingle();
+        if (error || !product) { showError('Product link not found or has expired.'); return; }
+
+        ppProduct = product;
+        document.getElementById('pp-product-name').textContent = product.product_name;
+        populateSizeSelect('pp-size', product.sizes);
+        populateTypeSelect('pp-pers-type', product.allowed_personalisation_types);
+        ppTypeChanged();
+        showScreen('product-player');
+    }
+
+    window.ppTypeChanged = function() {
+        const type = document.getElementById('pp-pers-type').value;
+        updateTypeFields(type, 'pp');
+        document.getElementById('pp-error').classList.add('hidden');
+    };
+
+    window.submitProductPlayer = async function() {
+        if (!ppProduct) return;
+        const errEl = document.getElementById('pp-error');
+        errEl.classList.add('hidden');
+
+        const size = document.getElementById('pp-size').value;
+        const type = document.getElementById('pp-pers-type').value;
+        const name = document.getElementById('pp-name').value.trim();
+        const number = document.getElementById('pp-number').value.trim();
+        const initials = document.getElementById('pp-initials').value.trim();
+
+        // Validate required fields for the selected type
+        if (type === 'name_number' && (!name || !number)) {
+            errEl.textContent = 'Please enter both a name and a number.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        if (type === 'number_only' && !number) {
+            errEl.textContent = 'Please enter a player number.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+        if (type === 'initials_only' && !initials) {
+            errEl.textContent = 'Please enter your initials.';
+            errEl.classList.remove('hidden');
+            return;
+        }
+
+        // Duplicate player number check (players cannot use a taken number)
+        if (number && (type === 'name_number' || type === 'number_only')) {
+            const isDuplicate = await checkDuplicatePlayerNumber(ppProduct.id, number);
+            if (isDuplicate) {
+                errEl.textContent = `Player number ${number} is already taken. Please choose a different number.`;
+                errEl.classList.remove('hidden');
+                return;
+            }
+        }
+
+        const btn = document.querySelector('#screen-product-player .btn-primary');
+        if (btn) { btn.disabled = true; btn.textContent = 'Submitting…'; }
+
+        const { error } = await db.from('kit_player_details').insert({
+            order_id: ppProduct.order_id,
+            kit_product_id: ppProduct.id,
+            product_name: ppProduct.product_name,
+            size,
+            personalisation_type: type,
+            player_name: name || null,
+            player_number: number || null,
+            player_initials: initials || null,
+            line_order: Date.now()
+        });
+
+        if (error) {
+            if (btn) { btn.disabled = false; btn.textContent = 'Submit My Details'; }
+            errEl.textContent = 'Failed to save. Please try again.';
+            errEl.classList.remove('hidden');
+            console.error(error);
+            return;
+        }
+
+        showScreen('done');
+    };
+
+    // ── All-products player view ───────────────────────────
+
+    let apOrder = null;
+    let apProducts = [];
+    let apStep = 0;
+
+    async function initAllProductsPlayerView() {
+        showScreen('loading');
+        const { data: order, error } = await db.from('kit_orders')
+            .select('id, hub_title').eq('player_order_token', allParam).maybeSingle();
+        if (error || !order) { showError('Link not found or has expired.'); return; }
+
+        const { data: prods } = await db.from('kit_products')
+            .select('id, product_name, sizes, allowed_personalisation_types')
+            .eq('order_id', order.id).order('created_at');
+
+        apOrder = order;
+        apProducts = prods || [];
+        apStep = 0;
+
+        if (!apProducts.length) { showError('No products available for this order.'); return; }
+
+        renderAllProductsStep();
+    }
+
+    function renderAllProductsStep() {
+        const total = apProducts.length;
+        const product = apProducts[apStep];
+
+        document.getElementById('ap-step-label').textContent = `Product ${apStep + 1} of ${total}`;
+        document.getElementById('ap-product-name').textContent = product.product_name;
+        document.getElementById('ap-error').classList.add('hidden');
+
+        // Step indicator dots
+        const dotsEl = document.getElementById('ap-step-dots');
+        dotsEl.innerHTML = apProducts.map((_, i) => `
+            <span style="width:8px;height:8px;border-radius:50%;display:inline-block;background:${i === apStep ? '#14b8a6' : '#e2e8f0'};transition:background 0.2s"></span>
+        `).join('');
+
+        populateSizeSelect('ap-size', product.sizes);
+        populateTypeSelect('ap-pers-type', product.allowed_personalisation_types);
+
+        // Reset fields
+        ['ap-name', 'ap-number', 'ap-initials'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        apTypeChanged();
+
+        const btn = document.getElementById('ap-next-btn');
+        btn.disabled = false;
+        btn.textContent = apStep === total - 1 ? 'Submit' : 'Next';
+
+        showScreen('all-player');
+    }
+
+    window.apTypeChanged = function() {
+        const type = document.getElementById('ap-pers-type').value;
+        updateTypeFields(type, 'ap');
+        document.getElementById('ap-error').classList.add('hidden');
+    };
+
+    window.nextAllProductsStep = async function() {
+        const errEl = document.getElementById('ap-error');
+        errEl.classList.add('hidden');
+
+        const product = apProducts[apStep];
+        const size = document.getElementById('ap-size').value;
+        const type = document.getElementById('ap-pers-type').value;
+        const name = document.getElementById('ap-name').value.trim();
+        const number = document.getElementById('ap-number').value.trim();
+        const initials = document.getElementById('ap-initials').value.trim();
+
+        // Validate
+        if (type === 'name_number' && (!name || !number)) {
+            errEl.textContent = 'Please enter both a name and a number.'; errEl.classList.remove('hidden'); return;
+        }
+        if (type === 'number_only' && !number) {
+            errEl.textContent = 'Please enter a player number.'; errEl.classList.remove('hidden'); return;
+        }
+        if (type === 'initials_only' && !initials) {
+            errEl.textContent = 'Please enter your initials.'; errEl.classList.remove('hidden'); return;
+        }
+
+        // Duplicate player number check
+        if (number && (type === 'name_number' || type === 'number_only')) {
+            const isDuplicate = await checkDuplicatePlayerNumber(product.id, number);
+            if (isDuplicate) {
+                errEl.textContent = `Player number ${number} is already taken. Please choose a different number.`;
+                errEl.classList.remove('hidden');
+                return;
+            }
+        }
+
+        const btn = document.getElementById('ap-next-btn');
+        btn.disabled = true;
+        btn.textContent = 'Saving…';
+
+        const { error } = await db.from('kit_player_details').insert({
+            order_id: apOrder.id,
+            kit_product_id: product.id,
+            product_name: product.product_name,
+            size,
+            personalisation_type: type,
+            player_name: name || null,
+            player_number: number || null,
+            player_initials: initials || null,
+            line_order: Date.now()
+        });
+
+        if (error) {
+            btn.disabled = false;
+            btn.textContent = apStep === apProducts.length - 1 ? 'Submit' : 'Next';
+            errEl.textContent = 'Failed to save. Please try again.';
+            errEl.classList.remove('hidden');
+            console.error(error);
+            return;
+        }
+
+        apStep++;
+        if (apStep >= apProducts.length) {
+            showScreen('done');
+        } else {
+            renderAllProductsStep();
+        }
+    };
 </script>
 </body>
 </html>
