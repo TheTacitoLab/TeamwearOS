@@ -87,6 +87,7 @@
             <p class="text-sm text-gray-500" id="hub-subtitle"></p>
         </div>
         <div class="flex gap-2 items-center">
+            <button onclick="sendAllPlayersLink()" class="btn-secondary btn-sm">Send All-Players Link</button>
             <span id="complete-badge" class="hidden pill" style="background:#dcfce7;color:#15803d">Completed</span>
         </div>
     </div>
@@ -413,7 +414,10 @@
 
             return `
             <div class="card mb-5" id="product-block-${product.id}">
-                <h3 class="font-semibold text-base mb-4">${product.product_name}</h3>
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="font-semibold text-base">${product.product_name}</h3>
+                    <button onclick="sendProductLink('${product.id}')" class="btn-secondary btn-sm">Send Player Link</button>
+                </div>
 
                 <!-- Size quantity grid -->
                 <div class="mb-3">
@@ -438,6 +442,10 @@
 
         const rows = productRows.map(row => {
             const type = row.personalisation_type || 'none';
+            const filled = type === 'none' ? true
+                : type === 'name_number' ? !!(row.player_name && row.player_number)
+                : type === 'number_only' ? !!row.player_number
+                : type === 'initials_only' ? !!row.player_initials : false;
             const showName = type === 'name_number';
             const showNumber = type === 'name_number' || type === 'number_only';
             const showInitials = type === 'initials_only';
@@ -447,7 +455,7 @@
                 .join('');
 
             return `
-            <tr class="player-row" id="pr-${row.id}">
+            <tr class="player-row" id="pr-${row.id}" style="border-left:3px solid ${filled ? '#22c55e' : '#ef4444'}">
                 <td class="font-medium text-gray-700">${row.size || ''}</td>
                 <td>
                     <select class="select" onchange="saveField('${row.id}', 'personalisation_type', this.value); updateRowFields('${row.id}', this.value)">
@@ -469,11 +477,6 @@
                         class="${showInitials ? '' : 'hidden'} row-initials" style="width:56px"
                         oninput="scheduleSave('${row.id}', 'player_initials', this.value)" />
                 </td>
-                <td>
-                    <button onclick="sendPlayerLink('${row.id}')" class="btn-secondary btn-sm" title="Copy player link">
-                        Send link
-                    </button>
-                </td>
             </tr>`;
         }).join('');
 
@@ -487,7 +490,6 @@
                         <th class="text-left pb-2 pr-2">Name</th>
                         <th class="text-left pb-2 pr-2">No.</th>
                         <th class="text-left pb-2 pr-2">Initials</th>
-                        <th class="text-left pb-2"></th>
                     </tr>
                 </thead>
                 <tbody>${rows}</tbody>
@@ -585,6 +587,32 @@
         toast('Player link copied to clipboard');
     };
 
+    window.sendProductLink = async function(productId) {
+        const product = kitProducts.find(p => p.id === productId);
+        if (!product) return;
+        if (!product.product_player_token) {
+            const newToken = crypto.randomUUID();
+            const { error } = await db.from('kit_products').update({ product_player_token: newToken }).eq('id', productId);
+            if (error) { toast('Failed to generate product link'); return; }
+            product.product_player_token = newToken;
+        }
+        const url = `${location.origin}/orders/hub.html?product=${product.product_player_token}`;
+        await navigator.clipboard.writeText(url);
+        toast('Product link copied to clipboard');
+    };
+
+    window.sendAllPlayersLink = async function() {
+        if (!kitOrder.player_order_token) {
+            const newToken = crypto.randomUUID();
+            const { error } = await db.from('kit_orders').update({ player_order_token: newToken }).eq('id', kitOrder.id);
+            if (error) { toast('Failed to generate all-players link'); return; }
+            kitOrder.player_order_token = newToken;
+        }
+        const url = `${location.origin}/orders/hub.html?all=${kitOrder.player_order_token}`;
+        await navigator.clipboard.writeText(url);
+        toast('All-players link copied to clipboard');
+    };
+
     // ── Summary tab ────────────────────────────────────────
     function renderSummary() {
         const container = document.getElementById('summary-container');
@@ -613,7 +641,7 @@
             </div>` : ''}
         </div>`;
 
-        // Player-grouped list
+        // Player × product grid table
         if (totalRows > 0) {
             // Build ordered map: submitter_name → { product_id → filled }
             const playerMap = new Map();
@@ -623,29 +651,37 @@
                 playerMap.get(name).set(r.kit_product_id, isRowFilled(r));
             }
 
-            html += `<div class="card mb-4" style="padding:0;overflow:hidden">`;
-            let first = true;
-            for (const [playerName, productMap] of playerMap) {
-                if (!first) html += `<div style="border-top:1px solid #f1f5f9"></div>`;
-                first = false;
-                html += `
-                <div class="flex items-center justify-between px-4 py-3" style="gap:8px">
-                    <span class="text-sm font-medium" style="min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${playerName}</span>
-                    <div class="flex items-center gap-2 flex-shrink-0">`;
-                for (const product of kitProducts) {
-                    const done = productMap.get(product.id);
-                    if (done === undefined) continue;
-                    html += `
-                        <span title="${product.product_name}" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;${done ? 'color:#14b8a6' : 'color:#cbd5e1'}">
-                            ${done
-                                ? `<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`
-                                : `<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>`
-                            }
-                        </span>`;
-                }
-                html += `</div></div>`;
-            }
-            html += `</div>`;
+            const circleDone = `<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#14b8a6;flex-shrink:0"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></span>`;
+            const circlePending = `<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;border:2px solid #e2e8f0;flex-shrink:0"></span>`;
+
+            const colHeaders = kitProducts.map(p =>
+                `<th class="text-center pb-2 px-2" style="font-size:11px;font-weight:500;color:#94a3b8;min-width:60px">${p.product_name}</th>`
+            ).join('');
+
+            const bodyRows = [...playerMap.entries()].map(([playerName, productMap]) => {
+                const cells = kitProducts.map(p => {
+                    const done = productMap.get(p.id);
+                    if (done === undefined) return `<td class="text-center py-2 px-2"><span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px"></span></td>`;
+                    return `<td class="text-center py-2 px-2">${done ? circleDone : circlePending}</td>`;
+                }).join('');
+                return `<tr style="border-top:1px solid #f8fafc">
+                    <td class="py-2 pr-4 text-sm font-medium" style="white-space:nowrap">${playerName}</td>
+                    ${cells}
+                </tr>`;
+            }).join('');
+
+            html += `
+            <div class="card mb-4 overflow-x-auto" style="padding:12px 16px">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="border-b" style="border-color:#f1f5f9">
+                            <th class="text-left pb-2 pr-4" style="font-size:11px;font-weight:500;color:#94a3b8">Player</th>
+                            ${colHeaders}
+                        </tr>
+                    </thead>
+                    <tbody>${bodyRows}</tbody>
+                </table>
+            </div>`;
         }
 
         // Buttons
@@ -823,7 +859,8 @@
             });
         }
 
-        doc.output('dataurlnewwindow');
+        doc.save(`order-details-PREVIEW-${new Date().toISOString().slice(0, 10)}.pdf`);
+        toast('Preview PDF downloaded');
     };
 
     // ── Player view ────────────────────────────────────────
