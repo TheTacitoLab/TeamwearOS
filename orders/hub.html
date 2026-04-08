@@ -937,6 +937,11 @@
 
     async function initAllProductsPlayerView() {
         showScreen('loading');
+        // If this player already submitted on this device, skip straight to done
+        if (sessionStorage.getItem(`ap_done_${allParam}`) === 'true') {
+            showScreen('done');
+            return;
+        }
         const { data: order, error } = await db.from('kit_orders')
             .select('id, hub_title').eq('player_order_token', allParam).maybeSingle();
         if (error || !order) { showError('Link not found or has expired.'); return; }
@@ -1047,6 +1052,7 @@
 
         apStep++;
         if (apStep >= apProducts.length) {
+            sessionStorage.setItem(`ap_done_${allParam}`, 'true');
             showScreen('done');
         } else {
             renderAllProductsStep();
