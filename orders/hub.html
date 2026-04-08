@@ -158,6 +158,20 @@
     </div>
 </div>
 
+<!-- Full Name capture screen (shown before either player flow begins) -->
+<div id="screen-full-name" class="hidden max-w-lg mx-auto px-4 py-8">
+    <div class="card">
+        <h2 class="text-lg font-semibold mb-1">Before we begin&hellip;</h2>
+        <p class="text-sm text-gray-500 mb-5">Enter your full name so we know whose details these are.</p>
+        <div class="mb-4">
+            <label class="text-xs text-gray-500 mb-1 block">Full Name</label>
+            <input type="text" id="fn-name" class="input" placeholder="e.g. John Smith" />
+        </div>
+        <p id="fn-error" class="text-xs text-red-500 mb-3 hidden">Please enter your full name.</p>
+        <button onclick="submitFullName()" class="btn-primary w-full">Continue</button>
+    </div>
+</div>
+
 <!-- Product player view (per-product link: player chooses own size + personalisation) -->
 <div id="screen-product-player" class="hidden max-w-lg mx-auto px-4 py-8">
     <div class="card">
@@ -176,8 +190,8 @@
         </div>
 
         <div id="pp-name-field" class="mb-4 hidden">
-            <label class="text-xs text-gray-500 mb-1 block">Player Name</label>
-            <input type="text" id="pp-name" class="input" placeholder="e.g. Jordan Smith" />
+            <label class="text-xs text-gray-500 mb-1 block">Name On Jersey</label>
+            <input type="text" id="pp-name" class="input" placeholder="E.g. BECKHAM" />
         </div>
 
         <div id="pp-number-field" class="mb-4 hidden">
@@ -217,8 +231,8 @@
         </div>
 
         <div id="ap-name-field" class="mb-4 hidden">
-            <label class="text-xs text-gray-500 mb-1 block">Player Name</label>
-            <input type="text" id="ap-name" class="input" placeholder="e.g. Jordan Smith" />
+            <label class="text-xs text-gray-500 mb-1 block">Name On Jersey</label>
+            <input type="text" id="ap-name" class="input" placeholder="E.g. BECKHAM" />
         </div>
 
         <div id="ap-number-field" class="mb-4 hidden">
@@ -262,6 +276,7 @@
     let playerDetails = [];
     let playerSaveTimer = null;
     let playerRowId = null;   // for player view
+    let submitterName = '';   // captured on the full-name screen
 
     // ── Toast ──────────────────────────────────────────────
     function toast(msg) {
@@ -273,7 +288,7 @@
 
     // ── Screen helpers ─────────────────────────────────────
     function showScreen(id) {
-        ['loading', 'error', 'pin', 'manager', 'player', 'product-player', 'all-player', 'done'].forEach(s => {
+        ['loading', 'error', 'pin', 'manager', 'player', 'full-name', 'product-player', 'all-player', 'done'].forEach(s => {
             document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== id);
         });
     }
@@ -574,87 +589,76 @@
     function renderSummary() {
         const container = document.getElementById('summary-container');
         const totalRows = playerDetails.length;
-        const filledRows = playerDetails.filter(r => {
-            if (r.personalisation_type === 'none') return true;
-            if (r.personalisation_type === 'name_number') return r.player_name && r.player_number;
-            if (r.personalisation_type === 'number_only') return r.player_number;
-            if (r.personalisation_type === 'initials_only') return r.player_initials;
-            return false;
-        }).length;
 
+        function isRowFilled(r) {
+            if (r.personalisation_type === 'none') return true;
+            if (r.personalisation_type === 'name_number') return !!(r.player_name && r.player_number);
+            if (r.personalisation_type === 'number_only') return !!r.player_number;
+            if (r.personalisation_type === 'initials_only') return !!r.player_initials;
+            return false;
+        }
+
+        const filledRows = playerDetails.filter(isRowFilled).length;
         const allFilled = totalRows > 0 && filledRows === totalRows;
 
         let html = `
         <div class="card mb-4">
-            <h3 class="font-semibold mb-3">Overview</h3>
-            <div class="flex gap-6 text-sm">
-                <div><span class="text-gray-400">Total rows:</span> <strong>${totalRows}</strong></div>
-                <div><span class="text-gray-400">Filled:</span> <strong>${filledRows}</strong></div>
-                <div><span class="text-gray-400">Remaining:</span> <strong>${totalRows - filledRows}</strong></div>
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="font-semibold">Overview</h3>
+                <span class="text-sm text-gray-500">${filledRows} / ${totalRows} submitted</span>
             </div>
             ${totalRows > 0 ? `
-            <div class="w-full rounded-full mt-3" style="background:#e2e8f0;height:8px">
-                <div class="rounded-full" style="background:#14b8a6;height:8px;width:${Math.round((filledRows/totalRows)*100)}%;transition:width 0.3s"></div>
+            <div class="w-full rounded-full" style="background:#e2e8f0;height:6px">
+                <div class="rounded-full" style="background:#14b8a6;height:6px;width:${Math.round((filledRows/totalRows)*100)}%;transition:width 0.3s"></div>
             </div>` : ''}
         </div>`;
 
-        // Per-product summary
-        for (const product of kitProducts) {
-            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
-            if (!productRows.length) continue;
-            const sizes = {};
-            productRows.forEach(r => { if (r.size) sizes[r.size] = (sizes[r.size] || 0) + 1; });
-            const sizeList = Object.entries(sizes).map(([s, q]) => `${s}×${q}`).join(', ');
+        // Player-grouped list
+        if (totalRows > 0) {
+            // Build ordered map: submitter_name → { product_id → filled }
+            const playerMap = new Map();
+            for (const r of playerDetails) {
+                const name = r.submitter_name || r.player_name || '—';
+                if (!playerMap.has(name)) playerMap.set(name, new Map());
+                playerMap.get(name).set(r.kit_product_id, isRowFilled(r));
+            }
 
-            html += `
-            <div class="card mb-3">
-                <h4 class="font-medium mb-1">${product.product_name}</h4>
-                <p class="text-xs text-gray-400 mb-3">${sizeList || 'No sizes entered'}</p>
-                <table class="w-full text-sm">
-                    <thead><tr class="text-xs text-gray-400 border-b" style="border-color:#f1f5f9">
-                        <th class="text-left pb-1">Size</th>
-                        <th class="text-left pb-1">Type</th>
-                        <th class="text-left pb-1">Name</th>
-                        <th class="text-left pb-1">Number</th>
-                        <th class="text-left pb-1">Initials</th>
-                        <th class="text-left pb-1">Status</th>
-                    </tr></thead>
-                    <tbody>
-                        ${productRows.map(r => {
-                            const filled = r.personalisation_type === 'none' ? true
-                                : r.personalisation_type === 'name_number' ? !!(r.player_name && r.player_number)
-                                : r.personalisation_type === 'number_only' ? !!r.player_number
-                                : r.personalisation_type === 'initials_only' ? !!r.player_initials : false;
-                            return `<tr class="border-b" style="border-color:#f8fafc">
-                                <td class="py-1">${r.size || ''}</td>
-                                <td>${r.personalisation_type === 'none' ? 'None'
-                                    : r.personalisation_type === 'name_number' ? 'Name & No.'
-                                    : r.personalisation_type === 'number_only' ? 'No. Only'
-                                    : 'Initials'}</td>
-                                <td>${r.player_name || '—'}</td>
-                                <td>${r.player_number || '—'}</td>
-                                <td>${r.player_initials || '—'}</td>
-                                <td><span class="pill" style="${filled ? 'background:#dcfce7;color:#15803d' : 'background:#fef9c3;color:#854d0e'}">${filled ? 'Done' : 'Pending'}</span></td>
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>`;
+            html += `<div class="card mb-4" style="padding:0;overflow:hidden">`;
+            let first = true;
+            for (const [playerName, productMap] of playerMap) {
+                if (!first) html += `<div style="border-top:1px solid #f1f5f9"></div>`;
+                first = false;
+                html += `
+                <div class="flex items-center justify-between px-4 py-3" style="gap:8px">
+                    <span class="text-sm font-medium" style="min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${playerName}</span>
+                    <div class="flex items-center gap-2 flex-shrink-0">`;
+                for (const product of kitProducts) {
+                    const done = productMap.get(product.id);
+                    if (done === undefined) continue;
+                    html += `
+                        <span title="${product.product_name}" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;${done ? 'color:#14b8a6' : 'color:#cbd5e1'}">
+                            ${done
+                                ? `<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`
+                                : `<svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>`
+                            }
+                        </span>`;
+                }
+                html += `</div></div>`;
+            }
+            html += `</div>`;
         }
 
-        if (allFilled) {
-            html += `
-            <div class="card text-center" style="border-color:#86efac;background:#f0fdf4">
-                <p class="text-sm font-semibold text-green-700 mb-3">All details collected!</p>
-                <button onclick="completeAndDownload()" class="btn-primary">Complete & Download PDF</button>
-            </div>`;
-        } else if (totalRows > 0) {
-            html += `
-            <div class="card text-center">
-                <p class="text-sm text-gray-500 mb-3">Fill all rows to unlock the PDF download.</p>
-                <button onclick="downloadPDF()" class="btn-secondary">Download Draft PDF</button>
-            </div>`;
-        }
+        // Buttons
+        html += `
+        <div class="card text-center">
+            <div class="flex gap-3 justify-center flex-wrap">
+                <button onclick="previewPDF()" class="btn-secondary" style="flex:1;min-width:120px">Preview PDF</button>
+                ${allFilled
+                    ? `<button onclick="completeAndDownload()" class="btn-primary" style="flex:1;min-width:120px">Download PDF</button>`
+                    : ''}
+            </div>
+            ${!allFilled && totalRows > 0 ? `<p class="text-xs text-gray-400 mt-3">Download unlocks when all players have submitted.</p>` : ''}
+        </div>`;
 
         container.innerHTML = html;
     }
@@ -696,8 +700,9 @@
 
             doc.autoTable({
                 startY: y,
-                head: [['Size', 'Type', 'Name', 'Number', 'Initials']],
+                head: [['Player', 'Size', 'Type', 'Name On Jersey', 'Number', 'Initials']],
                 body: productRows.map(r => [
+                    r.submitter_name || '',
                     r.size || '',
                     r.personalisation_type === 'none' ? 'None'
                         : r.personalisation_type === 'name_number' ? 'Name & Number'
@@ -743,6 +748,82 @@
 
         doc.save(`order-details-${new Date().toISOString().slice(0, 10)}.pdf`);
         toast('PDF downloaded');
+    };
+
+    window.previewPDF = function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        doc.setFontSize(20);
+        doc.setTextColor(20, 184, 166);
+        doc.text('ORDER DETAILS', 20, 22);
+
+        doc.setFontSize(9);
+        doc.setTextColor(100);
+        doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 30);
+        if (kitOrder.completed_at) doc.text(`Completed: ${new Date(kitOrder.completed_at).toLocaleDateString()}`, 20, 36);
+
+        let y = 46;
+
+        for (const product of kitProducts) {
+            if (y > 240) { doc.addPage(); y = 20; }
+            doc.setFontSize(11);
+            doc.setTextColor(30);
+            doc.text(product.product_name, 20, y);
+            y += 5;
+
+            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
+            if (!productRows.length) { y += 8; continue; }
+
+            doc.autoTable({
+                startY: y,
+                head: [['Player', 'Size', 'Type', 'Name On Jersey', 'Number', 'Initials']],
+                body: productRows.map(r => [
+                    r.submitter_name || '',
+                    r.size || '',
+                    r.personalisation_type === 'none' ? 'None'
+                        : r.personalisation_type === 'name_number' ? 'Name & Number'
+                        : r.personalisation_type === 'number_only' ? 'Number Only'
+                        : 'Initials Only',
+                    r.player_name || '',
+                    r.player_number || '',
+                    r.player_initials || ''
+                ]),
+                theme: 'grid',
+                headStyles: { fillColor: [20, 184, 166], fontSize: 8 },
+                styles: { fontSize: 8 },
+                margin: { left: 20, right: 20 }
+            });
+            y = doc.lastAutoTable.finalY + 10;
+        }
+
+        // Size summary
+        if (y > 220) { doc.addPage(); y = 20; }
+        doc.setFontSize(11);
+        doc.setTextColor(30);
+        doc.text('Size Summary', 20, y);
+        y += 4;
+
+        const summaryRows = [];
+        for (const product of kitProducts) {
+            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
+            const sizes = {};
+            productRows.forEach(r => { if (r.size) sizes[r.size] = (sizes[r.size] || 0) + 1; });
+            Object.entries(sizes).forEach(([size, qty]) => summaryRows.push([product.product_name, size, qty]));
+        }
+        if (summaryRows.length) {
+            doc.autoTable({
+                startY: y,
+                head: [['Product', 'Size', 'Qty']],
+                body: summaryRows,
+                theme: 'grid',
+                headStyles: { fillColor: [20, 184, 166], fontSize: 8 },
+                styles: { fontSize: 8 },
+                margin: { left: 20, right: 20 }
+            });
+        }
+
+        doc.output('dataurlnewwindow');
     };
 
     // ── Player view ────────────────────────────────────────
@@ -840,6 +921,18 @@
         document.getElementById(`${prefix}-initials-field`)?.classList.toggle('hidden', !showInitials);
     }
 
+    // ── Full Name screen ───────────────────────────────────
+
+    window.submitFullName = function() {
+        const val = document.getElementById('fn-name').value.trim();
+        const errEl = document.getElementById('fn-error');
+        if (!val) { errEl.classList.remove('hidden'); return; }
+        errEl.classList.add('hidden');
+        submitterName = val;
+        if (allParam) { renderAllProductsStep(); }
+        else          { showScreen('product-player'); }
+    };
+
     // ── Per-product player view ────────────────────────────
 
     let ppProduct = null;
@@ -856,7 +949,7 @@
         populateSizeSelect('pp-size', product.sizes);
         populateTypeSelect('pp-pers-type', product.allowed_personalisation_types);
         ppTypeChanged();
-        showScreen('product-player');
+        showScreen('full-name');
     }
 
     window.ppTypeChanged = function() {
@@ -912,6 +1005,7 @@
             product_name: ppProduct.product_name,
             size,
             personalisation_type: type,
+            submitter_name: submitterName || null,
             player_name: name || null,
             player_number: number || null,
             player_initials: initials || null,
@@ -956,7 +1050,7 @@
 
         if (!apProducts.length) { showError('No products available for this order.'); return; }
 
-        renderAllProductsStep();
+        showScreen('full-name');
     }
 
     function renderAllProductsStep() {
@@ -1035,6 +1129,7 @@
             product_name: product.product_name,
             size,
             personalisation_type: type,
+            submitter_name: submitterName || null,
             player_name: name || null,
             player_number: number || null,
             player_initials: initials || null,
