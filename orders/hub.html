@@ -88,7 +88,7 @@
         </div>
         <div class="flex gap-2 items-center">
             <button onclick="showInstructions()" title="How to use this hub" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;line-height:1" aria-label="Instructions">
-                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2.5"/></svg>
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2.5"/></svg>
             </button>
             <button onclick="sendAllPlayersLink()" class="btn-secondary btn-sm">Send All-Players Link</button>
             <span id="complete-badge" class="hidden pill" style="background:#dcfce7;color:#15803d">Completed</span>
@@ -462,7 +462,27 @@
         const allowedTypes = (product.allowed_personalisation_types || 'none,name_number,number_only,initials_only').split(',');
         const TYPE_LABELS = { none: 'None', name_number: 'Name & Number', number_only: 'Number Only', initials_only: 'Initials Only' };
 
-        const rows = productRows.map(row => {
+        // Size sort order — youth → women's numeric → adult
+        const SIZE_ORDER = ['YXXS','YXS','YS','YM','YL','YXL','4','6','8','10','12','14','16','18','20','22','24','XXS','XS','S','M','L','XL','2XL','3XL','4XL','5XL','6XL'];
+
+        // Group rows by size
+        const groups = {};
+        productRows.forEach(row => {
+            const sz = row.size || 'Unknown';
+            if (!groups[sz]) groups[sz] = [];
+            groups[sz].push(row);
+        });
+
+        // Sort group keys by SIZE_ORDER
+        const sortedSizes = Object.keys(groups).sort((a, b) => {
+            const ai = SIZE_ORDER.indexOf(a.toUpperCase()), bi = SIZE_ORDER.indexOf(b.toUpperCase());
+            if (ai === -1 && bi === -1) return a.localeCompare(b);
+            if (ai === -1) return 1;
+            if (bi === -1) return -1;
+            return ai - bi;
+        });
+
+        function buildRow(row) {
             const type = row.personalisation_type || 'none';
             const filled = type === 'none' ? true
                 : type === 'name_number' ? !!(row.player_name && row.player_number)
@@ -478,7 +498,6 @@
 
             return `
             <tr class="player-row" id="pr-${row.id}" style="border-left:3px solid ${filled ? '#22c55e' : '#ef4444'}">
-                <td class="font-medium text-gray-700" style="white-space:nowrap">${row.size || ''}</td>
                 <td>
                     <input type="text" placeholder="Full Name" value="${row.submitter_name || ''}"
                         class="row-fullname" style="min-width:90px"
@@ -505,6 +524,11 @@
                         oninput="scheduleSave('${row.id}', 'player_initials', this.value)" />
                 </td>
             </tr>`;
+        }
+
+        const rows = sortedSizes.flatMap(size => {
+            const headerRow = `<tr><td colspan="5" style="padding:8px 4px 4px;font-size:11px;font-weight:700;color:#64748b;letter-spacing:0.05em;border-top:1px solid #f1f5f9;text-transform:uppercase">${size}</td></tr>`;
+            return [headerRow, ...groups[size].map(buildRow)];
         }).join('');
 
         return `
@@ -512,7 +536,6 @@
             <table class="w-full border-collapse">
                 <thead>
                     <tr class="text-xs text-gray-400 border-b" style="border-color:#f1f5f9">
-                        <th class="text-left pb-2 pr-2">Size</th>
                         <th class="text-left pb-2 pr-2">Full Name</th>
                         <th class="text-left pb-2 pr-2">Personalisation</th>
                         <th class="text-left pb-2 pr-2">Name On Jersey</th>
