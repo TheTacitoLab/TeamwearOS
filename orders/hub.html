@@ -87,6 +87,9 @@
             <p class="text-sm text-gray-500" id="hub-subtitle"></p>
         </div>
         <div class="flex gap-2 items-center">
+            <button onclick="showInstructions()" title="How to use this hub" style="background:none;border:none;cursor:pointer;color:#94a3b8;padding:4px;line-height:1" aria-label="Instructions">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8" stroke-width="2.5"/></svg>
+            </button>
             <button onclick="sendAllPlayersLink()" class="btn-secondary btn-sm">Send All-Players Link</button>
             <span id="complete-badge" class="hidden pill" style="background:#dcfce7;color:#15803d">Completed</span>
         </div>
@@ -94,17 +97,21 @@
 
     <!-- Tabs -->
     <div class="flex gap-1 mb-6 p-1 rounded-xl w-fit" style="background:#f1f5f9">
-        <button class="tab active" onclick="switchTab('details')" id="tab-details">Products & Details</button>
+        <button class="tab active" onclick="switchTab('sizes')" id="tab-sizes">Sizes</button>
+        <button class="tab" onclick="switchTab('personalisation')" id="tab-personalisation">Personalisation</button>
         <button class="tab" onclick="switchTab('summary')" id="tab-summary">Summary</button>
     </div>
 
-    <!-- Tab: Products & Details -->
-    <div id="tab-content-details">
-        <div id="products-container">
-            <div class="flex items-center justify-center py-12">
-                <div class="spinner"></div>
-            </div>
+    <!-- Tab: Sizes -->
+    <div id="tab-content-sizes">
+        <div id="sizes-container">
+            <div class="flex items-center justify-center py-12"><div class="spinner"></div></div>
         </div>
+    </div>
+
+    <!-- Tab: Personalisation -->
+    <div id="tab-content-personalisation" class="hidden">
+        <div id="personalisation-container"></div>
     </div>
 
     <!-- Tab: Summary -->
@@ -279,6 +286,12 @@
     let playerRowId = null;   // for player view
     let submitterName = '';   // captured on the full-name screen
 
+    // ── Size groups (full range) ───────────────────────────
+    const SIZE_GROUPS = {
+        Youth: ['YXXS', 'YXS', 'YS', 'YM', 'YL', 'YXL', 'YXXL'],
+        Adult: ['XXS', 'XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL']
+    };
+
     // ── Toast ──────────────────────────────────────────────
     function toast(msg) {
         const el = document.getElementById('toast');
@@ -373,61 +386,70 @@
         kitProducts = prods || [];
         playerDetails = rows || [];
 
-        renderProducts();
+        renderSizesTab();
+        renderPersonalisationTab();
     }
 
     // ── Tab switching ──────────────────────────────────────
     window.switchTab = function(tab) {
-        ['details', 'summary'].forEach(t => {
+        ['sizes', 'personalisation', 'summary'].forEach(t => {
             document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
             document.getElementById(`tab-content-${t}`).classList.toggle('hidden', t !== tab);
         });
         if (tab === 'summary') renderSummary();
     };
 
-    // ── Products & Details tab ─────────────────────────────
-    function renderProducts() {
-        const container = document.getElementById('products-container');
+    // ── Sizes tab ──────────────────────────────────────────
+    function renderSizesTab() {
+        const container = document.getElementById('sizes-container');
         if (!kitProducts.length) {
             container.innerHTML = `<div class="card text-center text-sm text-gray-400 py-8">No products loaded for this order.<br>Ask your admin to sync products from the job record.</div>`;
             return;
         }
-
         container.innerHTML = kitProducts.map(product => {
-            const sizes = (product.sizes || 'S,M,L,XL,2XL').split(',').map(s => s.trim()).filter(Boolean);
-            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
-
-            const sizeInputs = sizes.map(size => {
-                const qty = productRows.filter(r => r.size === size).length;
-                return `
-                <div class="text-center">
-                    <label class="text-xs text-gray-400 block mb-1">${size}</label>
-                    <input type="number" min="0" value="${qty}"
-                        class="size-input"
-                        data-product="${product.id}"
-                        data-size="${size}"
-                        oninput="qtyChanged(this)" />
+            let groupHtml = '';
+            for (const [groupName, sizes] of Object.entries(SIZE_GROUPS)) {
+                const inputs = sizes.map(size => {
+                    const qty = playerDetails.filter(r => r.kit_product_id === product.id && r.size === size).length;
+                    return `
+                    <div class="text-center">
+                        <label class="text-xs text-gray-400 block mb-1">${size}</label>
+                        <input type="number" min="0" value="${qty}"
+                            class="size-input" data-product="${product.id}" data-size="${size}"
+                            oninput="qtyChanged(this)" />
+                    </div>`;
+                }).join('');
+                groupHtml += `
+                <div class="mb-3">
+                    <p class="text-xs font-medium text-gray-400 mb-2">${groupName}</p>
+                    <div class="flex flex-wrap gap-2">${inputs}</div>
                 </div>`;
-            }).join('');
-
-            const playerRowsHtml = renderPlayerRowsHtml(product, productRows);
-
+            }
             return `
-            <div class="card mb-5" id="product-block-${product.id}">
+            <div class="card mb-5" id="sizes-block-${product.id}">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="font-semibold text-base">${product.product_name}</h3>
                     <button onclick="sendProductLink('${product.id}')" class="btn-secondary btn-sm">Send Player Link</button>
                 </div>
+                ${groupHtml}
+            </div>`;
+        }).join('');
+    }
 
-                <!-- Size quantity grid -->
-                <div class="mb-3">
-                    <p class="text-xs text-gray-500 mb-2">Enter quantity per size:</p>
-                    <div class="flex flex-wrap gap-3">${sizeInputs}</div>
-                </div>
-
-                <!-- Player rows -->
+    // ── Personalisation tab ────────────────────────────────
+    function renderPersonalisationTab() {
+        const container = document.getElementById('personalisation-container');
+        if (!kitProducts.length) {
+            container.innerHTML = `<div class="card text-center text-sm text-gray-400 py-8">No products loaded for this order.</div>`;
+            return;
+        }
+        container.innerHTML = kitProducts.map(product => {
+            const productRows = playerDetails.filter(r => r.kit_product_id === product.id);
+            return `
+            <div class="card mb-5" id="product-block-${product.id}">
+                <h3 class="font-semibold text-base mb-4">${product.product_name}</h3>
                 <div id="player-rows-${product.id}">
-                    ${playerRowsHtml}
+                    ${renderPlayerRowsHtml(product, productRows)}
                 </div>
             </div>`;
         }).join('');
@@ -456,14 +478,19 @@
 
             return `
             <tr class="player-row" id="pr-${row.id}" style="border-left:3px solid ${filled ? '#22c55e' : '#ef4444'}">
-                <td class="font-medium text-gray-700">${row.size || ''}</td>
+                <td class="font-medium text-gray-700" style="white-space:nowrap">${row.size || ''}</td>
+                <td>
+                    <input type="text" placeholder="Full Name" value="${row.submitter_name || ''}"
+                        class="row-fullname" style="min-width:90px"
+                        oninput="scheduleSave('${row.id}', 'submitter_name', this.value)" />
+                </td>
                 <td>
                     <select class="select" onchange="saveField('${row.id}', 'personalisation_type', this.value); updateRowFields('${row.id}', this.value)">
                         ${typeOptions}
                     </select>
                 </td>
                 <td>
-                    <input type="text" placeholder="Name" value="${row.player_name || ''}"
+                    <input type="text" placeholder="E.g. BECKHAM" value="${row.player_name || ''}"
                         class="${showName ? '' : 'hidden'} row-name"
                         oninput="scheduleSave('${row.id}', 'player_name', this.value)" />
                 </td>
@@ -486,8 +513,9 @@
                 <thead>
                     <tr class="text-xs text-gray-400 border-b" style="border-color:#f1f5f9">
                         <th class="text-left pb-2 pr-2">Size</th>
+                        <th class="text-left pb-2 pr-2">Full Name</th>
                         <th class="text-left pb-2 pr-2">Personalisation</th>
-                        <th class="text-left pb-2 pr-2">Name</th>
+                        <th class="text-left pb-2 pr-2">Name On Jersey</th>
                         <th class="text-left pb-2 pr-2">No.</th>
                         <th class="text-left pb-2 pr-2">Initials</th>
                     </tr>
@@ -501,48 +529,58 @@
     const qtyTimers = {};
     window.qtyChanged = function(input) {
         const productId = input.dataset.product;
-        clearTimeout(qtyTimers[productId]);
-        qtyTimers[productId] = setTimeout(() => applyQtyChange(productId), 700);
+        const size = input.dataset.size;
+        const key = productId + '|' + size;
+        clearTimeout(qtyTimers[key]);
+        qtyTimers[key] = setTimeout(() => applyQtyChange(productId, size, parseInt(input.value || '0', 10)), 700);
     };
 
-    async function applyQtyChange(productId) {
+    async function applyQtyChange(productId, size, newQty) {
         const product = kitProducts.find(p => p.id === productId);
         if (!product) return;
-        const sizes = (product.sizes || 'S,M,L,XL,2XL').split(',').map(s => s.trim()).filter(Boolean);
+        newQty = Math.max(0, newQty);
 
-        for (const size of sizes) {
-            const input = document.querySelector(`input[data-product="${productId}"][data-size="${size}"]`);
-            const newQty = Math.max(0, parseInt(input?.value || '0', 10));
-            const existingRows = playerDetails.filter(r => r.kit_product_id === productId && r.size === size);
-            const diff = newQty - existingRows.length;
+        const existingRows = playerDetails.filter(r => r.kit_product_id === productId && r.size === size);
+        const diff = newQty - existingRows.length;
 
-            if (diff > 0) {
-                // Insert new rows
-                const maxOrder = playerDetails.reduce((m, r) => r.line_order > m ? r.line_order : m, 0);
-                const newRows = Array.from({ length: diff }, (_, i) => ({
-                    order_id: kitOrder.id,
-                    kit_product_id: productId,
-                    product_name: product.product_name,
-                    size,
-                    personalisation_type: 'none',
-                    line_order: maxOrder + i + 1
-                }));
-                const { data: inserted, error } = await db.from('kit_player_details').insert(newRows).select();
-                if (!error && inserted) {
-                    playerDetails.push(...inserted);
-                }
-            } else if (diff < 0) {
-                // Delete excess rows (remove last ones that have least data)
-                const toDelete = existingRows.slice(diff); // last |diff| rows
-                const ids = toDelete.map(r => r.id);
-                await db.from('kit_player_details').delete().in('id', ids);
-                playerDetails = playerDetails.filter(r => !ids.includes(r.id));
-            }
+        if (diff > 0) {
+            const maxOrder = playerDetails.reduce((m, r) => r.line_order > m ? r.line_order : m, 0);
+            const newRows = Array.from({ length: diff }, (_, i) => ({
+                order_id: kitOrder.id,
+                kit_product_id: productId,
+                product_name: product.product_name,
+                size,
+                personalisation_type: 'none',
+                line_order: maxOrder + i + 1
+            }));
+            const { data: inserted, error } = await db.from('kit_player_details').insert(newRows).select();
+            if (!error && inserted) playerDetails.push(...inserted);
+        } else if (diff < 0) {
+            const toDelete = existingRows.slice(diff);
+            const ids = toDelete.map(r => r.id);
+            await db.from('kit_player_details').delete().in('id', ids);
+            playerDetails = playerDetails.filter(r => !ids.includes(r.id));
         }
 
-        // Re-render just this product's rows
+        // Keep product.sizes in sync (for player-facing size dropdowns)
+        const currentSizes = (product.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
+        const hasRows = playerDetails.some(r => r.kit_product_id === productId && r.size === size);
+        let updatedSizes;
+        if (hasRows && !currentSizes.includes(size)) {
+            const allFlat = [...SIZE_GROUPS.Youth, ...SIZE_GROUPS.Adult];
+            updatedSizes = allFlat.filter(s => [...currentSizes, size].includes(s));
+        } else if (!hasRows && currentSizes.includes(size)) {
+            updatedSizes = currentSizes.filter(s => s !== size);
+        }
+        if (updatedSizes !== undefined) {
+            product.sizes = updatedSizes.join(',');
+            await db.from('kit_products').update({ sizes: product.sizes }).eq('id', productId);
+        }
+
+        // Re-render personalisation rows for this product
         const productRows = playerDetails.filter(r => r.kit_product_id === productId);
-        document.getElementById(`player-rows-${productId}`).innerHTML = renderPlayerRowsHtml(product, productRows);
+        const el = document.getElementById(`player-rows-${productId}`);
+        if (el) el.innerHTML = renderPlayerRowsHtml(product, productRows);
     }
 
     // ── Field autosave ─────────────────────────────────────
@@ -611,6 +649,18 @@
         const url = `${location.origin}/orders/hub.html?all=${kitOrder.player_order_token}`;
         await navigator.clipboard.writeText(url);
         toast('All-players link copied to clipboard');
+    };
+
+    // ── Instructions modal ─────────────────────────────────
+    window.showInstructions = function() {
+        const m = document.getElementById('modal-instructions');
+        m.classList.remove('hidden');
+        m.style.display = 'flex';
+    };
+    window.closeInstructions = function() {
+        const m = document.getElementById('modal-instructions');
+        m.classList.add('hidden');
+        m.style.display = 'none';
     };
 
     // ── Summary tab ────────────────────────────────────────
@@ -1191,5 +1241,23 @@
         }
     };
 </script>
+
+<!-- Instructions modal -->
+<div id="modal-instructions" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;padding:16px">
+    <div class="card" style="max-width:480px;width:100%;max-height:85vh;overflow-y:auto;position:relative">
+        <button onclick="closeInstructions()" style="position:absolute;top:12px;right:16px;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:22px;line-height:1">&times;</button>
+        <h2 style="font-size:16px;font-weight:600;margin-bottom:16px">How to use the Order Hub</h2>
+        <div style="font-size:13px;color:#475569;line-height:1.7">
+            <p style="font-weight:600;color:#0f172a;margin-bottom:4px">📐 Sizes tab</p>
+            <p style="margin-bottom:14px">Enter the quantity needed for each size. Changing a number automatically adds or removes rows in the Personalisation tab. Or click <em>Send Player Link</em> on a product to let a player choose their own size and personalisation — their submission updates the table automatically.</p>
+            <p style="font-weight:600;color:#0f172a;margin-bottom:4px">✏️ Personalisation tab</p>
+            <p style="margin-bottom:14px">Fill in each player's Full Name, personalisation type, jersey name and number. Rows show a <span style="color:#22c55e;font-weight:600">green border</span> when complete and a <span style="color:#ef4444;font-weight:600">red border</span> when information is still needed. All changes save automatically.</p>
+            <p style="font-weight:600;color:#0f172a;margin-bottom:4px">📋 Summary tab</p>
+            <p style="margin-bottom:14px">See all players and their completion status at a glance. Download a Preview PDF at any time. The Download PDF button unlocks in green when every entry is complete.</p>
+            <p style="font-weight:600;color:#0f172a;margin-bottom:4px">🔗 Sending player links</p>
+            <p><em>Send All-Players Link</em> (top right) gives one link for a player to fill in details for every product. <em>Send Player Link</em> on each product card gives a link just for that product. Players are asked for their Full Name before entering their details.</p>
+        </div>
+    </div>
+</div>
 </body>
 </html>
