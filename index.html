@@ -5127,13 +5127,22 @@
                 <!-- Filename guide -->
                 <div class="mx-6 mt-4 p-4 rounded-xl text-xs font-mono" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.2)">
                     <p class="text-brand-400 font-semibold mb-1.5 font-sans text-sm">Filename naming convention</p>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-400 mb-2">
+                        <span><span class="text-white">APX-COR-001.png</span> → Front view, V1</span>
+                        <span><span class="text-white">APX-COR-001-FRONT.png</span> → Front view</span>
+                        <span><span class="text-white">APX-COR-001-BACK.png</span> or <span class="text-white">-REAR</span> or <span class="text-white">-B</span> or <span class="text-white">-R</span> → Back view</span>
+                        <span><span class="text-white">APX-COR-001-SIDE.png</span> or <span class="text-white">-S</span> → Side view</span>
+                        <span><span class="text-white">APX-COR-001-TOP.png</span> or <span class="text-white">-T</span> → Top view</span>
+                        <span><span class="text-white">APX-COR-001-DETAIL.png</span> or <span class="text-white">-DTL</span> → Detail / close-up</span>
+                        <span><span class="text-white">APX-COR-001-INSIDE.png</span> or <span class="text-white">-IN</span> → Inside / lining</span>
+                        <span class="text-gray-600">V1 &amp; P1 are never written — just the code + view</span>
+                    </div>
+                    <p class="text-brand-400 font-semibold mb-1 font-sans text-xs">Variants (V2–V10) &amp; Standalone listings (P2–P10)</p>
                     <div class="grid grid-cols-2 gap-x-6 gap-y-1 text-gray-400">
-                        <span><span class="text-white">APX-COR-001.png</span> → Front view, product V1</span>
-                        <span><span class="text-white">APX-COR-001-B.png</span> → Back view (-B)</span>
-                        <span><span class="text-white">APX-COR-001-S.png</span> → Side view (-S)</span>
-                        <span><span class="text-white">APX-COR-001-V2.png</span> → Second product variant (V2)</span>
-                        <span><span class="text-white">APX-COR-001-B-V2.png</span> → Back view of V2 variant</span>
-                        <span class="text-gray-600">V1 is never written — just the code + view</span>
+                        <span><span class="text-white">APX-COR-001-V2-RED.png</span> → Variant titled "…Red"</span>
+                        <span><span class="text-white">APX-COR-001-REAR-V2-RED.png</span> → Back view of same variant</span>
+                        <span><span class="text-white">APX-COR-001-P2-HOME.png</span> → New standalone listing "…Home"</span>
+                        <span><span class="text-white">APX-COR-001-BACK-P3-AWAY.png</span> → Back view, 3rd listing "…Away"</span>
                     </div>
                 </div>
 
@@ -8260,23 +8269,53 @@
         function parseDesignFilename(filename) {
             const base = filename.replace(/\.[^.]+$/, '');
             let variantNumber = 1;
+            let variantName = '';
+            let listingNumber = 1;
             let name = base;
-            const variantMatch = base.match(/-V(\d+)$/i);
-            if (variantMatch) {
-                variantNumber = parseInt(variantMatch[1]);
-                name = base.slice(0, -variantMatch[0].length);
+
+            // Check for P2–P10 (standalone product listing) before V check — mutually exclusive
+            const listingMatch = base.match(/-P(\d{1,2})(?:-(.+))?$/i);
+            if (listingMatch) {
+                listingNumber = parseInt(listingMatch[1]);
+                if (listingMatch[2]) variantName = listingMatch[2];
+                name = base.slice(0, -listingMatch[0].length);
+            } else {
+                // Check for V2–V10 (product variant)
+                const variantMatch = base.match(/-V(\d{1,2})(?:-(.+))?$/i);
+                if (variantMatch) {
+                    variantNumber = parseInt(variantMatch[1]);
+                    if (variantMatch[2]) variantName = variantMatch[2];
+                    name = base.slice(0, -variantMatch[0].length);
+                }
             }
-            const viewMap = { '-B': 'back', '-S': 'side', '-T': 'top', '-F': 'front' };
+
+            // View suffixes — ordered longest-first to prevent partial matches (e.g. -FRONT before -F, -REAR before -R)
+            const viewMap = [
+                ['-FRONT',  'front'],
+                ['-BACK',   'back'],
+                ['-REAR',   'back'],
+                ['-SIDE',   'side'],
+                ['-TOP',    'top'],
+                ['-DETAIL', 'detail'],
+                ['-INSIDE', 'inside'],
+                ['-DTL',    'detail'],
+                ['-IN',     'inside'],
+                ['-F',      'front'],
+                ['-B',      'back'],
+                ['-R',      'back'],
+                ['-S',      'side'],
+                ['-T',      'top'],
+            ];
             let view = 'front';
             let productCode = name;
-            for (const [suffix, viewName] of Object.entries(viewMap)) {
+            for (const [suffix, viewName] of viewMap) {
                 if (name.toUpperCase().endsWith(suffix)) {
                     view = viewName;
                     productCode = name.slice(0, -suffix.length);
                     break;
                 }
             }
-            return { productCode: productCode.toUpperCase(), view, variantNumber };
+            return { productCode: productCode.toUpperCase(), view, variantNumber, variantName, listingNumber };
         }
 
         // Filenames cannot contain "/" so product codes like APX/WAR/004 are saved
@@ -8313,8 +8352,14 @@
             if (countEl) countEl.textContent = files.length;
 
             files.forEach(file => {
-                const { productCode, view, variantNumber } = parseDesignFilename(file.name);
+                const { productCode, view, variantNumber, variantName, listingNumber } = parseDesignFilename(file.name);
                 const masterProduct = findProductByFilenameCode(productCode);
+                let variantLabel = `V${variantNumber}`;
+                if (listingNumber > 1) {
+                    variantLabel = `P${listingNumber}` + (variantName ? ` – ${variantName}` : '');
+                } else if (variantNumber > 1 || variantName) {
+                    variantLabel = `V${variantNumber}` + (variantName ? ` – ${variantName}` : '');
+                }
                 const tr = document.createElement('tr');
                 tr.className = 'border-b border-white/5';
                 tr.innerHTML = `
@@ -8322,7 +8367,7 @@
                     <td class="py-1.5 pr-3 text-xs font-mono text-brand-400">${productCode}</td>
                     <td class="py-1.5 pr-3 text-xs ${masterProduct ? 'text-gray-200' : 'text-red-400'}">${masterProduct ? escHtml(masterProduct.item_name) : '⚠️ No match'}</td>
                     <td class="py-1.5 pr-3 text-xs capitalize text-gray-400">${view}</td>
-                    <td class="py-1.5 text-xs text-gray-400">V${variantNumber}</td>`;
+                    <td class="py-1.5 text-xs text-gray-400">${escHtml(variantLabel)}</td>`;
                 tbody.appendChild(tr);
             });
             document.getElementById('mockup-upload-btn').disabled = false;
@@ -8341,7 +8386,7 @@
             let successCount = 0, errors = [];
 
             for (const file of files) {
-                const { productCode, variantNumber } = parseDesignFilename(file.name);
+                const { productCode, variantNumber, variantName, listingNumber } = parseDesignFilename(file.name);
                 const masterProduct = findProductByFilenameCode(productCode);
                 if (!masterProduct) { errors.push(`${file.name}: no matching product`); continue; }
 
@@ -8354,7 +8399,8 @@
 
                 const { data: existingCP } = await supabase.from('club_products')
                     .select('*').eq('club_id', currentClub.id)
-                    .eq('product_id', masterProduct.id).eq('variant_number', variantNumber).maybeSingle();
+                    .eq('product_id', masterProduct.id).eq('variant_number', variantNumber)
+                    .eq('listing_number', listingNumber).maybeSingle();
 
                 if (!existingCP) {
                     // Resolve pricing from master product's tier_prices using club's tier
@@ -8367,6 +8413,8 @@
                         product_id:     masterProduct.id,
                         custom_name:    `${currentClub.name} ${masterProduct.item_name}`,
                         variant_number: variantNumber,
+                        variant_name:   variantName || null,
+                        listing_number: listingNumber,
                         image_urls:     [publicUrl],
                         web_price:     mpTp.adult    || mpTp.one_size || masterProduct.adult_retail_price   || null,
                         partner_price: mpTp.youth                    || masterProduct.youth_retail_price    || null,
@@ -10441,10 +10489,12 @@
                 if (!mp) continue;
 
                 const imageUrls = Array.isArray(cp.image_urls) ? cp.image_urls : [];
-                // Variant suffix: V2+ products need a distinct title & handle so Shopify treats
-                // them as separate products rather than merging their rows into V1.
-                const variantSuffix = (cp.variant_number > 1) ? ` – Style ${cp.variant_number}` : '';
-                const title  = (cp.custom_name || `${club.name} ${mp.item_name}`) + variantSuffix;
+                // Title suffix: use variant_name when set (e.g. "Red", "Home"), otherwise fall back to
+                // "– Style N" for unnamed V2+ products, or nothing for V1/P1 with no name.
+                const variantLabel = cp.variant_name
+                    ? ` ${cp.variant_name}`
+                    : (cp.variant_number > 1 ? ` – Style ${cp.variant_number}` : '');
+                const title  = (cp.custom_name || `${club.name} ${mp.item_name}`) + variantLabel;
                 const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
                 // Resolve description — replace all placeholder variants
@@ -11245,7 +11295,10 @@
                 return tp.adult || (priceList === 'retail' ? mp.adult_retail_price : mp.adult_partner_price) || cp.web_price || 0;
             }
 
-            const title = cp.custom_name || `${club.name} ${mp.item_name}`;
+            const variantLabel = cp.variant_name
+                ? ` ${cp.variant_name}`
+                : (cp.variant_number > 1 ? ` – Style ${cp.variant_number}` : '');
+            const title = (cp.custom_name || `${club.name} ${mp.item_name}`) + variantLabel;
             const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
             let description = (mp.description || '')
                 .replace(/\*ADD CLUB NAME \+ RANGE\*/g, `${club.name} ${mp.range_name}`)
@@ -11292,7 +11345,7 @@
                     'Type': isFirst ? mp.category : '',
                     'Tags': isFirst ? tags : '',
                     'Published on online store': isFirst ? 'TRUE' : '',
-                    'Status': 'active', 'Collection': isFirst ? club.name : '',
+                    'Status': 'active', 'Collection': '',
                     'SKU': sku, 'Barcode': '',
                     'Option1 name': multifit ? 'Fit' : 'Size',
                     'Option1 value': multifit ? fit : size,
