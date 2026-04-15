@@ -5227,6 +5227,27 @@
                         </div>
                     </div>
 
+                    <!-- Upload type -->
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block font-semibold">Upload Type</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:rgba(59,130,246,0.06);border:1px solid rgba(59,130,246,0.25)" id="upload-type-new-label">
+                                <input type="radio" name="store-upload-type" value="new-store" id="store-upload-new" checked class="accent-brand-500" onchange="_updateUploadTypeStyles()">
+                                <div>
+                                    <p class="text-sm font-semibold text-brand-400">New Store Creation</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">Assigns products to the Shopify collection on import</p>
+                                </div>
+                            </label>
+                            <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer" style="background:#f8fafc;border:1px solid #e2e8f0" id="upload-type-add-label">
+                                <input type="radio" name="store-upload-type" value="additional" id="store-upload-additional" class="accent-brand-500" onchange="_updateUploadTypeStyles()">
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-800">Additional Products</p>
+                                    <p class="text-xs text-gray-500 mt-0.5">Leaves the Collection field blank — Shopify smart collection assigns automatically via tag</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
                     <!-- Store overview -->
                     <div id="store-preview-info" class="p-4 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                         <p class="text-xs text-gray-500 mb-2 font-medium">Store overview</p>
@@ -8512,20 +8533,42 @@
             const draftEl = document.getElementById('store-status-draft');
             if (draftEl) draftEl.checked = true;
 
+            // Default upload type to new-store
+            const newStoreEl = document.getElementById('store-upload-new');
+            if (newStoreEl) newStoreEl.checked = true;
+            _updateUploadTypeStyles();
+
             document.getElementById('create-store-modal').classList.remove('hide');
+        }
+
+        function _updateUploadTypeStyles() {
+            const isNew = document.getElementById('store-upload-new')?.checked;
+            const newLabel = document.getElementById('upload-type-new-label');
+            const addLabel = document.getElementById('upload-type-add-label');
+            if (newLabel) {
+                newLabel.style.background = isNew ? 'rgba(59,130,246,0.06)' : '#f8fafc';
+                newLabel.style.border     = isNew ? '1px solid rgba(59,130,246,0.25)' : '1px solid #e2e8f0';
+                newLabel.querySelector('p').className = `text-sm font-semibold ${isNew ? 'text-brand-400' : 'text-gray-800'}`;
+            }
+            if (addLabel) {
+                addLabel.style.background = !isNew ? 'rgba(59,130,246,0.06)' : '#f8fafc';
+                addLabel.style.border     = !isNew ? '1px solid rgba(59,130,246,0.25)' : '1px solid #e2e8f0';
+                addLabel.querySelector('p').className = `text-sm font-semibold ${!isNew ? 'text-brand-400' : 'text-gray-800'}`;
+            }
         }
 
         async function downloadClubStoreCSV() {
             document.getElementById('create-store-modal').classList.add('hide');
             const status = document.querySelector('input[name="store-import-status"]:checked')?.value || 'draft';
+            const blankCollection = document.querySelector('input[name="store-upload-type"]:checked')?.value === 'additional';
             if (_csvMode === 'selected' && selectedCpIds.size > 0) {
                 const selectedProducts = currentClubProducts.filter(cp => selectedCpIds.has(cp.id));
                 const origProds = currentClubProducts;
                 currentClubProducts = selectedProducts;
-                await generateShopifyCSVForClub(null, _selectedPriceList, status);
+                await generateShopifyCSVForClub(null, _selectedPriceList, status, blankCollection);
                 currentClubProducts = origProds;
             } else {
-                await generateShopifyCSVForClub(null, _selectedPriceList, status);
+                await generateShopifyCSVForClub(null, _selectedPriceList, status, blankCollection);
             }
         }
 
@@ -10398,7 +10441,7 @@
         // status    : 'active' | 'draft' — import status on Shopify.
         //             Defaults to 'draft' so the brand can QA before live.
         // ─────────────────────────────────────────────────────────────
-        async function generateShopifyCSVForClub(overrideClubId, priceList = 'retail', status = 'draft') {
+        async function generateShopifyCSVForClub(overrideClubId, priceList = 'retail', status = 'draft', blankCollection = false) {
             const club = overrideClubId ? clubs.find(c => c.id === overrideClubId) : currentClub;
             if (!club) { showToast('No club selected', 'error'); return; }
 
@@ -10572,7 +10615,7 @@
                         'Published on online store': isFirst ? 'TRUE' : '',
                         'Status':                 isFirst ? status : '',
                         'Template suffix':        isFirst ? templateSuffix : '',
-                        'Collection':             isFirst ? club.name : '',
+                        'Collection':             (!blankCollection && isFirst) ? club.name : '',
                         'SKU':                    sku,
                         'Barcode':                '',
                         'Option1 name':           multifit ? 'Fit'  : 'Size',
