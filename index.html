@@ -5193,15 +5193,15 @@
              MODAL: Create Club Store (price list selector)
              ============================================================ -->
         <div id="create-store-modal" class="fixed inset-0 bg-black/85 z-50 flex items-center justify-center hide">
-            <div class="glass rounded-2xl w-full max-w-lg mx-4">
-                <div class="flex justify-between items-center p-6 border-b border-white/5">
+            <div class="glass rounded-2xl w-full max-w-lg mx-4 flex flex-col" style="max-height:90vh">
+                <div class="flex justify-between items-center p-6 border-b border-white/5 flex-shrink-0">
                     <div>
                         <h3 class="text-xl font-bold">Create Club Store via CSV</h3>
                         <p class="text-gray-500 text-xs mt-0.5">Generates a Shopify-ready product import file</p>
                     </div>
                     <button onclick="document.getElementById('create-store-modal').classList.add('hide')" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
-                <div class="p-6 space-y-5">
+                <div class="p-6 space-y-5 overflow-y-auto flex-1">
 
                     <!-- Pricing tier -->
                     <div>
@@ -5262,13 +5262,13 @@
                         </div>
                     </div>
 
-                    <div class="flex gap-3">
-                        <button onclick="document.getElementById('create-store-modal').classList.add('hide')" class="flex-1 btn-secondary py-3">Cancel</button>
-                        <button onclick="downloadClubStoreCSV()" class="flex-1 btn-primary py-3 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                            Download CSV
-                        </button>
-                    </div>
+                </div>
+                <div class="px-6 pb-6 pt-4 flex gap-3 flex-shrink-0 border-t border-white/5">
+                    <button onclick="document.getElementById('create-store-modal').classList.add('hide')" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="downloadClubStoreCSV()" class="flex-1 btn-primary py-3 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        Download CSV
+                    </button>
                 </div>
             </div>
         </div>
