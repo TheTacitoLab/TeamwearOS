@@ -21756,11 +21756,14 @@
                         </div>
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
-                        <div id="dtr-stages-inner" class="dtr-stages-inner">
+                        <div id="dtr-stages-inner" class="dtr-stages-inner" style="height:100%;overflow-y:auto">
                             ${buildDTRDesignUploadsSection(stage2, conceptUploads)}
                         </div>
-                        <!-- Activity feed below Design Uploads -->
-                        <div id="dtr-activity-inner" style="margin-top:14px;display:flex;flex-direction:column;background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden;max-height:280px">
+                    </div>
+                    <div class="dtr-activity-col" id="dtr-activity-col" style="display:flex;flex-direction:column;gap:14px;overflow-y:auto">
+                        ${buildDTRFactoryHandoverCol(task, stage5)}
+                        <!-- Activity feed -->
+                        <div id="dtr-activity-inner" style="display:flex;flex-direction:column;background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden;flex:1;min-height:200px">
                             <div class="dtr-activity-header" style="flex-shrink:0">
                                 <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
                                     <h4 style="font-size:13px">Activity</h4>
@@ -21788,9 +21791,6 @@
                                 <button onclick="addDesignTaskActivity()" class="dtr-composer-post-btn">Post</button>
                             </div>
                         </div>
-                    </div>
-                    <div class="dtr-activity-col" id="dtr-activity-col">
-                        ${buildDTRFactoryHandoverCol(task, stage5)}
                     </div>
                 </div>`;
 
@@ -21859,7 +21859,7 @@
 
         const _DTR_FR_ITEMS = [
             { key: 'web_images',          label: 'Web Images' },
-            { key: 'tech_packs',          label: 'Tech Packs' },
+            { key: 'tech_packs',          label: 'New Design Tech Pack' },
             { key: 'pattern_artwork',     label: 'Pattern Artwork & Pantones' },
             { key: 'logo_files',          label: 'Logo Files', subs: [
                 { key: 'logo_files_sponsor',     label: 'Sponsor' },
@@ -22375,8 +22375,7 @@
                         : `<div class="dtr-cimg-nothumb" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">${isPdf ? '📄' : '📁'}</div>`;
                     const actionBtns = isApproved ? '' : `
                         <button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickConceptImg('${u.id}','${stageId}',0)" title="Approve">✓</button>
-                        <button class="dtr-x-btn${u.status==='declined'?' declined':''}" onclick="dtrXConceptImg('${u.id}','${stageId}',0)" title="Decline">✕</button>
-                        <button class="dtr-archive-btn" onclick="dtrArchiveConceptImg('${u.id}','${stageId}',0)" title="Archive">⊗</button>`;
+                        <button class="dtr-archive-btn" onclick="dtrArchiveConceptImg('${u.id}','${stageId}',0)" title="Delete">⊗</button>`;
                     return `<div class="dtr-cimg-card${cls}" id="dtr-cimg-${u.id}" style="position:relative">
                         <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
                         ${thumb}
@@ -22398,7 +22397,7 @@
             }).join('');
 
             const gridHtml = hasUploads
-                ? `<div id="dtr-design-uploads-images">${batchesHtml}</div>`
+                ? `<div id="dtr-design-uploads-images" style="overflow-y:auto;flex:1;padding-bottom:4px">${batchesHtml}</div>`
                 : `<p style="font-size:11px;color:#94a3b8;margin:0 0 10px;padding:4px 0">No uploads yet. Drop files below to get started.</p>`;
 
             const uploadZone = isApproved ? '' : `
@@ -22461,14 +22460,13 @@
                     </div>
                 </div>`;
 
-            return `<div class="dtr-stage-section${isRevisions ? ' stage-active stage-revisions' : isApproved ? ' stage-approved' : ' stage-active'}" id="dtr-stage-2">
-                <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
+            return `<div class="dtr-stage-section${isRevisions ? ' stage-active stage-revisions' : isApproved ? ' stage-approved' : ' stage-active'}" id="dtr-stage-2" style="display:flex;flex-direction:column;height:100%;min-height:0">
+                <div class="dtr-stage-hdr" style="flex-shrink:0;cursor:default">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '↑'}</div>
                     <span class="dtr-stage-title">Design Uploads</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
-                    <svg class="dtr-stage-chevron" id="dtr-stage-chev-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                </button>
-                <div class="dtr-stage-body" id="dtr-stage-body-2">
+                </div>
+                <div class="dtr-stage-body" id="dtr-stage-body-2" style="display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden">
                     ${gridHtml}
                     ${uploadZone}
                     ${actionBar}
@@ -22485,19 +22483,30 @@
             const driveUrl = savedDriveUrl || jobDriveUrl;
             const isCompleted = task?.status === 'completed';
 
-            const frItemsHtml = _DTR_FR_ITEMS.map(item => `
-                <label style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;cursor:pointer;font-size:12px;font-weight:500;color:#374151">
-                    <input type="checkbox" id="fhcol-fr-${item.key}" ${fr[item.key]?'checked':''} onchange="dtrSaveFactoryReqFromCol()" style="margin-top:2px;accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0">
-                    ${escHtml(item.label)}
-                </label>
-                ${item.subs ? `<div id="fhcol-fr-subs-${item.key}" style="margin-left:22px;${fr[item.key]?'':'opacity:0.4;pointer-events:none'}">
-                    ${item.subs.map(sub => `
-                        <label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;font-size:11px;color:#475569">
-                            <input type="checkbox" id="fhcol-fr-${sub.key}" ${fr[sub.key]?'checked':''} onchange="dtrSaveFactoryReqFromCol()" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0">
-                            ${escHtml(sub.label)}
-                        </label>`).join('')}
-                </div>` : ''}
-            `).join('');
+            // Build flat list of all selectable items (including subs)
+            const _frAllOpts = [];
+            _DTR_FR_ITEMS.forEach(item => {
+                _frAllOpts.push({ key: item.key, label: item.label, indent: false });
+                if (item.subs) item.subs.forEach(sub => _frAllOpts.push({ key: sub.key, label: sub.label, indent: true }));
+            });
+            const frDropdownOpts = _frAllOpts.map(opt =>
+                `<label style="display:flex;align-items:center;gap:8px;padding:5px ${opt.indent?'22px':'10px'} 5px 10px;cursor:pointer;font-size:12px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    <input type="checkbox" id="fhcol-fr-${opt.key}" ${fr[opt.key]?'checked':''} onchange="dtrFRDropdownChange()" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0">
+                    <span style="overflow:hidden;text-overflow:ellipsis">${opt.indent ? '↳ ' : ''}${escHtml(opt.label)}</span>
+                </label>`
+            ).join('');
+            const frBulletList = _frAllOpts.filter(opt => fr[opt.key]).map(opt =>
+                `<li style="font-size:11px;color:#374151;padding:1px 0">${opt.indent ? '↳ ' : ''}${escHtml(opt.label)}</li>`
+            ).join('');
+            const frItemsHtml = `
+                <details id="fhcol-fr-details" style="border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;overflow:hidden">
+                    <summary style="padding:7px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#374151;list-style:none;display:flex;align-items:center;justify-content:space-between;outline:none">
+                        <span>Select requirements</span>
+                        <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div style="border-top:1px solid #f1f5f9;display:flex;flex-direction:column;gap:0">${frDropdownOpts}</div>
+                </details>
+                <ul id="fhcol-fr-list" style="margin:8px 0 0;padding:0 0 0 14px;list-style:disc;${frBulletList?'':'display:none'}">${frBulletList}</ul>`;
 
             const driveSection = driveUrl
                 ? `<a href="${escHtml(driveUrl)}" target="_blank" rel="noopener"
@@ -22535,7 +22544,7 @@
                 </div>
                 <div style="padding:14px 16px;overflow-y:auto;flex:1">
                     ${driveSection}
-                    <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:6px;border-top:1px solid #f1f5f9;padding-top:12px">Upload Requirements</div>
+                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px;border-top:1px solid #f1f5f9;padding-top:12px">Factory Requirements</div>
                     ${frItemsHtml}
                     ${completeBtn}
                 </div>
@@ -22838,17 +22847,29 @@
             await renderNewDTRLayout();
         }
 
+        function dtrFRDropdownChange() {
+            // Rebuild bullet list from current checkbox state
+            const list = document.getElementById('fhcol-fr-list');
+            if (!list) return;
+            const allOpts = [];
+            _DTR_FR_ITEMS.forEach(item => {
+                allOpts.push({ key: item.key, label: item.label, indent: false });
+                if (item.subs) item.subs.forEach(sub => allOpts.push({ key: sub.key, label: sub.label, indent: true }));
+            });
+            const selected = allOpts.filter(opt => document.getElementById(`fhcol-fr-${opt.key}`)?.checked);
+            list.style.display = selected.length ? '' : 'none';
+            list.innerHTML = selected.map(opt =>
+                `<li style="font-size:11px;color:#374151;padding:1px 0">${opt.indent ? '↳ ' : ''}${escHtml(opt.label)}</li>`
+            ).join('');
+            dtrSaveFactoryReqFromCol();
+        }
+
         async function dtrSaveFactoryReqFromCol() {
             if (!currentDesignTaskRecord?.id) return;
             const fr = {};
             _DTR_FR_ITEMS.forEach(item => {
                 fr[item.key] = document.getElementById(`fhcol-fr-${item.key}`)?.checked || false;
-                const subsEl = document.getElementById(`fhcol-fr-subs-${item.key}`);
-                if (item.subs) {
-                    item.subs.forEach(sub => { fr[sub.key] = document.getElementById(`fhcol-fr-${sub.key}`)?.checked || false; });
-                    if (subsEl) subsEl.style.opacity = fr[item.key] ? '1' : '0.4';
-                    if (subsEl) subsEl.style.pointerEvents = fr[item.key] ? '' : 'none';
-                }
+                if (item.subs) item.subs.forEach(sub => { fr[sub.key] = document.getElementById(`fhcol-fr-${sub.key}`)?.checked || false; });
             });
             await supabase.from('design_tasks').update({ factory_requirements: fr }).eq('id', currentDesignTaskRecord.id);
             if (currentDesignTaskRecord) currentDesignTaskRecord.factory_requirements = fr;
@@ -23396,23 +23417,7 @@
         function _renderStagesInner(s2, s3, s4, s5) {
             const stagesInner = document.getElementById('dtr-stages-inner');
             if (!stagesInner) return;
-            // Preserve open/closed state of stage accordion bodies before rebuilding
-            const openState = {};
-            [2, 3, 4, 5].forEach(n => {
-                const b = document.getElementById(`dtr-stage-body-${n}`);
-                if (b) openState[n] = b.style.display !== 'none';
-            });
-            stagesInner.innerHTML = buildDTRStagesColumn(s2, s3, s4, s5, _dtrConceptUploads, _dtrRangeUploads, _dtrFinaliseUploads);
-            // Restore open/closed state after rebuild (skip for newly-approved stages — let them collapse)
-            const stageObjs = { 2: s2, 3: s3, 4: s4, 5: s5 };
-            [2, 3, 4, 5].forEach(n => {
-                if (openState[n] === undefined) return; // wasn't rendered before, leave default
-                if (stageObjs[n]?.status === 'approved') return; // always collapse completed stages
-                const b = document.getElementById(`dtr-stage-body-${n}`);
-                const c = document.getElementById(`dtr-stage-chev-${n}`);
-                if (b) b.style.display = openState[n] ? '' : 'none';
-                if (c) c.classList.toggle('closed', !openState[n]);
-            });
+            stagesInner.innerHTML = buildDTRDesignUploadsSection(_dtrConceptStage || s2, _dtrConceptUploads);
         }
 
         // ── Stage 3 / 4 upload actions ────────────────────────────────────────
