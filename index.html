@@ -5353,23 +5353,10 @@
                             </div>
                         </div>
 
-                        <!-- Team + Order Type -->
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-                            <div>
-                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Team</label>
-                                <input type="text" id="cdt-team" placeholder="e.g. 1st Team, U18s" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'">
-                            </div>
-                            <div>
-                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Order Type</label>
-                                <select id="cdt-order-type" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
-                                    <option value="">— Select —</option>
-                                    <option value="match_kit">Match Kit</option>
-                                    <option value="training_range">Training Range</option>
-                                    <option value="travel_range">Travel Range</option>
-                                    <option value="leisurewear">Leisurewear</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
+                        <!-- Team -->
+                        <div>
+                            <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Team</label>
+                            <input type="text" id="cdt-team" placeholder="e.g. 1st Team, U18s" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'">
                         </div>
 
                         <!-- Season + Sport -->
@@ -5400,7 +5387,7 @@
                             </div>
                         </div>
 
-                        <!-- Designer + Job Type -->
+                        <!-- Designer + Owner -->
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                             <div>
                                 <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Assigned Designer</label>
@@ -5409,16 +5396,8 @@
                                 </select>
                             </div>
                             <div>
-                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Job Type</label>
-                                <select id="cdt-job-type" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;box-sizing:border-box">
-                                    <option value="">— Select Type —</option>
-                                    <option value="new_club_full_range">New Club Full Range</option>
-                                    <option value="sales_order_new_design">Sales Order New Design</option>
-                                    <option value="team_sponsor_change">Team Sponsor Change</option>
-                                    <option value="one_off">One Off</option>
-                                    <option value="special_edition">Special Edition</option>
-                                    <option value="internal_task">Internal Task</option>
-                                </select>
+                                <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Owner(s)</label>
+                                <div class="owner-dp" id="owner-dp-cdt"></div>
                             </div>
                         </div>
 
@@ -5457,43 +5436,10 @@
                             </div>
                         </div>
 
-                        <!-- Key Notes -->
+                        <!-- Task Details -->
                         <div>
-                            <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Key Notes / Constraints</label>
-                            <textarea id="cdt-key-notes" placeholder="e.g. Must include sponsor logo zone on chest, no white in the design" rows="2" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-                        </div>
-
-                        <!-- Factory Requirements -->
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:8px">Factory Requirements</div>
-                            <div style="border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;background:#fafbfc">
-                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
-                                    <input type="checkbox" id="cdt-fr-web_images" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Web Images
-                                </label>
-                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
-                                    <input type="checkbox" id="cdt-fr-tech_packs" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Tech Packs
-                                </label>
-                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
-                                    <input type="checkbox" id="cdt-fr-pattern_artwork" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Pattern Artwork & Pantones
-                                </label>
-                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0" id="cdt-fr-logo-label">
-                                    <input type="checkbox" id="cdt-fr-logo_files" onchange="document.getElementById('cdt-fr-logo-subs').style.display=this.checked?'flex':'none'" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Logo Files
-                                </label>
-                                <div id="cdt-fr-logo-subs" style="display:none;margin-left:22px;flex-direction:column;gap:1px">
-                                    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:#475569;padding:2px 0">
-                                        <input type="checkbox" id="cdt-fr-logo_files_sponsor" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0"> Sponsor
-                                    </label>
-                                    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:11px;color:#475569;padding:2px 0">
-                                        <input type="checkbox" id="cdt-fr-logo_files_team_crest" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0"> Team Crest
-                                    </label>
-                                </div>
-                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
-                                    <input type="checkbox" id="cdt-fr-font_files" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Font Files
-                                </label>
-                                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;font-weight:500;color:#374151;padding:3px 0">
-                                    <input type="checkbox" id="cdt-fr-factory_mockup" style="accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0"> Factory Mock-up / Sketch
-                                </label>
-                            </div>
+                            <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Task Details</label>
+                            <textarea id="cdt-key-notes" placeholder="Free text notes about this task…" rows="2" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
                         </div>
 
                         <!-- Products Required -->
@@ -18673,9 +18619,9 @@
             'Artwork Setup', 'Mockup Creation'
         ];
         const DS_STATUS_LABELS = {
-            new:'New', in_progress:'In Progress', revisions:'Revisions',
-            in_review:'In Review', awaiting_approval:'Awaiting Approval',
-            delivered:'Delivered', completed:'Completed'
+            new:'Not Started', in_progress:'In Progress', revisions:'Revisions',
+            in_review:'In Review', factory_handover:'Factory Handover',
+            awaiting_approval:'Awaiting Approval', delivered:'Delivered', completed:'Completed'
         };
 
         // ── Load & Render Design Studio ──────────────────────────────────────
@@ -18877,16 +18823,12 @@
             try {
                 await loadBrandUsers();
                 // Reset all fields
-                ['cdt-name','cdt-team','cdt-season-event','cdt-sport'].forEach(id => {
+                ['cdt-name','cdt-team','cdt-season-event','cdt-sport','cdt-design-brief','cdt-key-notes'].forEach(id => {
                     const el = document.getElementById(id); if (el) el.value = '';
                 });
-                ['cdt-design-brief','cdt-key-notes'].forEach(id => {
-                    const el = document.getElementById(id); if (el) el.value = '';
-                });
-                document.getElementById('cdt-due-date').value = '';
-                document.getElementById('cdt-order-type').value = '';
-                document.getElementById('cdt-priority').value = 'standard';
-                document.getElementById('cdt-job-type').value = '';
+                const cdtDueDate = document.getElementById('cdt-due-date'); if (cdtDueDate) cdtDueDate.value = '';
+                const cdtPriority = document.getElementById('cdt-priority'); if (cdtPriority) cdtPriority.value = 'standard';
+                renderOwnerDropdown('cdt', []);
                 // Reset colour pickers
                 _cdtColours = { primary:{hex:'',pantone:''}, secondary:{hex:'',pantone:''}, accent:{hex:'',pantone:''} };
                 ['primary','secondary','accent'].forEach(k => {
@@ -19156,8 +19098,6 @@
                 const ref = await generateDesignRef();
 
                 const clubId    = document.getElementById('cdt-club-id')?.value || null;
-                const dueDate   = document.getElementById('cdt-due-date')?.value || null;
-                const jobType   = document.getElementById('cdt-job-type')?.value || null;
                 const linkedJobId = document.getElementById('cdt-job-id')?.value || document.getElementById('cdt-linked-job-id')?.value || null;
                 const dsnSel    = document.getElementById('cdt-designer-id');
                 const designerId   = dsnSel?.value || null;
@@ -19193,29 +19133,18 @@
                     task_name: name,
                     task_ref:  ref,
                     club_id:   clubId || null,
-                    due_date:  dueDate || null,
-                    job_type:  jobType || null,
+                    due_date:  document.getElementById('cdt-due-date')?.value || null,
                     job_id:    linkedJobId || null,
                     assigned_designer_id:   designerId || null,
                     assigned_designer_name: designerName || null,
+                    owner_ids: getOwnerDropdownIds('cdt'),
                     status: 'new',
                     design_types: [],
                     team:         document.getElementById('cdt-team')?.value?.trim() || null,
-                    order_type:   document.getElementById('cdt-order-type')?.value || null,
                     season_event: document.getElementById('cdt-season-event')?.value?.trim() || null,
                     sport:        document.getElementById('cdt-sport')?.value?.trim() || null,
                     priority:     document.getElementById('cdt-priority')?.value || 'standard',
                     design_brief: document.getElementById('cdt-design-brief')?.value?.trim() || null,
-                    factory_requirements: {
-                        web_images:            !!(document.getElementById('cdt-fr-web_images')?.checked),
-                        tech_packs:            !!(document.getElementById('cdt-fr-tech_packs')?.checked),
-                        pattern_artwork:       !!(document.getElementById('cdt-fr-pattern_artwork')?.checked),
-                        logo_files:            !!(document.getElementById('cdt-fr-logo_files')?.checked),
-                        logo_files_sponsor:    !!(document.getElementById('cdt-fr-logo_files_sponsor')?.checked),
-                        logo_files_team_crest: !!(document.getElementById('cdt-fr-logo_files_team_crest')?.checked),
-                        font_files:            !!(document.getElementById('cdt-fr-font_files')?.checked),
-                        factory_mockup:        !!(document.getElementById('cdt-fr-factory_mockup')?.checked),
-                    },
                     custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
                     key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
                     products_required: productsRequired,
@@ -20121,30 +20050,35 @@
                 unreadByTask[f.task_id] = (unreadByTask[f.task_id] || 0) + 1;
             });
 
-            const stageGroups = [
-                { key: 'presentation', label: 'Concepts', color: '#6366f1' },
-                { key: 'range',        label: 'Range',        color: '#2563eb' },
-                { key: 'finalise',     label: 'Finalise',     color: '#0891b2' },
+            // Two status groups: In Progress (not started/active/revisions/handover) and In Review
+            const statusGroups = [
+                {
+                    key: 'in_progress',
+                    label: 'In Progress',
+                    color: '#2563eb',
+                    match: t => ['new','in_progress','revisions','factory_handover'].includes(t.status)
+                },
+                {
+                    key: 'in_review',
+                    label: 'In Review',
+                    color: '#b45309',
+                    match: t => t.status === 'in_review'
+                },
             ];
 
             const panel = document.getElementById('ds-task-list-panel');
             if (panel) {
-                const _tabDefs = [['all','All'],['presentation','Concepts'],['range','Range'],['finalise','Finalise']];
                 const collapseBar = `<div style="display:flex;align-items:center;gap:3px;padding:6px 8px;position:sticky;top:0;background:#f8fafc;z-index:6;border-bottom:1px solid #e8ecf0">
-                    ${_tabDefs.map(([key,lbl]) => {
-                        const active = _dsActiveStageTab === key;
-                        return `<button onclick="switchDSStageTab('${key}')" style="padding:3px 7px;border-radius:5px;font-size:10px;font-weight:${active?'700':'500'};border:none;cursor:pointer;background:${active?'#fff':'transparent'};color:${active?'#1d4ed8':'#64748b'};${active?'box-shadow:0 1px 3px rgba(0,0,0,0.1);':''}white-space:nowrap;transition:all 0.12s;flex-shrink:0">${lbl}</button>`;
-                    }).join('')}
+                    <span style="font-size:11px;font-weight:600;color:#64748b;padding:3px 7px">Active Tasks</span>
                     <button class="ds-list-collapse-btn" onclick="toggleDSTaskList()" title="Collapse task list" style="width:22px;height:22px;margin-left:auto;flex-shrink:0">
                         <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
                     </button>
                 </div>`;
                 if (filtered.length === 0) {
                     panel.innerHTML = collapseBar + `<div class="ds-preview-empty" style="padding:40px 20px;text-align:center"><p style="font-size:13px;font-weight:600;color:#94a3b8">No tasks match your filters</p><p style="font-size:11px;color:#b0b8c4;margin-top:4px">Try clearing the search or filters</p></div>`;
-                } else if (_dsActiveStageTab === 'all') {
-                    // Grouped by stage when on All tab
-                    panel.innerHTML = collapseBar + stageGroups.map(({ key, label, color }) => {
-                        const tasks = filtered.filter(t => getDSTaskStageGroup(t) === key);
+                } else {
+                    panel.innerHTML = collapseBar + statusGroups.map(({ label, color, match }) => {
+                        const tasks = filtered.filter(match);
                         if (tasks.length === 0) return '';
                         return `<div class="ds-group">
                             <div class="ds-group-header">
@@ -20155,17 +20089,6 @@
                             ${tasks.map(t => _renderDSTaskRow(t, unreadByTask[t.id] || 0, getDSTaskStatusLabel(t))).join('')}
                         </div>`;
                     }).join('');
-                } else {
-                    // Single group for specific stage tab
-                    const { label, color } = stageGroups.find(g => g.key === _dsActiveStageTab) || { label: 'Tasks', color: '#64748b' };
-                    panel.innerHTML = collapseBar + `<div class="ds-group">
-                        <div class="ds-group-header">
-                            <span style="width:7px;height:7px;border-radius:50%;background:${color};flex-shrink:0;display:inline-block"></span>
-                            <span class="ds-group-label" style="color:${color}">${label}</span>
-                            <span class="ds-group-count">${filtered.length}</span>
-                        </div>
-                        ${filtered.map(t => _renderDSTaskRow(t, unreadByTask[t.id] || 0, getDSTaskStatusLabel(t))).join('')}
-                    </div>`;
                 }
             }
 
@@ -20199,10 +20122,11 @@
 
             // Badge logic — always show a status; 'new' tasks show a clickable Start badge
             let badgeHtml = '';
-            if (statusLabel === 'revisions')        badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
-            else if (statusLabel === 'in_review')   badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
-            else if (statusLabel === 'new')         badgeHtml = `<span class="ds-row-badge new" onclick="event.stopPropagation();startDesignTask('${task.id}')" style="cursor:pointer;border-color:#6366f1;color:#6366f1;background:#eef2ff">▶ Start</span>`;
-            else if (statusLabel === 'in_progress') badgeHtml = `<span class="ds-row-badge in_progress">In Progress</span>`;
+            if (statusLabel === 'revisions')           badgeHtml = `<span class="ds-row-badge revisions">Revisions</span>`;
+            else if (statusLabel === 'in_review')      badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
+            else if (statusLabel === 'factory_handover') badgeHtml = `<span class="ds-row-badge" style="border-color:#0891b2;color:#0e7490;background:#ecfeff">Factory Handover</span>`;
+            else if (statusLabel === 'new')            badgeHtml = `<span class="ds-row-badge new" onclick="event.stopPropagation();startDesignTask('${task.id}')" style="cursor:pointer;border-color:#6366f1;color:#6366f1;background:#eef2ff">▶ Start</span>`;
+            else if (statusLabel === 'in_progress')    badgeHtml = `<span class="ds-row-badge in_progress">In Progress</span>`;
 
             const dName = task.designers?.full_name || task._designerName || '';
             const initials = dName ? dName.split(' ').map(w => w[0]||'').join('').substring(0,2).toUpperCase() : '';
@@ -20262,12 +20186,7 @@
         }
 
         function getDSTaskStatusLabel(task) {
-            if (task.status === 'new') return 'new';
-            const stages = task._stages || [];
-            if (stages.some(s => s.status === 'revisions_required')) return 'revisions';
-            const activeStage = stages.find(s => ['in_progress','in_review'].includes(s.status));
-            if (!activeStage) return 'in_progress';
-            return activeStage.status;
+            return task.status || 'new';
         }
 
         function toggleDSTaskList() {
@@ -20723,7 +20642,7 @@
                 const { error: se } = await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', conceptsStage.id);
                 if (!se) conceptsStage.status = 'in_progress';
             }
-            showToast('Task started — Concepts stage now active');
+            showToast('Task started — Design Uploads now active');
             _dsSelectedTaskId = taskId;
             renderDSDashboard();
             loadTaskInPreview(taskId);
@@ -21838,30 +21757,28 @@
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
                         <div id="dtr-stages-inner" class="dtr-stages-inner">
-                            ${buildDTRStagesColumn(stage2, stage3, stage4, stage5, conceptUploads, rangeUploads, finaliseUploads)}
+                            ${buildDTRDesignUploadsSection(stage2, conceptUploads)}
                         </div>
-                    </div>
-                    <div class="dtr-activity-col" id="dtr-activity-col">
-                        <div id="dtr-activity-inner" style="display:flex;flex-direction:column;background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden">
-                            <div class="dtr-activity-header">
+                        <!-- Activity feed below Design Uploads -->
+                        <div id="dtr-activity-inner" style="margin-top:14px;display:flex;flex-direction:column;background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden;max-height:280px">
+                            <div class="dtr-activity-header" style="flex-shrink:0">
                                 <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
-                                    <h4>Activity</h4>
+                                    <h4 style="font-size:13px">Activity</h4>
                                     <select id="dtr-act-filter-select" onchange="filterDTRActivity(null,this.value)" style="font-size:11px;font-weight:600;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:3px 8px;background:#f8fafc;cursor:pointer;outline:none">
                                         <option value="all">All Active</option>
                                         <option value="comment">Comments</option>
                                         <option value="sub_task">Sub-Tasks</option>
                                         <option value="revision_request">Revisions</option>
                                         <option value="history">History</option>
-                                        <option value="feed">Feed</option>
                                     </select>
                                 </div>
                             </div>
-                            <div class="dtr-activity-inner">
+                            <div class="dtr-activity-inner" style="overflow-y:auto;flex:1">
                                 <div id="dt-act-list">
                                     <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
                                 </div>
                             </div>
-                            <div class="dtr-activity-composer">
+                            <div class="dtr-activity-composer" style="flex-shrink:0">
                                 <div class="dtr-composer-tabs">
                                     <button id="dt-act-comment-btn" onclick="setDTInputType('comment')" class="act-tab-btn active">+ Comment</button>
                                     <button id="dt-act-task-btn" onclick="setDTInputType('sub_task')" class="act-tab-btn task-tab">+ Sub-Task</button>
@@ -21871,6 +21788,9 @@
                                 <button onclick="addDesignTaskActivity()" class="dtr-composer-post-btn">Post</button>
                             </div>
                         </div>
+                    </div>
+                    <div class="dtr-activity-col" id="dtr-activity-col">
+                        ${buildDTRFactoryHandoverCol(task, stage5)}
                     </div>
                 </div>`;
 
@@ -22049,6 +21969,12 @@
                     </div>` : ''}
                 `).join('');
 
+                const statusOpts = [
+                    ['new','Not Started'],['in_progress','In Progress'],['in_review','In Review'],
+                    ['revisions','Revisions'],['factory_handover','Factory Handover'],
+                    ['awaiting_approval','Awaiting Approval'],['delivered','Delivered'],['completed','Completed'],
+                ].map(([v,l]) => `<option value="${v}"${(task.status||'new')===v?' selected':''}>${l}</option>`).join('');
+
                 return `
                     <!-- Club identity header -->
                     <div class="dtr-brief-summary">
@@ -22062,77 +21988,49 @@
                         <button onclick="toggleDTREditMode()" class="dt-edit-btn active" style="font-size:10px;padding:3px 9px;flex-shrink:0">Done</button>
                     </div>
 
-                    <!-- § Job Details (collapsible) -->
+                    <!-- § Status -->
                     <div class="dtr-brief-section">
-                        ${_collapseSectionTitle('Job Details','dtr-job-details-body')}
-                        <div id="dtr-job-details-body" style="${_dtrJobDetailsOpen?'':'display:none'}">
-                            <!-- Hidden fields still needed for saveDTRLeftPanel -->
-                            <input type="hidden" id="dtr-ln-task-name" value="${escHtml(task.task_name||'')}">
-                            <input type="hidden" id="dtr-ln-sport" value="${escHtml(task.sport||'')}">
-                            <input type="hidden" id="dtr-ln-priority" value="${task.priority||'standard'}">
-                            <!-- Club + Linked Job -->
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-                                <div class="dtr-edit-row" style="margin-bottom:0">
-                                    <label class="dtr-edit-label" for="dtr-ln-club">Club</label>
-                                    <select class="dtr-edit-field" id="dtr-ln-club" onchange="dtrEditClubChanged()">
-                                        <option value="">— No Club —</option>
-                                        ${(clubs||[]).map(c => `<option value="${c.id}"${task.club_id===c.id?' selected':''}>${escHtml(c.name)}</option>`).join('')}
-                                    </select>
-                                </div>
-                                <div class="dtr-edit-row" style="margin-bottom:0">
-                                    <label class="dtr-edit-label" for="dtr-ln-job">Linked Job</label>
-                                    <select class="dtr-edit-field" id="dtr-ln-job">
-                                        <option value="">— No Job —</option>
-                                        ${(jobs||[]).filter(j => !task.club_id || j.club_id === task.club_id).map(j => `<option value="${j.id}"${task.job_id===j.id?' selected':''}>${escHtml(j.job_name||j.job_number||'Job')}</option>`).join('')}
-                                    </select>
-                                </div>
+                        <div class="dtr-edit-row" style="margin-bottom:0;flex-direction:column;gap:3px">
+                            <label class="dtr-edit-label" for="dtr-ln-status" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#64748b">Status</label>
+                            <select class="dtr-edit-field" id="dtr-ln-status" style="font-weight:600;font-size:12px">${statusOpts}</select>
+                        </div>
+                    </div>
+
+                    <!-- § Club + Linked Job -->
+                    <div class="dtr-brief-section">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                            <div class="dtr-edit-row" style="margin-bottom:0">
+                                <label class="dtr-edit-label" for="dtr-ln-club">Club</label>
+                                <select class="dtr-edit-field" id="dtr-ln-club" onchange="dtrEditClubChanged()">
+                                    <option value="">— No Club —</option>
+                                    ${(clubs||[]).map(c => `<option value="${c.id}"${task.club_id===c.id?' selected':''}>${escHtml(c.name)}</option>`).join('')}
+                                </select>
                             </div>
-                            <!-- Deadline + Order Type -->
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-                                <div class="dtr-edit-row" style="margin-bottom:0">
-                                    <label class="dtr-edit-label" for="dtr-ln-due-date">Deadline</label>
-                                    <input class="dtr-edit-field" id="dtr-ln-due-date" type="date" value="${task.due_date ? task.due_date.substring(0,10) : ''}">
-                                </div>
-                                <div class="dtr-edit-row" style="margin-bottom:0">
-                                    <label class="dtr-edit-label" for="dtr-ln-order-type">Order Type</label>
-                                    <select class="dtr-edit-field" id="dtr-ln-order-type">
-                                        <option value="">— Select —</option>
-                                        <option value="match_kit"${task.order_type==='match_kit'?' selected':''}>Match Kit</option>
-                                        <option value="training_range"${task.order_type==='training_range'?' selected':''}>Training Range</option>
-                                        <option value="travel_range"${task.order_type==='travel_range'?' selected':''}>Travel Range</option>
-                                        <option value="leisurewear"${task.order_type==='leisurewear'?' selected':''}>Leisurewear</option>
-                                        <option value="other"${task.order_type==='other'?' selected':''}>Other</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <!-- Task Type + Designer -->
-                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-                                <div class="dtr-edit-row" style="margin-bottom:0">
-                                    <label class="dtr-edit-label" for="dtr-ln-job-type">Task Type</label>
-                                    <select class="dtr-edit-field" id="dtr-ln-job-type">
-                                        <option value="">— Select —</option>
-                                        <option value="new_club_full_range"${task.job_type==='new_club_full_range'?' selected':''}>New Club Full Range</option>
-                                        <option value="sales_order_new_design"${task.job_type==='sales_order_new_design'?' selected':''}>Sales Order New Design</option>
-                                        <option value="team_sponsor_change"${task.job_type==='team_sponsor_change'?' selected':''}>Team Sponsor Change</option>
-                                        <option value="one_off"${task.job_type==='one_off'?' selected':''}>One Off</option>
-                                        <option value="special_edition"${task.job_type==='special_edition'?' selected':''}>Special Edition</option>
-                                        <option value="internal_task"${task.job_type==='internal_task'?' selected':''}>Internal Task</option>
-                                    </select>
-                                </div>
-                                <div class="dtr-edit-row" style="margin-bottom:0">
-                                    <label class="dtr-edit-label" for="dtr-ln-designer">Designer</label>
-                                    <select class="dtr-edit-field" id="dtr-ln-designer">${designerOpts}</select>
-                                </div>
-                            </div>
-                            <!-- Owner — full width -->
-                            <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0;flex-direction:column;gap:2px">
-                                <label class="dtr-edit-label">Owner(s)</label>
-                                <div><div class="owner-dp" id="owner-dp-design-task"></div></div>
+                            <div class="dtr-edit-row" style="margin-bottom:0">
+                                <label class="dtr-edit-label" for="dtr-ln-job">Linked Job</label>
+                                <select class="dtr-edit-field" id="dtr-ln-job">
+                                    <option value="">— No Job —</option>
+                                    ${(jobs||[]).filter(j => !task.club_id || j.club_id === task.club_id).map(j => `<option value="${j.id}"${task.job_id===j.id?' selected':''}>${escHtml(j.job_name||j.job_number||'Job')}</option>`).join('')}
+                                </select>
                             </div>
                         </div>
                     </div>
 
-                    <!-- § Products Required (edit) -->
+                    <!-- § Task Details -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Task Details</div>
+                        <div class="dtr-edit-row" style="margin-bottom:0">
+                            <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Free text notes about this task…" style="min-height:80px">${escHtml(task.key_notes||'')}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- § Owner(s) -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title">Owner(s)</div>
+                        <div class="owner-dp" id="owner-dp-design-task"></div>
+                    </div>
+
+                    <!-- § Products Required -->
                     <div class="dtr-brief-section">
                         <div class="dtr-brief-section-title">Products Required <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:9px">(click to toggle)</span></div>
                         <div class="dtr-source-toggle">
@@ -22144,63 +22042,11 @@
                     </div>
 
                     <!-- § Design Brief -->
-                    <div class="dtr-brief-section">
+                    <div class="dtr-brief-section" style="border-bottom:none">
                         <div class="dtr-brief-section-title">Design Brief</div>
-                        <div class="dtr-edit-row">
+                        <div class="dtr-edit-row" style="margin-bottom:0">
                             <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design vision…" style="min-height:100px">${escHtml(briefText)}</textarea>
                         </div>
-                        <div class="dtr-edit-row" style="margin-top:8px;margin-bottom:0">
-                            <label class="dtr-edit-label" for="dtr-ln-key-notes">Key Notes</label>
-                            <textarea class="dtr-edit-field textarea" id="dtr-ln-key-notes" placeholder="Important reminders…" style="min-height:54px">${escHtml(task.key_notes||'')}</textarea>
-                        </div>
-                    </div>
-
-                    <!-- § Colours -->
-                    <div class="dtr-brief-section">
-                        <div class="dtr-brief-section-title">Colours</div>
-                        <div style="display:flex;flex-direction:column;gap:6px">
-                            ${colPairs.map(c => `<div style="display:flex;align-items:center;gap:7px">
-                                <div id="dtr-sw-${c.key}" style="position:relative;width:22px;height:22px;border-radius:5px;background:${c.hex||'#e8ecf0'};border:1px solid rgba(0,0,0,0.12);flex-shrink:0;cursor:pointer;overflow:hidden" onclick="document.getElementById('dtr-cp-${c.key}').click()" title="Pick colour">
-                                    <input type="color" id="dtr-cp-${c.key}" value="${c.hex||'#000000'}" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" oninput="dtrColourPick('${c.key}',this.value)">
-                                </div>
-                                <span style="font-size:10px;color:#64748b;font-weight:600;width:40px;flex-shrink:0">${c.label}</span>
-                                <input class="ds-colour-input" id="dspan-${c.key}" value="${escHtml(c.pantone)}" placeholder="e.g. 286 C"
-                                    oninput="briefColourSave('${c.key}','pantone',this.value)"
-                                    style="flex:1;padding:3px 7px;font-size:11px;font-family:monospace">
-                            </div>`).join('')}
-                        </div>
-                    </div>
-
-                    <!-- § Uploads (single unified section) -->
-                    <div class="dtr-brief-section">
-                        <div class="dtr-brief-section-title">Uploads ${assets.length ? `<span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${assets.length}</span>` : ''}</div>
-                        <div id="dtr-asset-list-all">
-                            ${assets.length ? assets.map(_buildDTRAssetRow).join('') : `<p style="font-size:11px;color:#94a3b8;margin:0 0 6px">No files uploaded yet.</p>`}
-                        </div>
-                        <div class="dtr-asset-upload-zone" style="margin-top:6px"
-                            onclick="document.getElementById('dtr-asset-finput-all').click()"
-                            ondragover="event.preventDefault();this.classList.add('drag-over')"
-                            ondragleave="this.classList.remove('drag-over')"
-                            ondrop="event.preventDefault();this.classList.remove('drag-over');Array.from(event.dataTransfer?.files||[]).forEach(f=>_dtrUploadAsset(f,''))">
-                            <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 3px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                            <p style="font-size:10px;color:#94a3b8;margin:0">Drop or click to upload</p>
-                        </div>
-                        <input type="file" id="dtr-asset-finput-all" class="hide" multiple accept=".ai,.svg,image/*,.pdf" onchange="dtrAssetSelect(event)">
-                    </div>
-
-                    <!-- § Factory Requirements (edit) -->
-                    <div class="dtr-brief-section" style="border-bottom:none">
-                        <div class="dtr-brief-section-title">Factory Requirements</div>
-                        <div style="margin-top:4px">
-                            ${frEditHtml}
-                        </div>
-                        <script>
-                            (function(){
-                                var lf = document.getElementById('dtr-fr-logo_files');
-                                var subs = document.getElementById('dtr-fr-subs-logo_files');
-                                if(lf && subs) lf.addEventListener('change', function(){ subs.style.opacity = this.checked?'1':'0.4'; subs.style.pointerEvents = this.checked?'':'none'; });
-                            })();
-                        <\/script>
                     </div>
                     <div class="dtr-save-bar">
                         <button class="dtr-save-btn" onclick="saveDTRLeftPanel()">Save Changes</button>
@@ -22219,42 +22065,13 @@
                 return escHtml(designerName);
             })();
 
-            // Brief questions — show all, use dash when empty
-            const briefQRows = [
-                ['Team Crests',            task.brief_team_crests],
-                ['Brand Logos',            task.brief_brand_logos],
-                ['Sponsor Logo Type',      task.brief_sponsor_logo_type],
-                ['Player Embellishments',  task.brief_player_embellishments],
-                ['Colour Application',     task.brief_colour_application],
-                ['Piping',                 task.brief_piping],
-            ].map(([label, val]) => `
-                <div style="margin-top:7px">
-                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:#94a3b8;margin-bottom:2px">${label}</div>
-                    <p class="dtr-ro-text" style="margin:0;${!val?'color:#cbd5e1;font-style:italic':''}">${val ? escHtml(val) : '—'}</p>
-                </div>`).join('');
-
-            // Factory Requirements — checklist display
-            const frReadHtml = _DTR_FR_ITEMS.map(item => {
-                const checked = !!fr[item.key];
-                const rowHtml = `<div style="display:flex;align-items:center;gap:7px;padding:3px 0">
-                    <div style="width:15px;height:15px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-                        background:${checked?'#00e5cc':'#f1f5f9'};border:1.5px solid ${checked?'#00b89f':'#cbd5e1'}">
-                        ${checked?'<svg width="9" height="9" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>':''}
-                    </div>
-                    <span style="font-size:12px;font-weight:${checked?'600':'400'};color:${checked?'#0f172a':'#94a3b8'}">${escHtml(item.label)}</span>
-                </div>`;
-                const subsHtml = item.subs ? item.subs.map(sub => {
-                    const sc = !!fr[sub.key];
-                    return `<div style="display:flex;align-items:center;gap:6px;padding:2px 0;margin-left:22px">
-                        <div style="width:13px;height:13px;border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-                            background:${sc?'#e0f2fe':'#f8fafc'};border:1.5px solid ${sc?'#7dd3fc':'#e2e8f0'}">
-                            ${sc?'<svg width="8" height="8" fill="none" stroke="#0369a1" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>':''}
-                        </div>
-                        <span style="font-size:11px;color:${sc?'#0369a1':'#94a3b8'};font-weight:${sc?'600':'400'}">${escHtml(sub.label)}</span>
-                    </div>`;
-                }).join('') : '';
-                return rowHtml + subsHtml;
-            }).join('');
+            const roStatusLabel = (DS_STATUS_LABELS||{})[task.status||'new'] || 'Not Started';
+            const roStatusColors = {
+                new:'#64748b,#f1f5f9', in_progress:'#1d4ed8,#dbeafe', in_review:'#b45309,#fef3c7',
+                revisions:'#b45309,#fef3c7', factory_handover:'#0e7490,#ecfeff',
+                awaiting_approval:'#7c3aed,#f5f3ff', delivered:'#065f46,#d1fae5', completed:'#166534,#dcfce7',
+            }[task.status||'new'] || '#64748b,#f1f5f9';
+            const [roStatusFg, roStatusBg] = roStatusColors.split(',');
 
             return `
                 <!-- Club identity header -->
@@ -22271,41 +22088,37 @@
                     </div>
                 </div>
 
-                <!-- § Job Details — collapsible -->
+                <!-- § Status badge -->
+                <div class="dtr-ro-section" style="padding-top:8px;padding-bottom:8px">
+                    <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${roStatusBg};color:${roStatusFg}">${escHtml(roStatusLabel)}</span>
+                </div>
+
+                <!-- § Club + Linked Job -->
                 <div class="dtr-ro-section">
-                    ${_collapseSectionTitle('Job Details')}
-                    <div id="dtr-job-details-body" style="${_dtrJobDetailsOpen?'':'display:none'}">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
-                            <div>
-                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Club</div>
-                                <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(club.name||'—')}</div>
-                            </div>
-                            <div>
-                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Linked Job</div>
-                                <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.jobs?.job_name || task.jobs?.job_number || '—')}</div>
-                            </div>
-                            <div>
-                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Deadline</div>
-                                <div style="font-size:12px;font-weight:600;color:#0f172a">${dueDate}${dueExtra}</div>
-                            </div>
-                            <div>
-                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Order Type</div>
-                                <div style="font-size:12px;font-weight:600;color:#0f172a">${task.order_type ? escHtml(task.order_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</div>
-                            </div>
-                            <div>
-                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Task Type</div>
-                                <div style="font-size:12px;font-weight:600;color:#0f172a">${task.job_type ? escHtml((typeof DS_JOB_TYPES!=='undefined'?Object.fromEntries(DS_JOB_TYPES.map(t=>[t.key,t.label])):{} )[task.job_type] || task.job_type.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase())) : '—'}</div>
-                            </div>
-                            <div>
-                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Designer</div>
-                                <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.assigned_designer_name||'—')}</div>
-                            </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                        <div>
+                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Club</div>
+                            <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(club.name||'—')}</div>
                         </div>
-                        <div style="margin-top:10px">
-                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Owner(s)</div>
-                            <div style="font-size:12px;font-weight:600;color:#0f172a">${ownerDisplay}</div>
+                        <div>
+                            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Linked Job</div>
+                            <div style="font-size:12px;font-weight:600;color:#0f172a">${escHtml(task.jobs?.job_name || task.jobs?.job_number || '—')}</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- § Task Details -->
+                <div class="dtr-ro-section">
+                    <div class="dtr-ro-section-title">Task Details</div>
+                    ${task.key_notes
+                        ? `<p class="dtr-ro-text" style="white-space:pre-wrap">${escHtml(task.key_notes)}</p>`
+                        : `<p style="font-size:12px;color:#cbd5e1;font-style:italic;margin:0">No task details entered yet.</p>`}
+                </div>
+
+                <!-- § Owner(s) -->
+                <div class="dtr-ro-section">
+                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:3px">Owner(s)</div>
+                    <div style="font-size:12px;font-weight:600;color:#0f172a">${ownerDisplay||'—'}</div>
                 </div>
 
                 <!-- § Products Required (read-only) -->
@@ -22315,51 +22128,11 @@
                 </div>
 
                 <!-- § Design Brief (read-only) -->
-                <div class="dtr-ro-section">
+                <div class="dtr-ro-section" style="border-bottom:none">
                     <div class="dtr-ro-section-title">Design Brief</div>
                     ${briefText
                         ? `<p class="dtr-ro-text">${escHtml(briefText).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')}</p>`
                         : `<p style="font-size:12px;color:#cbd5e1;font-style:italic;margin:0">No brief entered yet.</p>`}
-                    ${task.key_notes ? `<div style="margin-top:8px;padding:8px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;color:#92400e;margin-bottom:3px">Key Notes</div>
-                        <p class="dtr-ro-text" style="color:#78350f;font-size:11px">${escHtml(task.key_notes)}</p>
-                    </div>` : ''}
-                </div>
-
-                <!-- § Colours (read-only) -->
-                <div class="dtr-ro-section">
-                    <div class="dtr-ro-section-title">Colours</div>
-                    <div style="display:flex;gap:5px;flex-wrap:wrap">
-                        ${colPairs.filter(c => c.hex || c.pantone).map(c => `
-                            <div style="display:inline-flex;align-items:center;gap:5px;padding:3px 8px 3px 5px;border:1px solid #e2e8f0;border-radius:20px;background:#f8fafc">
-                                <div style="width:13px;height:13px;border-radius:50%;background:${c.hex||'#e8ecf0'};flex-shrink:0;border:1px solid rgba(0,0,0,0.1)"></div>
-                                <span style="font-size:10px;font-weight:600;color:#475569;font-family:monospace">${c.pantone ? escHtml(c.pantone) : escHtml(c.hex)}</span>
-                            </div>`).join('')}
-                        ${colPairs.every(c => !c.hex && !c.pantone) ? `<span style="font-size:11px;color:#94a3b8">No colours set</span>` : ''}
-                    </div>
-                </div>
-
-                <!-- § Uploads (single unified section) -->
-                <div class="dtr-ro-section">
-                    <div class="dtr-ro-section-title">Uploads ${assets.length ? `<span style="background:#e0f2fe;color:#0369a1;padding:1px 6px;border-radius:10px;font-size:9px;font-weight:700;margin-left:4px">${assets.length}</span>` : ''}</div>
-                    <div id="dtr-asset-list-all">
-                        ${assets.length ? assets.map(_buildDTRAssetRow).join('') : `<p style="font-size:11px;color:#94a3b8;margin:0 0 6px">No files uploaded yet.</p>`}
-                    </div>
-                    <div class="dtr-asset-upload-zone" style="margin-top:6px"
-                        onclick="document.getElementById('dtr-asset-finput-all').click()"
-                        ondragover="event.preventDefault();this.classList.add('drag-over')"
-                        ondragleave="this.classList.remove('drag-over')"
-                        ondrop="event.preventDefault();this.classList.remove('drag-over');Array.from(event.dataTransfer?.files||[]).forEach(f=>_dtrUploadAsset(f,''))">
-                        <svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 3px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                        <p style="font-size:10px;color:#94a3b8;margin:0">Drop or click to upload</p>
-                    </div>
-                    <input type="file" id="dtr-asset-finput-all" class="hide" multiple accept=".ai,.svg,image/*,.pdf" onchange="dtrAssetSelect(event)">
-                </div>
-
-                <!-- § Factory Requirements (read-only) -->
-                <div class="dtr-ro-section" style="border-bottom:none">
-                    <div class="dtr-ro-section-title">Factory Requirements</div>
-                    <div style="margin-top:4px">${frReadHtml}</div>
                 </div>`;
         }
 
@@ -22513,22 +22286,16 @@
                     if (panEl) { if (!savedCols[k]) savedCols[k] = {}; savedCols[k].pantone = panEl.value; }
                 });
                 const hasColour = ['primary','secondary','accent'].some(k => savedCols[k]?.hex || savedCols[k]?.pantone);
+                const statusEl = document.getElementById('dtr-ln-status');
                 const payload = {
-                    task_name:   document.getElementById('dtr-ln-task-name')?.value?.trim() || currentDesignTaskRecord.task_name,
-                    sport:       document.getElementById('dtr-ln-sport')?.value?.trim() || null,
-                    due_date:    document.getElementById('dtr-ln-due-date')?.value || null,
+                    task_name:   currentDesignTaskRecord.task_name,
+                    status:      statusEl?.value || currentDesignTaskRecord.status || 'new',
                     design_brief: document.getElementById('dtr-ln-brief')?.value?.trim() || '',
-                    factory_requirements: _dtrReadFactoryReqs(),
                     key_notes:   document.getElementById('dtr-ln-key-notes')?.value?.trim() || null,
-                    priority:    document.getElementById('dtr-ln-priority')?.value || currentDesignTaskRecord.priority || 'standard',
-                    order_type:  document.getElementById('dtr-ln-order-type')?.value || null,
-                    job_type:    document.getElementById('dtr-ln-job-type')?.value || null,
-                    assigned_designer_id:   designerId,
-                    assigned_designer_name: designerName,
                     club_id:     document.getElementById('dtr-ln-club')?.value || null,
                     job_id:      document.getElementById('dtr-ln-job')?.value || null,
-                    custom_colours: hasColour ? savedCols : null,
                     owner_ids:   getOwnerDropdownIds('design-task'),
+                    custom_colours: hasColour ? savedCols : null,
                 };
                 if (!payload.task_name) { showToast('Task name is required', 'warning'); return; }
                 const { data, error } = await supabase.from('design_tasks')
@@ -22568,6 +22335,211 @@
                 stage5 ? buildDTRUploadToDriveStage(stage5) : '',
                 completeTaskBtn,
             ].join('');
+        }
+
+        // ── Design Uploads section (replaces Concepts+Range+Finalise stages) ────
+        function buildDTRDesignUploadsSection(stage, uploads) {
+            if (!stage) return '<p style="color:#94a3b8;font-size:12px;padding:16px">No upload stage found.</p>';
+            const stageId    = stage.id;
+            const isApproved = stage.status === 'approved';
+            const isInReview = stage.status === 'in_review';
+            const isRevisions = stage.status === 'revisions_required';
+            const hasUploads = uploads.length > 0;
+
+            // Group uploads into batches — uploads within 10 min of each other form a batch
+            const batches = [];
+            uploads.forEach(u => {
+                const uTime = new Date(u.uploaded_at || u.created_at).getTime();
+                const last  = batches[batches.length - 1];
+                if (last && uTime - last.ts < 10 * 60 * 1000) {
+                    last.items.push(u);
+                } else {
+                    batches.push({ ts: uTime, items: [u] });
+                }
+            });
+
+            // Render each batch with a timestamp header and separator
+            let uploadIdx = 0;
+            const batchesHtml = batches.map((batch, bIdx) => {
+                const dt = new Date(batch.ts);
+                const stamp = dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' })
+                    + ' · ' + dt.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+                const cardsHtml = batch.items.map(u => {
+                    const idx = uploadIdx++;
+                    const isImg = (u.file_type || '').startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(u.file_url || '');
+                    const isPdf = u.file_type === 'application/pdf' || (u.file_name || '').toLowerCase().endsWith('.pdf');
+                    const fname = (u.file_url || '').split('/').pop().split('?')[0];
+                    const cls   = u.status === 'approved' ? ' ci-approved' : u.status === 'declined' ? ' ci-declined' : (u.review_comment && u.review_comment !== '__archived__') ? ' ci-revisions' : '';
+                    const thumb = isImg
+                        ? `<img class="dtr-cimg-thumb" src="${escHtml(u.file_url)}" alt="" loading="lazy" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">`
+                        : `<div class="dtr-cimg-nothumb" onclick="openPreviewModal('${u.id}','${escHtml(u.file_url)}','${escHtml(u.file_type||'')}',false,${idx+1});event.stopPropagation()">${isPdf ? '📄' : '📁'}</div>`;
+                    const actionBtns = isApproved ? '' : `
+                        <button class="dtr-tick-btn${u.status==='approved'?' ticked':''}" onclick="dtrTickConceptImg('${u.id}','${stageId}',0)" title="Approve">✓</button>
+                        <button class="dtr-x-btn${u.status==='declined'?' declined':''}" onclick="dtrXConceptImg('${u.id}','${stageId}',0)" title="Decline">✕</button>
+                        <button class="dtr-archive-btn" onclick="dtrArchiveConceptImg('${u.id}','${stageId}',0)" title="Archive">⊗</button>`;
+                    return `<div class="dtr-cimg-card${cls}" id="dtr-cimg-${u.id}" style="position:relative">
+                        <div style="position:absolute;top:4px;left:4px;width:18px;height:18px;border-radius:9px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;z-index:2;pointer-events:none">${idx+1}</div>
+                        ${thumb}
+                        <div class="dtr-cimg-actions">
+                            <button class="dtr-archive-btn" onclick="downloadFile('${escHtml(u.file_url)}','${escHtml(fname)}')" title="Download" style="font-size:13px">⬇</button>
+                            ${actionBtns}
+                        </div>
+                        ${u.review_comment && u.review_comment !== '__archived__' ? `<div style="position:absolute;top:4px;right:4px;background:#f59e0b;color:#fff;font-size:8px;font-weight:700;border-radius:4px;padding:1px 5px;z-index:3;pointer-events:none">↩</div>` : ''}
+                        <div style="padding:3px 6px 5px;font-size:9px;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(fname)}">${escHtml(fname)}</div>
+                    </div>`;
+                }).join('');
+                return `
+                    ${bIdx > 0 ? '<div style="margin:10px 0 6px;border-top:1px solid #f1f5f9"></div>' : ''}
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+                        <span style="font-size:9px;font-weight:600;color:#94a3b8;white-space:nowrap">${stamp}</span>
+                        <div style="flex:1;height:1px;background:#f1f5f9"></div>
+                    </div>
+                    <div class="dtr-concept-images">${cardsHtml}</div>`;
+            }).join('');
+
+            const gridHtml = hasUploads
+                ? `<div id="dtr-design-uploads-images">${batchesHtml}</div>`
+                : `<p style="font-size:11px;color:#94a3b8;margin:0 0 10px;padding:4px 0">No uploads yet. Drop files below to get started.</p>`;
+
+            const uploadZone = isApproved ? '' : `
+                <div class="dtr-concept-upload${isRevisions ? ' upload-revisions' : ''}" style="margin-top:8px"
+                    onclick="document.getElementById('dtr-du-file-input-${stageId}').click()"
+                    ondragover="event.preventDefault();this.classList.add('drag-over')"
+                    ondragleave="this.classList.remove('drag-over')"
+                    ondrop="dtrConceptImgDrop(event,'${stageId}',0)">
+                    <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin:0 auto 5px;display:block"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <p style="font-size:11px;color:#94a3b8;margin:0">Drop files or click to upload</p>
+                    <p style="font-size:10px;color:#b0bec5;margin:3px 0 0">PNG · JPG · PDF · AI · EPS · SVG</p>
+                </div>
+                <input type="file" id="dtr-du-file-input-${stageId}" class="hide" multiple
+                    accept="image/*,.pdf,.ai,.eps,.svg"
+                    onchange="dtrConceptImgSelect(event,'${stageId}',0)">`;
+
+            // Status badge
+            const statusStyleMap = {
+                not_started:'background:rgba(220,38,38,0.1);color:#dc2626',
+                in_progress:'background:rgba(37,99,235,0.1);color:#1d4ed8',
+                in_review:'background:rgba(245,158,11,0.12);color:#b45309',
+                revisions_required:'background:rgba(239,68,68,0.1);color:#dc2626',
+                approved:'background:rgba(34,197,94,0.1);color:#16a34a',
+            };
+            const statusLabel = dsStageStatusLabel(stage.status);
+            const statusStyle = statusStyleMap[stage.status] || statusStyleMap.not_started;
+
+            // Deliver / action bar
+            const deliverBtn = isInReview
+                ? `<div style="display:flex;align-items:center;gap:5px"><button class="dtr-deliver-btn delivered" disabled>✓ Delivered</button><button onclick="dtrUndeliverConcepts('${stageId}')" style="padding:3px 8px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer" title="Undo">↩</button></div>`
+                : isRevisions
+                    ? `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stageId}')">Re-Deliver</button>`
+                    : `<button class="dtr-deliver-btn deliver" onclick="dtrDeliverConcepts('${stageId}')"${!hasUploads ? ' disabled style="opacity:0.45;cursor:not-allowed"' : ''}>Deliver</button>`;
+
+            const revisionsBtn = isRevisions
+                ? `<span style="padding:4px 9px;border-radius:7px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.08);color:#b45309;border:1.5px solid #fde68a">🔄 Revisions Requested</span>`
+                : isInReview
+                    ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #fde68a;background:#fff;color:#b45309;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrToggleRevisionForm('${stageId}')">↩ Request Revisions</button>`
+                    : `<button disabled style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;font-size:11px;font-weight:600;cursor:not-allowed">↩ Request Revisions</button>`;
+
+            const completeBtn = isInReview
+                ? `<button style="padding:4px 10px;border-radius:7px;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;font-size:11px;font-weight:700;cursor:pointer" onclick="dtrCompleteDesignUploads('${stageId}')">✓ Complete</button>`
+                : `<button disabled style="padding:4px 10px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#b0bec5;font-size:11px;font-weight:600;cursor:not-allowed">✓ Complete</button>`;
+
+            const actionBar = isApproved
+                ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid #e8ecf0;display:flex;align-items:center;justify-content:space-between">
+                    <span style="color:#16a34a;font-size:11px;font-weight:600">✓ Complete — Factory Handover</span>
+                    <button onclick="dtrRevertDesignUploads('${stageId}')" style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:600;border:1px solid #fde68a;background:#fffbeb;color:#b45309;cursor:pointer">Revert</button>
+                </div>`
+                : `<div class="dtr-deliver-bar" style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9">
+                    <div>${deliverBtn}</div>
+                    <div style="display:flex;align-items:center;gap:6px">${revisionsBtn}${completeBtn}</div>
+                </div>
+                <div id="dtr-revision-form-${stageId}" class="dtr-revision-form hide">
+                    <div style="font-size:12px;font-weight:700;color:#b45309;margin-bottom:8px">📝 Request Revisions — Feedback</div>
+                    <textarea id="dtr-revision-text-${stageId}" placeholder="Describe exactly what revisions are needed…"></textarea>
+                    <div class="dtr-revision-form-footer">
+                        <button onclick="dtrSubmitRevisionFeedback('${stageId}')" style="padding:7px 16px;border-radius:8px;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer">Send Revision Request</button>
+                        <button onclick="dtrToggleRevisionForm('${stageId}')" style="padding:7px 12px;border-radius:8px;border:1px solid #e2e8f0;background:#fff;font-size:12px;color:#64748b;cursor:pointer">Cancel</button>
+                    </div>
+                </div>`;
+
+            return `<div class="dtr-stage-section${isRevisions ? ' stage-active stage-revisions' : isApproved ? ' stage-approved' : ' stage-active'}" id="dtr-stage-2">
+                <button class="dtr-stage-hdr" onclick="dtrToggleStage(2)">
+                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '↑'}</div>
+                    <span class="dtr-stage-title">Design Uploads</span>
+                    <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
+                    <svg class="dtr-stage-chevron" id="dtr-stage-chev-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="dtr-stage-body" id="dtr-stage-body-2">
+                    ${gridHtml}
+                    ${uploadZone}
+                    ${actionBar}
+                </div>
+            </div>`;
+        }
+
+        // ── Factory Handover right column ─────────────────────────────────────
+        function buildDTRFactoryHandoverCol(task, stage5) {
+            const task_id = task?.id;
+            const fr = task?.factory_requirements || {};
+            const jobDriveUrl = task?.jobs?.google_drive_url || '';
+            const savedDriveUrl = stage5?.concept_statuses?.drive_url || '';
+            const driveUrl = savedDriveUrl || jobDriveUrl;
+            const isCompleted = task?.status === 'completed';
+
+            const frItemsHtml = _DTR_FR_ITEMS.map(item => `
+                <label style="display:flex;align-items:flex-start;gap:7px;padding:5px 0;cursor:pointer;font-size:12px;font-weight:500;color:#374151">
+                    <input type="checkbox" id="fhcol-fr-${item.key}" ${fr[item.key]?'checked':''} onchange="dtrSaveFactoryReqFromCol()" style="margin-top:2px;accent-color:#00e5cc;width:14px;height:14px;flex-shrink:0">
+                    ${escHtml(item.label)}
+                </label>
+                ${item.subs ? `<div id="fhcol-fr-subs-${item.key}" style="margin-left:22px;${fr[item.key]?'':'opacity:0.4;pointer-events:none'}">
+                    ${item.subs.map(sub => `
+                        <label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer;font-size:11px;color:#475569">
+                            <input type="checkbox" id="fhcol-fr-${sub.key}" ${fr[sub.key]?'checked':''} onchange="dtrSaveFactoryReqFromCol()" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0">
+                            ${escHtml(sub.label)}
+                        </label>`).join('')}
+                </div>` : ''}
+            `).join('');
+
+            const driveSection = driveUrl
+                ? `<a href="${escHtml(driveUrl)}" target="_blank" rel="noopener"
+                        style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;background:#f0fdf4;border:1.5px solid #86efac;text-decoration:none;margin-bottom:12px">
+                    <svg width="18" height="18" fill="none" stroke="#16a34a" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:11px;font-weight:700;color:#16a34a">Google Drive Folder</div>
+                        <div style="font-size:10px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(driveUrl)}</div>
+                    </div>
+                    <button onclick="event.preventDefault();document.getElementById('fh-drive-edit').classList.toggle('hide')" style="font-size:10px;color:#64748b;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:5px;border:1px solid #e2e8f0;background:#fff">Edit</button>
+                </a>
+                <div id="fh-drive-edit" class="hide" style="margin-bottom:12px">
+                    <input id="fh-drive-url-input" type="url" value="${escHtml(driveUrl)}" placeholder="https://drive.google.com/…" style="width:100%;box-sizing:border-box;padding:7px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:12px;margin-bottom:6px">
+                    <button onclick="dtrSaveDriveUrlFromCol(${stage5 ? `'${stage5.id}'` : 'null'})" style="width:100%;padding:7px;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer">Save URL</button>
+                </div>`
+                : `<div style="margin-bottom:12px">
+                    <div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:6px">Google Drive Folder</div>
+                    <input id="fh-drive-url-input" type="url" placeholder="Paste Drive folder URL…" style="width:100%;box-sizing:border-box;padding:7px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:12px;margin-bottom:6px">
+                    <button onclick="dtrSaveDriveUrlFromCol(${stage5 ? `'${stage5.id}'` : 'null'})" style="width:100%;padding:7px;border-radius:8px;background:#2563eb;color:#fff;font-size:12px;font-weight:600;border:none;cursor:pointer">Save URL</button>
+                </div>`;
+
+            const completeBtn = isCompleted
+                ? `<button disabled style="width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:800;border:2.5px solid #16a34a;background:#f0fdf4;color:#16a34a;cursor:default;margin-top:8px">✓ Design Complete</button>`
+                : `<button onclick="completeDesignTask()" id="fh-complete-btn"
+                    style="width:100%;padding:14px;border-radius:12px;font-size:15px;font-weight:800;border:2.5px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;margin-top:8px;transition:all 0.2s"
+                    onmouseover="this.style.borderColor='#16a34a';this.style.color='#16a34a';this.style.background='#f0fdf4'"
+                    onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#374151';this.style.background='#fff'">
+                    Complete Design
+                </button>`;
+
+            return `<div style="display:flex;flex-direction:column;background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden;height:100%">
+                <div style="padding:14px 16px;border-bottom:1px solid #f1f5f9;flex-shrink:0">
+                    <h4 style="margin:0;font-size:13px;font-weight:700;color:#0f172a">Factory Handover</h4>
+                    <p style="margin:3px 0 0;font-size:11px;color:#94a3b8">Checklist before marking complete</p>
+                </div>
+                <div style="padding:14px 16px;overflow-y:auto;flex:1">
+                    ${driveSection}
+                    <div style="font-size:11px;font-weight:700;color:#374151;margin-bottom:6px;border-top:1px solid #f1f5f9;padding-top:12px">Upload Requirements</div>
+                    ${frItemsHtml}
+                    ${completeBtn}
+                </div>
+            </div>`;
         }
 
         // ── Shared upload-stage body builder (Range + Finalise) ──────────────
@@ -22847,6 +22819,72 @@
                     ${bodyHtml}
                 </div>
             </div>`;
+        }
+
+        async function dtrSaveDriveUrlFromCol(stageId) {
+            const url = document.getElementById('fh-drive-url-input')?.value.trim();
+            if (!url) { showToast('Please enter a URL', 'warning'); return; }
+            if (stageId) {
+                const stage = currentStages.find(s => s.id === stageId);
+                if (stage) {
+                    const cs = { ...(stage.concept_statuses || {}), drive_url: url };
+                    await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', stageId);
+                    stage.concept_statuses = cs;
+                }
+            } else if (currentDesignTaskRecord?.job_id) {
+                await supabase.from('jobs').update({ google_drive_url: url }).eq('id', currentDesignTaskRecord.job_id);
+            }
+            showToast('Drive URL saved ✓');
+            await renderNewDTRLayout();
+        }
+
+        async function dtrSaveFactoryReqFromCol() {
+            if (!currentDesignTaskRecord?.id) return;
+            const fr = {};
+            _DTR_FR_ITEMS.forEach(item => {
+                fr[item.key] = document.getElementById(`fhcol-fr-${item.key}`)?.checked || false;
+                const subsEl = document.getElementById(`fhcol-fr-subs-${item.key}`);
+                if (item.subs) {
+                    item.subs.forEach(sub => { fr[sub.key] = document.getElementById(`fhcol-fr-${sub.key}`)?.checked || false; });
+                    if (subsEl) subsEl.style.opacity = fr[item.key] ? '1' : '0.4';
+                    if (subsEl) subsEl.style.pointerEvents = fr[item.key] ? '' : 'none';
+                }
+            });
+            await supabase.from('design_tasks').update({ factory_requirements: fr }).eq('id', currentDesignTaskRecord.id);
+            if (currentDesignTaskRecord) currentDesignTaskRecord.factory_requirements = fr;
+        }
+
+        async function dtrCompleteDesignUploads(stageId) {
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const ok = await updateStageStatus(stage, 'approved', 'Design Uploads complete');
+            if (!ok) return;
+            // Set task to Factory Handover status
+            if (currentDesignTaskRecord?.id) {
+                await supabase.from('design_tasks').update({ status: 'factory_handover' }).eq('id', currentDesignTaskRecord.id);
+                currentDesignTaskRecord.status = 'factory_handover';
+                const t = (allDesignTasks || []).find(t => t.id === currentDesignTaskRecord.id);
+                if (t) t.status = 'factory_handover';
+                dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_approved', { stage_name: 'Design Uploads' });
+            }
+            showToast('Design Uploads complete — Factory Handover ✓');
+            await _dtrRefreshConceptsStage();
+            renderDSDashboard();
+        }
+
+        async function dtrRevertDesignUploads(stageId) {
+            if (!confirm('Revert Design Uploads back to In Progress?')) return;
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', stageId);
+            stage.status = 'in_progress';
+            if (currentDesignTaskRecord?.id) {
+                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', currentDesignTaskRecord.id);
+                currentDesignTaskRecord.status = 'in_progress';
+                dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_reverted', { stage_name: 'Design Uploads' });
+            }
+            await _dtrRefreshConceptsStage();
+            renderDSDashboard();
         }
 
         async function dtrSaveDriveUrl(stageId) {
@@ -23227,8 +23265,8 @@
                 if (!stage) return;
                 const ok = await updateStageStatus(stage, 'revisions_required', comment);
                 if (!ok) return;
-                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
-                if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
+                await supabase.from('design_tasks').update({ status: 'revisions' }).eq('id', stage.task_id);
+                if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'revisions';
                 await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: 'Concepts', comment });
                 showToast('Revisions requested');
                 await _dtrRefreshConceptsStage();
@@ -23269,11 +23307,13 @@
                 task_completed: false
             });
 
-            // Update stage status to revisions_required
+            // Update stage status to revisions_required; task status → revisions
             const ok = await updateStageStatus(stage, 'revisions_required', msg);
             if (!ok) return;
-            await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
-            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
+            await supabase.from('design_tasks').update({ status: 'revisions' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'revisions';
+            const t = (allDesignTasks || []).find(t => t.id === stage.task_id);
+            if (t) t.status = 'revisions';
             await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: stage.stage_name, comment: msg });
 
             showToast('Revision request sent ✓');
@@ -23429,7 +23469,10 @@
         async function dtrStageRevisions(stageId, stageNum) {
             await supabase.from('design_stages').update({ status: 'revisions_required' }).eq('id', stageId);
             if (currentDesignTaskRecord?.id) {
-                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', currentDesignTaskRecord.id);
+                await supabase.from('design_tasks').update({ status: 'revisions' }).eq('id', currentDesignTaskRecord.id);
+                currentDesignTaskRecord.status = 'revisions';
+                const t = (allDesignTasks||[]).find(t=>t.id===currentDesignTaskRecord.id);
+                if (t) t.status = 'revisions';
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'revisions_requested', {});
             }
             await _dtrRefreshStagesCol();
