@@ -728,9 +728,21 @@
         .ds-kanban-col-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; display:inline-block; }
         .ds-kanban-col-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; flex:1; }
         .ds-kanban-col-count { font-size:10px; font-weight:700; color:#94a3b8; background:#e2e8f0; border-radius:10px; padding:1px 7px; }
-        .ds-kanban-col-body { flex:1; overflow-y:auto; }
+        .ds-kanban-col-body { flex:1; overflow-y:auto; padding-top:8px; }
         .ds-kanban-col-body::-webkit-scrollbar { width:4px; }
         .ds-kanban-col-body::-webkit-scrollbar-thumb { background:#cbd5e1; border-radius:2px; }
+
+        /* Due-date filter chips */
+        .ds-due-chip { font-size:11px; font-weight:600; padding:4px 10px; border-radius:7px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#64748b; cursor:pointer; transition:all 0.15s; white-space:nowrap; }
+        .ds-due-chip:hover { border-color:#94a3b8; background:#fff; }
+        .ds-due-chip.ds-due-active { background:#0f172a; color:#fff; border-color:#0f172a; }
+
+        /* Collapsed empty kanban column */
+        .ds-kanban-col.ds-col-collapsed { min-width:38px; }
+        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-body { display:none; }
+        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-hdr { flex-direction:column; align-items:center; justify-content:flex-start; padding:12px 6px; gap:8px; border-bottom:none; border-right:1px solid #edf0f4; height:100%; writing-mode:vertical-rl; text-orientation:mixed; opacity:0.45; }
+        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-dot { width:6px; height:6px; }
+        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-count { display:none; }
         .ds-kanban-card { padding:11px 14px; border-bottom:1px solid #f0f2f5; cursor:pointer; background:#fff; transition:background 0.1s; border-left:3px solid transparent; }
         .ds-kanban-card:hover { background:#f8fafc; }
         .ds-kanban-card.ds-selected { background:#f0f4ff; border-left-color:#6366f1; }
@@ -2398,14 +2410,13 @@
                     <input id="ds-search" class="ds-toolbar-search" placeholder="Search tasks or clubs…" oninput="renderDSDashboard()">
                 </div>
 
-                <!-- Status filter -->
-                <select id="ds-filter-label" class="ds-toolbar-filter" onchange="renderDSDashboard()">
-                    <option value="">All Status</option>
-                    <option value="new">Not Started</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="in_review">In Review</option>
-                    <option value="revisions">Revisions</option>
-                </select>
+                <!-- Due date filter chips -->
+                <div style="display:flex;align-items:center;gap:4px">
+                    <button id="ds-due-chip-all"     class="ds-due-chip ds-due-active" onclick="setDSDueFilter('all')">All</button>
+                    <button id="ds-due-chip-today"   class="ds-due-chip"               onclick="setDSDueFilter('today')">Due Today</button>
+                    <button id="ds-due-chip-week"    class="ds-due-chip"               onclick="setDSDueFilter('week')">Due This Week</button>
+                    <button id="ds-due-chip-overdue" class="ds-due-chip"               onclick="setDSDueFilter('overdue')">Overdue</button>
+                </div>
 
                 <!-- Right actions -->
                 <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -2427,7 +2438,7 @@
             <div class="ds-studio-body">
 
                 <!-- COL 1: New Jobs -->
-                <div class="ds-kanban-col">
+                <div class="ds-kanban-col" id="ds-col-new">
                     <div class="ds-kanban-col-hdr">
                         <span class="ds-kanban-col-dot" style="background:#dc2626"></span>
                         <span class="ds-kanban-col-title" style="color:#dc2626">New Jobs</span>
@@ -2439,7 +2450,7 @@
                 </div>
 
                 <!-- COL 2: In Progress -->
-                <div class="ds-kanban-col">
+                <div class="ds-kanban-col" id="ds-col-inprogress">
                     <div class="ds-kanban-col-hdr">
                         <span class="ds-kanban-col-dot" style="background:#2563eb"></span>
                         <span class="ds-kanban-col-title" style="color:#2563eb">In Progress</span>
@@ -2451,7 +2462,7 @@
                 </div>
 
                 <!-- COL 3: In Review -->
-                <div class="ds-kanban-col">
+                <div class="ds-kanban-col" id="ds-col-inreview">
                     <div class="ds-kanban-col-hdr">
                         <span class="ds-kanban-col-dot" style="background:#b45309"></span>
                         <span class="ds-kanban-col-title" style="color:#b45309">In Review</span>
@@ -10388,6 +10399,7 @@
                         <div class="flex items-center gap-2 flex-shrink-0">
                             ${club.has_images ? '<span class="badge badge-success text-xs">Images</span>' : ''}
                             ${club.shopify_collection_id ? '<span class="badge badge-info text-xs">Shopify ✓</span>' : ''}
+                            ${(isSuperAdmin || currentUserProfile?.role === 'admin') ? `<button onclick="event.stopPropagation();deleteClub('${club.id}')" title="Delete club" style="padding:4px 6px;border-radius:6px;border:1.5px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);color:#dc2626;cursor:pointer;display:flex;align-items:center;transition:all 0.15s" onmouseover="this.style.background='rgba(239,68,68,0.14)'" onmouseout="this.style.background='rgba(239,68,68,0.06)'"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>` : ''}
                             <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
                     </div>
@@ -15861,6 +15873,7 @@
         // =============================================
         let designStudioFilter = 'all';
         let designStageFilter = 'all';
+        let _dsDueFilter = 'all';
         let allDesignTasks = [];
         let designBriefLog = [];
 
@@ -20042,6 +20055,14 @@
             }
         }
 
+        function setDSDueFilter(filter) {
+            _dsDueFilter = filter;
+            ['all','today','week','overdue'].forEach(f => {
+                document.getElementById(`ds-due-chip-${f}`)?.classList.toggle('ds-due-active', f === filter);
+            });
+            renderDSDashboard();
+        }
+
         function renderDSDashboard() {
             const allTasks = (allDesignTasks || []).filter(t => !['completed'].includes(t.status));
             const completedTasks = (allDesignTasks || []).filter(t => t.status === 'completed');
@@ -20055,6 +20076,10 @@
 
             const query = (document.getElementById('ds-search')?.value || '').toLowerCase();
 
+            const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+            const todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
+            const weekEnd    = new Date(todayStart); weekEnd.setDate(weekEnd.getDate() + 7); weekEnd.setHours(23,59,59,999);
+
             const matchesFilters = t => {
                 if (query) {
                     const name = (t.task_name || '').toLowerCase();
@@ -20062,30 +20087,49 @@
                     const ref  = (t.task_ref  || '').toLowerCase();
                     if (!name.includes(query) && !club.includes(query) && !ref.includes(query)) return false;
                 }
+                if (_dsDueFilter !== 'all') {
+                    const due = t.due_date ? new Date(t.due_date) : null;
+                    if (!due) return false;
+                    if (_dsDueFilter === 'today')   return due >= todayStart && due <= todayEnd;
+                    if (_dsDueFilter === 'week')    return due >= todayStart && due <= weekEnd;
+                    if (_dsDueFilter === 'overdue') return due < todayStart;
+                }
                 return true;
             };
 
             const filtered = allTasks.filter(matchesFilters);
 
-            const emptyMsg = query ? 'No tasks match your search' : 'No tasks here';
+            const emptyMsg = (query || _dsDueFilter !== 'all') ? 'No tasks match your filter' : 'No tasks here';
 
             // Three kanban columns
             const cols = [
-                { bodyId: 'ds-col-body-new',       countId: 'ds-col-count-new',       match: t => t.status === 'new' },
-                { bodyId: 'ds-col-body-inprogress', countId: 'ds-col-count-inprogress', match: t => ['in_progress','revisions'].includes(t.status) },
-                { bodyId: 'ds-col-body-inreview',   countId: 'ds-col-count-inreview',  match: t => ['in_review','factory_handover'].includes(t.status) },
+                { bodyId: 'ds-col-body-new',        countId: 'ds-col-count-new',        colId: 'ds-col-new',        match: t => t.status === 'new' },
+                { bodyId: 'ds-col-body-inprogress',  countId: 'ds-col-count-inprogress', colId: 'ds-col-inprogress', match: t => ['in_progress','revisions'].includes(t.status) },
+                { bodyId: 'ds-col-body-inreview',    countId: 'ds-col-count-inreview',   colId: 'ds-col-inreview',   match: t => ['in_review','factory_handover'].includes(t.status) },
             ];
 
-            cols.forEach(({ bodyId, countId, match }) => {
+            const colCounts = cols.map(({ bodyId, countId, colId, match }) => {
                 const tasks = filtered.filter(match);
                 const body  = document.getElementById(bodyId);
                 const cnt   = document.getElementById(countId);
                 if (cnt) cnt.textContent = tasks.length;
-                if (!body) return;
-                body.innerHTML = tasks.length === 0
-                    ? `<div style="padding:24px 14px;text-align:center"><p style="font-size:11px;color:#b0b8c4;font-style:italic">${emptyMsg}</p></div>`
-                    : tasks.map(t => _renderDSKanbanCard(t, _dsUnreadByTask[t.id] || 0)).join('');
+                if (body) {
+                    body.innerHTML = tasks.length === 0
+                        ? `<div style="padding:24px 14px;text-align:center"><p style="font-size:11px;color:#b0b8c4;font-style:italic">${emptyMsg}</p></div>`
+                        : tasks.map(t => _renderDSKanbanCard(t, _dsUnreadByTask[t.id] || 0)).join('');
+                }
+                return tasks.length;
             });
+
+            // Collapse empty columns and dynamically resize active ones
+            const studioBody = document.querySelector('.ds-studio-body');
+            if (studioBody) {
+                cols.forEach(({ colId }, i) => {
+                    document.getElementById(colId)?.classList.toggle('ds-col-collapsed', colCounts[i] === 0);
+                });
+                const tplCols = colCounts.map(c => c === 0 ? '44px' : '1fr').join(' ');
+                studioBody.style.gridTemplateColumns = `${tplCols} 1.5fr`;
+            }
 
             // Auto-select first active task on first render
             const allActive = filtered.filter(t => ['new','in_progress','revisions','in_review','factory_handover'].includes(t.status));
@@ -20285,13 +20329,16 @@
 
             panel.innerHTML = `<div style="overflow-y:auto;height:100%;padding:16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
 
-                <!-- Header -->
+                <!-- Header: Open Task button + title + status pill + ref/club -->
                 <div style="border-bottom:1px solid #f1f5f9;padding-bottom:10px">
-                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:4px">
-                        <div style="font-size:14px;font-weight:800;color:#0f172a;line-height:1.3;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
-                        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;flex-shrink:0;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                    <!-- Open Task button at the top -->
+                    <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s;margin-bottom:10px" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
+                        Open Task Record
+                    </button>
+                    <div style="font-size:14px;font-weight:800;color:#0f172a;line-height:1.3;margin-bottom:6px">${escHtml(task.task_name || 'Untitled Task')}</div>
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+                        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
                         ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px">${escHtml(task.task_ref)}</span>` : ''}
                         ${task.clubs?.name ? `<span style="font-size:11px;color:#475569;font-weight:500">${escHtml(task.clubs.name)}</span>` : ''}
                     </div>
@@ -20337,14 +20384,8 @@
                 <!-- Unread activity (async injected) -->
                 <div id="dsp-panel-notif-${task.id}"></div>
 
-                <!-- Open button -->
-                <div style="margin-top:auto;padding-top:4px;display:flex;flex-direction:column;gap:6px">
-                    <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
-                        Open Task Record
-                    </button>
-                    ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="width:100%;padding:8px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;gap:6px">▶ Start Task</button>` : ''}
-                </div>
+                <!-- Start Task button (new tasks only) -->
+                ${task.status === 'new' ? `<div style="margin-top:auto;padding-top:4px"><button onclick="startDesignTask('${task.id}')" style="width:100%;padding:8px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;gap:6px">▶ Start Task</button></div>` : ''}
 
             </div>`;
 
