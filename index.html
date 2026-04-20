@@ -22026,6 +22026,22 @@
                     </svg>
                 </div>`;
 
+            const _assetsHtml = assets.length
+                ? assets.map(a => {
+                    const _isImg = a.file_type && a.file_type.startsWith('image/');
+                    const _kb = a.file_size ? Math.round(a.file_size / 1024) + 'KB' : '';
+                    const _thumb = _isImg
+                        ? '<img src="' + escHtml(a.file_url) + '" alt="" style="width:28px;height:28px;object-fit:cover;border-radius:5px;border:1px solid #e2e8f0;flex-shrink:0">'
+                        : '<div style="width:28px;height:28px;border-radius:5px;background:#f1f5f9;border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg></div>';
+                    return '<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;margin-bottom:4px">'
+                        + _thumb
+                        + '<a href="' + escHtml(a.file_url) + '" target="_blank" style="flex:1;min-width:0;font-size:11px;color:#0f172a;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none">' + escHtml(a.file_name) + '</a>'
+                        + (_kb ? '<span style="font-size:10px;color:#94a3b8;flex-shrink:0">' + _kb + '</span>' : '')
+                        + '<button onclick="deleteBriefAsset(\'' + a.id + '\',event)" title="Remove" style="width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;display:flex;align-items:center;justify-content:center">×</button>'
+                        + '</div>';
+                }).join('')
+                : '<p style="font-size:11px;color:#94a3b8;margin:0 0 6px">No attachments yet.</p>';
+
             // ── EDIT MODE ──────────────────────────────────────────────────────
             if (_dtrEditMode) {
                 const designerOpts = `<option value="">— Unassigned —</option>` +
@@ -22130,6 +22146,36 @@
                             <textarea class="dtr-edit-field textarea" id="dtr-ln-brief" placeholder="Describe the design vision…" style="min-height:100px">${escHtml(briefText)}</textarea>
                         </div>
                     </div>
+
+                    <!-- § Colours (editable) -->
+                    <div class="dtr-brief-section">
+                        <div class="dtr-brief-section-title" style="display:flex;align-items:center;justify-content:space-between">
+                            <span>Colours</span>
+                            <span style="display:flex;align-items:center;gap:6px">
+                                <div class="ds-toggle${useClub?' on':''}" onclick="toggleBriefColours()" style="flex-shrink:0"></div>
+                                <span style="font-size:10px;color:#94a3b8;font-weight:500">${useClub ? 'Club colours' : 'Custom'}</span>
+                            </span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px">
+                            ${colPairs.map(c => `<div>
+                                <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:4px">${escHtml(c.label)}</div>
+                                <div style="height:34px;border-radius:7px;background:${c.hex||'#e2e8f0'};border:1px solid rgba(0,0,0,0.08);margin-bottom:5px;position:relative;overflow:hidden;${!useClub?'cursor:pointer':''}" ${!useClub?`onclick="document.getElementById('dtr-cp-${c.key}').click()"`:''}>
+                                    <input type="color" id="dtr-cp-${c.key}" value="${c.hex||'#000000'}" oninput="briefColourPick('${c.key}',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+                                    ${!c.hex?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8">${useClub?'Not set':'Click'}</div>`:''}
+                                </div>
+                                <input style="width:100%;padding:3px 6px;border:1px solid #e2e8f0;border-radius:6px;font-size:10px;font-family:monospace;box-sizing:border-box;outline:none" id="dtr-pan-${c.key}" value="${escHtml(c.pantone)}" placeholder="Pantone…" oninput="briefColourSave('${c.key}','pantone',this.value)">
+                            </div>`).join('')}
+                        </div>
+                    </div>
+
+                    <!-- § Attachments -->
+                    <div class="dtr-brief-section" style="border-bottom:none">
+                        <div class="dtr-brief-section-title">Attachments <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#94a3b8;font-size:9px">— club logo, sponsor logos, references…</span></div>
+                        ${_assetsHtml}
+                        <button onclick="document.getElementById('dtr-attach-input').click()" style="width:100%;margin-top:4px;padding:7px;border:1.5px dashed #cbd5e1;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;text-align:center">+ Upload Attachment</button>
+                        <input type="file" id="dtr-attach-input" class="hide" multiple accept=".ai,.eps,.svg,.pdf,.png,.jpg,.jpeg,.gif,.webp,.zip,.rar" onchange="briefAttachSelect(event)">
+                    </div>
+
                     <div class="dtr-save-bar">
                         <button class="dtr-save-btn" onclick="saveDTRLeftPanel()">Save Changes</button>
                         ${(isSuperAdmin || currentUserProfile?.role === 'admin') ? `<button onclick="deleteDesignTask('${task.id}')" style="width:100%;margin-top:6px;padding:8px;border-radius:9px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">Delete Task</button>` : ''}
@@ -22218,7 +22264,7 @@
                 </div>
 
                 <!-- § Colours (read-only) -->
-                <div class="dtr-ro-section" style="border-bottom:none">
+                <div class="dtr-ro-section">
                     <div class="dtr-ro-section-title">Colours</div>
                     <div style="display:flex;gap:5px;flex-wrap:wrap">
                         ${colPairs.filter(c => c.hex || c.pantone).map(c => `
@@ -22228,6 +22274,14 @@
                             </div>`).join('')}
                         ${colPairs.every(c => !c.hex && !c.pantone) ? `<span style="font-size:11px;color:#94a3b8">No colours set</span>` : ''}
                     </div>
+                </div>
+
+                <!-- § Attachments -->
+                <div class="dtr-ro-section" style="border-bottom:none">
+                    <div class="dtr-ro-section-title">Attachments</div>
+                    ${_assetsHtml}
+                    <button onclick="document.getElementById('dtr-attach-input').click()" style="width:100%;margin-top:4px;padding:7px;border:1.5px dashed #cbd5e1;border-radius:8px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;text-align:center">+ Upload Attachment</button>
+                    <input type="file" id="dtr-attach-input" class="hide" multiple accept=".ai,.eps,.svg,.pdf,.png,.jpg,.jpeg,.gif,.webp,.zip,.rar" onchange="briefAttachSelect(event)">
                 </div>`;
         }
 
@@ -23860,12 +23914,7 @@
             const newVal = !(currentDesignTaskRecord.use_club_colours !== false);
             currentDesignTaskRecord.use_club_colours = newVal;
             await supabase.from('design_tasks').update({ use_club_colours: newVal }).eq('id', currentDesignTaskRecord.id);
-            // Re-render but stay on colours tab and preserve scroll
-            _briefActiveTab = 'colours';
-            const panel = document.getElementById('dt-stage-panel');
-            const scrollY = window.scrollY;
-            await renderStagePanel(1);
-            window.scrollTo({ top: scrollY, behavior: 'instant' });
+            await _refreshDTRLeftBrief();
         }
 
         function briefColourPick(key, hex) {
@@ -24089,7 +24138,7 @@
                     uploaded_by: actor?.data?.user?.id, uploaded_by_name: actorName
                 });
                 showToast(`${file.name} uploaded ✓`);
-                renderStagePanel(1);
+                await _refreshDTRLeftBrief();
             } catch(err) {
                 showToast('Upload failed: ' + (err.message || 'Unknown error'), 'error');
             }
@@ -24100,7 +24149,20 @@
             if (!confirm('Remove this asset?')) return;
             await supabase.from('design_task_assets').delete().eq('id', assetId);
             showToast('Asset removed');
-            renderStagePanel(1);
+            await _refreshDTRLeftBrief();
+        }
+
+        async function _refreshDTRLeftBrief() {
+            const leftEl = document.getElementById('dtr-left-tab-content');
+            if (leftEl && currentDesignTaskRecord?.id) {
+                const { data } = await supabase.from('design_task_assets').select('*').eq('design_task_id', currentDesignTaskRecord.id).order('created_at');
+                _dtrCachedAssets = data || [];
+                const club = currentDesignTaskRecord?.clubs || {};
+                leftEl.innerHTML = buildDTRLeftColumn(currentDesignTaskRecord, club, _dtrCachedAssets, _dtrCachedClubProds, _dtrCachedJobProds);
+                if (_dtrEditMode) renderOwnerDropdown('design-task', currentDesignTaskRecord.owner_ids || []);
+            } else {
+                renderStagePanel(1);
+            }
         }
 
         // ── Stage 1: Accept / Decline / Needs Info ─────────────────────────
