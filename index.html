@@ -737,12 +737,6 @@
         .ds-due-chip:hover { border-color:#94a3b8; background:#fff; }
         .ds-due-chip.ds-due-active { background:#0f172a; color:#fff; border-color:#0f172a; }
 
-        /* Collapsed empty kanban column */
-        .ds-kanban-col.ds-col-collapsed { min-width:38px; }
-        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-body { display:none; }
-        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-hdr { flex-direction:column; align-items:center; justify-content:flex-start; padding:12px 6px; gap:8px; border-bottom:none; border-right:1px solid #edf0f4; height:100%; writing-mode:vertical-rl; text-orientation:mixed; opacity:0.45; }
-        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-dot { width:6px; height:6px; }
-        .ds-kanban-col.ds-col-collapsed .ds-kanban-col-count { display:none; }
         .ds-kanban-card { padding:11px 14px; border-bottom:1px solid #f0f2f5; cursor:pointer; background:#fff; transition:background 0.1s; border-left:3px solid transparent; }
         .ds-kanban-card:hover { background:#f8fafc; }
         .ds-kanban-card.ds-selected { background:#f0f4ff; border-left-color:#6366f1; }
@@ -20120,16 +20114,6 @@
                 }
                 return tasks.length;
             });
-
-            // Collapse empty columns and dynamically resize active ones
-            const studioBody = document.querySelector('.ds-studio-body');
-            if (studioBody) {
-                cols.forEach(({ colId }, i) => {
-                    document.getElementById(colId)?.classList.toggle('ds-col-collapsed', colCounts[i] === 0);
-                });
-                const tplCols = colCounts.map(c => c === 0 ? '44px' : '1fr').join(' ');
-                studioBody.style.gridTemplateColumns = `${tplCols} 1.5fr`;
-            }
 
             // Auto-select first active task on first render
             const allActive = filtered.filter(t => ['new','in_progress','revisions','in_review','factory_handover'].includes(t.status));
