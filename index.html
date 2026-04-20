@@ -21569,6 +21569,28 @@
                             ${task.colour_palette ? `<div style="margin-top:10px;padding:7px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;color:#64748b">
                                 <span style="font-weight:600">Notes:</span> ${escHtml(task.colour_palette)}
                             </div>` : ''}
+
+                            <!-- Attachments sub-section -->
+                            <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9">
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                                    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8">Attachments</span>
+                                    <button onclick="document.getElementById('br-attach-input').click()" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;border:1.5px dashed #cbd5e1;background:#fafbfc;color:#64748b;font-size:10px;font-weight:600;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='#94a3b8'" onmouseout="this.style.borderColor='#cbd5e1'">
+                                        <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                        Add file
+                                    </button>
+                                </div>
+                                ${assets.length
+                                    ? `<div style="display:flex;flex-direction:column;gap:4px">${assets.map(a => `<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px">
+                                        <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                        <a href="${escHtml(a.file_url)}" target="_blank" style="flex:1;min-width:0;font-size:11px;color:#0f172a;font-weight:500;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(a.file_name)}">${escHtml(a.file_name)}</a>
+                                        <span style="font-size:10px;color:#94a3b8;flex-shrink:0">${a.file_size ? Math.round(a.file_size/1024)+'KB' : ''}</span>
+                                        <button onclick="deleteBriefAsset('${a.id}')" title="Remove" style="width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;flex-shrink:0;padding:0" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#94a3b8'">×</button>
+                                    </div>`).join('')}</div>`
+                                    : `<p style="font-size:11px;color:#94a3b8;margin:0">No attachments yet</p>`}
+                                <input type="file" id="br-attach-input" class="hide" multiple
+                                    accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf,.zip,.eps"
+                                    onchange="briefAttachSelect(event)">
+                            </div>
                         </div>
                     </div><!-- /compact tabbed card -->
 
@@ -23189,6 +23211,7 @@
         }
 
         async function dtrUploadConceptImage(stageId, conceptNum, file) {
+            if (file.size > 999 * 1024) { showToast('File must be under 999 KB', 'error'); return; }
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage || !currentBrand?.id) return;
             showToast(`Uploading…`);
@@ -23462,6 +23485,7 @@
         }
         async function dtrUploadStageImage(stageId, stageNum, sectionLabel, file) {
             if (!currentBrand?.id || !file) return;
+            if (file.size > 999 * 1024) { showToast('File must be under 999 KB', 'error'); return; }
             const ext = file.name.split('.').pop();
             const safeName = file.name.replace(/[^a-z0-9._-]/gi, '_');
             const path = `${currentBrand.id}/design-stages/${stageId}/${sectionLabel}-${Date.now()}-${safeName}`;
@@ -23976,6 +24000,11 @@
             event.target.value = '';
         }
 
+        function briefAttachSelect(event) {
+            Array.from(event.target.files || []).forEach(f => uploadBriefAsset(f));
+            event.target.value = '';
+        }
+
         async function uploadBriefAsset(file) {
             if (!currentDesignTaskRecord?.id || !currentBrand?.id) return;
             showToast(`Uploading ${file.name}…`);
@@ -24265,6 +24294,7 @@
         }
 
         async function uploadVersionFile(stageId, vNum, file) {
+            if (file.size > 999 * 1024) { showToast('File must be under 999 KB', 'error'); return; }
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage || !currentBrand?.id) return;
             const dz = document.getElementById(`dsvz-${stageId}-${vNum}`);
@@ -24550,6 +24580,7 @@
         }
 
         async function uploadS4File(stageId, sectionKey, file) {
+            if (file.size > 999 * 1024) { showToast('File must be under 999 KB', 'error'); return; }
             const stage = currentStages.find(s => s.id === stageId);
             if (!stage || !currentBrand?.id) return;
             try {
