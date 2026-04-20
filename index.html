@@ -5499,6 +5499,19 @@
                             </div>
                         </div>
 
+                        <!-- Attachments -->
+                        <div>
+                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8;margin-bottom:6px">Attachments <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:#94a3b8">— club logo, sponsor logos, references…</span></div>
+                            <div id="cdt-attach-list" style="display:flex;flex-direction:column;gap:3px;margin-bottom:6px"></div>
+                            <button type="button" onclick="document.getElementById('cdt-attach-input').click()" style="display:flex;align-items:center;gap:6px;padding:7px 12px;border:1.5px dashed #cbd5e1;border-radius:8px;background:#fafbfc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;width:100%;box-sizing:border-box" onmouseover="this.style.borderColor='#94a3b8';this.style.background='#f1f5f9'" onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#fafbfc'">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                Add attachment
+                            </button>
+                            <input type="file" id="cdt-attach-input" class="hide" multiple
+                                accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf,.zip,.eps,.psd"
+                                onchange="_cdtAttachFileSelect(event)">
+                        </div>
+
                     </div><!-- end LEFT -->
 
                     <!-- RIGHT: Brief prompts (always visible, scrollable) -->
@@ -18849,6 +18862,7 @@
         // ── Create Design Task (modal) ────────────────────────────────────────
         let _cdtSelectedProducts = [];
         let _cdtColours = { primary:{hex:'',pantone:''}, secondary:{hex:'',pantone:''}, accent:{hex:'',pantone:''} };
+        let _cdtPendingAttachments = [];
 
         function cdtColourPick(key, hex) {
             if (!_cdtColours[key]) _cdtColours[key] = {};
@@ -18877,6 +18891,7 @@
                     const cp = document.getElementById(`cdt-cp-${k}`); if (cp) cp.value = '#000000';
                     const pan = document.getElementById(`cdt-pan-${k}`); if (pan) pan.value = '';
                 });
+                _cdtPendingAttachments = [];
                 _cdtSelectedProducts = [];
                 _cdtSelectedCatalogueProducts = [];
                 _cdtAllProducts = [];
@@ -19206,6 +19221,29 @@
                 showToast(`Design task created: ${ref}`);
                 allDesignTasks.unshift(data);
                 renderDesignStudio();
+
+                // Upload any pending attachments
+                if (_cdtPendingAttachments.length > 0) {
+                    const taskId = data.id;
+                    const attachCopy = [..._cdtPendingAttachments];
+                    _cdtPendingAttachments = [];
+                    const actor = await supabase.auth.getUser();
+                    const actorName = currentUserProfile ? `${currentUserProfile.first_name||''} ${currentUserProfile.last_name||''}`.trim() : null;
+                    for (const file of attachCopy) {
+                        try {
+                            const safeName = file.name.replace(/[^a-z0-9._-]/gi, '_');
+                            const path = `${currentBrand.slug || currentBrand.id}/design-tasks/${taskId}/assets/${Date.now()}-${safeName}`;
+                            const { error: upErr } = await supabase.storage.from('club-images').upload(path, file, { upsert: true });
+                            if (upErr) { console.error('Attachment upload error', upErr); continue; }
+                            const { data: { publicUrl } } = supabase.storage.from('club-images').getPublicUrl(path);
+                            await supabase.from('design_task_assets').insert({
+                                design_task_id: taskId, brand_id: currentBrand.id,
+                                file_name: file.name, file_url: publicUrl, file_type: file.type, file_size: file.size,
+                                uploaded_by: actor?.data?.user?.id || null, uploaded_by_name: actorName
+                            });
+                        } catch(e) { console.error('Attachment upload error', e); }
+                    }
+                }
 
                 // Navigate to the new task record
                 setTimeout(() => showDesignTask(data.id), 300);
@@ -21569,30 +21607,35 @@
                             ${task.colour_palette ? `<div style="margin-top:10px;padding:7px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:11px;color:#64748b">
                                 <span style="font-weight:600">Notes:</span> ${escHtml(task.colour_palette)}
                             </div>` : ''}
-
-                            <!-- Attachments sub-section -->
-                            <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9">
-                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-                                    <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8">Attachments</span>
-                                    <button onclick="document.getElementById('br-attach-input').click()" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;border:1.5px dashed #cbd5e1;background:#fafbfc;color:#64748b;font-size:10px;font-weight:600;cursor:pointer;transition:border-color 0.15s" onmouseover="this.style.borderColor='#94a3b8'" onmouseout="this.style.borderColor='#cbd5e1'">
-                                        <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                                        Add file
-                                    </button>
-                                </div>
-                                ${assets.length
-                                    ? `<div style="display:flex;flex-direction:column;gap:4px">${assets.map(a => `<div style="display:flex;align-items:center;gap:7px;padding:5px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px">
-                                        <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                        <a href="${escHtml(a.file_url)}" target="_blank" style="flex:1;min-width:0;font-size:11px;color:#0f172a;font-weight:500;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(a.file_name)}">${escHtml(a.file_name)}</a>
-                                        <span style="font-size:10px;color:#94a3b8;flex-shrink:0">${a.file_size ? Math.round(a.file_size/1024)+'KB' : ''}</span>
-                                        <button onclick="deleteBriefAsset('${a.id}')" title="Remove" style="width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:#94a3b8;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;flex-shrink:0;padding:0" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#94a3b8'">×</button>
-                                    </div>`).join('')}</div>`
-                                    : `<p style="font-size:11px;color:#94a3b8;margin:0">No attachments yet</p>`}
-                                <input type="file" id="br-attach-input" class="hide" multiple
-                                    accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf,.zip,.eps"
-                                    onchange="briefAttachSelect(event)">
-                            </div>
                         </div>
                     </div><!-- /compact tabbed card -->
+
+                    <!-- ③ Attachments -->
+                    <div class="ds-ov-section">
+                        <div class="ds-ov-section-hdr">
+                            <div class="ds-ov-section-num">3</div>
+                            <div class="ds-ov-section-title">Attachments</div>
+                            <span style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:4px">Club logo, sponsor logos, references…</span>
+                            ${assets.length ? `<span style="margin-left:auto;font-size:10px;color:#64748b;font-weight:600;flex-shrink:0">${assets.length} file${assets.length!==1?'s':''}</span>` : ''}
+                        </div>
+                        <div style="display:flex;flex-direction:column;gap:4px">
+                            ${assets.map(a => `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f8fafc;border:1px solid #e8ecf2;border-radius:8px">
+                                ${/\.(png|jpe?g|gif|webp|svg)$/i.test(a.file_name)
+                                    ? `<img src="${escHtml(a.file_url)}" alt="" style="width:28px;height:28px;object-fit:cover;border-radius:4px;flex-shrink:0;border:1px solid #e2e8f0">`
+                                    : `<div style="width:28px;height:28px;border-radius:4px;background:#e8ecf2;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:8px;font-weight:700;color:#64748b;text-transform:uppercase">${escHtml(a.file_name.split('.').pop())}</div>`}
+                                <a href="${escHtml(a.file_url)}" target="_blank" style="flex:1;min-width:0;font-size:12px;font-weight:600;color:#0f172a;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(a.file_name)}">${escHtml(a.file_name)}</a>
+                                <span style="font-size:10px;color:#94a3b8;flex-shrink:0">${a.file_size ? Math.round(a.file_size/1024)+'KB' : ''}</span>
+                                <button onclick="deleteBriefAsset('${a.id}',event)" title="Remove" style="width:20px;height:20px;border-radius:5px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-size:16px;line-height:1;padding:0;flex-shrink:0;display:flex;align-items:center;justify-content:center" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#94a3b8'">×</button>
+                            </div>`).join('')}
+                            <button onclick="document.getElementById('br-attach-input').click()" style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;border:1.5px dashed #cbd5e1;border-radius:8px;background:#fafbfc;color:#64748b;font-size:11px;font-weight:600;cursor:pointer;transition:all 0.15s;margin-top:${assets.length?'4':'0'}px" onmouseover="this.style.borderColor='#94a3b8';this.style.background='#f1f5f9'" onmouseout="this.style.borderColor='#cbd5e1';this.style.background='#fafbfc'">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                Upload attachment
+                            </button>
+                            <input type="file" id="br-attach-input" class="hide" multiple
+                                accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf,.zip,.eps,.psd"
+                                onchange="briefAttachSelect(event)">
+                        </div>
+                    </div>
 
                     <!-- ④ Products Required -->
                     <div class="ds-ov-section">
@@ -24003,6 +24046,27 @@
         function briefAttachSelect(event) {
             Array.from(event.target.files || []).forEach(f => uploadBriefAsset(f));
             event.target.value = '';
+        }
+
+        function _cdtAttachFileSelect(event) {
+            Array.from(event.target.files || []).forEach(f => _cdtPendingAttachments.push(f));
+            event.target.value = '';
+            _cdtRenderAttachList();
+        }
+        function _cdtRemoveAttach(idx) {
+            _cdtPendingAttachments.splice(idx, 1);
+            _cdtRenderAttachList();
+        }
+        function _cdtRenderAttachList() {
+            const el = document.getElementById('cdt-attach-list');
+            if (!el) return;
+            el.innerHTML = _cdtPendingAttachments.map((f, i) => `
+                <div style="display:flex;align-items:center;gap:7px;padding:5px 8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px">
+                    <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="flex-shrink:0"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                    <span style="flex:1;min-width:0;font-size:11px;color:#0f172a;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(f.name)}</span>
+                    <span style="font-size:10px;color:#94a3b8;flex-shrink:0">${Math.round(f.size/1024)}KB</span>
+                    <button onclick="_cdtRemoveAttach(${i})" style="width:18px;height:18px;border-radius:4px;border:none;background:transparent;color:#94a3b8;cursor:pointer;font-size:14px;line-height:1;padding:0;flex-shrink:0;display:flex;align-items:center;justify-content:center" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#94a3b8'">×</button>
+                </div>`).join('');
         }
 
         async function uploadBriefAsset(file) {
