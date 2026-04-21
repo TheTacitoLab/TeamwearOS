@@ -4959,12 +4959,28 @@
              MODAL: Catalogue Settings
              ============================================================ -->
         <!-- ── Tag Editor Popover ──────────────────────────────────────────── -->
-        <div id="tag-editor-popover" class="hide fixed z-[200] w-72 glass rounded-2xl p-4 shadow-2xl border border-white/10">
-            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Edit Tags</p>
+        <div id="tag-editor-popover" class="hide fixed z-[200] w-80 glass rounded-2xl p-4 shadow-2xl border border-white/10">
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Edit Tags</p>
+                <button onclick="clearAllTagsFromEditor()" class="text-xs text-red-400 hover:text-red-300" title="Clear all tags">Clear all</button>
+            </div>
             <div id="tag-editor-chips" class="flex flex-wrap gap-1 min-h-6 mb-3"></div>
-            <div class="flex gap-2">
-                <input type="text" id="tag-editor-input" placeholder="Add tag…" class="flex-1 px-2.5 py-1.5 rounded-lg text-xs bg-gray-800 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-brand-500" onkeydown="if(event.key==='Enter'){event.preventDefault();addTagFromEditor();}">
+            <div class="flex gap-2 mb-3">
+                <input type="text" id="tag-editor-input" placeholder="Type new tag…" class="flex-1 px-2.5 py-1.5 rounded-lg text-xs bg-gray-800 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-brand-500" onkeydown="if(event.key==='Enter'){event.preventDefault();addTagFromEditor();}">
                 <button onclick="addTagFromEditor()" class="btn-primary text-xs px-3 py-1.5 rounded-lg">Add</button>
+            </div>
+            <div id="tag-editor-suggestions-wrap">
+                <p class="text-xs text-gray-600 uppercase tracking-wider font-semibold mb-1.5">From Library</p>
+                <div id="tag-editor-suggestions" class="flex flex-wrap gap-1 max-h-28 overflow-y-auto"></div>
+            </div>
+        </div>
+
+        <!-- ── Inline Price Editor Popover ────────────────────────────────── -->
+        <div id="inline-price-popover" class="hide fixed z-[200] w-52 glass rounded-xl p-3 shadow-2xl border border-white/10">
+            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2" id="inline-price-label">Price</p>
+            <div class="flex gap-2">
+                <input type="number" step="0.01" min="0" id="inline-price-input" placeholder="0.00" class="flex-1 px-2.5 py-1.5 rounded-lg text-sm bg-gray-800 border border-gray-700 text-white placeholder-gray-600 focus:outline-none focus:border-brand-500" onkeydown="if(event.key==='Enter'){saveInlinePrice();}if(event.key==='Escape'){closeInlinePrice();}">
+                <button onclick="saveInlinePrice()" class="btn-primary text-xs px-3 py-1.5 rounded-lg">✓</button>
             </div>
         </div>
 
@@ -7065,8 +7081,10 @@
                     const tp = tierPricesObj[t.tier_key] || {};
                     const y = tp.youth || (t.tier_key === 'retail' ? p.youth_retail_price : (t.tier_key === 'partner' ? p.youth_partner_price : null));
                     const a = tp.adult || (t.tier_key === 'retail' ? p.adult_retail_price : (t.tier_key === 'partner' ? p.adult_partner_price : null));
-                    return `<td class="py-3 pr-3 text-right text-sm">${y ? '£' + Number(y).toFixed(2) : '-'}</td>` +
-                           `<td class="py-3 pr-3 text-right text-sm">${a ? '£' + Number(a).toFixed(2) : (p.is_single_price ? '<span class="text-gray-600 text-xs">single</span>' : '-')}</td>`;
+                    const yDisp = y ? '£' + Number(y).toFixed(2) : '-';
+                    const aDisp = a ? '£' + Number(a).toFixed(2) : (p.is_single_price ? '—' : '-');
+                    return `<td class="py-3 pr-3 text-right text-sm cursor-pointer hover:text-brand-400 group" onclick="openInlinePrice(event,'${p.id}','${t.tier_key}','youth')" title="Click to edit">${yDisp}<svg class="w-2.5 h-2.5 inline-block ml-0.5 opacity-0 group-hover:opacity-60 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg></td>` +
+                           `<td class="py-3 pr-3 text-right text-sm cursor-pointer hover:text-brand-400 group" onclick="openInlinePrice(event,'${p.id}','${t.tier_key}',${p.is_single_price ? "'one_size'" : "'adult'"})" title="Click to edit">${aDisp}<svg class="w-2.5 h-2.5 inline-block ml-0.5 opacity-0 group-hover:opacity-60 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg></td>`;
                 }).join('');
                 return `<tr class="border-b border-gray-800 hover:bg-gray-900/50">
                     <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap text-xs">${escHtml(p.product_code)}</td>
@@ -7159,6 +7177,30 @@
             document.getElementById('tag-editor-chips').innerHTML = _tagEditorTags.length
                 ? _tagEditorTags.map(t => `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-gray-700 text-gray-200">${escHtml(t)}<button type="button" onclick="removeTagFromEditor('${escHtml(t)}')" class="text-gray-400 hover:text-red-400 leading-none">&times;</button></span>`).join('')
                 : '<span class="text-gray-600 text-xs">No tags yet</span>';
+            // Render library suggestions (excluding already-applied tags)
+            const sugg = document.getElementById('tag-editor-suggestions');
+            const wrap = document.getElementById('tag-editor-suggestions-wrap');
+            if (sugg && typeof brandShopifyTags !== 'undefined') {
+                const available = (brandShopifyTags || []).filter(t => !_tagEditorTags.includes(t.tag));
+                if (wrap) wrap.style.display = available.length ? '' : 'none';
+                sugg.innerHTML = available.map(t => `<button type="button" onclick="addLibTagFromEditor('${escHtml(t.tag)}')" class="px-2 py-0.5 rounded-full text-xs border border-gray-700 bg-gray-800 text-gray-400 hover:border-brand-500 hover:text-brand-400 transition">${escHtml(t.tag)}</button>`).join('');
+            }
+        }
+
+        function addLibTagFromEditor(tag) {
+            if (!_tagEditorTags.includes(tag)) {
+                _tagEditorTags.push(tag);
+                renderTagEditorChips();
+                saveTagEditorTags();
+            }
+        }
+
+        async function clearAllTagsFromEditor() {
+            if (!_tagEditorTags.length) return;
+            if (!confirm('Remove all tags from this product?')) return;
+            _tagEditorTags = [];
+            renderTagEditorChips();
+            await saveTagEditorTags();
         }
 
         async function addTagFromEditor() {
@@ -7194,6 +7236,66 @@
                         `<svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>`;
                 }
             }
+        }
+
+        // ── Inline Price Editor ────────────────────────────────────────────────
+        let _inlinePriceState = null; // { productId, tierKey, fitKey }
+
+        function openInlinePrice(event, productId, tierKey, fitKey) {
+            event.stopPropagation();
+            const p = products.find(x => x.id === productId);
+            if (!p) return;
+            const tp = (p.tier_prices && typeof p.tier_prices === 'object') ? (p.tier_prices[tierKey] || {}) : {};
+            const currentVal = tp[fitKey] || '';
+            _inlinePriceState = { productId, tierKey, fitKey };
+            const lbl = document.getElementById('inline-price-label');
+            const inp = document.getElementById('inline-price-input');
+            if (lbl) lbl.textContent = tierKey.charAt(0).toUpperCase() + tierKey.slice(1) + ' · ' + fitKey.replace('_', ' ');
+            if (inp) { inp.value = currentVal; }
+            const popover = document.getElementById('inline-price-popover');
+            popover.classList.remove('hide');
+            const rect = event.currentTarget.getBoundingClientRect();
+            const scrollY = window.scrollY;
+            const pw = 208;
+            let left = rect.right - pw;
+            if (left < 8) left = 8;
+            if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+            popover.style.top = (rect.bottom + scrollY + 4) + 'px';
+            popover.style.left = left + 'px';
+            setTimeout(() => inp?.select(), 50);
+        }
+
+        function closeInlinePrice() {
+            document.getElementById('inline-price-popover').classList.add('hide');
+            _inlinePriceState = null;
+        }
+
+        async function saveInlinePrice() {
+            if (!_inlinePriceState) return;
+            const { productId, tierKey, fitKey } = _inlinePriceState;
+            const inp = document.getElementById('inline-price-input');
+            const val = inp ? parseFloat(inp.value) || null : null;
+            const p = products.find(x => x.id === productId);
+            if (!p) { closeInlinePrice(); return; }
+            // Update tier_prices JSON
+            const tierPrices = JSON.parse(JSON.stringify((p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {}));
+            if (!tierPrices[tierKey]) tierPrices[tierKey] = {};
+            if (val) tierPrices[tierKey][fitKey] = val;
+            else delete tierPrices[tierKey][fitKey];
+            // Build legacy column updates for backward compat
+            const legacyUpdate = { tier_prices: tierPrices };
+            if (tierKey === 'retail' && fitKey === 'youth')  legacyUpdate.youth_retail_price  = val;
+            if (tierKey === 'retail' && fitKey === 'adult')  legacyUpdate.adult_retail_price  = val;
+            if (tierKey === 'partner' && fitKey === 'youth') legacyUpdate.youth_partner_price = val;
+            if (tierKey === 'partner' && fitKey === 'adult') legacyUpdate.adult_partner_price = val;
+            if (fitKey === 'one_size') { legacyUpdate.is_single_price = true; if (tierKey === 'retail') legacyUpdate.single_retail_price = val; if (tierKey === 'partner') legacyUpdate.single_partner_price = val; }
+            const { error } = await supabase.from('products').update(legacyUpdate).eq('id', productId);
+            if (error) { showToast('Error saving price', 'error'); return; }
+            p.tier_prices = tierPrices;
+            Object.assign(p, legacyUpdate);
+            closeInlinePrice();
+            renderProductsTable();
+            showToast('Price updated ✓');
         }
 
         // ── Bulk Tag Operations (from Catalogue Settings) ──────────────────────
@@ -7270,6 +7372,8 @@
         document.addEventListener('click', function(e) {
             const tagPopover = document.getElementById('tag-editor-popover');
             if (tagPopover && !tagPopover.classList.contains('hide') && !tagPopover.contains(e.target)) closeTagEditor();
+            const pricePopover = document.getElementById('inline-price-popover');
+            if (pricePopover && !pricePopover.classList.contains('hide') && !pricePopover.contains(e.target)) closeInlinePrice();
             const skuPopover = document.getElementById('sku-info-popover');
             if (skuPopover && !skuPopover.classList.contains('hide') &&
                 !skuPopover.contains(e.target) && !document.getElementById('sku-info-btn')?.contains(e.target)) {
@@ -7377,8 +7481,10 @@
             const fitTypeEl = document.getElementById('prod-fit-type');
             if (fitTypeEl) fitTypeEl.value = parts.join(' / ') || 'One Size Only';
 
-            // Snapshot DOM prices before re-render so user entries aren't lost
-            if (typeof collectCurrentTierPriceInputs === 'function') {
+            // Snapshot DOM prices before re-render — only if _lastTierPrices is already seeded
+            // (skips stale snapshot during editProduct() initialisation)
+            const _pricesSeeded = Object.values(_lastTierPrices).some(t => t && Object.keys(t).length > 0);
+            if (_pricesSeeded && typeof collectCurrentTierPriceInputs === 'function') {
                 const snap = collectCurrentTierPriceInputs();
                 brandPricingTiers.forEach(t => {
                     if (!_lastTierPrices[t.tier_key]) _lastTierPrices[t.tier_key] = {};
@@ -18383,23 +18489,55 @@
             container.innerHTML = homeActivityFeed.map(activity => {
                 const isTask = activity.activity_type === 'task';
                 const ts = new Date(activity.created_at).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-                const jobName = activity.jobs?.job_name || activity.jobs?.job_number || 'Unknown Job';
+                // Detect record type and name from joined data
+                let recordName = 'Unknown Record', recordType = '', recordId = '';
+                if (activity.design_tasks?.id) {
+                    recordType = 'design-task'; recordId = activity.design_tasks.id;
+                    recordName = activity.design_tasks.task_name || activity.design_tasks.task_ref || 'Design Task';
+                } else if (activity.jobs?.id) {
+                    recordType = 'job'; recordId = activity.jobs.id;
+                    recordName = activity.jobs.job_name || activity.jobs.job_number || 'Job';
+                } else if (activity.leads?.id) {
+                    recordType = 'lead'; recordId = activity.leads.id;
+                    recordName = activity.leads.lead_name || 'Lead';
+                } else if (activity.clubs?.id) {
+                    recordType = 'club'; recordId = activity.clubs.id;
+                    recordName = activity.clubs.name || 'Club';
+                }
                 const typeIcon = isTask ? '📋' : '💬';
                 const typeColor = isTask ? '#c2410c' : '#2563eb';
+                const viewBtn = recordId ? `<button onclick="navigateFromFeed('${recordType}','${recordId}')" class="feed-action-btn" title="View record" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;font-size:9px;font-weight:700">→</button>` : '';
                 return `<div class="home-feed-item${isTask ? ' task-feed-item' : ''}">
                     <div style="font-size:16px;flex-shrink:0;margin-top:2px">${typeIcon}</div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold truncate" style="color:${typeColor}">${isTask ? 'Task' : 'Comment'} · <span style="color:#64748b;font-weight:600">${escHtml(jobName)}</span></p>
+                        <p class="text-xs font-bold truncate" style="color:${typeColor}">${isTask ? 'Task' : 'Comment'} · <span style="color:#64748b;font-weight:600">${escHtml(recordName)}</span></p>
                         <p class="text-xs text-gray-600 mt-0.5 truncate">${escHtml(activity.message)}</p>
                         <p class="text-xs text-gray-400 mt-0.5">${escHtml(activity.user_name)} · ${ts}</p>
                     </div>
                     <div class="flex flex-col gap-1">
+                        ${viewBtn}
                         <button onclick="dismissFeedActivity('${activity.id}')" class="feed-action-btn btn-dismiss" title="Dismiss">✕</button>
                         ${isTask && !activity.task_completed ? `<button onclick="completeFeedTask('${activity.id}')" class="feed-action-btn btn-done" title="Complete task">✓</button>` : ''}
-                        <button onclick="likeFeedActivity('${activity.id}')" class="feed-action-btn btn-like" title="Acknowledge">👍</button>
                     </div>
                 </div>`;
             }).join('');
+        }
+
+        function navigateFromFeed(recordType, recordId) {
+            if (!recordId) return;
+            if (recordType === 'design-task') { showDesignTask(recordId); return; }
+            if (recordType === 'job') { openJobRecord(recordId); return; }
+            if (recordType === 'club') {
+                setGlobalNav('clubs');
+                const club = (clubs||[]).find(c => c.id === recordId);
+                if (club && typeof openClubDetail === 'function') openClubDetail(club);
+                return;
+            }
+            if (recordType === 'lead') {
+                setGlobalNav('leads');
+                if (typeof openLeadRecord === 'function') openLeadRecord(recordId);
+                return;
+            }
         }
 
         async function dismissFeedActivity(activityId) {
@@ -20181,7 +20319,7 @@
             // Status action badge
             let actionBadge = '';
             if (task.status === 'new') {
-                actionBadge = `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid #dc2626;color:#dc2626;background:#fef2f2;cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1.4">Not Started</button>`;
+                actionBadge = `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;border:1.5px solid #16a34a;color:#fff;background:#16a34a;cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1.4">▶ Start</button>`;
             } else if (task.status === 'revisions') {
                 actionBadge = `<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid #b4530920;color:#b45309;background:#fffbeb;white-space:nowrap;flex-shrink:0">Revisions</span>`;
             } else if (task.status === 'factory_handover') {
@@ -20351,19 +20489,18 @@
 
             panel.innerHTML = `<div style="overflow-y:auto;height:100%;padding:16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
 
-                <!-- Header: Open Task button + title + status pill + ref/club -->
+                <!-- Header: title + status + ref/club + Open Task button -->
                 <div style="border-bottom:1px solid #f1f5f9;padding-bottom:10px">
-                    <!-- Open Task button at the top -->
-                    <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s;margin-bottom:10px" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
-                        Open Task Record
-                    </button>
                     <div style="font-size:14px;font-weight:800;color:#0f172a;line-height:1.3;margin-bottom:6px">${escHtml(task.task_name || 'Untitled Task')}</div>
-                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
                         <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
                         ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px">${escHtml(task.task_ref)}</span>` : ''}
                         ${task.clubs?.name ? `<span style="font-size:11px;color:#475569;font-weight:500">${escHtml(task.clubs.name)}</span>` : ''}
                     </div>
+                    <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
+                        Open Task Record
+                    </button>
                 </div>
 
                 <!-- Key details grid -->
@@ -22080,8 +22217,8 @@
                             ? `<img src="${escHtml(logoUrl)}" alt="" style="width:32px;height:32px;object-fit:contain;border-radius:6px;background:#fff;border:1px solid #e2e8f0;flex-shrink:0;padding:2px">`
                             : `<div style="width:32px;height:32px;border-radius:6px;background:#e8ecf0;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg width="13" height="13" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg></div>`}
                         <div style="flex:1;min-width:0">
-                            <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled Task')}</div>
-                            <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
+                            <input id="dtr-ln-task-name" value="${escHtml(task.task_name||'')}" placeholder="Task name…" style="width:100%;font-size:12px;font-weight:700;color:#0f172a;border:none;border-bottom:1.5px solid #e2e8f0;background:transparent;outline:none;padding:0 0 2px;box-sizing:border-box" onfocus="this.style.borderColor='#6d28d9'" onblur="this.style.borderColor='#e2e8f0'">
+                            <div style="font-size:10px;color:#64748b;margin-top:3px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                         </div>
                         <button onclick="toggleDTREditMode()" class="dt-edit-btn active" style="font-size:10px;padding:3px 9px;flex-shrink:0">Done</button>
                     </div>
@@ -22437,7 +22574,7 @@
                 const hasColour = ['primary','secondary','accent'].some(k => savedCols[k]?.hex || savedCols[k]?.pantone);
                 const statusEl = document.getElementById('dtr-ln-status');
                 const payload = {
-                    task_name:   currentDesignTaskRecord.task_name,
+                    task_name:   document.getElementById('dtr-ln-task-name')?.value?.trim() || currentDesignTaskRecord.task_name,
                     status:      statusEl?.value || currentDesignTaskRecord.status || 'new',
                     design_brief: document.getElementById('dtr-ln-brief')?.value?.trim() || '',
                     key_notes:   document.getElementById('dtr-ln-key-notes')?.value?.trim() || null,
