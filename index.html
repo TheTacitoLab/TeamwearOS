@@ -2318,15 +2318,19 @@
                         </label>
                     </div>
 
-                    <!-- Shopify Tags (replaces has_addons) -->
+                    <!-- Shopify Tags -->
                     <div class="mt-3 pt-3 border-t border-gray-700">
-                        <label class="text-gray-400 text-sm mb-2 block">Shopify Tags <span class="text-gray-600 text-xs ml-1">(saved per brand — reusable)</span></label>
-                        <div class="flex gap-2 mb-2">
-                            <input type="text" id="prod-tag-input" placeholder="Type a tag and press Enter..." class="flex-1 px-3 py-2 rounded-lg text-sm" onkeydown="handleProductTagInput(event)">
-                            <button type="button" onclick="addProductTag()" class="btn-secondary text-sm px-3">Add</button>
+                        <label class="text-gray-400 text-sm mb-2 block">Shopify Tags <span class="text-gray-600 text-xs ml-1">(brand library — reusable across all products)</span></label>
+                        <div id="product-tags-chips" class="flex flex-wrap gap-1.5 mb-2 min-h-6"></div>
+                        <div style="position:relative">
+                            <input type="text" id="prod-tag-input" placeholder="Search or create tag…" autocomplete="off"
+                                class="w-full px-3 py-2 rounded-lg text-sm"
+                                oninput="filterProdTagSuggestions(this.value)"
+                                onfocus="filterProdTagSuggestions(this.value)"
+                                onkeydown="handleProductTagInput(event)"
+                                onblur="setTimeout(closeProdTagDropdown,150)">
+                            <div id="prod-tag-dropdown" class="hide" style="position:absolute;left:0;right:0;top:100%;margin-top:4px;z-index:999;max-height:200px;overflow-y:auto;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:#1e293b;box-shadow:0 8px 32px rgba(0,0,0,0.45)"></div>
                         </div>
-                        <div id="brand-saved-tags" class="flex flex-wrap gap-1 mb-2 empty:hidden"></div>
-                        <div id="product-tags-chips" class="flex flex-wrap gap-1 min-h-5"></div>
                     </div>
                 </div>
 
@@ -7154,14 +7158,18 @@
             renderTagEditorChips();
             const popover = document.getElementById('tag-editor-popover');
             popover.classList.remove('hide');
-            // Position below the clicked cell, clamped to viewport
+            // Position below cell, flip above if near viewport bottom
             const rect = event.currentTarget.getBoundingClientRect();
             const scrollY = window.scrollY;
-            const pw = 288; // w-72
+            const pw = 320; // w-80
             let left = rect.left;
             if (left + pw > window.innerWidth - 12) left = window.innerWidth - pw - 12;
             if (left < 8) left = 8;
-            popover.style.top = (rect.bottom + scrollY + 6) + 'px';
+            const popH = 290;
+            const top = (rect.bottom + popH + 8 > window.innerHeight)
+                ? rect.top + scrollY - popH - 4
+                : rect.bottom + scrollY + 6;
+            popover.style.top = Math.max(scrollY + 8, top) + 'px';
             popover.style.left = left + 'px';
             const inp = document.getElementById('tag-editor-input');
             inp.value = '';
@@ -7260,7 +7268,12 @@
             let left = rect.right - pw;
             if (left < 8) left = 8;
             if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
-            popover.style.top = (rect.bottom + scrollY + 4) + 'px';
+            // Flip above cell if near viewport bottom
+            const popH = 100;
+            const top = (rect.bottom + popH + 8 > window.innerHeight)
+                ? rect.top + scrollY - popH - 4
+                : rect.bottom + scrollY + 4;
+            popover.style.top = Math.max(scrollY + 8, top) + 'px';
             popover.style.left = left + 'px';
             setTimeout(() => inp?.select(), 50);
         }
@@ -7372,6 +7385,8 @@
         document.addEventListener('click', function(e) {
             const tagPopover = document.getElementById('tag-editor-popover');
             if (tagPopover && !tagPopover.classList.contains('hide') && !tagPopover.contains(e.target)) closeTagEditor();
+            const prodTagDropdown = document.getElementById('prod-tag-dropdown');
+            if (prodTagDropdown && !prodTagDropdown.classList.contains('hide') && !prodTagDropdown.contains(e.target) && e.target.id !== 'prod-tag-input') closeProdTagDropdown();
             const pricePopover = document.getElementById('inline-price-popover');
             if (pricePopover && !pricePopover.classList.contains('hide') && !pricePopover.contains(e.target)) closeInlinePrice();
             const skuPopover = document.getElementById('sku-info-popover');
@@ -7724,55 +7739,100 @@
         // PRODUCT: SHOPIFY TAGS UI
         // =============================================
         function renderProductTagsUI() {
-            // Render saved brand tags as clickable suggestions
-            const savedEl = document.getElementById('brand-saved-tags');
-            if (savedEl) {
-                savedEl.innerHTML = brandShopifyTags.map(t =>
-                    `<button type="button" onclick="toggleProductTag('${escHtml(t.tag)}')" class="px-2 py-1 rounded text-xs border transition ${currentProductTags.includes(t.tag) ? 'bg-brand-500/20 border-brand-500 text-brand-400' : 'bg-gray-800 border-gray-700 text-gray-500 hover:border-gray-500'}">${escHtml(t.tag)}</button>`
-                ).join('');
-            }
-            // Render current product tags as removable chips
             const chipsEl = document.getElementById('product-tags-chips');
-            if (chipsEl) {
-                if (currentProductTags.length === 0) {
-                    chipsEl.innerHTML = '<span class="text-gray-700 text-xs italic">No tags added yet</span>';
-                } else {
-                    chipsEl.innerHTML = currentProductTags.map(t =>
-                        `<span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs">${escHtml(t)}<button type="button" onclick="removeProductTag('${escHtml(t)}')" class="text-brand-600 hover:text-red-400 ml-0.5">&times;</button></span>`
-                    ).join('');
-                }
+            if (!chipsEl) return;
+            if (!currentProductTags.length) {
+                chipsEl.innerHTML = '<span style="font-size:11px;color:#475569;font-style:italic">No tags yet — search above to add</span>';
+                return;
             }
+            chipsEl.innerHTML = currentProductTags.map((t, i) =>
+                '<span style="display:inline-flex;align-items:center;gap:5px;padding:4px 6px 4px 10px;border-radius:20px;background:rgba(109,40,217,0.13);border:1px solid rgba(109,40,217,0.28);font-size:11px;font-weight:500;color:#c4b5fd">'
+                + escHtml(t)
+                + '<button type="button" onclick="removeProductTagByIndex(' + i + ')" title="Remove tag" style="width:16px;height:16px;border-radius:50%;border:none;background:rgba(255,255,255,0.1);color:#94a3b8;cursor:pointer;font-size:12px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">×</button>'
+                + '</span>'
+            ).join('');
         }
 
-        function toggleProductTag(tag) {
-            const idx = currentProductTags.indexOf(tag);
-            if (idx === -1) currentProductTags.push(tag);
-            else currentProductTags.splice(idx, 1);
+        function removeProductTagByIndex(idx) {
+            currentProductTags.splice(idx, 1);
             renderProductTagsUI();
+            // Re-filter suggestions with current input
+            const inp = document.getElementById('prod-tag-input');
+            if (inp) filterProdTagSuggestions(inp.value);
         }
 
+        // keep legacy alias for any remaining callers
         function removeProductTag(tag) {
             currentProductTags = currentProductTags.filter(t => t !== tag);
             renderProductTagsUI();
         }
+        function toggleProductTag(tag) {
+            const idx = currentProductTags.indexOf(tag);
+            if (idx === -1) currentProductTags.push(tag); else currentProductTags.splice(idx, 1);
+            renderProductTagsUI();
+        }
 
-        function addProductTag() {
-            const input = document.getElementById('prod-tag-input');
-            if (!input) return;
-            const tag = input.value.trim();
-            if (!tag) return;
+        function filterProdTagSuggestions(val) {
+            const dropdown = document.getElementById('prod-tag-dropdown');
+            if (!dropdown) return;
+            const q = (val || '').toLowerCase().trim();
+            const available = (brandShopifyTags || [])
+                .filter(t => !currentProductTags.includes(t.tag) && (!q || t.tag.toLowerCase().includes(q)));
+            const exactMatch = brandShopifyTags.some(t => t.tag.toLowerCase() === q);
+            const showCreate = q && !currentProductTags.includes(q) && !exactMatch;
+            const items = available.slice(0, 12);
+            if (!items.length && !showCreate) { dropdown.classList.add('hide'); return; }
+            const itemStyle = 'padding:8px 12px;font-size:12px;color:#e2e8f0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.05)';
+            dropdown.innerHTML = items.map(t =>
+                '<div onclick="selectProdTagSuggestion(\'' + escHtml(t.tag) + '\')" style="' + itemStyle + '" onmouseover="this.style.background=\'rgba(109,40,217,0.18)\'" onmouseout="this.style.background=\'\'">'
+                + escHtml(t.tag) + '</div>'
+            ).join('') + (showCreate
+                ? '<div onclick="selectProdTagSuggestion(\'' + escHtml(q) + '\')" style="' + itemStyle + 'color:#a78bfa;font-weight:600;border-bottom:none" onmouseover="this.style.background=\'rgba(109,40,217,0.18)\'" onmouseout="this.style.background=\'\'">+ Create "' + escHtml(q) + '"</div>'
+                : '');
+            dropdown.classList.remove('hide');
+        }
+
+        function selectProdTagSuggestion(tag) {
             if (!currentProductTags.includes(tag)) {
                 currentProductTags.push(tag);
                 renderProductTagsUI();
             }
-            input.value = '';
+            const inp = document.getElementById('prod-tag-input');
+            if (inp) { inp.value = ''; inp.focus(); }
+            closeProdTagDropdown();
+            setTimeout(() => filterProdTagSuggestions(''), 10);
+        }
+
+        function closeProdTagDropdown() {
+            document.getElementById('prod-tag-dropdown')?.classList.add('hide');
         }
 
         function handleProductTagInput(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                addProductTag();
+                const val = event.target.value.trim().toLowerCase().replace(/\s+/g, '-');
+                if (val && !currentProductTags.includes(val)) {
+                    currentProductTags.push(val);
+                    renderProductTagsUI();
+                }
+                event.target.value = '';
+                closeProdTagDropdown();
+                setTimeout(() => filterProdTagSuggestions(''), 10);
+            } else if (event.key === 'Escape') {
+                closeProdTagDropdown();
             }
+        }
+
+        function addProductTag() {
+            const input = document.getElementById('prod-tag-input');
+            if (!input) return;
+            const tag = input.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (tag && !currentProductTags.includes(tag)) {
+                currentProductTags.push(tag);
+                renderProductTagsUI();
+            }
+            input.value = '';
+            closeProdTagDropdown();
         }
 
         // =============================================
@@ -13585,52 +13645,13 @@
             }).join('');
 
             panel.innerHTML = `
-                <!-- Stats row -->
-                <div class="gtm-stats-row">
-                    <div class="gtm-stat-card">
+                <!-- Pipeline value strip -->
+                <div style="display:flex;align-items:center;gap:16px;padding:10px 16px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;flex-shrink:0;margin-bottom:2px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+                    <div>
                         <div class="gtm-stat-label">My Pipeline</div>
-                        <div class="gtm-stat-row-inner">
-                            <div class="gtm-stat-value">${fmt(pipelineVal)}</div>
-                            <div class="gtm-stat-sub">${activeJobs.length} active jobs</div>
-                        </div>
+                        <div style="font-size:22px;font-weight:800;color:#0f172a;line-height:1">${fmt(pipelineVal)}</div>
                     </div>
-                    <div class="gtm-stat-card">
-                        <div class="gtm-stat-label">This Month</div>
-                        <div class="gtm-stat-row-inner">
-                            <div style="display:flex;align-items:center;gap:6px">
-                                <div class="gtm-stat-value" style="color:#059669">${fmt(monthRev)}</div>
-                                ${monthPct!==null?`<span class="gtm-target-pct" style="background:${tgtColor(monthPct)}22;color:${tgtColor(monthPct)}">${monthPct}%</span>`:''}
-                            </div>
-                            <div class="gtm-stat-sub">of £${yearlyTarget>0?Number(yearlyTarget/12).toLocaleString('en-GB',{maximumFractionDigits:0}):'—'}/mo target</div>
-                        </div>
-                    </div>
-                    <div class="gtm-stat-card">
-                        <div class="gtm-stat-label">YTD Revenue</div>
-                        <div class="gtm-stat-row-inner">
-                            <div style="display:flex;align-items:center;gap:6px">
-                                <div class="gtm-stat-value" style="color:#0369a1">${fmt(ytdRev)}</div>
-                                ${ytdPct!==null?`<span class="gtm-target-pct" style="background:${tgtColor(ytdPct)}22;color:${tgtColor(ytdPct)}">${ytdPct}%</span>`:''}
-                            </div>
-                            <div class="gtm-stat-sub">${paidJobs.filter(j=>new Date(j.paid_at).getFullYear()===curYear).length} jobs paid this year</div>
-                        </div>
-                    </div>
-                    <div class="gtm-stat-card">
-                        <div class="gtm-stat-label">Yearly Target</div>
-                        <div class="gtm-stat-row-inner">
-                            <div class="gtm-stat-value" style="font-size:15px">${yearlyTarget>0?fmt(yearlyTarget):'Not set'}</div>
-                            <div style="display:flex;align-items:center;gap:4px;margin-top:4px">
-                                <span style="font-size:10px;color:#94a3b8">£/yr:</span>
-                                <input class="gtm-target-input" type="number" value="${yearlyTarget||''}" placeholder="e.g. 500000"
-                                    onchange="_gtmSaveTarget(this.value);_renderGTMDashboard()" style="width:90px">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Monthly revenue bar chart -->
-                <div class="gtm-card" style="margin-bottom:14px;padding:12px 14px">
-                    <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">${curYear} Monthly Revenue (Paid jobs)</div>
-                    <div style="display:flex;gap:3px;align-items:flex-end">${barHtml}</div>
+                    <div style="font-size:11px;color:#94a3b8;font-weight:500">${activeJobs.length} active job${activeJobs.length !== 1 ? 's' : ''}</div>
                 </div>
 
                 <!-- 3-column body -->
