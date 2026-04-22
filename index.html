@@ -4997,47 +4997,68 @@
         </div>
 
         <!-- ── Tags Manager Modal ────────────────────────────────────────── -->
-        <div id="tags-manager-modal" class="hide fixed inset-0 z-[300] flex flex-col" style="background:#0f172a">
-            <!-- Header -->
-            <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;background:#1e293b;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0">
-                <svg class="w-5 h-5 text-brand-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
-                <span style="font-size:16px;font-weight:700;color:#f1f5f9;flex:1">Tags Manager</span>
-                <button onclick="closeTagsManager()" style="padding:6px 14px;background:#334155;border:none;border-radius:8px;color:#94a3b8;font-size:13px;cursor:pointer;font-weight:600">✕ Close</button>
-            </div>
-            <!-- Bulk Action Bar -->
-            <div style="display:flex;align-items:center;gap:10px;padding:10px 20px;background:#1e293b;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;flex-wrap:wrap">
-                <span style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Bulk Apply:</span>
-                <div style="position:relative;flex:0 0 220px">
-                    <input type="text" id="tm-bulk-tag-input" placeholder="Type or search tag…" autocomplete="off"
-                        oninput="tmFilterBulkSuggestions(this.value)"
-                        onfocus="tmFilterBulkSuggestions(this.value)"
-                        onblur="setTimeout(tmCloseBulkDropdown, 150)"
-                        onkeydown="tmBulkTagKeydown(event)"
-                        style="width:100%;padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:13px;outline:none">
-                    <div id="tm-bulk-dropdown" class="hide" style="position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:8px;max-height:160px;overflow-y:auto;z-index:10"></div>
+        <div id="tags-manager-modal" class="hide fixed inset-0 bg-black/80 z-[250] flex items-center justify-center py-6">
+            <div class="glass rounded-2xl w-full max-w-5xl mx-4 flex flex-col" style="max-height:88vh">
+                <!-- Header -->
+                <div class="flex justify-between items-center p-5 border-b border-white/5 flex-shrink-0">
+                    <div>
+                        <h3 class="text-xl font-bold">Tags Manager</h3>
+                        <p class="text-gray-500 text-xs mt-0.5">Manage Shopify tags across your product catalogue</p>
+                    </div>
+                    <button onclick="closeTagsManager()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
                 </div>
-                <button onclick="tmBulkAddToSelected()" style="padding:6px 12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#e2e8f0;font-size:12px;cursor:pointer;font-weight:600">Add to Selected</button>
-                <button onclick="tmBulkRemoveFromSelected()" style="padding:6px 12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#e2e8f0;font-size:12px;cursor:pointer;font-weight:600">Remove from Selected</button>
-                <button onclick="tmBulkAddToAll()" style="padding:6px 12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#e2e8f0;font-size:12px;cursor:pointer;font-weight:600">Add to All</button>
-                <div style="flex:1"></div>
-                <input type="text" id="tm-product-search" placeholder="Filter products…" oninput="tmRenderList()"
-                    style="padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:13px;outline:none;width:180px">
+                <!-- Toolbar -->
+                <div class="p-4 border-b border-white/5 flex-shrink-0 space-y-3">
+                    <!-- Product search -->
+                    <input type="text" id="tm-product-search" placeholder="Search by product code or name…" oninput="tmRenderList()" class="w-full px-3 py-2 rounded-lg text-sm">
+                    <!-- Bulk actions -->
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs text-gray-500 font-semibold uppercase tracking-wide flex-shrink-0">Bulk tag:</span>
+                        <div style="position:relative;flex:0 0 200px">
+                            <input type="text" id="tm-bulk-tag-input" placeholder="Type or pick from library…" autocomplete="off"
+                                oninput="tmFilterBulkSuggestions(this.value)"
+                                onfocus="tmFilterBulkSuggestions(this.value)"
+                                onblur="setTimeout(tmCloseBulkDropdown,150)"
+                                onkeydown="tmBulkTagKeydown(event)"
+                                class="w-full px-3 py-2 rounded-lg text-sm">
+                            <div id="tm-bulk-dropdown" class="hide" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:20;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.5)"></div>
+                        </div>
+                        <button onclick="tmBulkAddToSelected()" class="bg-brand-500 hover:bg-brand-600 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap">
+                            + Add to Selected (<span id="tm-sel-count">0</span>)
+                        </button>
+                        <button onclick="tmBulkRemoveFromSelected()" class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap">Remove from Selected</button>
+                        <button onclick="tmBulkAddToAll()" class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap">Add to All Products</button>
+                    </div>
+                </div>
+                <!-- Table -->
+                <div style="overflow-y:auto;flex:1">
+                    <table style="width:100%;border-collapse:collapse">
+                        <thead style="position:sticky;top:0;z-index:2;background:rgba(15,23,42,0.97)">
+                            <tr class="border-b border-white/5">
+                                <th class="text-left" style="padding:9px 8px 9px 20px;width:40px">
+                                    <input type="checkbox" id="tm-select-all" onchange="tmToggleSelectAll(this.checked)" style="cursor:pointer">
+                                </th>
+                                <th class="text-xs text-gray-500 font-semibold uppercase tracking-wide text-left" style="padding:9px 8px;width:130px">Code</th>
+                                <th class="text-xs text-gray-500 font-semibold uppercase tracking-wide text-left" style="padding:9px 8px;width:220px">Name</th>
+                                <th class="text-xs text-gray-500 font-semibold uppercase tracking-wide text-left" style="padding:9px 20px 9px 8px">Tags</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tm-product-list"></tbody>
+                    </table>
+                </div>
             </div>
-            <!-- Product Table -->
-            <div style="flex:1;overflow-y:auto;padding:0 20px 20px">
-                <table style="width:100%;border-collapse:collapse">
-                    <thead style="position:sticky;top:0;background:#0f172a;z-index:2">
-                        <tr>
-                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b;width:36px">
-                                <input type="checkbox" id="tm-select-all" onchange="tmToggleSelectAll(this.checked)" style="cursor:pointer">
-                            </th>
-                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b;width:120px">Code</th>
-                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b">Name</th>
-                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b">Tags</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tm-product-list"></tbody>
-                </table>
+        </div>
+
+        <!-- ── Tags Manager: per-row tag popover ──────────────────────────── -->
+        <div id="tm-row-popover" class="hide fixed z-[400] w-60 glass rounded-xl p-3 shadow-2xl border border-white/10">
+            <input type="text" id="tm-row-tag-input" placeholder="Search or type new tag…" autocomplete="off"
+                oninput="tmFilterRowSuggestions(this.value)"
+                onkeydown="tmRowTagKeydown(event)"
+                class="w-full px-2.5 py-1.5 rounded-lg text-xs mb-2">
+            <div id="tm-row-suggestions" class="max-h-40 overflow-y-auto mb-2"></div>
+            <div class="flex gap-2">
+                <button onclick="tmRowSaveTag()" class="btn-primary text-xs px-3 py-1.5 rounded-lg flex-1">Add</button>
+                <button onclick="tmRowClosePopover()" class="text-xs px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300">✕</button>
             </div>
         </div>
 
@@ -7496,18 +7517,26 @@
 
         // ── Tags Manager ──────────────────────────────────────────────────────
         let _tmSelectedIds = new Set();
+        let _tmRowProductId = null;
 
         function openTagsManager() {
             _tmSelectedIds = new Set();
             document.getElementById('tags-manager-modal').classList.remove('hide');
             document.getElementById('tm-product-search').value = '';
             document.getElementById('tm-bulk-tag-input').value = '';
+            tmUpdateSelCount();
             tmRenderList();
         }
 
         function closeTagsManager() {
+            tmRowClosePopover();
             document.getElementById('tags-manager-modal').classList.add('hide');
             renderProductsTable();
+        }
+
+        function tmUpdateSelCount() {
+            const el = document.getElementById('tm-sel-count');
+            if (el) el.textContent = _tmSelectedIds.size;
         }
 
         function tmGetFilteredProducts() {
@@ -7531,23 +7560,19 @@
                 const tags = Array.isArray(p.shopify_tags) ? p.shopify_tags : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
                 const isChecked = _tmSelectedIds.has(p.id);
                 const chipsHtml = tags.map((t, i) =>
-                    '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:11px;background:#1e293b;border:1px solid #334155;color:#cbd5e1;margin:2px">'
+                    '<span style="display:inline-flex;align-items:center;gap:2px;padding:2px 7px 2px 8px;border-radius:999px;font-size:11px;background:#1e293b;border:1px solid #334155;color:#cbd5e1;margin:2px 2px">'
                     + escHtml(t)
-                    + '<button type="button" onclick="tmRemoveTagFromProduct(\'' + p.id + '\',' + i + ')" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:13px;padding:0;line-height:1;margin-left:1px" title="Remove tag">&times;</button>'
+                    + '<button type="button" onclick="tmRemoveTagFromProduct(\'' + p.id + '\',' + i + ')" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:14px;padding:0 0 0 2px;line-height:1" title="Remove">&times;</button>'
                     + '</span>'
                 ).join('');
-                return '<tr style="border-bottom:1px solid #1e293b" id="tm-row-' + p.id + '">'
-                    + '<td style="padding:8px 8px;vertical-align:middle"><input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="tmToggleSelect(\'' + p.id + '\',this.checked)" style="cursor:pointer"></td>'
-                    + '<td style="padding:8px 8px;vertical-align:middle;font-family:monospace;font-size:12px;color:#60a5fa;white-space:nowrap">' + escHtml(p.product_code) + '</td>'
-                    + '<td style="padding:8px 8px;vertical-align:middle;font-size:13px;color:#e2e8f0">' + escHtml(p.item_name) + '</td>'
-                    + '<td style="padding:6px 8px;vertical-align:middle">'
-                    + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:2px">'
+                return '<tr class="border-b border-white/5 hover:bg-white/3" id="tm-row-' + p.id + '">'
+                    + '<td style="padding:8px 8px 8px 20px;vertical-align:middle"><input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="tmToggleSelect(\'' + p.id + '\',this.checked)" style="cursor:pointer"></td>'
+                    + '<td style="padding:8px;vertical-align:middle;font-family:monospace;font-size:12px;color:#60a5fa;white-space:nowrap">' + escHtml(p.product_code) + '</td>'
+                    + '<td style="padding:8px;vertical-align:middle;font-size:13px;color:#e2e8f0">' + escHtml(p.item_name) + '</td>'
+                    + '<td style="padding:6px 20px 6px 8px;vertical-align:middle">'
+                    + '<div style="display:flex;flex-wrap:wrap;align-items:center">'
                     + chipsHtml
-                    + '<button onclick="tmOpenInlineAdd(\'' + p.id + '\',this)" style="padding:2px 8px;border-radius:999px;font-size:11px;background:transparent;border:1px dashed #334155;color:#64748b;cursor:pointer;margin:2px" title="Add tag">+ Add</button>'
-                    + '<span id="tm-inline-add-' + p.id + '" style="display:none">'
-                    + '<input type="text" id="tm-inline-inp-' + p.id + '" placeholder="tag…" style="padding:2px 6px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#f1f5f9;font-size:11px;width:90px;outline:none" onkeydown="tmInlineKeydown(event,\'' + p.id + '\')" onblur="setTimeout(()=>tmCloseInlineAdd(\'' + p.id + '\'),200)">'
-                    + '<button onclick="tmSaveInlineAdd(\'' + p.id + '\')" style="padding:2px 6px;background:#1d4ed8;border:none;border-radius:6px;color:#fff;font-size:11px;cursor:pointer;margin-left:3px">+</button>'
-                    + '</span>'
+                    + '<button onclick="tmOpenRowTagPopover(\'' + p.id + '\',this)" style="padding:2px 9px;border-radius:999px;font-size:11px;background:transparent;border:1px dashed #475569;color:#64748b;cursor:pointer;margin:2px;white-space:nowrap" onmouseenter="this.style.borderColor=\'#94a3b8\';this.style.color=\'#94a3b8\'" onmouseleave="this.style.borderColor=\'#475569\';this.style.color=\'#64748b\'">+ Add tag</button>'
                     + '</div>'
                     + '</td>'
                     + '</tr>';
@@ -7557,60 +7582,94 @@
         function tmToggleSelect(productId, checked) {
             if (checked) _tmSelectedIds.add(productId);
             else _tmSelectedIds.delete(productId);
+            tmUpdateSelCount();
         }
 
         function tmToggleSelectAll(checked) {
             const filtered = tmGetFilteredProducts();
             filtered.forEach(p => { if (checked) _tmSelectedIds.add(p.id); else _tmSelectedIds.delete(p.id); });
+            tmUpdateSelCount();
             tmRenderList();
             const sa = document.getElementById('tm-select-all');
             if (sa) sa.checked = checked;
         }
 
-        function tmOpenInlineAdd(productId, btn) {
-            const wrap = document.getElementById('tm-inline-add-' + productId);
-            if (wrap) { wrap.style.display = 'inline-flex'; wrap.style.alignItems = 'center'; }
-            if (btn) btn.style.display = 'none';
-            const inp = document.getElementById('tm-inline-inp-' + productId);
-            if (inp) setTimeout(() => inp.focus(), 30);
-        }
-
-        function tmCloseInlineAdd(productId) {
-            const wrap = document.getElementById('tm-inline-add-' + productId);
-            if (wrap) wrap.style.display = 'none';
-        }
-
-        function tmInlineKeydown(event, productId) {
-            if (event.key === 'Enter') { event.preventDefault(); tmSaveInlineAdd(productId); }
-            if (event.key === 'Escape') { tmCloseInlineAdd(productId); }
-        }
-
-        async function tmSaveInlineAdd(productId) {
-            const inp = document.getElementById('tm-inline-inp-' + productId);
-            if (!inp) return;
-            const tag = inp.value.trim().toLowerCase().replace(/\s+/g, '-');
-            if (!tag) { tmCloseInlineAdd(productId); return; }
-            await tmAddTagToProduct(productId, tag);
+        // ── Per-row tag popover ──────────────────────────────────────────
+        function tmOpenRowTagPopover(productId, btn) {
+            _tmRowProductId = productId;
+            const pop = document.getElementById('tm-row-popover');
+            const inp = document.getElementById('tm-row-tag-input');
             inp.value = '';
-            tmCloseInlineAdd(productId);
+            tmFilterRowSuggestions('');
+            pop.classList.remove('hide');
+            const rect = btn.getBoundingClientRect();
+            const pw = 240, ph = 220;
+            let left = rect.left;
+            if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+            if (left < 8) left = 8;
+            const top = (rect.bottom + ph + 4 > window.innerHeight)
+                ? rect.top - ph - 4
+                : rect.bottom + 4;
+            pop.style.top = top + 'px';
+            pop.style.left = left + 'px';
+            setTimeout(() => inp.focus(), 30);
         }
 
-        async function tmAddTagToProduct(productId, tag) {
-            const p = products.find(x => x.id === productId);
+        function tmRowClosePopover() {
+            document.getElementById('tm-row-popover')?.classList.add('hide');
+            _tmRowProductId = null;
+        }
+
+        function tmFilterRowSuggestions(val) {
+            const sugg = document.getElementById('tm-row-suggestions');
+            if (!sugg) return;
+            const q = val.trim().toLowerCase();
+            const p = products.find(x => x.id === _tmRowProductId);
+            const applied = p ? (Array.isArray(p.shopify_tags) ? p.shopify_tags : (p.shopify_tags ? JSON.parse(p.shopify_tags) : [])) : [];
+            const allTags = typeof brandShopifyTags !== 'undefined' ? (brandShopifyTags || []).map(t => t.tag) : [];
+            const matches = allTags.filter(t => !applied.includes(t) && (!q || t.includes(q)));
+            const showCreate = q && !allTags.includes(q) && !applied.includes(q);
+            let html = '';
+            if (showCreate) {
+                html += '<div onclick="tmRowAddTag(\'' + escHtml(q) + '\')" style="padding:6px 8px;font-size:12px;color:#60a5fa;cursor:pointer;border-radius:6px;border:1px dashed #334155;margin-bottom:4px" onmouseenter="this.style.background=\'#1e293b\'" onmouseleave="this.style.background=\'\'">'
+                    + '+ Create &ldquo;' + escHtml(q) + '&rdquo;'
+                    + '</div>';
+            }
+            html += matches.slice(0, 15).map(t =>
+                '<div onclick="tmRowAddTag(\'' + escHtml(t) + '\')" style="padding:6px 8px;font-size:12px;color:#e2e8f0;cursor:pointer;border-radius:6px" onmouseenter="this.style.background=\'#1e293b\'" onmouseleave="this.style.background=\'\'">' + escHtml(t) + '</div>'
+            ).join('');
+            if (!html) html = '<p style="font-size:11px;color:#64748b;padding:4px 8px;margin:0">' + (q ? 'No matches' : 'No tags in library yet') + '</p>';
+            sugg.innerHTML = html;
+        }
+
+        function tmRowTagKeydown(event) {
+            if (event.key === 'Enter') { event.preventDefault(); tmRowSaveTag(); }
+            if (event.key === 'Escape') { tmRowClosePopover(); }
+        }
+
+        function tmRowSaveTag() {
+            const val = document.getElementById('tm-row-tag-input')?.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (val) tmRowAddTag(val);
+        }
+
+        async function tmRowAddTag(tag) {
+            if (!_tmRowProductId) return;
+            const p = products.find(x => x.id === _tmRowProductId);
             if (!p) return;
             const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
-            if (tags.includes(tag)) { tmRenderList(); return; }
-            tags.push(tag);
-            const { error } = await supabase.from('products').update({ shopify_tags: tags }).eq('id', productId);
-            if (!error) {
-                p.shopify_tags = tags;
-                // Ensure tag is in brand library
-                if (typeof brandShopifyTags !== 'undefined' && !brandShopifyTags.find(t => t.tag === tag)) {
-                    const { data } = await supabase.from('brand_shopify_tags').insert({ brand_id: currentBrand.id, tag }).select().single();
-                    if (data) brandShopifyTags.push(data);
+            if (!tags.includes(tag)) {
+                tags.push(tag);
+                const { error } = await supabase.from('products').update({ shopify_tags: tags }).eq('id', p.id);
+                if (!error) {
+                    p.shopify_tags = tags;
+                    if (typeof brandShopifyTags !== 'undefined' && !brandShopifyTags.find(t => t.tag === tag)) {
+                        const { data } = await supabase.from('brand_shopify_tags').insert({ brand_id: currentBrand.id, tag }).select().single();
+                        if (data) brandShopifyTags.push(data);
+                    }
                 }
-                tmRenderList();
             }
+            tmRowClosePopover();
+            tmRenderList();
         }
 
         async function tmRemoveTagFromProduct(productId, tagIndex) {
@@ -7623,10 +7682,14 @@
             if (!error) { p.shopify_tags = newTags; tmRenderList(); }
         }
 
+        function _tmGetBulkTag() {
+            return (document.getElementById('tm-bulk-tag-input')?.value || '').trim().toLowerCase().replace(/\s+/g, '-');
+        }
+
         async function tmBulkAddToSelected() {
-            const tag = document.getElementById('tm-bulk-tag-input')?.value.trim().toLowerCase().replace(/\s+/g, '-');
+            const tag = _tmGetBulkTag();
             if (!tag) { showToast('Enter a tag first', 'error'); return; }
-            if (!_tmSelectedIds.size) { showToast('Select products first', 'error'); return; }
+            if (!_tmSelectedIds.size) { showToast('Select at least one product', 'error'); return; }
             let updated = 0;
             for (const pid of _tmSelectedIds) {
                 const p = products.find(x => x.id === pid);
@@ -7642,13 +7705,13 @@
                 if (data) brandShopifyTags.push(data);
             }
             tmRenderList();
-            showToast(`Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}`);
+            showToast(updated ? `Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}` : `"${tag}" already on all selected products`);
         }
 
         async function tmBulkRemoveFromSelected() {
-            const tag = document.getElementById('tm-bulk-tag-input')?.value.trim().toLowerCase().replace(/\s+/g, '-');
+            const tag = _tmGetBulkTag();
             if (!tag) { showToast('Enter a tag first', 'error'); return; }
-            if (!_tmSelectedIds.size) { showToast('Select products first', 'error'); return; }
+            if (!_tmSelectedIds.size) { showToast('Select at least one product', 'error'); return; }
             let updated = 0;
             for (const pid of _tmSelectedIds) {
                 const p = products.find(x => x.id === pid);
@@ -7661,13 +7724,13 @@
                 if (!error) { p.shopify_tags = newVal; updated++; }
             }
             tmRenderList();
-            showToast(`Removed "${tag}" from ${updated} product${updated !== 1 ? 's' : ''}`);
+            showToast(updated ? `Removed "${tag}" from ${updated} product${updated !== 1 ? 's' : ''}` : `Tag not found on selected products`);
         }
 
         async function tmBulkAddToAll() {
-            const tag = document.getElementById('tm-bulk-tag-input')?.value.trim().toLowerCase().replace(/\s+/g, '-');
+            const tag = _tmGetBulkTag();
             if (!tag) { showToast('Enter a tag first', 'error'); return; }
-            if (!confirm(`Add tag "${tag}" to ALL products in your catalogue?`)) return;
+            if (!confirm(`Add tag "${tag}" to all ${products.length} products?`)) return;
             let updated = 0;
             for (const p of products) {
                 const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
@@ -7681,7 +7744,7 @@
                 if (data) brandShopifyTags.push(data);
             }
             tmRenderList();
-            showToast(`Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}`);
+            showToast(updated ? `Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}` : 'All products already have that tag');
         }
 
         function tmFilterBulkSuggestions(val) {
@@ -7690,11 +7753,16 @@
             const q = val.trim().toLowerCase();
             const allTags = typeof brandShopifyTags !== 'undefined' ? (brandShopifyTags || []).map(t => t.tag) : [];
             const matches = allTags.filter(t => !q || t.includes(q));
-            if (!matches.length) { dropdown.classList.add('hide'); return; }
-            dropdown.classList.remove('hide');
-            dropdown.innerHTML = matches.slice(0, 20).map(t =>
+            if (!matches.length && !q) { dropdown.classList.add('hide'); return; }
+            const showCreate = q && !allTags.includes(q);
+            let html = '';
+            if (showCreate) html += '<div onclick="tmSelectBulkTag(\'' + escHtml(q) + '\')" style="padding:7px 12px;font-size:12px;color:#60a5fa;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06)" onmouseenter="this.style.background=\'#334155\'" onmouseleave="this.style.background=\'\'">+ Create &ldquo;' + escHtml(q) + '&rdquo;</div>';
+            html += matches.slice(0, 15).map(t =>
                 '<div onclick="tmSelectBulkTag(\'' + escHtml(t) + '\')" style="padding:7px 12px;font-size:13px;color:#e2e8f0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04)" onmouseenter="this.style.background=\'#334155\'" onmouseleave="this.style.background=\'\'">' + escHtml(t) + '</div>'
             ).join('');
+            if (!html) { dropdown.classList.add('hide'); return; }
+            dropdown.classList.remove('hide');
+            dropdown.innerHTML = html;
         }
 
         function tmSelectBulkTag(tag) {
@@ -7704,8 +7772,7 @@
         }
 
         function tmCloseBulkDropdown() {
-            const dropdown = document.getElementById('tm-bulk-dropdown');
-            if (dropdown) dropdown.classList.add('hide');
+            document.getElementById('tm-bulk-dropdown')?.classList.add('hide');
         }
 
         function tmBulkTagKeydown(event) {
@@ -7743,6 +7810,8 @@
                 !skuPopover.contains(e.target) && !document.getElementById('sku-info-btn')?.contains(e.target)) {
                 skuPopover.classList.add('hide');
             }
+            const tmRowPop = document.getElementById('tm-row-popover');
+            if (tmRowPop && !tmRowPop.classList.contains('hide') && !tmRowPop.contains(e.target)) tmRowClosePopover();
         });
 
         function populateFilterDropdowns() {
