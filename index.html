@@ -2100,6 +2100,14 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     Catalogue Settings
                 </button>
+                <button id="pricing-edit-btn" onclick="togglePricingEditMode()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+                    Edit Pricing
+                </button>
+                <button onclick="openTagsManager()" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+                    Manage Tags
+                </button>
                 <button onclick="toggleSkuInfoPopover(event)" id="sku-info-btn" class="bg-gray-700 hover:bg-gray-600 w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" title="Master Product SKU — how SKUs work">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
                 </button>
@@ -4988,6 +4996,51 @@
             </div>
         </div>
 
+        <!-- ── Tags Manager Modal ────────────────────────────────────────── -->
+        <div id="tags-manager-modal" class="hide fixed inset-0 z-[300] flex flex-col" style="background:#0f172a">
+            <!-- Header -->
+            <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;background:#1e293b;border-bottom:1px solid rgba(255,255,255,0.08);flex-shrink:0">
+                <svg class="w-5 h-5 text-brand-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>
+                <span style="font-size:16px;font-weight:700;color:#f1f5f9;flex:1">Tags Manager</span>
+                <button onclick="closeTagsManager()" style="padding:6px 14px;background:#334155;border:none;border-radius:8px;color:#94a3b8;font-size:13px;cursor:pointer;font-weight:600">✕ Close</button>
+            </div>
+            <!-- Bulk Action Bar -->
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 20px;background:#1e293b;border-bottom:1px solid rgba(255,255,255,0.06);flex-shrink:0;flex-wrap:wrap">
+                <span style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Bulk Apply:</span>
+                <div style="position:relative;flex:0 0 220px">
+                    <input type="text" id="tm-bulk-tag-input" placeholder="Type or search tag…" autocomplete="off"
+                        oninput="tmFilterBulkSuggestions(this.value)"
+                        onfocus="tmFilterBulkSuggestions(this.value)"
+                        onblur="setTimeout(tmCloseBulkDropdown, 150)"
+                        onkeydown="tmBulkTagKeydown(event)"
+                        style="width:100%;padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:13px;outline:none">
+                    <div id="tm-bulk-dropdown" class="hide" style="position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:8px;max-height:160px;overflow-y:auto;z-index:10"></div>
+                </div>
+                <button onclick="tmBulkAddToSelected()" style="padding:6px 12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#e2e8f0;font-size:12px;cursor:pointer;font-weight:600">Add to Selected</button>
+                <button onclick="tmBulkRemoveFromSelected()" style="padding:6px 12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#e2e8f0;font-size:12px;cursor:pointer;font-weight:600">Remove from Selected</button>
+                <button onclick="tmBulkAddToAll()" style="padding:6px 12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#e2e8f0;font-size:12px;cursor:pointer;font-weight:600">Add to All</button>
+                <div style="flex:1"></div>
+                <input type="text" id="tm-product-search" placeholder="Filter products…" oninput="tmRenderList()"
+                    style="padding:6px 10px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:13px;outline:none;width:180px">
+            </div>
+            <!-- Product Table -->
+            <div style="flex:1;overflow-y:auto;padding:0 20px 20px">
+                <table style="width:100%;border-collapse:collapse">
+                    <thead style="position:sticky;top:0;background:#0f172a;z-index:2">
+                        <tr>
+                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b;width:36px">
+                                <input type="checkbox" id="tm-select-all" onchange="tmToggleSelectAll(this.checked)" style="cursor:pointer">
+                            </th>
+                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b;width:120px">Code</th>
+                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b">Name</th>
+                            <th style="padding:10px 8px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;border-bottom:1px solid #1e293b">Tags</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tm-product-list"></tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- ── SKU Info Popover ───────────────────────────────────────────── -->
         <div id="sku-info-popover" class="hide fixed z-[200] w-80 glass rounded-2xl p-5 shadow-2xl border" style="border-color:rgba(59,130,246,0.25)">
             <div class="flex items-start gap-3">
@@ -7085,10 +7138,17 @@
                     const tp = tierPricesObj[t.tier_key] || {};
                     const y = tp.youth || (t.tier_key === 'retail' ? p.youth_retail_price : (t.tier_key === 'partner' ? p.youth_partner_price : null));
                     const a = tp.adult || (t.tier_key === 'retail' ? p.adult_retail_price : (t.tier_key === 'partner' ? p.adult_partner_price : null));
+                    const aFitKey = p.is_single_price ? 'one_size' : 'adult';
+                    if (_cataloguePricingEditMode) {
+                        const yVal = y ? Number(y).toFixed(2) : '';
+                        const aVal = a ? Number(a).toFixed(2) : '';
+                        return `<td class="py-2 pr-2 text-right"><input type="number" step="0.01" min="0" class="cat-price-inp" data-pid="${p.id}" data-tier="${t.tier_key}" data-fit="youth" value="${yVal}" style="width:68px;text-align:right;background:#1e293b;border:1px solid #334155;border-radius:4px;color:#e2e8f0;padding:3px 5px;font-size:12px;outline:none" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#334155'"></td>` +
+                               `<td class="py-2 pr-2 text-right"><input type="number" step="0.01" min="0" class="cat-price-inp" data-pid="${p.id}" data-tier="${t.tier_key}" data-fit="${aFitKey}" value="${aVal}" style="width:68px;text-align:right;background:#1e293b;border:1px solid #334155;border-radius:4px;color:#e2e8f0;padding:3px 5px;font-size:12px;outline:none" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#334155'"></td>`;
+                    }
                     const yDisp = y ? '£' + Number(y).toFixed(2) : '-';
                     const aDisp = a ? '£' + Number(a).toFixed(2) : (p.is_single_price ? '—' : '-');
-                    return `<td class="py-3 pr-3 text-right text-sm cursor-pointer hover:text-brand-400 group" onclick="openInlinePrice(event,'${p.id}','${t.tier_key}','youth')" title="Click to edit">${yDisp}<svg class="w-2.5 h-2.5 inline-block ml-0.5 opacity-0 group-hover:opacity-60 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg></td>` +
-                           `<td class="py-3 pr-3 text-right text-sm cursor-pointer hover:text-brand-400 group" onclick="openInlinePrice(event,'${p.id}','${t.tier_key}',${p.is_single_price ? "'one_size'" : "'adult'"})" title="Click to edit">${aDisp}<svg class="w-2.5 h-2.5 inline-block ml-0.5 opacity-0 group-hover:opacity-60 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"/></svg></td>`;
+                    return `<td class="py-3 pr-3 text-right text-sm">${yDisp}</td>` +
+                           `<td class="py-3 pr-3 text-right text-sm">${aDisp}</td>`;
                 }).join('');
                 return `<tr class="border-b border-gray-800 hover:bg-gray-900/50">
                     <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap text-xs">${escHtml(p.product_code)}</td>
@@ -7246,6 +7306,76 @@
             }
         }
 
+        // ── Pricing Edit Mode ─────────────────────────────────────────────────
+        let _cataloguePricingEditMode = false;
+
+        function togglePricingEditMode() {
+            if (_cataloguePricingEditMode) {
+                _savePricingEditMode();
+            } else {
+                _cataloguePricingEditMode = true;
+                renderProductsTable();
+                const btn = document.getElementById('pricing-edit-btn');
+                if (btn) {
+                    btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg> Confirm Prices';
+                    btn.style.background = '#059669';
+                    btn.style.color = '#fff';
+                }
+            }
+        }
+
+        async function _savePricingEditMode() {
+            const inputs = document.querySelectorAll('.cat-price-inp');
+            const byProduct = {};
+            inputs.forEach(inp => {
+                const pid = inp.dataset.pid;
+                const tier = inp.dataset.tier;
+                const fit = inp.dataset.fit;
+                const val = parseFloat(inp.value) || null;
+                if (!byProduct[pid]) byProduct[pid] = {};
+                if (!byProduct[pid][tier]) byProduct[pid][tier] = {};
+                byProduct[pid][tier][fit] = val;
+            });
+            let saved = 0;
+            for (const pid of Object.keys(byProduct)) {
+                const p = products.find(x => x.id === pid);
+                if (!p) continue;
+                const tierPrices = JSON.parse(JSON.stringify((p.tier_prices && typeof p.tier_prices === 'object') ? p.tier_prices : {}));
+                let changed = false;
+                for (const tier of Object.keys(byProduct[pid])) {
+                    if (!tierPrices[tier]) tierPrices[tier] = {};
+                    for (const fit of Object.keys(byProduct[pid][tier])) {
+                        const newVal = byProduct[pid][tier][fit];
+                        const oldVal = tierPrices[tier]?.[fit] || null;
+                        if (newVal !== oldVal) {
+                            if (newVal) tierPrices[tier][fit] = newVal;
+                            else delete tierPrices[tier][fit];
+                            changed = true;
+                        }
+                    }
+                }
+                if (!changed) continue;
+                const legacyUpdate = { tier_prices: tierPrices };
+                if (byProduct[pid].retail?.youth  != null) legacyUpdate.youth_retail_price  = byProduct[pid].retail.youth;
+                if (byProduct[pid].retail?.adult  != null) legacyUpdate.adult_retail_price  = byProduct[pid].retail.adult;
+                if (byProduct[pid].partner?.youth != null) legacyUpdate.youth_partner_price = byProduct[pid].partner.youth;
+                if (byProduct[pid].partner?.adult != null) legacyUpdate.adult_partner_price = byProduct[pid].partner.adult;
+                if (byProduct[pid].retail?.one_size  != null) { legacyUpdate.is_single_price = true; legacyUpdate.single_retail_price  = byProduct[pid].retail.one_size; }
+                if (byProduct[pid].partner?.one_size != null) { legacyUpdate.is_single_price = true; legacyUpdate.single_partner_price = byProduct[pid].partner.one_size; }
+                const { error } = await supabase.from('products').update(legacyUpdate).eq('id', pid);
+                if (!error) { p.tier_prices = tierPrices; Object.assign(p, legacyUpdate); saved++; }
+            }
+            _cataloguePricingEditMode = false;
+            renderProductsTable();
+            const btn = document.getElementById('pricing-edit-btn');
+            if (btn) {
+                btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg> Edit Pricing';
+                btn.style.background = '';
+                btn.style.color = '';
+            }
+            showToast(saved > 0 ? `Saved pricing for ${saved} product${saved !== 1 ? 's' : ''} ✓` : 'No changes to save');
+        }
+
         // ── Inline Price Editor ────────────────────────────────────────────────
         let _inlinePriceState = null; // { productId, tierKey, fitKey }
 
@@ -7362,6 +7492,225 @@
             }
             renderProductsTable();
             showToast(`Removed "${tag}" from ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        // ── Tags Manager ──────────────────────────────────────────────────────
+        let _tmSelectedIds = new Set();
+
+        function openTagsManager() {
+            _tmSelectedIds = new Set();
+            document.getElementById('tags-manager-modal').classList.remove('hide');
+            document.getElementById('tm-product-search').value = '';
+            document.getElementById('tm-bulk-tag-input').value = '';
+            tmRenderList();
+        }
+
+        function closeTagsManager() {
+            document.getElementById('tags-manager-modal').classList.add('hide');
+            renderProductsTable();
+        }
+
+        function tmGetFilteredProducts() {
+            const q = (document.getElementById('tm-product-search')?.value || '').toLowerCase();
+            if (!q) return products;
+            return products.filter(p =>
+                p.product_code.toLowerCase().includes(q) ||
+                p.item_name.toLowerCase().includes(q)
+            );
+        }
+
+        function tmRenderList() {
+            const list = document.getElementById('tm-product-list');
+            if (!list) return;
+            const filtered = tmGetFilteredProducts();
+            if (!filtered.length) {
+                list.innerHTML = '<tr><td colspan="4" style="padding:24px;text-align:center;color:#64748b;font-size:13px">No products found</td></tr>';
+                return;
+            }
+            list.innerHTML = filtered.map(p => {
+                const tags = Array.isArray(p.shopify_tags) ? p.shopify_tags : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                const isChecked = _tmSelectedIds.has(p.id);
+                const chipsHtml = tags.map((t, i) =>
+                    '<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:11px;background:#1e293b;border:1px solid #334155;color:#cbd5e1;margin:2px">'
+                    + escHtml(t)
+                    + '<button type="button" onclick="tmRemoveTagFromProduct(\'' + p.id + '\',' + i + ')" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:13px;padding:0;line-height:1;margin-left:1px" title="Remove tag">&times;</button>'
+                    + '</span>'
+                ).join('');
+                return '<tr style="border-bottom:1px solid #1e293b" id="tm-row-' + p.id + '">'
+                    + '<td style="padding:8px 8px;vertical-align:middle"><input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onchange="tmToggleSelect(\'' + p.id + '\',this.checked)" style="cursor:pointer"></td>'
+                    + '<td style="padding:8px 8px;vertical-align:middle;font-family:monospace;font-size:12px;color:#60a5fa;white-space:nowrap">' + escHtml(p.product_code) + '</td>'
+                    + '<td style="padding:8px 8px;vertical-align:middle;font-size:13px;color:#e2e8f0">' + escHtml(p.item_name) + '</td>'
+                    + '<td style="padding:6px 8px;vertical-align:middle">'
+                    + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:2px">'
+                    + chipsHtml
+                    + '<button onclick="tmOpenInlineAdd(\'' + p.id + '\',this)" style="padding:2px 8px;border-radius:999px;font-size:11px;background:transparent;border:1px dashed #334155;color:#64748b;cursor:pointer;margin:2px" title="Add tag">+ Add</button>'
+                    + '<span id="tm-inline-add-' + p.id + '" style="display:none">'
+                    + '<input type="text" id="tm-inline-inp-' + p.id + '" placeholder="tag…" style="padding:2px 6px;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#f1f5f9;font-size:11px;width:90px;outline:none" onkeydown="tmInlineKeydown(event,\'' + p.id + '\')" onblur="setTimeout(()=>tmCloseInlineAdd(\'' + p.id + '\'),200)">'
+                    + '<button onclick="tmSaveInlineAdd(\'' + p.id + '\')" style="padding:2px 6px;background:#1d4ed8;border:none;border-radius:6px;color:#fff;font-size:11px;cursor:pointer;margin-left:3px">+</button>'
+                    + '</span>'
+                    + '</div>'
+                    + '</td>'
+                    + '</tr>';
+            }).join('');
+        }
+
+        function tmToggleSelect(productId, checked) {
+            if (checked) _tmSelectedIds.add(productId);
+            else _tmSelectedIds.delete(productId);
+        }
+
+        function tmToggleSelectAll(checked) {
+            const filtered = tmGetFilteredProducts();
+            filtered.forEach(p => { if (checked) _tmSelectedIds.add(p.id); else _tmSelectedIds.delete(p.id); });
+            tmRenderList();
+            const sa = document.getElementById('tm-select-all');
+            if (sa) sa.checked = checked;
+        }
+
+        function tmOpenInlineAdd(productId, btn) {
+            const wrap = document.getElementById('tm-inline-add-' + productId);
+            if (wrap) { wrap.style.display = 'inline-flex'; wrap.style.alignItems = 'center'; }
+            if (btn) btn.style.display = 'none';
+            const inp = document.getElementById('tm-inline-inp-' + productId);
+            if (inp) setTimeout(() => inp.focus(), 30);
+        }
+
+        function tmCloseInlineAdd(productId) {
+            const wrap = document.getElementById('tm-inline-add-' + productId);
+            if (wrap) wrap.style.display = 'none';
+        }
+
+        function tmInlineKeydown(event, productId) {
+            if (event.key === 'Enter') { event.preventDefault(); tmSaveInlineAdd(productId); }
+            if (event.key === 'Escape') { tmCloseInlineAdd(productId); }
+        }
+
+        async function tmSaveInlineAdd(productId) {
+            const inp = document.getElementById('tm-inline-inp-' + productId);
+            if (!inp) return;
+            const tag = inp.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { tmCloseInlineAdd(productId); return; }
+            await tmAddTagToProduct(productId, tag);
+            inp.value = '';
+            tmCloseInlineAdd(productId);
+        }
+
+        async function tmAddTagToProduct(productId, tag) {
+            const p = products.find(x => x.id === productId);
+            if (!p) return;
+            const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+            if (tags.includes(tag)) { tmRenderList(); return; }
+            tags.push(tag);
+            const { error } = await supabase.from('products').update({ shopify_tags: tags }).eq('id', productId);
+            if (!error) {
+                p.shopify_tags = tags;
+                // Ensure tag is in brand library
+                if (typeof brandShopifyTags !== 'undefined' && !brandShopifyTags.find(t => t.tag === tag)) {
+                    const { data } = await supabase.from('brand_shopify_tags').insert({ brand_id: currentBrand.id, tag }).select().single();
+                    if (data) brandShopifyTags.push(data);
+                }
+                tmRenderList();
+            }
+        }
+
+        async function tmRemoveTagFromProduct(productId, tagIndex) {
+            const p = products.find(x => x.id === productId);
+            if (!p) return;
+            const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+            tags.splice(tagIndex, 1);
+            const newTags = tags.length ? tags : null;
+            const { error } = await supabase.from('products').update({ shopify_tags: newTags }).eq('id', productId);
+            if (!error) { p.shopify_tags = newTags; tmRenderList(); }
+        }
+
+        async function tmBulkAddToSelected() {
+            const tag = document.getElementById('tm-bulk-tag-input')?.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { showToast('Enter a tag first', 'error'); return; }
+            if (!_tmSelectedIds.size) { showToast('Select products first', 'error'); return; }
+            let updated = 0;
+            for (const pid of _tmSelectedIds) {
+                const p = products.find(x => x.id === pid);
+                if (!p) continue;
+                const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                if (tags.includes(tag)) continue;
+                tags.push(tag);
+                const { error } = await supabase.from('products').update({ shopify_tags: tags }).eq('id', pid);
+                if (!error) { p.shopify_tags = tags; updated++; }
+            }
+            if (updated && typeof brandShopifyTags !== 'undefined' && !brandShopifyTags.find(t => t.tag === tag)) {
+                const { data } = await supabase.from('brand_shopify_tags').insert({ brand_id: currentBrand.id, tag }).select().single();
+                if (data) brandShopifyTags.push(data);
+            }
+            tmRenderList();
+            showToast(`Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        async function tmBulkRemoveFromSelected() {
+            const tag = document.getElementById('tm-bulk-tag-input')?.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { showToast('Enter a tag first', 'error'); return; }
+            if (!_tmSelectedIds.size) { showToast('Select products first', 'error'); return; }
+            let updated = 0;
+            for (const pid of _tmSelectedIds) {
+                const p = products.find(x => x.id === pid);
+                if (!p) continue;
+                const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                const newTags = tags.filter(t => t !== tag);
+                if (newTags.length === tags.length) continue;
+                const newVal = newTags.length ? newTags : null;
+                const { error } = await supabase.from('products').update({ shopify_tags: newVal }).eq('id', pid);
+                if (!error) { p.shopify_tags = newVal; updated++; }
+            }
+            tmRenderList();
+            showToast(`Removed "${tag}" from ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        async function tmBulkAddToAll() {
+            const tag = document.getElementById('tm-bulk-tag-input')?.value.trim().toLowerCase().replace(/\s+/g, '-');
+            if (!tag) { showToast('Enter a tag first', 'error'); return; }
+            if (!confirm(`Add tag "${tag}" to ALL products in your catalogue?`)) return;
+            let updated = 0;
+            for (const p of products) {
+                const tags = Array.isArray(p.shopify_tags) ? [...p.shopify_tags] : (p.shopify_tags ? JSON.parse(p.shopify_tags) : []);
+                if (tags.includes(tag)) continue;
+                tags.push(tag);
+                const { error } = await supabase.from('products').update({ shopify_tags: tags }).eq('id', p.id);
+                if (!error) { p.shopify_tags = tags; updated++; }
+            }
+            if (updated && typeof brandShopifyTags !== 'undefined' && !brandShopifyTags.find(t => t.tag === tag)) {
+                const { data } = await supabase.from('brand_shopify_tags').insert({ brand_id: currentBrand.id, tag }).select().single();
+                if (data) brandShopifyTags.push(data);
+            }
+            tmRenderList();
+            showToast(`Added "${tag}" to ${updated} product${updated !== 1 ? 's' : ''}`);
+        }
+
+        function tmFilterBulkSuggestions(val) {
+            const dropdown = document.getElementById('tm-bulk-dropdown');
+            if (!dropdown) return;
+            const q = val.trim().toLowerCase();
+            const allTags = typeof brandShopifyTags !== 'undefined' ? (brandShopifyTags || []).map(t => t.tag) : [];
+            const matches = allTags.filter(t => !q || t.includes(q));
+            if (!matches.length) { dropdown.classList.add('hide'); return; }
+            dropdown.classList.remove('hide');
+            dropdown.innerHTML = matches.slice(0, 20).map(t =>
+                '<div onclick="tmSelectBulkTag(\'' + escHtml(t) + '\')" style="padding:7px 12px;font-size:13px;color:#e2e8f0;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04)" onmouseenter="this.style.background=\'#334155\'" onmouseleave="this.style.background=\'\'">' + escHtml(t) + '</div>'
+            ).join('');
+        }
+
+        function tmSelectBulkTag(tag) {
+            const inp = document.getElementById('tm-bulk-tag-input');
+            if (inp) inp.value = tag;
+            tmCloseBulkDropdown();
+        }
+
+        function tmCloseBulkDropdown() {
+            const dropdown = document.getElementById('tm-bulk-dropdown');
+            if (dropdown) dropdown.classList.add('hide');
+        }
+
+        function tmBulkTagKeydown(event) {
+            if (event.key === 'Enter') { event.preventDefault(); tmCloseBulkDropdown(); }
+            if (event.key === 'Escape') { tmCloseBulkDropdown(); }
         }
 
         // ── SKU Info Popover ──────────────────────────────────────────────────
@@ -13536,6 +13885,8 @@
             );
             const activeJobs  = myJobs.filter(j => !j.paid_at);
             const pipelineVal = activeJobs.reduce((s,j) => s + (j.estimated_revenue||0), 0);
+            const myPaidJobs  = myJobs.filter(j => j.paid_at);
+            const revenueWon  = myPaidJobs.reduce((s,j) => s + (j.revenue_recognized || j.estimated_revenue || 0), 0);
 
             // ── Revenue based on paid_at ──
             const paidJobs = (jobs||[]).filter(j => j.paid_at); // brand-wide paid jobs
@@ -13645,13 +13996,19 @@
             }).join('');
 
             panel.innerHTML = `
-                <!-- Pipeline value strip -->
-                <div style="display:flex;align-items:center;gap:16px;padding:10px 16px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;flex-shrink:0;margin-bottom:2px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
-                    <div>
+                <!-- Pipeline & Revenue Won strip -->
+                <div style="display:flex;align-items:center;gap:0;padding:10px 16px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;flex-shrink:0;margin-bottom:2px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+                    <div style="flex:1">
                         <div class="gtm-stat-label">My Pipeline</div>
                         <div style="font-size:22px;font-weight:800;color:#0f172a;line-height:1">${fmt(pipelineVal)}</div>
+                        <div style="font-size:10px;color:#94a3b8;margin-top:2px">${activeJobs.length} active job${activeJobs.length !== 1 ? 's' : ''}</div>
                     </div>
-                    <div style="font-size:11px;color:#94a3b8;font-weight:500">${activeJobs.length} active job${activeJobs.length !== 1 ? 's' : ''}</div>
+                    <div style="width:1px;height:40px;background:#e2e8f0;flex-shrink:0;margin:0 20px"></div>
+                    <div style="flex:1">
+                        <div class="gtm-stat-label">Revenue Won</div>
+                        <div style="font-size:22px;font-weight:800;color:#059669;line-height:1">${fmt(revenueWon)}</div>
+                        <div style="font-size:10px;color:#94a3b8;margin-top:2px">${myPaidJobs.length} paid job${myPaidJobs.length !== 1 ? 's' : ''}</div>
+                    </div>
                 </div>
 
                 <!-- 3-column body -->
