@@ -4997,50 +4997,46 @@
         </div>
 
         <!-- ── Tags Manager Modal ────────────────────────────────────────── -->
-        <div id="tags-manager-modal" class="hide fixed inset-0 bg-black/80 z-[250] flex items-center justify-center py-6">
-            <div class="glass rounded-2xl w-full max-w-5xl mx-4 flex flex-col" style="max-height:88vh">
+        <div id="tags-manager-modal" class="hide fixed inset-0 flex items-center justify-center p-4" style="z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px)">
+            <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:20px;width:100%;max-width:960px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 80px rgba(0,0,0,0.7);position:relative">
+                <!-- Close X — top right corner -->
+                <button onclick="closeTagsManager()" title="Close" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#94a3b8;font-size:18px;line-height:1;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2" onmouseenter="this.style.background='rgba(255,255,255,0.12)';this.style.color='#fff'" onmouseleave="this.style.background='rgba(255,255,255,0.06)';this.style.color='#94a3b8'">&times;</button>
                 <!-- Header -->
-                <div class="flex justify-between items-center p-5 border-b border-white/5 flex-shrink-0">
-                    <div>
-                        <h3 class="text-xl font-bold">Tags Manager</h3>
-                        <p class="text-gray-500 text-xs mt-0.5">Manage Shopify tags across your product catalogue</p>
-                    </div>
-                    <button onclick="closeTagsManager()" class="text-gray-400 hover:text-white text-2xl leading-none">&times;</button>
+                <div style="padding:18px 52px 18px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0">
+                    <h3 style="font-size:17px;font-weight:700;color:#f1f5f9;margin:0">Tags Manager</h3>
+                    <p style="font-size:12px;color:#64748b;margin:3px 0 0">Manage Shopify tags across your product catalogue</p>
                 </div>
                 <!-- Toolbar -->
-                <div class="p-4 border-b border-white/5 flex-shrink-0 space-y-3">
-                    <!-- Product search -->
-                    <input type="text" id="tm-product-search" placeholder="Search by product code or name…" oninput="tmRenderList()" class="w-full px-3 py-2 rounded-lg text-sm">
-                    <!-- Bulk actions -->
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <span class="text-xs text-gray-500 font-semibold uppercase tracking-wide flex-shrink-0">Bulk tag:</span>
-                        <div style="position:relative;flex:0 0 200px">
+                <div style="padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.07);flex-shrink:0;display:flex;flex-direction:column;gap:10px">
+                    <input type="text" id="tm-product-search" placeholder="Search products by code or name…" oninput="tmRenderList()"
+                        style="width:100%;padding:8px 12px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                        <span style="font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap">Bulk tag:</span>
+                        <div style="position:relative;flex:0 0 210px">
                             <input type="text" id="tm-bulk-tag-input" placeholder="Type or pick from library…" autocomplete="off"
                                 oninput="tmFilterBulkSuggestions(this.value)"
                                 onfocus="tmFilterBulkSuggestions(this.value)"
                                 onblur="setTimeout(tmCloseBulkDropdown,150)"
                                 onkeydown="tmBulkTagKeydown(event)"
-                                class="w-full px-3 py-2 rounded-lg text-sm">
-                            <div id="tm-bulk-dropdown" class="hide" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:20;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.5)"></div>
+                                style="width:100%;padding:7px 10px;background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f1f5f9;font-size:13px;outline:none" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                            <div id="tm-bulk-dropdown" class="hide" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:20;background:#1e293b;border:1px solid rgba(255,255,255,0.12);border-radius:10px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.5)"></div>
                         </div>
-                        <button onclick="tmBulkAddToSelected()" class="bg-brand-500 hover:bg-brand-600 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap">
-                            + Add to Selected (<span id="tm-sel-count">0</span>)
-                        </button>
-                        <button onclick="tmBulkRemoveFromSelected()" class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap">Remove from Selected</button>
-                        <button onclick="tmBulkAddToAll()" class="bg-gray-700 hover:bg-gray-600 px-3 py-2 rounded-lg text-xs font-semibold whitespace-nowrap">Add to All Products</button>
+                        <button onclick="tmBulkAddToSelected()" style="padding:7px 14px;background:#2563eb;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap" onmouseenter="this.style.background='#1d4ed8'" onmouseleave="this.style.background='#2563eb'">+ Add to Selected (<span id="tm-sel-count">0</span>)</button>
+                        <button onclick="tmBulkRemoveFromSelected()" style="padding:7px 12px;background:#334155;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap" onmouseenter="this.style.background='#475569'" onmouseleave="this.style.background='#334155'">Remove from Selected</button>
+                        <button onclick="tmBulkAddToAll()" style="padding:7px 12px;background:#334155;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e2e8f0;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap" onmouseenter="this.style.background='#475569'" onmouseleave="this.style.background='#334155'">Add to All Products</button>
                     </div>
                 </div>
                 <!-- Table -->
                 <div style="overflow-y:auto;flex:1">
                     <table style="width:100%;border-collapse:collapse">
-                        <thead style="position:sticky;top:0;z-index:2;background:rgba(15,23,42,0.97)">
-                            <tr class="border-b border-white/5">
-                                <th class="text-left" style="padding:9px 8px 9px 20px;width:40px">
+                        <thead style="position:sticky;top:0;z-index:2;background:#0f172a">
+                            <tr style="border-bottom:1px solid rgba(255,255,255,0.07)">
+                                <th style="padding:9px 8px 9px 20px;text-align:left;width:40px">
                                     <input type="checkbox" id="tm-select-all" onchange="tmToggleSelectAll(this.checked)" style="cursor:pointer">
                                 </th>
-                                <th class="text-xs text-gray-500 font-semibold uppercase tracking-wide text-left" style="padding:9px 8px;width:130px">Code</th>
-                                <th class="text-xs text-gray-500 font-semibold uppercase tracking-wide text-left" style="padding:9px 8px;width:220px">Name</th>
-                                <th class="text-xs text-gray-500 font-semibold uppercase tracking-wide text-left" style="padding:9px 20px 9px 8px">Tags</th>
+                                <th style="padding:9px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;width:130px">Code</th>
+                                <th style="padding:9px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;width:220px">Name</th>
+                                <th style="padding:9px 20px 9px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px">Tags</th>
                             </tr>
                         </thead>
                         <tbody id="tm-product-list"></tbody>
@@ -5050,15 +5046,15 @@
         </div>
 
         <!-- ── Tags Manager: per-row tag popover ──────────────────────────── -->
-        <div id="tm-row-popover" class="hide fixed z-[400] w-60 glass rounded-xl p-3 shadow-2xl border border-white/10">
+        <div id="tm-row-popover" class="hide fixed w-60" style="z-index:10001;background:#1e293b;border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px;box-shadow:0 12px 40px rgba(0,0,0,0.6)">
             <input type="text" id="tm-row-tag-input" placeholder="Search or type new tag…" autocomplete="off"
                 oninput="tmFilterRowSuggestions(this.value)"
                 onkeydown="tmRowTagKeydown(event)"
-                class="w-full px-2.5 py-1.5 rounded-lg text-xs mb-2">
-            <div id="tm-row-suggestions" class="max-h-40 overflow-y-auto mb-2"></div>
-            <div class="flex gap-2">
-                <button onclick="tmRowSaveTag()" class="btn-primary text-xs px-3 py-1.5 rounded-lg flex-1">Add</button>
-                <button onclick="tmRowClosePopover()" class="text-xs px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-300">✕</button>
+                style="width:100%;padding:7px 10px;background:#0f172a;border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#f1f5f9;font-size:12px;outline:none;box-sizing:border-box;margin-bottom:8px" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+            <div id="tm-row-suggestions" style="max-height:160px;overflow-y:auto;margin-bottom:8px"></div>
+            <div style="display:flex;gap:6px">
+                <button onclick="tmRowSaveTag()" style="flex:1;padding:6px 0;background:#2563eb;border:none;border-radius:7px;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Add</button>
+                <button onclick="tmRowClosePopover()" style="padding:6px 12px;background:#334155;border:none;border-radius:7px;color:#94a3b8;font-size:12px;cursor:pointer">✕</button>
             </div>
         </div>
 
