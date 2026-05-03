@@ -2017,7 +2017,7 @@
                     <span class="card-badge badge-new" id="badge-products" style="display:none">Off</span>
                     <div class="card-icon" style="background:#dbeafe"><svg class="w-7 h-7" fill="none" stroke="#1d4ed8" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg></div>
                     <h3>Product Database</h3>
-                    <p>Master catalogue — product codes, pricing and size structure for all ranges</p>
+                    <p>Master catalogue — SKUs, pricing and size structure for all ranges</p>
                     <div class="mt-4">
                         <span id="stat-products-db" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#dbeafe;color:#1d4ed8">0 products</span>
                     </div>
@@ -2135,7 +2135,7 @@
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <div>
                         <label class="text-gray-400 text-xs mb-1 block">Search</label>
-                        <input type="text" id="product-search" placeholder="Code or name..." class="w-full px-3 py-2 rounded-lg text-sm" oninput="filterProducts()">
+                        <input type="text" id="product-search" placeholder="SKU or name..." class="w-full px-3 py-2 rounded-lg text-sm" oninput="filterProducts()">
                     </div>
                     <div>
                         <label class="text-gray-400 text-xs mb-1 block">Category</label>
@@ -2176,8 +2176,9 @@
                     <table class="w-full text-sm">
                         <thead>
                             <tr id="products-table-header" class="text-left text-gray-400 border-b border-gray-800">
-                                <th class="pb-3 pr-3 whitespace-nowrap">Code</th>
+                                <th class="pb-3 pr-3 whitespace-nowrap">SKU</th>
                                 <th class="pb-3 pr-3">Name</th>
+                                <th class="pb-3 pr-3">Pattern Code</th>
                                 <th class="pb-3 pr-3">Category</th>
                                 <th class="pb-3 pr-3">Range</th>
                                 <th class="pb-3 pr-3 text-right" id="th-youth-price">Youth Price</th>
@@ -2203,24 +2204,32 @@
                 <input type="hidden" id="edit-product-id">
                 
                 <!-- Basic Info -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
                     <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Product Code *</label>
+                        <label class="text-gray-400 text-sm mb-1 block">SKU *</label>
                         <input type="text" id="prod-code" placeholder="BRAND/RANGE/001" class="w-full px-3 py-2 rounded-lg font-mono">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Pattern Code</label>
+                        <input type="text" id="prod-pattern-code" placeholder="e.g. PC-001" class="w-full px-3 py-2 rounded-lg font-mono">
                     </div>
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">Item Name *</label>
                         <input type="text" id="prod-name" placeholder="e.g. Zipped Hoodie" class="w-full px-3 py-2 rounded-lg">
                     </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">Category *</label>
-                        <input type="text" id="prod-category" list="prod-categories-list" placeholder="e.g. Football Match Kit" class="w-full px-3 py-2 rounded-lg">
-                        <datalist id="prod-categories-list"></datalist>
+                        <select id="prod-category" class="w-full px-3 py-2 rounded-lg">
+                            <option value="">Select category...</option>
+                        </select>
                     </div>
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">Range *</label>
-                        <input type="text" id="prod-range" list="prod-ranges-list" placeholder="e.g. Atlas, Warrior" class="w-full px-3 py-2 rounded-lg">
-                        <datalist id="prod-ranges-list"></datalist>
+                        <select id="prod-range" class="w-full px-3 py-2 rounded-lg">
+                            <option value="">Select range...</option>
+                        </select>
                     </div>
                 </div>
 
@@ -2783,7 +2792,7 @@
                             <span class="text-green-400">collection-image.png</span>
                         </div>
                     </div>
-                    <p class="text-gray-500 text-xs">Replace / with - in product codes</p>
+                    <p class="text-gray-500 text-xs">Replace / with - in SKUs</p>
                 </div>
             </div>
         </div>
@@ -2848,7 +2857,7 @@
                             <span style="background:#0f172a;color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span>
                             Upload Product Images
                         </div>
-                        <p style="font-size:12px;color:#64748b;margin:0 0 12px">Filenames must include product codes (e.g. <code style="background:#f1f5f9;padding:1px 5px;border-radius:4px">RP100.jpg</code>, <code style="background:#f1f5f9;padding:1px 5px;border-radius:4px">RP100-B.jpg</code>).</p>
+                        <p style="font-size:12px;color:#64748b;margin:0 0 12px">Filenames must include SKUs (e.g. <code style="background:#f1f5f9;padding:1px 5px;border-radius:4px">RP100.jpg</code>, <code style="background:#f1f5f9;padding:1px 5px;border-radius:4px">RP100-B.jpg</code>).</p>
                         <div id="sg-dropzone"
                             ondragover="event.preventDefault();this.style.borderColor='#0f172a';this.style.background='#f8fafc'"
                             ondragleave="this.style.borderColor='#cbd5e1';this.style.background='#fafbfc'"
@@ -4456,7 +4465,7 @@
                     <div class="flex items-center justify-between mb-3">
                         <div>
                             <h4 class="font-semibold text-sm">Upload Product Mock-Ups</h4>
-                            <p class="text-gray-500 text-xs mt-0.5">Name files as the product code (e.g. <span class="font-mono text-brand-400">APX-ATL-001.png</span>). Images auto-match to products and set the club's pricing from the selected Partnership Level.</p>
+                            <p class="text-gray-500 text-xs mt-0.5">Name files as the SKU (e.g. <span class="font-mono text-brand-400">APX-ATL-001.png</span>). Images auto-match to products and set the club's pricing from the selected Partnership Level.</p>
                         </div>
                         <button onclick="showNamingHelp(event)" class="help-trigger text-xs flex items-center gap-1 flex-shrink-0">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -4660,7 +4669,7 @@
                             <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         </div>
                         <p class="text-white text-sm font-medium mb-1">Drop images or click to browse</p>
-                        <p class="text-gray-600 text-xs">Name files as product code (e.g. APX-ATL-001.png)</p>
+                        <p class="text-gray-600 text-xs">Name files as SKU (e.g. APX-ATL-001.png)</p>
                     </div>
                     <div id="club-detail-upload-progress" class="mt-3 hide">
                         <div class="flex justify-between mb-1 text-xs text-gray-400">
@@ -5034,7 +5043,7 @@
                                 <th style="padding:9px 8px 9px 20px;text-align:left;width:40px">
                                     <input type="checkbox" id="tm-select-all" onchange="tmToggleSelectAll(this.checked)" style="cursor:pointer">
                                 </th>
-                                <th style="padding:9px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;width:130px">Code</th>
+                                <th style="padding:9px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;width:130px">SKU</th>
                                 <th style="padding:9px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;width:220px">Name</th>
                                 <th style="padding:9px 20px 9px 8px;text-align:left;font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px">Tags</th>
                             </tr>
@@ -5299,7 +5308,7 @@
                         <table class="w-full text-xs">
                             <thead><tr class="text-gray-500 border-b border-white/5 text-left">
                                 <th class="pb-1.5 pr-3">Filename</th>
-                                <th class="pb-1.5 pr-3">Product Code</th>
+                                <th class="pb-1.5 pr-3">SKU</th>
                                 <th class="pb-1.5 pr-3">Item Name</th>
                                 <th class="pb-1.5 pr-3">View</th>
                                 <th class="pb-1.5">Variant</th>
@@ -7073,6 +7082,7 @@
                                 brand_id:                 currentBrand.id,
                                 product_code:             productCode,
                                 item_name:                itemName,
+                                pattern_code:             (row.pattern_code || '').trim() || null,
                                 category:                 (row.category || '').trim() || null,
                                 range_name:               (row.range_name || row.range || '').trim() || null,
                                 description:              (row.description || '').trim() || null,
@@ -7140,8 +7150,9 @@
                     `<th class="pb-3 pr-3 text-right whitespace-nowrap">${escHtml(t.tier_name)} A</th>`
                 ).join('');
                 headerRow.innerHTML = `
-                    <th class="pb-3 pr-3 whitespace-nowrap">Code</th>
+                    <th class="pb-3 pr-3 whitespace-nowrap">SKU</th>
                     <th class="pb-3 pr-3">Name</th>
+                    <th class="pb-3 pr-3 whitespace-nowrap">Pattern Code</th>
                     <th class="pb-3 pr-3">Category</th>
                     <th class="pb-3 pr-3">Range</th>
                     ${priceCols}
@@ -7168,16 +7179,26 @@
                            `<td class="py-3 pr-3 text-right text-sm">${aDisp}</td>`;
                 }).join('');
                 return `<tr class="border-b border-gray-800 hover:bg-gray-900/50">
-                    <td class="py-3 pr-3 font-mono text-brand-400 whitespace-nowrap text-xs">${escHtml(p.product_code)}</td>
-                    <td class="py-3 pr-3 text-sm">${escHtml(p.item_name)}</td>
-                    <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.category || '-')}</td>
-                    <td class="py-3 pr-3 text-gray-400 text-xs">${escHtml(p.range_name || '-')}</td>
+                    <td class="py-2 pr-3 font-mono text-brand-400 whitespace-nowrap text-xs cursor-pointer group/inline" onclick="startInlineProdEdit('${p.id}','product_code',this)" title="Click to edit SKU">
+                        <span class="group-hover/inline:underline group-hover/inline:decoration-dotted">${escHtml(p.product_code)}</span>
+                        <svg class="w-3 h-3 inline-block ml-1 text-gray-700 opacity-0 group-hover/inline:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </td>
+                    <td class="py-2 pr-3 text-sm cursor-pointer group/inline" onclick="startInlineProdEdit('${p.id}','item_name',this)" title="Click to edit name">
+                        <span class="group-hover/inline:underline group-hover/inline:decoration-dotted">${escHtml(p.item_name)}</span>
+                        <svg class="w-3 h-3 inline-block ml-1 text-gray-700 opacity-0 group-hover/inline:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </td>
+                    <td class="py-2 pr-3 font-mono text-gray-400 text-xs cursor-pointer group/inline" onclick="startInlineProdEdit('${p.id}','pattern_code',this)" title="Click to edit Pattern Code">
+                        <span class="group-hover/inline:underline group-hover/inline:decoration-dotted">${escHtml(p.pattern_code || '—')}</span>
+                        <svg class="w-3 h-3 inline-block ml-1 text-gray-700 opacity-0 group-hover/inline:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </td>
+                    <td class="py-2 pr-3 text-gray-400 text-xs">${escHtml(p.category || '-')}</td>
+                    <td class="py-2 pr-3 text-gray-400 text-xs">${escHtml(p.range_name || '-')}</td>
                     ${priceCells}
-                    <td id="product-tags-${p.id}" class="py-3 pr-3 cursor-pointer group" onclick="openTagEditor(event, '${p.id}')">
+                    <td id="product-tags-${p.id}" class="py-2 pr-3 cursor-pointer group" onclick="openTagEditor(event, '${p.id}')">
                         ${renderProductTagChips(p.shopify_tags)}
                         <svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
                     </td>
-                    <td class="py-3 text-center whitespace-nowrap">
+                    <td class="py-2 text-center whitespace-nowrap">
                         <button onclick="editProduct('${p.id}')" class="text-brand-400 hover:text-brand-300 text-sm mr-2">Edit</button>
                         <button onclick="showDeleteProductModal('${p.id}')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
                     </td>
@@ -7196,6 +7217,7 @@
                 // Search filter
                 if (search && !p.product_code.toLowerCase().includes(search) &&
                     !p.item_name.toLowerCase().includes(search) &&
+                    !(p.pattern_code && p.pattern_code.toLowerCase().includes(search)) &&
                     !(p.range_name && p.range_name.toLowerCase().includes(search))) {
                     return false;
                 }
@@ -7221,6 +7243,56 @@
             const arr = Array.isArray(tags) ? tags : (tags ? (typeof tags === 'string' ? JSON.parse(tags) : []) : []);
             if (!arr.length) return '<span class="text-gray-700 text-xs">—</span>';
             return arr.slice(0, 3).map(t => `<span class="inline-block px-1.5 py-0.5 rounded text-xs bg-gray-800 text-gray-400 mr-1">${escHtml(t)}</span>`).join('') + (arr.length > 3 ? `<span class="text-gray-600 text-xs">+${arr.length - 3}</span>` : '');
+        }
+
+        // ── Inline Product Field Editor ───────────────────────────────────────
+        let _inlineProdEdit = null;
+
+        function startInlineProdEdit(pid, field, td) {
+            if (_cataloguePricingEditMode) return; // don't interfere with price edit mode
+            if (_inlineProdEdit) {
+                _inlineProdEdit.saved = true;
+                _inlineProdEdit = null;
+            }
+            const p = products.find(x => x.id === pid);
+            if (!p) return;
+            const current = p[field] || '';
+            const isCode = (field === 'product_code');
+            const isMono = isCode || field === 'pattern_code';
+
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.value = current;
+            inp.style.cssText = `width:100%;min-width:80px;background:#1e293b;border:1px solid #3b82f6;border-radius:4px;color:#e2e8f0;padding:2px 6px;font-size:12px;outline:none;${isMono ? 'font-family:monospace;' : ''}`;
+
+            _inlineProdEdit = { saved: false };
+            const ctx = _inlineProdEdit;
+
+            ctx.save = async () => {
+                if (ctx.saved) return;
+                ctx.saved = true;
+                const newVal = inp.value.trim();
+                const finalVal = isCode ? (newVal.toUpperCase() || null) : (newVal || null);
+                const p2 = products.find(x => x.id === pid);
+                if (p2 && p2[field] !== finalVal) {
+                    const { error } = await supabase.from('products').update({ [field]: finalVal }).eq('id', pid);
+                    if (error) { showToast(error.message, 'error'); }
+                    else { p2[field] = finalVal; }
+                }
+                _inlineProdEdit = null;
+                renderProductsTable();
+            };
+
+            inp.addEventListener('keydown', e => {
+                if (e.key === 'Enter') { e.preventDefault(); ctx.save(); }
+                if (e.key === 'Escape') { ctx.saved = true; _inlineProdEdit = null; renderProductsTable(); }
+            });
+            inp.addEventListener('blur', () => { if (!ctx.saved) ctx.save(); });
+
+            td.textContent = '';
+            td.appendChild(inp);
+            inp.focus();
+            inp.select();
         }
 
         // ── Inline Tag Editor ─────────────────────────────────────────────────
@@ -7928,8 +8000,13 @@
             document.getElementById('product-modal-title').textContent = 'Add Product';
             document.getElementById('edit-product-id').value = '';
 
+            // Populate selects first so they have options when values are cleared
+            populateProdCategoryDatalist();
+            populateProdRangeDatalist();
+            populateProdFitTypeSelect();
+
             // Clear all fields
-            ['prod-code','prod-name','prod-category','prod-range','prod-description',
+            ['prod-code','prod-name','prod-pattern-code','prod-category','prod-range','prod-description',
              'prod-template-suffix','prod-shopify-category'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
@@ -7963,9 +8040,6 @@
             // Reset tags
             currentProductTags = [];
             renderProductTagsUI();
-            populateProdCategoryDatalist();
-            populateProdRangeDatalist();
-            populateProdFitTypeSelect();
 
             document.getElementById('product-modal').classList.remove('hide');
         }
@@ -7977,11 +8051,18 @@
             document.getElementById('product-modal-title').textContent = 'Edit Product';
             document.getElementById('edit-product-id').value = productId;
 
+            // Populate selects first so values can be pre-selected
+            populateProdCategoryDatalist();
+            populateProdRangeDatalist();
+            populateProdFitTypeSelect();
+
             // Basic fields
             document.getElementById('prod-code').value        = product.product_code || '';
             document.getElementById('prod-name').value        = product.item_name || '';
             document.getElementById('prod-category').value    = product.category || '';
             document.getElementById('prod-range').value       = product.range_name || '';
+            const patternCodeEl = document.getElementById('prod-pattern-code');
+            if (patternCodeEl) patternCodeEl.value = product.pattern_code || '';
             document.getElementById('prod-weight').value      = product.weight_grams || 450;
             document.getElementById('prod-cogs').value        = product.cogs || '';
             document.getElementById('prod-description').value = product.description || '';
@@ -7993,10 +8074,6 @@
             if (cat) cat.value = product.shopify_product_category || '';
             const mto = document.getElementById('prod-made-to-order');
             if (mto) mto.checked = product.is_made_to_order !== false; // default TRUE
-
-            populateProdCategoryDatalist();
-            populateProdRangeDatalist();
-            populateProdFitTypeSelect();
 
             // Fit checkboxes — derived from available_fits
             const availFits = (product.available_fits || (product.is_single_price ? 'one_size' : 'adult'))
@@ -8253,20 +8330,26 @@
         // PRODUCT: CATEGORY & RANGE DATALISTS
         // =============================================
         function populateProdCategoryDatalist() {
-            const dl = document.getElementById('prod-categories-list');
-            if (!dl) return;
+            const sel = document.getElementById('prod-category');
+            if (!sel || sel.tagName !== 'SELECT') return;
+            const current = sel.value;
             const fromProducts = products.map(p => p.category).filter(Boolean);
             const defaults = ['Cut & Sew Teamwear','Sublimated Training','Jackets','Football Match Kit','Football Socks','Rugby Match Kit','Basketball Match Kit','Netball','Cricket','Accessories','Goalkeeper Kit','Training Wear'];
             const all = [...new Set([...fromProducts, ...catalogueCustomCategories, ...defaults])].sort();
-            dl.innerHTML = all.map(c => `<option value="${escHtml(c)}">`).join('');
+            sel.innerHTML = '<option value="">Select category...</option>' +
+                all.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('');
+            if (current) sel.value = current;
         }
 
         function populateProdRangeDatalist() {
-            const dl = document.getElementById('prod-ranges-list');
-            if (!dl) return;
+            const sel = document.getElementById('prod-range');
+            if (!sel || sel.tagName !== 'SELECT') return;
+            const current = sel.value;
             const fromProducts = products.map(p => p.range_name).filter(Boolean);
             const all = [...new Set([...fromProducts, ...catalogueCustomRanges.map(r => typeof r === 'string' ? r : r.name)])].sort();
-            dl.innerHTML = all.map(r => `<option value="${escHtml(r)}">`).join('');
+            sel.innerHTML = '<option value="">Select range...</option>' +
+                all.map(r => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
+            if (current) sel.value = current;
         }
 
         function populateProdFitTypeSelect() {
@@ -8552,19 +8635,69 @@
             saveCatalogueSettings();
         }
 
+        let _csCatEditing = null;
+
         function renderCsCategoriesList() {
             const container = document.getElementById('cs-categories-list');
             if (!container) return;
             const fromProducts = [...new Set(products.map(p => p.category).filter(Boolean))].sort();
-            if (!catalogueCustomCategories.length && !fromProducts.length) {
-                container.innerHTML = '<span class="text-gray-600 text-xs italic">No custom categories yet</span>';
+            const allNames = [...new Set([...fromProducts, ...catalogueCustomCategories])].sort();
+            if (!allNames.length) {
+                container.innerHTML = '<span class="text-gray-600 text-xs italic">No categories yet</span>';
                 return;
             }
-            const allCustom = [...new Set([...catalogueCustomCategories])].sort();
-            container.innerHTML = [
-                ...fromProducts.map(c => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-gray-800/50 text-gray-500">${escHtml(c)}</span>`),
-                ...allCustom.map(c => `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs bg-brand-500/10 border border-brand-500/30 text-brand-400">${escHtml(c)}<button type="button" onclick="csRemoveCategory('${escHtml(c)}')" class="text-brand-600 hover:text-red-400 ml-0.5">&times;</button></span>`)
-            ].join('');
+            container.innerHTML = allNames.map(c => {
+                const isCustom = catalogueCustomCategories.includes(c);
+                const chipStyle = isCustom
+                    ? 'background:#ede9fe;border:1px solid #c4b5fd;color:#7c3aed'
+                    : 'background:#f1f5f9;border:1px solid #cbd5e1;color:#475569';
+                if (_csCatEditing === c) {
+                    return `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs" style="${chipStyle}">
+                        <input id="cs-cat-edit-inp" type="text" value="${escHtml(c)}" style="background:transparent;border:none;border-bottom:1px solid currentColor;outline:none;font-size:12px;width:90px;color:inherit"
+                            onkeydown="if(event.key==='Enter'){event.preventDefault();csCatEditSave('${escHtml(c)}');}if(event.key==='Escape'){_csCatEditing=null;renderCsCategoriesList();}">
+                        <button onclick="csCatEditSave('${escHtml(c)}')" style="background:none;border:none;cursor:pointer;color:#16a34a;font-size:14px;padding:0;line-height:1" title="Save">✓</button>
+                        <button onclick="_csCatEditing=null;renderCsCategoriesList();" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:14px;padding:0;line-height:1" title="Cancel">✗</button>
+                    </span>`;
+                }
+                return `<span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs" style="${chipStyle}">
+                    ${escHtml(c)}
+                    <button onclick="csCategoryStartEdit('${escHtml(c).replace(/'/g,"&#39;")}')" style="background:none;border:none;cursor:pointer;opacity:0.5;padding:0;line-height:1;margin-left:2px" title="Rename" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.5'">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
+                    <button onclick="csDeleteCategory('${escHtml(c).replace(/'/g,"&#39;")}')" style="background:none;border:none;cursor:pointer;color:#f87171;font-size:14px;padding:0;line-height:1" title="Delete">&times;</button>
+                </span>`;
+            }).join('');
+            if (_csCatEditing) {
+                const inp = document.getElementById('cs-cat-edit-inp');
+                if (inp) { inp.focus(); inp.select(); }
+            }
+        }
+
+        function csCategoryStartEdit(name) {
+            _csCatEditing = name;
+            renderCsCategoriesList();
+        }
+
+        async function csCatEditSave(oldName) {
+            const inp = document.getElementById('cs-cat-edit-inp');
+            if (!inp) return;
+            const newName = inp.value.trim();
+            _csCatEditing = null;
+            if (!newName || newName === oldName) { renderCsCategoriesList(); return; }
+            // Update all products with this category in DB
+            const affected = products.filter(p => p.category === oldName);
+            if (affected.length) {
+                const { error } = await supabase.from('products').update({ category: newName }).in('id', affected.map(p => p.id));
+                if (error) { showToast(error.message, 'error'); renderCsCategoriesList(); return; }
+                affected.forEach(p => { p.category = newName; });
+            }
+            // Update custom list
+            const idx = catalogueCustomCategories.indexOf(oldName);
+            if (idx >= 0) catalogueCustomCategories[idx] = newName;
+            else catalogueCustomCategories.push(newName);
+            saveCatalogueSettings();
+            renderCsCategoriesList();
+            showToast(`Category renamed to "${newName}"`);
         }
 
         function csAddCategory() {
@@ -8578,17 +8711,31 @@
             input.value = '';
         }
 
-        function csRemoveCategory(cat) {
-            catalogueCustomCategories = catalogueCustomCategories.filter(c => c !== cat);
+        async function csDeleteCategory(name) {
+            const affectedCount = products.filter(p => p.category === name).length;
+            const msg = affectedCount
+                ? `Delete category "${name}"? ${affectedCount} product(s) will have their category cleared.`
+                : `Delete category "${name}"?`;
+            if (!confirm(msg)) return;
+            const affected = products.filter(p => p.category === name);
+            if (affected.length) {
+                const { error } = await supabase.from('products').update({ category: null }).in('id', affected.map(p => p.id));
+                if (error) { showToast(error.message, 'error'); return; }
+                affected.forEach(p => { p.category = null; });
+            }
+            catalogueCustomCategories = catalogueCustomCategories.filter(c => c !== name);
+            saveCatalogueSettings();
             renderCsCategoriesList();
+            showToast(`Category "${name}" deleted`);
         }
+
+        let _csRangeEditing = null;
 
         function renderCsRangesList() {
             const container = document.getElementById('cs-ranges-list');
             if (!container) return;
             const fromProducts = [...new Set(products.map(p => p.range_name).filter(Boolean))].sort();
             const customNames = catalogueCustomRanges.map(r => typeof r === 'string' ? r : r.name);
-            // Unified list: DB ranges + custom ranges, deduped
             const allNames = [...new Set([...fromProducts, ...customNames])].sort();
             if (!allNames.length) {
                 container.innerHTML = '<p class="text-gray-500 text-xs italic">No ranges yet. Add a range below.</p>';
@@ -8598,10 +8745,20 @@
                 const isCustom = customNames.includes(name);
                 const customEntry = catalogueCustomRanges.find(r => (typeof r === 'string' ? r : r.name) === name);
                 const prefix = catalogueRangePrefixes[name] || (customEntry?.prefix) || '';
+                const isEditing = _csRangeEditing === name;
+                const nameDisplay = isEditing
+                    ? `<input id="cs-range-edit-inp" type="text" value="${escHtml(name)}" style="background:#fff;border:1px solid #3b82f6;border-radius:4px;font-size:13px;font-weight:600;color:#1e293b;padding:2px 6px;outline:none;width:120px"
+                        onkeydown="if(event.key==='Enter'){event.preventDefault();csRangeEditSave('${escHtml(name).replace(/'/g,"&#39;")}');}if(event.key==='Escape'){_csRangeEditing=null;renderCsRangesList();}">
+                      <button onclick="csRangeEditSave('${escHtml(name).replace(/'/g,"&#39;")}')" style="margin-left:4px;background:none;border:none;cursor:pointer;color:#16a34a;font-size:16px;padding:0;line-height:1" title="Save">✓</button>
+                      <button onclick="_csRangeEditing=null;renderCsRangesList();" style="margin-left:2px;background:none;border:none;cursor:pointer;color:#94a3b8;font-size:16px;padding:0;line-height:1" title="Cancel">✗</button>`
+                    : `<span class="font-semibold text-sm text-gray-800">${escHtml(name)}</span>
+                       <button onclick="csRangeStartEdit('${escHtml(name).replace(/'/g,"&#39;")}')" style="background:none;border:none;cursor:pointer;opacity:0.4;padding:0 0 0 4px;line-height:1;vertical-align:middle" title="Rename" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.4'">
+                           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                       </button>`;
                 return `<div class="flex items-center gap-3 rounded-lg px-3 py-2.5" style="background:#f8fafc;border:1px solid #e2e8f0" data-range-name="${escHtml(name)}">
-                    <div class="flex-1 min-w-0">
-                        <span class="font-semibold text-sm text-gray-800">${escHtml(name)}</span>
-                        <span class="text-xs ml-2 px-1.5 py-0.5 rounded" style="${isCustom ? 'background:#ede9fe;color:#7c3aed' : 'background:#f1f5f9;color:#94a3b8'}">${isCustom ? 'Custom' : 'Catalogue'}</span>
+                    <div class="flex-1 min-w-0 flex items-center gap-1 flex-wrap">
+                        ${nameDisplay}
+                        <span class="text-xs px-1.5 py-0.5 rounded ml-1" style="${isCustom ? 'background:#ede9fe;color:#7c3aed' : 'background:#f1f5f9;color:#94a3b8'}">${isCustom ? 'Custom' : 'Catalogue'}</span>
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0">
                         <label class="text-xs text-gray-500 whitespace-nowrap">SKU Prefix</label>
@@ -8611,9 +8768,13 @@
                             style="background:#fff;border:1px solid #cbd5e1"
                             oninput="csSetRangePrefixFromInput(this)">
                     </div>
-                    ${isCustom ? `<button onclick="csRemoveRange('${escHtml(name).replace(/'/g,'&#39;')}')" class="text-red-400 hover:text-red-600 text-xs px-2 py-1 rounded hover:bg-red-50 transition flex-shrink-0">&times; Remove</button>` : ''}
+                    <button onclick="csDeleteRange('${escHtml(name).replace(/'/g,'&#39;')}')" class="text-red-400 hover:text-red-600 text-xs px-2 py-1 rounded hover:bg-red-50 transition flex-shrink-0">&times; Delete</button>
                 </div>`;
             }).join('');
+            if (_csRangeEditing) {
+                const inp = document.getElementById('cs-range-edit-inp');
+                if (inp) { inp.focus(); inp.select(); }
+            }
         }
 
         function csSetRangePrefixFromInput(el) {
@@ -8647,10 +8808,58 @@
             saveCatalogueSettings();
         }
 
-        function csRemoveRange(name) {
-            catalogueCustomRanges = catalogueCustomRanges.filter(r => (typeof r === 'string' ? r : r.name) !== name);
+        function csRangeStartEdit(name) {
+            _csRangeEditing = name;
             renderCsRangesList();
+        }
+
+        async function csRangeEditSave(oldName) {
+            const inp = document.getElementById('cs-range-edit-inp');
+            if (!inp) return;
+            const newName = inp.value.trim();
+            _csRangeEditing = null;
+            if (!newName || newName === oldName) { renderCsRangesList(); return; }
+            // Update all products with this range in DB
+            const affected = products.filter(p => p.range_name === oldName);
+            if (affected.length) {
+                const { error } = await supabase.from('products').update({ range_name: newName }).in('id', affected.map(p => p.id));
+                if (error) { showToast(error.message, 'error'); renderCsRangesList(); return; }
+                affected.forEach(p => { p.range_name = newName; });
+            }
+            // Update custom list
+            const idx = catalogueCustomRanges.findIndex(r => (typeof r === 'string' ? r : r.name) === oldName);
+            if (idx >= 0) {
+                const existing = catalogueCustomRanges[idx];
+                const prefix = typeof existing === 'string' ? '' : (existing.prefix || '');
+                catalogueCustomRanges[idx] = { name: newName, prefix };
+            }
+            // Update rangePrefixes key
+            if (catalogueRangePrefixes[oldName] !== undefined) {
+                catalogueRangePrefixes[newName] = catalogueRangePrefixes[oldName];
+                delete catalogueRangePrefixes[oldName];
+            }
             saveCatalogueSettings();
+            renderCsRangesList();
+            showToast(`Range renamed to "${newName}"`);
+        }
+
+        async function csDeleteRange(name) {
+            const affectedCount = products.filter(p => p.range_name === name).length;
+            const msg = affectedCount
+                ? `Delete range "${name}"? ${affectedCount} product(s) will have their range cleared.`
+                : `Delete range "${name}"?`;
+            if (!confirm(msg)) return;
+            const affected = products.filter(p => p.range_name === name);
+            if (affected.length) {
+                const { error } = await supabase.from('products').update({ range_name: null }).in('id', affected.map(p => p.id));
+                if (error) { showToast(error.message, 'error'); return; }
+                affected.forEach(p => { p.range_name = null; });
+            }
+            catalogueCustomRanges = catalogueCustomRanges.filter(r => (typeof r === 'string' ? r : r.name) !== name);
+            delete catalogueRangePrefixes[name];
+            saveCatalogueSettings();
+            renderCsRangesList();
+            showToast(`Range "${name}" deleted`);
         }
 
         function renderCsFitTypesList() {
@@ -8751,6 +8960,7 @@
                 brand_id:      currentBrand.id,
                 product_code:  document.getElementById('prod-code').value.trim().toUpperCase(),
                 item_name:     document.getElementById('prod-name').value.trim(),
+                pattern_code:  document.getElementById('prod-pattern-code')?.value.trim() || null,
                 category:      document.getElementById('prod-category').value.trim(),
                 range_name:    document.getElementById('prod-range').value.trim(),
                 tier_prices:   tierPrices,
@@ -8779,7 +8989,7 @@
             };
 
             if (!productData.product_code || !productData.item_name || !productData.category || !productData.range_name) {
-                showToast('Please fill in all required fields: Code, Name, Category and Range', 'error');
+                showToast('Please fill in all required fields: SKU, Name, Category and Range', 'error');
                 return;
             }
             if (!hasAdult && !hasYouth && !hasWomen && !hasOneSize) {
@@ -9196,7 +9406,7 @@
             });
 
             const headers = [
-                'product_code', 'item_name', 'category', 'range_name', 'description',
+                'product_code', 'item_name', 'pattern_code', 'category', 'range_name', 'description',
                 'available_fits', 'adult_sizes', 'youth_sizes', 'women_sizes',
                 ...priceHeaders,
                 'shopify_tags', 'shopify_template_suffix', 'shopify_product_category',
@@ -9208,6 +9418,7 @@
                 const row = {
                     product_code:             p.product_code,
                     item_name:                p.item_name,
+                    pattern_code:             p.pattern_code || '',
                     category:                 p.category || '',
                     range_name:               p.range_name || '',
                     description:              p.description || '',
@@ -9254,7 +9465,7 @@
             });
 
             const headers = [
-                'product_code', 'item_name', 'category', 'range_name', 'description',
+                'product_code', 'item_name', 'pattern_code', 'category', 'range_name', 'description',
                 'available_fits', 'adult_sizes', 'youth_sizes', 'women_sizes',
                 ...priceHeaders,
                 'shopify_tags', 'shopify_template_suffix', 'shopify_product_category',
@@ -9263,8 +9474,9 @@
 
             // Row 2: field-by-field instructions
             const instrRow = {
-                product_code:             'REQUIRED. Unique code per brand — any format (e.g. POLO-001)',
+                product_code:             'REQUIRED. Unique SKU per brand — any format (e.g. POLO-001)',
                 item_name:                'REQUIRED. Product display name (e.g. Classic Polo Shirt)',
+                pattern_code:             'Optional. Internal pattern/design code (e.g. PC-001)',
                 category:                 'Product category (e.g. Cut & Sew Teamwear, Accessories, Jackets)',
                 range_name:               'Range or collection name (e.g. Elite, Academy, Accessories)',
                 description:              'Use *CLUB_NAME*, *CLUB_NAME_RANGE*, *PRODUCT_NAME* as dynamic placeholders',
@@ -26243,7 +26455,7 @@
                     <thead>
                         <tr style="background:#f8fafc;border-bottom:1px solid #e2e8f0">
                             <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Filename</th>
-                            <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Code</th>
+                            <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">SKU</th>
                             <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Product</th>
                             <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">View</th>
                             <th style="text-align:left;padding:7px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8">Variant</th>
