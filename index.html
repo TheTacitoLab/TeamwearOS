@@ -5582,19 +5582,29 @@
 
                         <!-- Products Required -->
                         <div id="cdt-products-section">
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px;flex-wrap:wrap">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:10px;flex-wrap:wrap">
                                 <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#94a3b8">Products Required</div>
-                                <div style="display:flex;align-items:center;gap:8px">
+                                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                                     <div class="dtr-source-toggle" style="margin-bottom:0">
                                         <button id="cdt-src-job"       class="dtr-source-btn active" onclick="cdtSwitchProdSource('job')">Job</button>
+                                        <button id="cdt-src-club"      class="dtr-source-btn"        onclick="cdtSwitchProdSource('club')">Club</button>
                                         <button id="cdt-src-catalogue" class="dtr-source-btn"        onclick="cdtSwitchProdSource('catalogue')">Catalogue</button>
                                     </div>
-                                    <input id="cdt-prod-search" type="text" placeholder="Search…" oninput="cdtFilterProducts(this.value)" style="padding:5px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;outline:none;width:120px">
+                                    <input id="cdt-prod-search" type="text" placeholder="Search…" oninput="cdtFilterProducts(this.value)" style="padding:5px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:12px;outline:none;width:110px">
                                     <span id="cdt-prod-count" style="font-size:11px;color:#00b89f;font-weight:700"></span>
                                 </div>
                             </div>
-                            <div id="cdt-products-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:8px;max-height:220px;overflow-y:auto">
-                                <div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading products…</div>
+                            <!-- Catalogue filters (shown only in catalogue/club mode) -->
+                            <div id="cdt-cat-filters" style="display:none;gap:6px;margin-bottom:6px">
+                                <select id="cdt-filter-cat" onchange="cdtFilterProducts()" style="flex:1;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;outline:none;background:#fff;color:#374151">
+                                    <option value="">All Categories</option>
+                                </select>
+                                <select id="cdt-filter-range" onchange="cdtFilterProducts()" style="flex:1;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;outline:none;background:#fff;color:#374151">
+                                    <option value="">All Ranges</option>
+                                </select>
+                            </div>
+                            <div id="cdt-products-grid" style="display:flex;flex-direction:column;gap:2px;max-height:220px;overflow-y:auto;border:1.5px solid #e2e8f0;border-radius:9px;background:#fff">
+                                <div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">Loading products…</div>
                             </div>
                         </div>
 
@@ -19691,9 +19701,12 @@
                 _cdtClubFilter = null;
                 _cdtProdSource = 'job';
                 _cdtJobProds = [];
+                _cdtClubProds = [];
                 const prodSearch = document.getElementById('cdt-prod-search');
                 if (prodSearch) prodSearch.value = '';
-                ['job','catalogue'].forEach(s => document.getElementById(`cdt-src-${s}`)?.classList.toggle('active', s === 'job'));
+                ['job','club','catalogue'].forEach(s => document.getElementById(`cdt-src-${s}`)?.classList.toggle('active', s === 'job'));
+                const catFilters = document.getElementById('cdt-cat-filters');
+                if (catFilters) catFilters.style.display = 'none';
 
                 // Populate club dropdown
                 const clubSel = document.getElementById('cdt-club-id');
@@ -19769,14 +19782,20 @@
                 }
             }
 
-            // Load products (cached after first load) and filter by club if selected
-            await _cdtLoadAndRenderProducts(clubId || null);
+            _cdtClubProds = [];
+            // Load products based on active source
+            if (_cdtProdSource === 'club') {
+                await _cdtLoadClubProds(clubId || null);
+            } else {
+                await _cdtLoadAndRenderProducts(clubId || null);
+            }
         }
 
         let _cdtAllProducts = [];          // master catalogue products (products table)
         let _cdtClubFilter = null;         // currently selected club id
-        let _cdtProdSource = 'job';        // active product source tab: 'job'|'catalogue'
-        let _cdtJobProds = [];             // club_products from the selected job
+        let _cdtProdSource = 'job';        // active product source tab: 'job'|'club'|'catalogue'
+        let _cdtJobProds = [];             // club_products from the linked job
+        let _cdtClubProds = [];            // club_products for the selected club
         let _cdtSelectedCatalogueProducts = []; // master product IDs selected from catalogue tab
 
         async function _cdtLoadAndRenderProducts(clubId) {
@@ -19784,21 +19803,45 @@
             if (!grid) return;
             _cdtClubFilter = clubId || null;
 
-            // Load master catalogue once (from products table, not club_products)
+            // Load master catalogue once
             if (!_cdtAllProducts.length) {
-                grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">Loading…</div>';
+                grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">Loading…</div>';
                 const { data: prodRows } = await supabase.from('products')
-                    .select('id, product_code, item_name, range_name, category')
+                    .select('id, product_code, pattern_code, item_name, range_name, category')
                     .eq('brand_id', currentBrand.id)
                     .order('range_name').order('item_name');
                 _cdtAllProducts = (prodRows || []).map(p => ({
                     id: p.id,
                     nm: p.item_name || 'Product',
                     code: p.product_code || '',
-                    range: p.range_name || p.category || '',
-                    img: '',
+                    pc: p.pattern_code || '',
+                    range: p.range_name || '',
+                    cat: p.category || '',
                 }));
+                _cdtPopulateCatFilters();
             }
+            _cdtRenderProducts(clubId);
+        }
+
+        function _cdtPopulateCatFilters() {
+            const cats  = [...new Set(_cdtAllProducts.map(p => p.cat).filter(Boolean))].sort();
+            const ranges = [...new Set(_cdtAllProducts.map(p => p.range).filter(Boolean))].sort();
+            const catSel = document.getElementById('cdt-filter-cat');
+            const rngSel = document.getElementById('cdt-filter-range');
+            if (catSel) catSel.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${escHtml(c)}">${escHtml(c)}</option>`).join('');
+            if (rngSel) rngSel.innerHTML = '<option value="">All Ranges</option>' + ranges.map(r => `<option value="${escHtml(r)}">${escHtml(r)}</option>`).join('');
+        }
+
+        async function _cdtLoadClubProds(clubId) {
+            if (!clubId) { _cdtClubProds = []; _cdtRenderProducts(null); return; }
+            const grid = document.getElementById('cdt-products-grid');
+            if (grid) grid.innerHTML = '<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">Loading…</div>';
+            const { data } = await supabase
+                .from('club_products')
+                .select('id, custom_name, products(id, item_name, product_code, pattern_code, category, range_name)')
+                .eq('club_id', clubId)
+                .eq('is_active', true);
+            _cdtClubProds = (data || []).filter(cp => cp.products);
             _cdtRenderProducts(clubId);
         }
 
@@ -19807,63 +19850,97 @@
             if (!grid) return;
             _cdtClubFilter = clubId || null;
             const search = (document.getElementById('cdt-prod-search')?.value || '').toLowerCase();
+            const filterCat   = document.getElementById('cdt-filter-cat')?.value || '';
+            const filterRange = document.getElementById('cdt-filter-range')?.value || '';
 
             let list;
             let emptyMsg;
             if (_cdtProdSource === 'job') {
-                // Job source: show club_products from the linked job
                 list = _cdtJobProds.map(cp => ({
                     id: cp.id,
                     nm: cp.custom_name || cp.products?.item_name || 'Product',
-                    img: (Array.isArray(cp.image_urls) ? cp.image_urls[0] : null) || cp.image_url || '',
                     code: cp.products?.product_code || '',
+                    pc: cp.products?.pattern_code || '',
+                    cat: cp.products?.category || '',
+                    range: cp.products?.range_name || '',
+                    isCatProd: false,
                 }));
                 emptyMsg = !document.getElementById('cdt-job-id')?.value
                     ? 'Select a job above to see its products.'
-                    : 'No products on the linked job. Use Catalogue to browse all products.';
+                    : 'No products on the linked job. Use Club or Catalogue to browse.';
+            } else if (_cdtProdSource === 'club') {
+                list = _cdtClubProds.map(cp => ({
+                    id: cp.id,
+                    nm: cp.custom_name || cp.products?.item_name || 'Product',
+                    code: cp.products?.product_code || '',
+                    pc: cp.products?.pattern_code || '',
+                    cat: cp.products?.category || '',
+                    range: cp.products?.range_name || '',
+                    isCatProd: false,
+                }));
+                emptyMsg = !clubId ? 'Select a club above to see its products.' : 'No active products for this club.';
             } else {
-                // Catalogue source: show master products table
-                list = _cdtAllProducts;
-                emptyMsg = _cdtAllProducts.length ? 'No products match your search.' : 'No products found in this brand\'s catalogue.';
+                list = _cdtAllProducts.map(p => ({ id: p.id, nm: p.nm, code: p.code, pc: p.pc, cat: p.cat, range: p.range, isCatProd: true }));
+                emptyMsg = _cdtAllProducts.length ? 'No products match your filters.' : 'No products found in this brand\'s catalogue.';
             }
 
-            if (search) list = list.filter(p => (p.nm||'').toLowerCase().includes(search) || (p.code||'').toLowerCase().includes(search) || (p.range||'').toLowerCase().includes(search));
+            if (search) list = list.filter(p =>
+                (p.nm||'').toLowerCase().includes(search) ||
+                (p.code||'').toLowerCase().includes(search) ||
+                (p.pc||'').toLowerCase().includes(search) ||
+                (p.range||'').toLowerCase().includes(search));
+            if (filterCat)   list = list.filter(p => p.cat === filterCat);
+            if (filterRange) list = list.filter(p => p.range === filterRange);
 
             if (!list.length) {
-                grid.innerHTML = `<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px;grid-column:1/-1">${emptyMsg}</div>`;
+                grid.innerHTML = `<div style="padding:16px;text-align:center;color:#94a3b8;font-size:12px">${emptyMsg}</div>`;
                 return;
             }
-            grid.innerHTML = list.map(cp => {
-                const nm  = escHtml(cp.nm);
-                const img = cp.img || '';
-                // Check correct selection array based on source
-                const sel = _cdtProdSource === 'job'
-                    ? _cdtSelectedProducts.includes(cp.id)
-                    : _cdtSelectedCatalogueProducts.includes(cp.id);
-                return `<div class="ds-prod-card${sel?' selected':''}" id="cdtprod-${cp.id}" onclick="cdtToggleProduct('${cp.id}',this)" style="cursor:pointer">
-                    <div class="ds-prod-check">✓</div>
-                    <div class="ds-prod-img">
-                        ${img ? `<img src="${escHtml(img)}" alt="${nm}" loading="lazy">` : `<svg width="24" height="24" fill="none" stroke="#cbd5e1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`}
+            grid.innerHTML = list.map((item, idx) => {
+                const isCat = item.isCatProd;
+                const sel = isCat
+                    ? _cdtSelectedCatalogueProducts.includes(item.id)
+                    : _cdtSelectedProducts.includes(item.id);
+                const cbStyle = sel
+                    ? 'width:16px;height:16px;border-radius:4px;border:2px solid #6366f1;background:#6366f1;display:flex;align-items:center;justify-content:center;flex-shrink:0'
+                    : 'width:16px;height:16px;border-radius:4px;border:2px solid #cbd5e1;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+                const rowBg = sel ? '#f0f0ff' : (idx % 2 === 0 ? '#fff' : '#fafafa');
+                return `<div id="cdtprod-${item.id}" onclick="cdtToggleProduct('${item.id}',this,${isCat})"
+                    style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;background:${rowBg};transition:background 0.1s;border-bottom:1px solid #f1f5f9"
+                    onmouseover="if(!this.dataset.sel)this.style.background='#f5f3ff'" onmouseout="if(!this.dataset.sel)this.style.background='${idx%2===0?'#fff':'#fafafa'}'">
+                    <div id="cdtprod-cb-${item.id}" style="${cbStyle}">
+                        ${sel ? '<svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg>' : ''}
                     </div>
-                    <div class="ds-prod-info">
-                        <div class="ds-prod-name" title="${nm}">${nm}</div>
-                        ${cp.code ? `<div class="ds-prod-code">${escHtml(cp.code)}</div>` : ''}
-                        ${cp.range ? `<div class="ds-prod-range">${escHtml(cp.range)}</div>` : ''}
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:12px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(item.nm)}</div>
+                        <div style="display:flex;gap:4px;margin-top:2px;flex-wrap:wrap">
+                            ${item.code ? `<span style="font-family:monospace;font-size:10px;color:#6366f1;background:#eef2ff;border-radius:3px;padding:0 4px">${escHtml(item.code)}</span>` : ''}
+                            ${item.pc   ? `<span style="font-family:monospace;font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:3px;padding:0 4px">${escHtml(item.pc)}</span>` : ''}
+                            ${item.range ? `<span style="font-size:10px;color:#94a3b8">${escHtml(item.range)}</span>` : ''}
+                        </div>
                     </div>
                 </div>`;
             }).join('');
         }
 
-        function cdtFilterProducts(search) {
+        function cdtFilterProducts() {
             _cdtRenderProducts(_cdtClubFilter);
         }
 
         function cdtSwitchProdSource(src) {
             _cdtProdSource = src;
-            ['catalogue', 'job'].forEach(s => {
+            ['job','club','catalogue'].forEach(s => {
                 document.getElementById(`cdt-src-${s}`)?.classList.toggle('active', s === src);
             });
-            _cdtRenderProducts(_cdtClubFilter);
+            const filterBar = document.getElementById('cdt-cat-filters');
+            if (filterBar) filterBar.style.display = (src === 'catalogue' || src === 'club') ? 'flex' : 'none';
+            if (src === 'catalogue') {
+                _cdtLoadAndRenderProducts(_cdtClubFilter);
+            } else if (src === 'club') {
+                _cdtLoadClubProds(_cdtClubFilter);
+            } else {
+                _cdtRenderProducts(_cdtClubFilter);
+            }
         }
 
         async function cdtJobChanged() {
@@ -19872,19 +19949,27 @@
             if (jobId) {
                 const { data: jpRows } = await supabase
                     .from('job_products')
-                    .select('club_products(id, club_id, custom_name, image_url, image_urls, products(product_code, item_name))')
+                    .select('club_products(id, club_id, custom_name, image_url, image_urls, products(product_code, pattern_code, item_name, category, range_name))')
                     .eq('job_id', jobId);
                 _cdtJobProds = (jpRows || []).map(jp => jp.club_products).filter(Boolean);
             }
             _cdtRenderProducts(_cdtClubFilter);
         }
 
-        function cdtToggleProduct(id, el) {
-            // Use separate arrays for job (club_product IDs) vs catalogue (master product IDs)
-            const arr = _cdtProdSource === 'catalogue' ? _cdtSelectedCatalogueProducts : _cdtSelectedProducts;
+        function cdtToggleProduct(id, el, isCatProd) {
+            const arr = isCatProd ? _cdtSelectedCatalogueProducts : _cdtSelectedProducts;
             const idx = arr.indexOf(id);
-            if (idx === -1) { arr.push(id); el.classList.add('selected'); }
-            else { arr.splice(idx, 1); el.classList.remove('selected'); }
+            const nowSelected = idx === -1;
+            if (nowSelected) arr.push(id); else arr.splice(idx, 1);
+            // Update row appearance
+            el.style.background = nowSelected ? '#f0f0ff' : '';
+            const cb = document.getElementById(`cdtprod-cb-${id}`);
+            if (cb) {
+                cb.style.cssText = nowSelected
+                    ? 'width:16px;height:16px;border-radius:4px;border:2px solid #6366f1;background:#6366f1;display:flex;align-items:center;justify-content:center;flex-shrink:0'
+                    : 'width:16px;height:16px;border-radius:4px;border:2px solid #cbd5e1;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+                cb.innerHTML = nowSelected ? '<svg width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5"/></svg>' : '';
+            }
             const total = _cdtSelectedProducts.length + _cdtSelectedCatalogueProducts.length;
             const countEl = document.getElementById('cdt-prod-count');
             if (countEl) countEl.textContent = total ? `${total} selected` : '';
@@ -21127,8 +21212,10 @@
 
             const due = task.due_date ? new Date(task.due_date) : null;
             const dueInfo = due ? getDueInfo(due) : null;
-            const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' }) : '—';
-            const dueCls = dueInfo ? (dueInfo.urgency === 'overdue' ? '#dc2626' : dueInfo.urgency === 'soon' ? '#ea580c' : '#0f172a') : '#94a3b8';
+            const dueLabel = due ? due.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : null;
+            const dueCls = dueInfo ? (dueInfo.urgency === 'overdue' ? '#dc2626' : dueInfo.urgency === 'soon' ? '#ea580c' : '#374151') : '#94a3b8';
+            const dueBg  = dueInfo ? (dueInfo.urgency === 'overdue' ? '#fef2f2' : dueInfo.urgency === 'soon' ? '#fff7ed' : '#f8fafc') : '#f8fafc';
+            const dueBdr = dueInfo ? (dueInfo.urgency === 'overdue' ? '#fecaca' : dueInfo.urgency === 'soon' ? '#fed7aa' : '#e2e8f0') : '#e2e8f0';
             const nextAct = getDSTaskNextAction(task);
 
             const colorBg   = { red:'#fef2f2', amber:'#fffbeb', blue:'#eff6ff', green:'#f0fdf4', grey:'#f8fafc' };
@@ -21138,48 +21225,59 @@
             const statusLabels = { new:'New', in_progress:'In Progress', revisions:'Revisions', in_review:'In Review', factory_handover:'Factory Handover', awaiting_approval:'Awaiting Approval', delivered:'Delivered', completed:'Completed' };
             const priLabels    = { urgent:'Urgent', high:'High', standard:'Standard' };
             const priColors    = { urgent:'#dc2626', high:'#ea580c', standard:'#64748b' };
+            const priBgs       = { urgent:'#fef2f2', high:'#fff7ed', standard:'#f8fafc' };
+            const priBdrs      = { urgent:'#fecaca', high:'#fed7aa', standard:'#e2e8f0' };
             const designerName = task.designers?.full_name || task._designerName || 'Unassigned';
             const brief  = task.design_brief || task.design_summary || '';
             const notes  = task.key_notes || '';
+            const pri    = task.priority || 'standard';
 
-            panel.innerHTML = `<div style="overflow-y:auto;height:100%;padding:16px;display:flex;flex-direction:column;gap:12px;box-sizing:border-box">
+            // Colours
+            const cc = task.custom_colours || {};
+            const hasColours = cc.primary?.hex || cc.secondary?.hex || cc.accent?.hex || cc.primary?.pantone;
+            const colourDots = ['primary','secondary','accent'].map(k => {
+                const c = cc[k] || {};
+                if (!c.hex && !c.pantone) return '';
+                const label = k === 'primary' ? 'Main' : k.charAt(0).toUpperCase() + k.slice(1);
+                const swatch = c.hex ? `<span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${escHtml(c.hex)};border:1px solid rgba(0,0,0,0.12);vertical-align:middle;margin-right:4px"></span>` : '';
+                const text   = [c.hex || '', c.pantone ? `PMS ${c.pantone}` : ''].filter(Boolean).join(' · ');
+                return `<div style="font-size:10px;color:#475569;display:flex;align-items:center;gap:3px">${swatch}<span style="font-weight:600">${label}:</span> ${escHtml(text)}</div>`;
+            }).filter(Boolean).join('');
 
-                <!-- Header: title + status + ref/club + Open Task button -->
+            panel.innerHTML = `<div style="overflow-y:auto;height:100%;padding:14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box">
+
+                <!-- Header: title + chips + action buttons -->
                 <div style="border-bottom:1px solid #f1f5f9;padding-bottom:10px">
-                    <div style="font-size:14px;font-weight:800;color:#0f172a;line-height:1.3;margin-bottom:6px">${escHtml(task.task_name || 'Untitled Task')}</div>
-                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
-                        <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
-                        ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px">${escHtml(task.task_ref)}</span>` : ''}
-                        ${task.clubs?.name ? `<span style="font-size:11px;color:#475569;font-weight:500">${escHtml(task.clubs.name)}</span>` : ''}
+                    <!-- Title row with action buttons top-right -->
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:7px">
+                        <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
+                        <div style="display:flex;gap:4px;flex-shrink:0;margin-top:1px">
+                            ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;white-space:nowrap;line-height:1" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">▶ Start</button>` : ''}
+                            <button onclick="showDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;white-space:nowrap;line-height:1;display:flex;align-items:center;gap:4px" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
+                                Open
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="showDesignTask('${task.id}')" style="width:100%;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
-                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
-                        Open Task Record
-                    </button>
+                    <!-- Chips row: status · ref · club · priority · due date -->
+                    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
+                        ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.task_ref)}</span>` : ''}
+                        ${task.clubs?.name ? `<span style="font-size:10px;color:#475569;font-weight:500;background:#f8fafc;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.clubs.name)}</span>` : ''}
+                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${priBgs[pri]};color:${priColors[pri]};border:1px solid ${priBdrs[pri]};white-space:nowrap">${priLabels[pri]}</span>
+                        ${dueLabel ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${dueBg};color:${dueCls};border:1px solid ${dueBdr};white-space:nowrap" title="${dueInfo?.text||''}">${dueLabel}</span>` : ''}
+                    </div>
                 </div>
 
-                <!-- Key details grid -->
+                <!-- Owner + Next Action -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
                     <div style="background:#f8fafc;border-radius:7px;padding:7px 9px">
                         <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:2px">Owner</div>
                         <div style="font-size:11px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(designerName)}</div>
                     </div>
-                    <div style="background:#f8fafc;border-radius:7px;padding:7px 9px">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:2px">Priority</div>
-                        <div style="font-size:11px;font-weight:600;color:${priColors[task.priority||'standard']}">${priLabels[task.priority||'standard']||'Standard'}</div>
-                    </div>
-                    <div style="background:#f8fafc;border-radius:7px;padding:7px 9px;grid-column:span 2">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:2px">Deadline</div>
-                        <div style="font-size:11px;font-weight:600;color:${dueCls}">${dueLabel}${dueInfo ? `<span style="font-size:10px;margin-left:5px;font-weight:600">${dueInfo.text}</span>` : ''}</div>
-                    </div>
-                </div>
-
-                <!-- Next Action -->
-                <div style="padding:9px 11px;border-radius:9px;background:${colorBg[nextAct.color]};border:1.5px solid ${colorBdr[nextAct.color]}">
-                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:${colorText[nextAct.color]};margin-bottom:3px">Next Action</div>
-                    <div style="display:flex;align-items:flex-start;gap:6px">
-                        <span style="font-size:13px;flex-shrink:0;line-height:1.3">${nextAct.icon}</span>
-                        <span style="font-size:11px;font-weight:700;color:#0f172a;line-height:1.4">${nextAct.label}</span>
+                    <div style="padding:7px 9px;border-radius:7px;background:${colorBg[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]}">
+                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:${colorText[nextAct.color]};margin-bottom:2px">Next Action</div>
+                        <div style="font-size:10px;font-weight:700;color:#0f172a;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(nextAct.label)}">${nextAct.icon} ${nextAct.label}</div>
                     </div>
                 </div>
 
@@ -21195,15 +21293,31 @@
                     <p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>
                 </div>` : ''}
 
+                <!-- Brand Colours -->
+                ${hasColours ? `<div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px">
+                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Brand Colours</div>
+                    <div style="display:flex;flex-direction:column;gap:4px">${colourDots}</div>
+                </div>` : ''}
+
+                <!-- Products Required (async) -->
+                <div id="dsp-products-${task.id}">
+                    <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px">
+                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div>
+                        <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                    </div>
+                </div>
+
+                <!-- Uploads / Assets (async) -->
+                <div id="dsp-assets-${task.id}"></div>
+
                 <!-- Unread activity (async injected) -->
                 <div id="dsp-panel-notif-${task.id}"></div>
 
-                <!-- Start Task button (new tasks only) -->
-                ${task.status === 'new' ? `<div style="margin-top:auto;padding-top:4px"><button onclick="startDesignTask('${task.id}')" style="width:100%;padding:8px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;display:flex;align-items:center;justify-content:center;gap:6px">▶ Start Task</button></div>` : ''}
-
             </div>`;
 
-            // Load unread activity asynchronously and inject into the panel
+            // Load data asynchronously
+            _loadPreviewPanelProducts(task.id, task.products_required || []);
+            _loadPreviewPanelAssets(task.id);
             _loadPreviewPanelNotifications(task.id);
         }
 
@@ -21232,6 +21346,70 @@
             el.innerHTML = `<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:7px;padding-top:10px;border-top:1px solid #e8ecf0">
                 Unread Activity&nbsp;<span style="background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700">${data.length}</span>
             </div>${items}`;
+        }
+
+        async function _loadPreviewPanelProducts(taskId, productIds) {
+            const el = document.getElementById(`dsp-products-${taskId}`);
+            if (!el) return;
+            if (!productIds || !productIds.length) {
+                el.innerHTML = '';
+                return;
+            }
+            // productIds are club_product UUIDs
+            const { data, error } = await supabase
+                .from('club_products')
+                .select('id, custom_name, product_id, products(item_name, product_code, pattern_code)')
+                .in('id', productIds);
+            if (!document.getElementById(`dsp-products-${taskId}`)) return;
+            if (error || !data?.length) {
+                el.innerHTML = '';
+                return;
+            }
+            const rows = data.map(cp => {
+                const prod = cp.products || {};
+                const name = cp.custom_name || prod.item_name || '—';
+                const sku  = prod.product_code ? `<span style="font-family:monospace;font-size:10px;color:#6366f1;background:#eef2ff;border-radius:4px;padding:1px 5px">${escHtml(prod.product_code)}</span>` : '';
+                const pc   = prod.pattern_code ? `<span style="font-family:monospace;font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:1px 5px">${escHtml(prod.pattern_code)}</span>` : '';
+                return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+                    <span style="font-size:11px;font-weight:600;color:#1e293b;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(name)}</span>
+                    <div style="display:flex;gap:3px;flex-shrink:0">${sku}${pc}</div>
+                </div>`;
+            }).join('');
+            el.innerHTML = `<div style="border:1px solid #e8ecf0;border-radius:10px;padding:10px 12px;background:#fff">
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:7px">Products Required</div>
+                ${rows}
+            </div>`;
+        }
+
+        async function _loadPreviewPanelAssets(taskId) {
+            const el = document.getElementById(`dsp-assets-${taskId}`);
+            if (!el) return;
+            const { data, error } = await supabase
+                .from('design_task_assets')
+                .select('id, file_name, file_url, file_type, file_size')
+                .eq('design_task_id', taskId)
+                .order('created_at', { ascending: false });
+            if (!document.getElementById(`dsp-assets-${taskId}`)) return;
+            if (error || !data?.length) { el.innerHTML = ''; return; }
+            const imgTypes = ['image/jpeg','image/png','image/gif','image/webp','image/svg+xml'];
+            const items = data.map(f => {
+                const isImg = imgTypes.includes(f.file_type);
+                const sizeStr = f.file_size ? (f.file_size > 1048576 ? (f.file_size/1048576).toFixed(1)+'MB' : Math.round(f.file_size/1024)+'KB') : '';
+                if (isImg) {
+                    return `<a href="${escHtml(f.file_url)}" target="_blank" title="${escHtml(f.file_name)}" style="display:block;flex-shrink:0;width:60px;height:60px;border-radius:8px;border:1px solid #e8ecf0;overflow:hidden">
+                        <img src="${escHtml(f.file_url)}" style="width:100%;height:100%;object-fit:cover" loading="lazy">
+                    </a>`;
+                }
+                const ext = (f.file_name || '').split('.').pop().toUpperCase().slice(0,4);
+                return `<a href="${escHtml(f.file_url)}" target="_blank" title="${escHtml(f.file_name)}" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:60px;height:60px;border-radius:8px;border:1px solid #e8ecf0;background:#f8fafc;text-decoration:none">
+                    <span style="font-size:9px;font-weight:800;color:#6366f1">${escHtml(ext)}</span>
+                    ${sizeStr ? `<span style="font-size:8px;color:#9ca3af">${escHtml(sizeStr)}</span>` : ''}
+                </a>`;
+            }).join('');
+            el.innerHTML = `<div style="border:1px solid #e8ecf0;border-radius:10px;padding:10px 12px;background:#fff">
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:8px">Uploads & Assets</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">${items}</div>
+            </div>`;
         }
 
         function openAddCommentFromDashboard(taskId) {
