@@ -11334,10 +11334,12 @@
 
                 const imageUrls = Array.isArray(cp.image_urls) ? cp.image_urls : [];
                 // Title suffix: use variant_name when set (e.g. "Red", "Home"), otherwise fall back to
-                // "– Style N" for unnamed V2+ products, or nothing for V1/P1 with no name.
+                // "– Listing N" for unnamed P2+ standalone products, "– Style N" for unnamed V2+ variants,
+                // or nothing for V1/P1 with no name.
                 const variantLabel = cp.variant_name
                     ? ` ${cp.variant_name}`
-                    : (cp.variant_number > 1 ? ` – Style ${cp.variant_number}` : '');
+                    : (cp.listing_number > 1 ? ` – Listing ${cp.listing_number}`
+                    : (cp.variant_number > 1 ? ` – Style ${cp.variant_number}` : ''));
                 const title  = (cp.custom_name || `${club.name} ${mp.item_name}`) + variantLabel;
                 const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
@@ -12141,7 +12143,8 @@
 
             const variantLabel = cp.variant_name
                 ? ` ${cp.variant_name}`
-                : (cp.variant_number > 1 ? ` – Style ${cp.variant_number}` : '');
+                : (cp.listing_number > 1 ? ` – Listing ${cp.listing_number}`
+                : (cp.variant_number > 1 ? ` – Style ${cp.variant_number}` : ''));
             const title = (cp.custom_name || `${club.name} ${mp.item_name}`) + variantLabel;
             const handle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
             let description = (mp.description || '')
@@ -12427,12 +12430,16 @@
                 const skuPreview = mp ? buildSku(mp, currentClub, availFits.includes('one_size') ? 'OS' : 'S') : '';
                 const displayCode = escHtml(skuPreview || mp?.product_code || '');
 
+                const photoCountBadge = imgUrls.length > 1
+                    ? `<span style="position:absolute;bottom:5px;right:5px;background:rgba(0,0,0,0.55);color:#fff;font-size:9px;padding:1px 5px;border-radius:10px;pointer-events:none;line-height:1.6">${imgUrls.length} photos</span>`
+                    : '';
                 const imageArea = imgUrls.length > 0
                     ? `<div style="position:relative;width:100%;aspect-ratio:1/1;overflow:hidden">
-                           <img src="${escHtml(imgUrls[0])}" alt="" data-src="${escHtml(imgUrls[0])}" style="width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in" onclick="enlargeProductImage(this.dataset.src)">
+                           <img src="${escHtml(imgUrls[0])}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in" onclick="showProductImageGallery('${cp.id}',0)">
                            <div class="cp-select-overlay" onclick="toggleCpSelection('${cp.id}',event)" style="position:absolute;top:5px;left:5px;width:20px;height:20px;border-radius:5px;border:2px solid #fff;background:rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s" id="cp-chk-${cp.id}">
                                <svg style="width:11px;height:11px;display:none" fill="none" stroke="#fff" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
                            </div>
+                           ${photoCountBadge}
                        </div>`
                     : `<div style="position:relative;width:100%;aspect-ratio:1/1;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer" onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')">
                            <svg style="width:18px;height:18px" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
@@ -12445,6 +12452,9 @@
                 const variantBadge = cp.variant_number > 1
                     ? `<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:#fef3c7;color:#92400e;font-weight:700;flex-shrink:0">V${cp.variant_number}</span>`
                     : '';
+                const listingBadge = cp.listing_number > 1
+                    ? `<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:#e0f2fe;color:#0369a1;font-weight:700;flex-shrink:0">P${cp.listing_number}</span>`
+                    : '';
                 const shopifyBadge = cp.shopify_product_id
                     ? `<span style="font-size:9px;padding:1px 4px;border-radius:3px;background:rgba(34,197,94,0.12);color:#16a34a;font-weight:600;flex-shrink:0">✓</span>`
                     : '';
@@ -12455,7 +12465,7 @@
                     <div style="padding:5px 7px 7px">
                         <p style="font-size:11px;font-weight:600;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:2px" title="${escHtml(cp.custom_name)}">${escHtml(cp.custom_name)}</p>
                         <p style="font-size:10px;font-family:monospace;color:#64748b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:4px" title="${displayCode}">${displayCode}</p>
-                        ${variantBadge || shopifyBadge ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px">${variantBadge}${shopifyBadge}</div>` : ''}
+                        ${variantBadge || listingBadge || shopifyBadge ? `<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px">${variantBadge}${listingBadge}${shopifyBadge}</div>` : ''}
                         <div style="display:flex;gap:2px">
                             <button onclick="editClubProduct('${cp.id}')" class="btn-secondary" style="flex:1;font-size:10px;padding:2px 0">Edit</button>
                             <button onclick="triggerClubProductImageUpload('${cp.id}','${cp.product_id}')" class="btn-secondary" style="flex:1;font-size:10px;padding:2px 0">Img</button>
@@ -12526,16 +12536,65 @@
         }
 
 
-        function enlargeProductImage(url) {
+        function showProductImageGallery(cpId, startIndex) {
+            const cp = currentClubProducts.find(p => p.id === cpId || p.id === String(cpId));
+            if (!cp) return;
+            const urls = Array.isArray(cp.image_urls) ? cp.image_urls : (cp.image_urls ? JSON.parse(cp.image_urls) : []);
+            if (!urls.length) return;
+            let current = startIndex || 0;
+
             const overlay = document.createElement('div');
-            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer';
-            overlay.title = 'Click to close';
-            overlay.onclick = () => overlay.remove();
-            const img = document.createElement('img');
-            img.src = url;
-            img.style.cssText = 'max-width:85vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 25px 50px rgba(0,0,0,0.5)';
-            overlay.appendChild(img);
+            overlay.tabIndex = -1;
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;outline:none';
+
+            function render() {
+                overlay.innerHTML = '';
+
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '✕';
+                closeBtn.style.cssText = 'position:absolute;top:16px;right:20px;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;line-height:1;padding:4px 8px';
+                closeBtn.onclick = () => overlay.remove();
+                overlay.appendChild(closeBtn);
+
+                const img = document.createElement('img');
+                img.src = urls[current];
+                img.style.cssText = 'max-width:85vw;max-height:85vh;object-fit:contain;border-radius:12px;box-shadow:0 25px 50px rgba(0,0,0,0.5)';
+                overlay.appendChild(img);
+
+                if (urls.length > 1) {
+                    const counter = document.createElement('div');
+                    counter.style.cssText = 'position:absolute;bottom:20px;left:50%;transform:translateX(-50%);color:#fff;font-size:13px;background:rgba(0,0,0,0.5);padding:4px 12px;border-radius:20px;pointer-events:none';
+                    counter.textContent = `${current + 1} / ${urls.length}`;
+                    overlay.appendChild(counter);
+
+                    const navStyle = 'position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:36px;cursor:pointer;border-radius:50%;width:50px;height:50px;display:flex;align-items:center;justify-content:center;line-height:1;backdrop-filter:blur(4px)';
+                    if (current > 0) {
+                        const prevBtn = document.createElement('button');
+                        prevBtn.innerHTML = '‹';
+                        prevBtn.style.cssText = navStyle + ';left:20px';
+                        prevBtn.onclick = (e) => { e.stopPropagation(); current--; render(); };
+                        overlay.appendChild(prevBtn);
+                    }
+                    if (current < urls.length - 1) {
+                        const nextBtn = document.createElement('button');
+                        nextBtn.innerHTML = '›';
+                        nextBtn.style.cssText = navStyle + ';right:20px';
+                        nextBtn.onclick = (e) => { e.stopPropagation(); current++; render(); };
+                        overlay.appendChild(nextBtn);
+                    }
+                }
+            }
+
+            overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+            overlay.onkeydown = (e) => {
+                if (e.key === 'Escape') overlay.remove();
+                if (e.key === 'ArrowLeft' && current > 0) { current--; render(); }
+                if (e.key === 'ArrowRight' && current < urls.length - 1) { current++; render(); }
+            };
+
+            render();
             document.body.appendChild(overlay);
+            overlay.focus();
         }
 
         function showAddClubProductModal() {
