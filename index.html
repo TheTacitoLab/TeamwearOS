@@ -2319,9 +2319,11 @@
                         <p class="text-gray-400 text-xs mb-2 font-medium">Shopify Settings</p>
                         <div class="grid grid-cols-2 gap-3 mb-3">
                             <div>
-                                <label class="text-gray-500 text-xs mb-1 block">Product Template <span class="text-gray-600 font-normal">(optional)</span></label>
-                                <input type="text" id="prod-template-suffix" placeholder="Leave blank for default" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
-                                <p class="text-gray-600 text-xs mt-0.5">Liquid template suffix e.g. <span class="font-mono">product.teamwear</span></p>
+                                <label class="text-gray-500 text-xs mb-1 block">Product Template</label>
+                                <select id="prod-template-suffix" class="w-full px-3 py-1.5 rounded-lg text-xs font-mono" style="background:#f8fafc;border:1px solid #e2e8f0;color:#1e293b">
+                                    <!-- populated by populateTemplateSuffixSelect() -->
+                                </select>
+                                <p class="text-gray-600 text-xs mt-0.5">Manage templates in Catalogue Settings</p>
                             </div>
                             <div>
                                 <label class="text-gray-500 text-xs mb-1 block">Product Category</label>
@@ -5126,6 +5128,22 @@
                         </div>
                     </div>
 
+                    <!-- Shopify Product Templates -->
+                    <div class="pt-4 border-t border-white/5">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h4 class="font-semibold text-brand-400">Shopify Product Templates</h4>
+                                <p class="text-gray-500 text-xs mt-0.5">Liquid template suffixes available when creating products (e.g. teamwear)</p>
+                            </div>
+                        </div>
+                        <div id="cs-templates-list" class="space-y-2 mb-3"></div>
+                        <div class="flex gap-2">
+                            <input type="text" id="cs-new-tmpl-key"  placeholder="Key e.g. teamwear" class="flex-1 px-3 py-2 rounded-lg text-sm font-mono" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <input type="text" id="cs-new-tmpl-name" placeholder="Label e.g. Teamwear" class="flex-1 px-3 py-2 rounded-lg text-sm" style="background:#f8fafc;border:1px solid #e2e8f0">
+                            <button onclick="csAddTemplate()" class="btn-primary text-sm px-4">Add</button>
+                        </div>
+                    </div>
+
                     <!-- Active Price List for Catalogue View -->
                     <div class="pt-4 border-t border-white/5">
                         <h4 class="font-semibold text-brand-400 mb-2">Catalogue Display Price</h4>
@@ -6060,6 +6078,7 @@
         let clubs = [];
         let salespeople = [];
         let brandPricingTiers = [];   // brand_pricing_tiers rows for current brand
+        let brandShopifyTemplates = []; // brand_shopify_templates rows for current brand
         let brandShopifyTags = [];    // brand_shopify_tags rows for current brand
         let currentProductTags = [];  // tags currently applied to product being edited
         let catalogueCustomCategories = [];   // persisted in localStorage per brand
@@ -6422,6 +6441,15 @@
                     { id: 'partner', brand_id: currentBrand.id, tier_key: 'partner', tier_name: 'Partner', sort_order: 1, is_active: true }
                 ];
             }
+
+            // Load brand shopify templates
+            const { data: tmplRows } = await supabase
+                .from('brand_shopify_templates')
+                .select('*')
+                .eq('brand_id', currentBrand.id)
+                .eq('is_active', true)
+                .order('sort_order');
+            brandShopifyTemplates = tmplRows || [];
 
             // Load brand shopify tags
             const { data: stags } = await supabase
@@ -8014,10 +8042,11 @@
             populateProdCategoryDatalist();
             populateProdRangeDatalist();
             populateProdFitTypeSelect();
+            populateTemplateSuffixSelect('');
 
             // Clear all fields
             ['prod-code','prod-name','prod-pattern-code','prod-category','prod-range','prod-description',
-             'prod-template-suffix','prod-shopify-category'].forEach(id => {
+             'prod-shopify-category'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.value = '';
             });
@@ -8078,8 +8107,7 @@
             document.getElementById('prod-description').value = product.description || '';
 
             // Shopify fields
-            const tmpl = document.getElementById('prod-template-suffix');
-            if (tmpl) tmpl.value = product.shopify_template_suffix || '';
+            populateTemplateSuffixSelect(product.shopify_template_suffix || '');
             const cat = document.getElementById('prod-shopify-category');
             if (cat) cat.value = product.shopify_product_category || '';
             const mto = document.getElementById('prod-made-to-order');
@@ -8371,6 +8399,17 @@
             sel.innerHTML = all.map(f => `<option value="${escHtml(f)}" ${f === current ? 'selected' : ''}>${escHtml(f)}</option>`).join('');
         }
 
+        function populateTemplateSuffixSelect(currentValue) {
+            const sel = document.getElementById('prod-template-suffix');
+            if (!sel) return;
+            sel.innerHTML =
+                '<option value="">Default (no template)</option>' +
+                brandShopifyTemplates.map(t =>
+                    `<option value="${escHtml(t.template_key)}">${escHtml(t.template_name)}</option>`
+                ).join('');
+            sel.value = currentValue || '';
+        }
+
         // =============================================
         // PRICING TIERS MODAL
         // =============================================
@@ -8490,6 +8529,8 @@
         function showCatalogueSettings() {
             // Render pricing tiers section
             renderCsTiersList();
+            // Render shopify templates section
+            renderCsTemplatesList();
             // Populate active price list checkboxes
             const activeSel = document.getElementById('cs-active-price-list');
             if (activeSel) {
@@ -8624,6 +8665,52 @@
             if (idx <= 0) return;
             [brandPricingTiers[idx-1], brandPricingTiers[idx]] = [brandPricingTiers[idx], brandPricingTiers[idx-1]];
             renderCsTiersList();
+        }
+
+        function renderCsTemplatesList() {
+            const container = document.getElementById('cs-templates-list');
+            if (!container) return;
+            if (!brandShopifyTemplates.length) {
+                container.innerHTML = '<p class="text-gray-600 text-sm">No templates yet. Add one below.</p>';
+                return;
+            }
+            container.innerHTML = brandShopifyTemplates.map((t, idx) => `
+                <div class="flex items-center justify-between rounded-lg px-4 py-3" style="background:#f8fafc;border:1px solid #e2e8f0">
+                    <div>
+                        <span class="font-medium text-sm">${escHtml(t.template_name)}</span>
+                        <span class="text-gray-600 text-xs ml-2 font-mono">${escHtml(t.template_key)}</span>
+                    </div>
+                    <button onclick="csRemoveTemplate('${escHtml(t.template_key)}')" class="text-red-400 hover:text-red-300 text-xs">Remove</button>
+                </div>`).join('');
+        }
+
+        async function csAddTemplate() {
+            const keyEl  = document.getElementById('cs-new-tmpl-key');
+            const nameEl = document.getElementById('cs-new-tmpl-name');
+            const key  = (keyEl.value.trim()).toLowerCase().replace(/\s+/g, '-');
+            const name = nameEl.value.trim();
+            if (!key || !name) { showToast('Enter both a key and a display label', 'error'); return; }
+            if (brandShopifyTemplates.find(t => t.template_key === key)) { showToast('That template key already exists', 'error'); return; }
+            const newTmpl = { brand_id: currentBrand.id, template_key: key, template_name: name, sort_order: brandShopifyTemplates.length };
+            const { data, error } = await supabase.from('brand_shopify_templates').upsert(newTmpl, { onConflict: 'brand_id,template_key' }).select().single();
+            if (error) { showToast(error.message, 'error'); return; }
+            const existingIdx = brandShopifyTemplates.findIndex(t => t.template_key === data.template_key);
+            if (existingIdx >= 0) { brandShopifyTemplates[existingIdx] = data; } else { brandShopifyTemplates.push(data); }
+            keyEl.value = ''; nameEl.value = '';
+            renderCsTemplatesList();
+            showToast(`Template "${name}" added`);
+        }
+
+        async function csRemoveTemplate(templateKey) {
+            if (!confirm(`Remove template "${templateKey}"? Products already set to this template are not affected.`)) return;
+            const tmpl = brandShopifyTemplates.find(t => t.template_key === templateKey);
+            if (tmpl && tmpl.id) {
+                const { error } = await supabase.from('brand_shopify_templates').update({ is_active: false }).eq('id', tmpl.id);
+                if (error) { showToast(error.message, 'error'); return; }
+            }
+            brandShopifyTemplates = brandShopifyTemplates.filter(t => t.template_key !== templateKey);
+            renderCsTemplatesList();
+            showToast('Template removed');
         }
 
         function csSetActivePriceList(key) {
