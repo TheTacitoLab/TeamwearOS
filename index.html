@@ -9306,7 +9306,7 @@
                 const { data: existingCP } = await supabase.from('club_products')
                     .select('*').eq('club_id', currentClub.id)
                     .eq('product_id', masterProduct.id).eq('variant_number', variantNumber)
-                    .eq('listing_number', listingNumber).maybeSingle();
+                    .eq('listing_number', listingNumber).eq('is_active', true).maybeSingle();
 
                 if (!existingCP) {
                     // Resolve pricing from master product's tier_prices using club's tier
@@ -13068,7 +13068,7 @@
 
         async function removeClubProduct(cpId) {
             if (!confirm('Remove this product from the club?')) return;
-            const { error } = await supabase.from('club_products').update({ is_active: false }).eq('id', cpId);
+            const { error } = await supabase.from('club_products').delete().eq('id', cpId);
             if (error) { showToast(error.message, 'error'); return; }
             currentClubProducts = currentClubProducts.filter(p => p.id !== cpId);
             renderClubProducts();
@@ -13449,6 +13449,7 @@
                 .eq('club_id', currentClub.id)
                 .eq('product_id', masterProduct.id)
                 .eq('variant_number', variantNumber)
+                .eq('is_active', true)
                 .maybeSingle();
             if (existing) {
                 // Append new image URL to image_urls array (avoid duplicates)
@@ -26855,6 +26856,7 @@
                         .eq('club_id',       newClub.id)
                         .eq('product_id',    fd.product.id)
                         .eq('variant_number', fd.variantNumber)
+                        .eq('is_active', true)
                         .maybeSingle();
 
                     if (!existingCP) {
