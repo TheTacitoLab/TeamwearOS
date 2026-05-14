@@ -7238,6 +7238,7 @@
                     </td>
                     <td class="py-2 text-center whitespace-nowrap">
                         <button onclick="editProduct('${p.id}')" class="text-brand-400 hover:text-brand-300 text-sm mr-2">Edit</button>
+                        <button onclick="duplicateProduct('${p.id}')" class="text-gray-400 hover:text-gray-300 text-sm mr-2">Duplicate</button>
                         <button onclick="showDeleteProductModal('${p.id}')" class="text-red-400 hover:text-red-300 text-sm">Delete</button>
                     </td>
                 </tr>`;
@@ -8163,6 +8164,18 @@
             renderProductTagsUI();
 
             document.getElementById('product-modal').classList.remove('hide');
+        }
+
+        function duplicateProduct(productId) {
+            editProduct(productId);
+            // Switch to "new product" mode — clear the ID so saveProduct does an INSERT
+            document.getElementById('edit-product-id').value = '';
+            document.getElementById('product-modal-title').textContent = 'Duplicate Product';
+            // Append "(copy)" to name and "-COPY" to SKU so it saves without a unique-key clash
+            const nameEl = document.getElementById('prod-name');
+            if (nameEl) nameEl.value = (nameEl.value + ' (copy)').trim();
+            const codeEl = document.getElementById('prod-code');
+            if (codeEl) codeEl.value = (codeEl.value + '-COPY').trim();
         }
 
         function hideProductModal() {
