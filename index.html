@@ -10180,11 +10180,11 @@
                 }
 
                 // Product image
-                const productCode = nameWithoutExt.replace(/-/g, '/').toUpperCase();
-                const product = products.find(p => p.product_code.toUpperCase() === productCode);
-                
+                const { productCode: parsedCode, view, variantNumber, variantName, listingNumber } = parseDesignFilename(file.name);
+                const product = findProductByFilenameCode(parsedCode);
+
                 if (!product) {
-                    showToast(`No product: ${nameWithoutExt}`, 'error');
+                    showToast(`No product: ${parsedCode}`, 'error');
                     failed++;
                     continue;
                 }
@@ -10210,12 +10210,14 @@
                         .upsert({
                             club_id: selectedClubId,
                             product_id: product.id,
+                            view,
                             file_name: file.name,
                             storage_path: storagePath,
                             public_url: urlData.publicUrl,
                             uploaded_by: currentUser.id
-                        }, { onConflict: 'club_id,product_id' });
+                        }, { onConflict: 'club_id,product_id,view' });
 
+                    await autoCreateClubProductFromImage(product, urlData.publicUrl, variantNumber, variantName, listingNumber);
                     uploaded++;
                 } catch (err) {
                     failed++;
@@ -12450,6 +12452,7 @@
             const masterProduct = products.find(p => p.id === productId);
             if (!masterProduct) { showToast('Master product not found', 'error'); return; }
             showToast('Uploading image...');
+            const { view } = parseDesignFilename(file.name);
             const storagePath = `${currentBrand.slug}/${currentClub.suffix}/${file.name}`;
             const { error: uploadError } = await supabase.storage.from('club-images').upload(storagePath, file, { upsert: true });
             if (uploadError) { showToast(uploadError.message, 'error'); return; }
@@ -12458,9 +12461,10 @@
             // Upsert into club_images
             await supabase.from('club_images').upsert({
                 club_id: currentClub.id, product_id: productId,
+                view,
                 file_name: file.name, storage_path: storagePath,
                 public_url: imageUrl, uploaded_by: currentUser.id
-            }, { onConflict: 'club_id,product_id' });
+            }, { onConflict: 'club_id,product_id,view' });
             // Update club_product image_urls
             const { data: cp } = await supabase.from('club_products').select('image_urls').eq('id', cpId).single();
             const currentUrls = Array.isArray(cp?.image_urls) ? cp.image_urls : [];
@@ -13417,8 +13421,8 @@
                     } catch { failed++; }
                     continue;
                 }
-                // Use the same parser as the mockup modal — handles -V2, -B, -S, -T suffixes
-                const { productCode, variantNumber } = parseDesignFilename(file.name);
+                // Use the same parser as the mockup modal — handles -V2, -B, -S, -T, -P2 suffixes
+                const { productCode, view, variantNumber, variantName, listingNumber } = parseDesignFilename(file.name);
                 const product = findProductByFilenameCode(productCode);
                 if (!product) { showToast(`No product matching: ${file.name}`, 'error'); failed++; continue; }
                 try {
@@ -13428,12 +13432,13 @@
                     const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(storagePath);
                     await supabase.from('club_images').upsert({
                         club_id: currentClub.id, product_id: product.id,
+                        view,
                         file_name: file.name, storage_path: storagePath,
                         public_url: urlData.publicUrl, uploaded_by: currentUser.id
-                    }, { onConflict: 'club_id,product_id' });
+                    }, { onConflict: 'club_id,product_id,view' });
 
                     // Auto-create club product from image if not already present
-                    await autoCreateClubProductFromImage(product, urlData.publicUrl, variantNumber);
+                    await autoCreateClubProductFromImage(product, urlData.publicUrl, variantNumber, variantName, listingNumber);
                     uploaded++;
                 } catch { failed++; }
             }
@@ -13452,16 +13457,17 @@
         }
 
         // Auto-create a club product when an image is uploaded and matched to a master product
-        async function autoCreateClubProductFromImage(masterProduct, imageUrl, variantNumber = 1) {
+        async function autoCreateClubProductFromImage(masterProduct, imageUrl, variantNumber = 1, variantName = '', listingNumber = 1) {
             if (!currentClub || !masterProduct) return;
 
-            // Check if club product already exists for this product+variant
+            // Check if club product already exists for this product+variant+listing
             const { data: existing } = await supabase
                 .from('club_products')
                 .select('id, image_urls')
                 .eq('club_id', currentClub.id)
                 .eq('product_id', masterProduct.id)
                 .eq('variant_number', variantNumber)
+                .eq('listing_number', listingNumber)
                 .eq('is_active', true)
                 .maybeSingle();
             if (existing) {
@@ -13483,14 +13489,17 @@
             const youthPrice = tp.youth || masterProduct.youth_partner_price || masterProduct.youth_retail_price || null;
             const webPrice = adultPrice ? parseFloat(adultPrice) : null;
 
-            // Build custom name using club name as prefix (placeholder replacement)
-            const customName = `${currentClub.name} ${masterProduct.item_name}`;
+            // Build custom name using club name as prefix, appending variant/listing name if present
+            const nameSuffix = variantName ? ` – ${variantName}` : '';
+            const customName = `${currentClub.name} ${masterProduct.item_name}${nameSuffix}`;
 
             await supabase.from('club_products').insert({
                 club_id: currentClub.id,
                 product_id: masterProduct.id,
                 custom_name: customName,
                 variant_number: variantNumber,
+                variant_name: variantName || null,
+                listing_number: listingNumber,
                 image_urls: [imageUrl],
                 partner_price: adultPrice,
                 non_partner_price: youthPrice,
