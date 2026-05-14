@@ -20,6 +20,6 @@ create policy "brand members can manage shopify templates"
     on public.brand_shopify_templates for all
     using (
         brand_id in (
-            select brand_id from public.brand_members where user_id = auth.uid()
+            select brand_id from public.user_profiles where id = auth.uid()
         )
     );
