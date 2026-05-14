@@ -9208,6 +9208,18 @@
                 }
             }
 
+            // If the captured variantName is actually a view keyword (e.g. -P2-R, -V2-S),
+            // promote it to view and clear variantName so it isn't treated as a product name.
+            const knownViewSuffixes = {
+                'FRONT': 'front', 'BACK': 'back', 'REAR': 'back', 'SIDE': 'side',
+                'TOP': 'top', 'DETAIL': 'detail', 'INSIDE': 'inside', 'DTL': 'detail',
+                'IN': 'inside', 'F': 'front', 'B': 'back', 'R': 'back', 'S': 'side', 'T': 'top'
+            };
+            if (variantName && knownViewSuffixes[variantName.toUpperCase()]) {
+                view = knownViewSuffixes[variantName.toUpperCase()];
+                variantName = '';
+            }
+
             // View suffixes — ordered longest-first to prevent partial matches (e.g. -FRONT before -F, -REAR before -R)
             const viewMap = [
                 ['-FRONT',  'front'],
@@ -10215,9 +10227,9 @@
                             storage_path: storagePath,
                             public_url: urlData.publicUrl,
                             uploaded_by: currentUser.id
-                        }, { onConflict: 'club_id,product_id,view' });
+                        }, { onConflict: 'club_id,file_name' });
 
-                    await autoCreateClubProductFromImage(product, urlData.publicUrl, variantNumber, variantName, listingNumber);
+                    await autoCreateClubProductFromImage(product, urlData.publicUrl, variantNumber, variantName, listingNumber, club);
                     uploaded++;
                 } catch (err) {
                     failed++;
@@ -12464,7 +12476,7 @@
                 view,
                 file_name: file.name, storage_path: storagePath,
                 public_url: imageUrl, uploaded_by: currentUser.id
-            }, { onConflict: 'club_id,product_id,view' });
+            }, { onConflict: 'club_id,file_name' });
             // Update club_product image_urls
             const { data: cp } = await supabase.from('club_products').select('image_urls').eq('id', cpId).single();
             const currentUrls = Array.isArray(cp?.image_urls) ? cp.image_urls : [];
@@ -13435,7 +13447,7 @@
                         view,
                         file_name: file.name, storage_path: storagePath,
                         public_url: urlData.publicUrl, uploaded_by: currentUser.id
-                    }, { onConflict: 'club_id,product_id,view' });
+                    }, { onConflict: 'club_id,file_name' });
 
                     // Auto-create club product from image if not already present
                     await autoCreateClubProductFromImage(product, urlData.publicUrl, variantNumber, variantName, listingNumber);
@@ -13457,14 +13469,15 @@
         }
 
         // Auto-create a club product when an image is uploaded and matched to a master product
-        async function autoCreateClubProductFromImage(masterProduct, imageUrl, variantNumber = 1, variantName = '', listingNumber = 1) {
-            if (!currentClub || !masterProduct) return;
+        async function autoCreateClubProductFromImage(masterProduct, imageUrl, variantNumber = 1, variantName = '', listingNumber = 1, clubOverride = null) {
+            const club = clubOverride || currentClub;
+            if (!club || !masterProduct) return;
 
             // Check if club product already exists for this product+variant+listing
             const { data: existing } = await supabase
                 .from('club_products')
                 .select('id, image_urls')
-                .eq('club_id', currentClub.id)
+                .eq('club_id', club.id)
                 .eq('product_id', masterProduct.id)
                 .eq('variant_number', variantNumber)
                 .eq('listing_number', listingNumber)
@@ -13482,7 +13495,7 @@
             }
 
             // Determine pricing based on club's partnership level
-            const clubTierKey = currentClub.club_status || 'retail';
+            const clubTierKey = club.club_status || 'retail';
             const tierPrices = (masterProduct.tier_prices && typeof masterProduct.tier_prices === 'object') ? masterProduct.tier_prices : {};
             const tp = tierPrices[clubTierKey] || tierPrices['retail'] || {};
             const adultPrice = tp.adult || masterProduct.adult_partner_price || masterProduct.adult_retail_price || null;
@@ -13491,10 +13504,10 @@
 
             // Build custom name using club name as prefix, appending variant/listing name if present
             const nameSuffix = variantName ? ` – ${variantName}` : '';
-            const customName = `${currentClub.name} ${masterProduct.item_name}${nameSuffix}`;
+            const customName = `${club.name} ${masterProduct.item_name}${nameSuffix}`;
 
             await supabase.from('club_products').insert({
-                club_id: currentClub.id,
+                club_id: club.id,
                 product_id: masterProduct.id,
                 custom_name: customName,
                 variant_number: variantNumber,
