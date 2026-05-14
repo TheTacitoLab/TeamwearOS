@@ -9191,6 +9191,7 @@
             let variantName = '';
             let listingNumber = 1;
             let name = base;
+            let view = 'front';
 
             // Check for P2–P10 (standalone product listing) before V check — mutually exclusive
             const listingMatch = base.match(/-P(\d{1,2})(?:-(.+))?$/i);
@@ -9208,19 +9209,7 @@
                 }
             }
 
-            // If the captured variantName is actually a view keyword (e.g. -P2-R, -V2-S),
-            // promote it to view and clear variantName so it isn't treated as a product name.
-            const knownViewSuffixes = {
-                'FRONT': 'front', 'BACK': 'back', 'REAR': 'back', 'SIDE': 'side',
-                'TOP': 'top', 'DETAIL': 'detail', 'INSIDE': 'inside', 'DTL': 'detail',
-                'IN': 'inside', 'F': 'front', 'B': 'back', 'R': 'back', 'S': 'side', 'T': 'top'
-            };
-            if (variantName && knownViewSuffixes[variantName.toUpperCase()]) {
-                view = knownViewSuffixes[variantName.toUpperCase()];
-                variantName = '';
-            }
-
-            // View suffixes — ordered longest-first to prevent partial matches (e.g. -FRONT before -F, -REAR before -R)
+            // View suffixes on the base name — ordered longest-first to prevent partial matches
             const viewMap = [
                 ['-FRONT',  'front'],
                 ['-BACK',   'back'],
@@ -9237,7 +9226,6 @@
                 ['-S',      'side'],
                 ['-T',      'top'],
             ];
-            let view = 'front';
             let productCode = name;
             for (const [suffix, viewName] of viewMap) {
                 if (name.toUpperCase().endsWith(suffix)) {
@@ -9246,6 +9234,19 @@
                     break;
                 }
             }
+
+            // If the captured variantName is a view keyword (e.g. -P2-R or -V2-S),
+            // promote it to view and clear variantName so it isn't treated as a product name.
+            const knownViewSuffixes = {
+                'FRONT': 'front', 'BACK': 'back', 'REAR': 'back', 'SIDE': 'side',
+                'TOP': 'top', 'DETAIL': 'detail', 'INSIDE': 'inside', 'DTL': 'detail',
+                'IN': 'inside', 'F': 'front', 'B': 'back', 'R': 'back', 'S': 'side', 'T': 'top'
+            };
+            if (variantName && knownViewSuffixes[variantName.toUpperCase()]) {
+                view = knownViewSuffixes[variantName.toUpperCase()];
+                variantName = '';
+            }
+
             return { productCode: productCode.toUpperCase(), view, variantNumber, variantName, listingNumber };
         }
 
