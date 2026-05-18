@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fabric Stock View</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+    body { background: #0f172a; color: #e2e8f0; font-family: system-ui, sans-serif; }
+    .glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+    input[type="number"], input[type="date"] {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 0.25rem 0.5rem;
+    }
+    input:focus { outline: 2px solid #f97316; outline-offset: 1px; }
+    .saved-flash { animation: flash 0.6s ease; }
+    @keyframes flash { 0%,100% { background: transparent; } 50% { background: rgba(249,115,22,0.15); } }
+</style>
+</head>
+<body class="min-h-screen p-6">
+
+<div id="app">
+    <div class="text-gray-400 text-center py-20">Loading…</div>
+</div>
+
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm font-medium hidden" style="background:#1e293b;border:1px solid rgba(255,255,255,0.1)"></div>
+
+<script type="module">
+    const { createClient } = supabase;
+    const SUPABASE_URL = 'https://odfpmwgwnyexuxqbusvi.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kZnBtd2d3bnlleHV4cWJ1c3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNzk5ODcsImV4cCI6MjA4NTk1NTk4N30.HWndMOL2InGTbE_Mb96qtcjgcyQPOhV8VnuX6AP_8eM';
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+
+    let brandId = null;
+    let allFabrics = [];
+    let stockData = [];
+
+    function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 2500);
+    }
+
+    function hexLuminance(hex) {
+        if (!hex || hex.length < 7) return 0.5;
+        const r = parseInt(hex.slice(1,3),16)/255;
+        const g = parseInt(hex.slice(3,5),16)/255;
+        const b = parseInt(hex.slice(5,7),16)/255;
+        const toLinear = c => c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+        return 0.2126*toLinear(r) + 0.7152*toLinear(g) + 0.0722*toLinear(b);
+    }
+
+    function esc(str) {
+        const d = document.createElement('div');
+        d.textContent = str || '';
+        return d.innerHTML;
+    }
+
+    async function init() {
+        const app = document.getElementById('app');
+        if (!token) {
+            app.innerHTML = '<div class="text-center py-20 text-red-400">Invalid link — no token provided.</div>';
+            return;
+        }
+
+        // Look up brand by token
+        const { data: brand, error: brandErr } = await db
+            .from('brands')
+            .select('id, name, logo_url')
+            .eq('fabric_view_token', token)
+            .single();
+        if (brandErr || !brand) {
+            app.innerHTML = '<div class="text-center py-20 text-red-400">Link not found or expired.</div>';
+            return;
+        }
+        brandId = brand.id;
+
+        // Load fabrics
+        const { data: fabrics } = await db.from('fabrics').select('id, fabric_name, construction, gsm, colour_options').eq('brand_id', brandId).eq('status','active').order('fabric_name');
+        allFabrics = fabrics || [];
+
+        // Load stock
+        const { data: stock } = await db.from('fabric_stock').select('*').eq('brand_id', brandId);
+        stockData = stock || [];
+
+        render(brand);
+    }
+
+    function render(brand) {
+        const stockMap = {};
+        stockData.forEach(s => { stockMap[`${s.fabric_id}::${s.colour_hex||''}`] = s; });
+
+        // Build rows: one per fabric+colour combo
+        const rows = [];
+        allFabrics.forEach(fabric => {
+            const colourOpts = Array.isArray(fabric.colour_options) ? fabric.colour_options : [];
+            if (colourOpts.length === 0) {
+                rows.push({ fabric, colour: null, stockKey: `${fabric.id}::` });
+            } else {
+                colourOpts.forEach(c => rows.push({ fabric, colour: c, stockKey: `${fabric.id}::${c.hex||''}` }));
+            }
+        });
+
+        const app = document.getElementById('app');
+        app.innerHTML = `
+            <div class="max-w-5xl mx-auto">
+                <div class="flex items-center gap-4 mb-8">
+                    ${brand.logo_url ? `<img src="${esc(brand.logo_url)}" class="h-12 w-12 rounded-xl object-contain" alt="">` : ''}
+                    <div>
+                        <h1 class="text-2xl font-bold">${esc(brand.name)}</h1>
+                        <p class="text-gray-400 text-sm">Fabric Stock View — update live stock, orders, and expected dates below</p>
+                    </div>
+                </div>
+
+                ${rows.length === 0 ? '<div class="glass rounded-2xl p-10 text-center text-gray-500">No fabrics configured yet.</div>' : `
+                <div class="glass rounded-2xl overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                                <th class="text-left px-4 py-3">Fabric</th>
+                                <th class="text-left px-4 py-3">Construction</th>
+                                <th class="text-left px-4 py-3">GSM</th>
+                                <th class="text-left px-4 py-3">Colour</th>
+                                <th class="text-right px-4 py-3">Live Stock (kg)</th>
+                                <th class="text-right px-4 py-3">KG Ordered</th>
+                                <th class="text-left px-4 py-3">Date Expected</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-tbody">
+                            ${rows.map((r, i) => {
+                                const s = stockMap[r.stockKey] || {};
+                                const colourPill = r.colour ? (() => {
+                                    const hex = r.colour.hex || '#cccccc';
+                                    const textCol = hexLuminance(hex) > 0.4 ? '#1e293b' : '#f1f5f9';
+                                    return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded" style="background:${hex};color:${textCol}">${esc(r.colour.pantone_code || hex)}</span>`;
+                                })() : '<span class="text-gray-600 text-xs">—</span>';
+                                return `<tr id="row-${i}" class="border-b border-white/5 hover:bg-white/5">
+                                    <td class="px-4 py-3 font-medium text-orange-300">${esc(r.fabric.fabric_name)}</td>
+                                    <td class="px-4 py-3 text-gray-400">${esc(r.fabric.construction||'—')}</td>
+                                    <td class="px-4 py-3 text-gray-400">${r.fabric.gsm ? r.fabric.gsm + ' gsm' : '—'}</td>
+                                    <td class="px-4 py-3">${colourPill}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <input type="number" step="0.01" min="0" value="${s.live_stock_kg != null ? s.live_stock_kg : ''}" placeholder="0"
+                                            class="w-24 text-right" data-row="${i}" data-field="live_stock_kg"
+                                            data-fabric="${r.fabric.id}" data-colour="${r.colour?.hex||''}" data-pantone="${r.colour?.pantone_code||''}">
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <input type="number" step="0.01" min="0" value="${s.kg_ordered != null ? s.kg_ordered : ''}" placeholder="—"
+                                            class="w-24 text-right" data-row="${i}" data-field="kg_ordered"
+                                            data-fabric="${r.fabric.id}" data-colour="${r.colour?.hex||''}" data-pantone="${r.colour?.pantone_code||''}">
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <input type="date" value="${s.date_expected_in_stock||''}"
+                                            data-row="${i}" data-field="date_expected_in_stock"
+                                            data-fabric="${r.fabric.id}" data-colour="${r.colour?.hex||''}" data-pantone="${r.colour?.pantone_code||''}">
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`}
+                <p class="text-xs text-gray-600 mt-4 text-center">Changes save automatically on leaving each field.</p>
+            </div>`;
+
+        // Attach blur handlers
+        document.querySelectorAll('#stock-tbody input').forEach(input => {
+            input.addEventListener('blur', handleStockEdit);
+        });
+    }
+
+    async function handleStockEdit(e) {
+        const input = e.target;
+        const fabricId = input.dataset.fabric;
+        const colourHex = input.dataset.colour || null;
+        const colourPantone = input.dataset.pantone || null;
+        const field = input.dataset.field;
+        let value = input.value;
+        if (field === 'date_expected_in_stock') {
+            value = value || null;
+        } else {
+            value = value !== '' ? parseFloat(value) : null;
+        }
+
+        const { error } = await db.from('fabric_stock').upsert({
+            brand_id: brandId,
+            fabric_id: fabricId,
+            colour_hex: colourHex || null,
+            colour_pantone: colourPantone || null,
+            [field]: value,
+            updated_at: new Date().toISOString()
+        }, { onConflict: 'fabric_id,colour_hex' });
+
+        if (error) {
+            showToast('Save failed: ' + error.message);
+        } else {
+            const row = document.getElementById(`row-${input.dataset.row}`);
+            if (row) { row.classList.add('saved-flash'); setTimeout(() => row.classList.remove('saved-flash'), 700); }
+        }
+    }
+
+    init();
+</script>
+</body>
+</html>

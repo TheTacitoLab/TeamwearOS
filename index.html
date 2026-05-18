@@ -3228,6 +3228,7 @@
                 <div class="sh-tabs">
                     <button id="factory-tab-fabrics" class="sh-tab active" onclick="switchFactoryTab('fabrics')">Fabric List <span id="ftab-fabrics-count" class="sh-count">0</span></button>
                     <button id="factory-tab-forecast" class="sh-tab" onclick="switchFactoryTab('forecast')">Fabric Forecast</button>
+                    <button id="factory-tab-stock" class="sh-tab" onclick="switchFactoryTab('stock')">Fabric Stock</button>
                     <button id="factory-tab-development" class="sh-tab" onclick="switchFactoryTab('development')">Product Development</button>
                 </div>
                 <div class="sh-topbar-right">
@@ -3237,11 +3238,15 @@
                     <div id="factory-actions-forecast" class="sh-actions hide">
                         <button class="btn-secondary text-sm" onclick="loadForecast()">Refresh</button>
                     </div>
+                    <div id="factory-actions-stock" class="sh-actions hide">
+                        <button class="btn-secondary text-sm" id="factory-stock-share-btn" onclick="copyStockShareLink()">Share Stock View</button>
+                    </div>
                     <div id="factory-actions-development" class="sh-actions hide"></div>
                 </div>
             </div>
             <div id="factory-view-fabrics"></div>
             <div id="factory-view-forecast" class="hide"></div>
+            <div id="factory-view-stock" class="hide"></div>
             <div id="factory-view-development" class="hide"></div>
         </div>
 
@@ -3278,8 +3283,9 @@
                 </div>
 
                 <div class="mb-4">
-                    <label class="text-gray-400 text-sm mb-1 block">Colours <span class="text-gray-500 text-xs">(comma-separated)</span></label>
-                    <input type="text" id="fabric-colours" placeholder="White, Black, Navy, Red" class="w-full px-3 py-2 rounded-lg">
+                    <label class="text-gray-400 text-sm mb-2 block">Colours</label>
+                    <div id="fabric-colour-rows"></div>
+                    <button type="button" onclick="addFabricColourRow()" class="btn-secondary text-xs mt-2">+ Add Colour</button>
                 </div>
 
                 <div class="mb-4">
@@ -7052,7 +7058,7 @@
 
         function switchFactoryTab(tab) {
             _factoryActiveTab = tab;
-            ['fabrics','forecast','development'].forEach(t => {
+            ['fabrics','forecast','stock','development'].forEach(t => {
                 const btn = document.getElementById(`factory-tab-${t}`);
                 const view = document.getElementById(`factory-view-${t}`);
                 const actions = document.getElementById(`factory-actions-${t}`);
@@ -7065,7 +7071,8 @@
 
         function renderFactoryActiveView() {
             if (_factoryActiveTab === 'fabrics')     renderFabricsTable();
-            if (_factoryActiveTab === 'forecast')    renderForecastView();
+            if (_factoryActiveTab === 'forecast')    loadForecast();
+            if (_factoryActiveTab === 'stock')       loadStockView();
             if (_factoryActiveTab === 'development') renderDevelopmentView();
         }
 
@@ -7104,20 +7111,32 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${rows.map(f => `
+                            ${rows.map(f => {
+                                const colourOpts = Array.isArray(f.colour_options) ? f.colour_options : [];
+                                const colourPills = colourOpts.slice(0,5).map(c => {
+                                    const hex = c.hex || '#cccccc';
+                                    const lum = hexLuminance(hex);
+                                    const textCol = lum > 0.4 ? '#1e293b' : '#f1f5f9';
+                                    const label = c.pantone_code ? escHtml(c.pantone_code) : hex;
+                                    return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded mr-1 mb-0.5" style="background:${hex};color:${textCol}"><span style="width:8px;height:8px;border-radius:2px;display:inline-block;background:${hex};border:1px solid rgba(0,0,0,0.15)"></span>${label}</span>`;
+                                }).join('');
+                                return `
                             <tr class="border-b border-white/5 hover:bg-white/5 cursor-pointer" onclick="openFabricModal(${JSON.stringify(f.id)})">
                                 <td class="px-4 py-3 font-medium">${escHtml(f.fabric_name)}</td>
                                 <td class="px-4 py-3 text-gray-400">${escHtml(f.construction || '—')}</td>
-                                <td class="px-4 py-3 text-gray-400">${f.gsm || '—'}</td>
-                                <td class="px-4 py-3">${(f.colours || []).slice(0,4).map(c => `<span class="inline-block text-xs px-1.5 py-0.5 rounded mr-1" style="background:rgba(255,255,255,0.08);color:#cbd5e1">${escHtml(c)}</span>`).join('')}</td>
+                                <td class="px-4 py-3 text-gray-400">${f.gsm ? f.gsm + ' gsm' : '—'}</td>
+                                <td class="px-4 py-3">${colourPills || '<span class="text-gray-600 text-xs">—</span>'}</td>
                                 <td class="px-4 py-3">
                                     <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${f.status === 'archived' ? 'bg-gray-700 text-gray-400' : 'bg-green-500/10 text-green-400'}">${f.status === 'archived' ? 'Archived' : 'Active'}</span>
                                 </td>
-                                <td class="px-4 py-3">
+                                <td class="px-4 py-3 flex items-center gap-2">
                                     <button onclick="event.stopPropagation();archiveFabric('${f.id}','${f.status === 'archived' ? 'active' : 'archived'}')"
                                         class="text-xs text-gray-500 hover:text-gray-300 underline">${f.status === 'archived' ? 'Restore' : 'Archive'}</button>
+                                    <button onclick="event.stopPropagation();deleteFabric('${f.id}')"
+                                        class="text-xs text-red-600 hover:text-red-400 underline ml-1">Delete</button>
                                 </td>
-                            </tr>`).join('')}
+                            </tr>`;
+                            }).join('')}
                         </tbody>
                     </table>
                 </div>`}`;
@@ -7125,6 +7144,8 @@
 
         let _fabricShowArchived = false;
         function setFabricSearch(val) { _fabricSearchVal = val; renderFabricsTable(); }
+
+        let _fabricColourRows = [];
 
         function openFabricModal(fabricId) {
             const fabric = fabricId ? allFabrics.find(f => f.id === fabricId) : null;
@@ -7134,19 +7155,49 @@
             document.getElementById('fabric-construction').value = fabric?.construction || '';
             document.getElementById('fabric-gsm').value = fabric?.gsm || '';
             document.getElementById('fabric-status').value = fabric?.status || 'active';
-            document.getElementById('fabric-colours').value = (fabric?.colours || []).join(', ');
             document.getElementById('fabric-notes').value = fabric?.notes || '';
             document.getElementById('fabric-supplier').value = fabric?.supplier || '';
             document.getElementById('fabric-width').value = fabric?.fabric_width || '';
             document.getElementById('fabric-cost-per-kg').value = fabric?.cost_per_kg || '';
             document.getElementById('fabric-min-order-qty').value = fabric?.min_order_qty || '';
             document.getElementById('fabric-lead-time').value = fabric?.lead_time_days || '';
+            // Load colour options
+            _fabricColourRows = Array.isArray(fabric?.colour_options) ? fabric.colour_options.map(c => ({hex: c.hex || '#cccccc', pantone_code: c.pantone_code || ''})) : [];
+            renderFabricColourRows();
             // Collapse procurement section
             const procFields = document.getElementById('fabric-procurement-fields');
             const procChevron = document.getElementById('fabric-proc-chevron');
             if (procFields) procFields.classList.add('hide');
             if (procChevron) procChevron.style.transform = '';
             document.getElementById('fabric-modal').classList.remove('hide');
+        }
+
+        function renderFabricColourRows() {
+            const container = document.getElementById('fabric-colour-rows');
+            if (!container) return;
+            if (_fabricColourRows.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-xs mb-2">No colours added yet.</p>';
+                return;
+            }
+            container.innerHTML = _fabricColourRows.map((row, i) => `
+                <div class="flex items-center gap-2 mb-2">
+                    <input type="color" value="${row.hex}" id="fc-picker-${i}"
+                        oninput="_fabricColourRows[${i}].hex=this.value;document.getElementById('fc-hex-${i}').value=this.value"
+                        class="w-9 h-9 rounded cursor-pointer border-0 bg-transparent">
+                    <input type="text" value="${escHtml(row.hex)}" id="fc-hex-${i}" placeholder="#cccccc" maxlength="7"
+                        oninput="_fabricColourRows[${i}].hex=this.value;if(/^#[0-9a-fA-F]{6}$/.test(this.value))document.getElementById('fc-picker-${i}').value=this.value"
+                        class="px-2 py-1.5 rounded-lg text-sm" style="width:90px;font-family:monospace">
+                    <input type="text" value="${escHtml(row.pantone_code)}" placeholder="Pantone code" id="fc-pantone-${i}"
+                        oninput="_fabricColourRows[${i}].pantone_code=this.value"
+                        class="px-2 py-1.5 rounded-lg text-sm flex-1">
+                    <button type="button" onclick="_fabricColourRows.splice(${i},1);renderFabricColourRows()"
+                        class="text-gray-500 hover:text-red-400 text-lg leading-none">&times;</button>
+                </div>`).join('');
+        }
+
+        function addFabricColourRow() {
+            _fabricColourRows.push({ hex: '#cccccc', pantone_code: '' });
+            renderFabricColourRows();
         }
 
         function closeFabricModal() {
@@ -7167,14 +7218,13 @@
             const fabricId = document.getElementById('edit-fabric-id').value;
             const name = document.getElementById('fabric-name').value.trim();
             if (!name) { showToast('Fabric name is required', 'error'); return; }
-            const coloursRaw = document.getElementById('fabric-colours').value;
-            const colours = coloursRaw ? coloursRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
+            const validColours = _fabricColourRows.filter(c => /^#[0-9a-fA-F]{6}$/.test(c.hex));
             const fabricData = {
                 brand_id: currentBrand.id,
                 fabric_name: name,
                 construction: document.getElementById('fabric-construction').value.trim() || null,
                 gsm: parseInt(document.getElementById('fabric-gsm').value) || null,
-                colours: colours.length ? colours : null,
+                colour_options: validColours.length ? validColours : [],
                 notes: document.getElementById('fabric-notes').value.trim() || null,
                 status: document.getElementById('fabric-status').value || 'active',
                 supplier: document.getElementById('fabric-supplier').value.trim() || null,
@@ -7216,6 +7266,33 @@
             showToast(newStatus === 'archived' ? 'Fabric archived' : 'Fabric restored');
         }
 
+        async function deleteFabric(fabricId) {
+            const { data: usages } = await supabase
+                .from('product_fabric_recipes').select('id').eq('fabric_id', fabricId).limit(1);
+            if (usages && usages.length > 0) {
+                showToast('This fabric is used in product recipes — archive it instead', 'error');
+                return;
+            }
+            if (!confirm('Delete this fabric permanently? This cannot be undone.')) return;
+            const { error } = await supabase.from('fabrics').delete().eq('id', fabricId);
+            if (error) { showToast(error.message, 'error'); return; }
+            allFabrics = allFabrics.filter(f => f.id !== fabricId);
+            const countEl = document.getElementById('ftab-fabrics-count');
+            if (countEl) countEl.textContent = allFabrics.filter(f => f.status !== 'archived').length;
+            const statEl = document.getElementById('stat-fabrics');
+            if (statEl) statEl.textContent = allFabrics.filter(f => f.status !== 'archived').length + ' fabrics';
+            renderFabricsTable();
+            showToast('Fabric deleted');
+        }
+
+        function hexLuminance(hex) {
+            const r = parseInt(hex.slice(1,3),16)/255;
+            const g = parseInt(hex.slice(3,5),16)/255;
+            const b = parseInt(hex.slice(5,7),16)/255;
+            const toLinear = c => c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+            return 0.2126*toLinear(r) + 0.7152*toLinear(g) + 0.0722*toLinear(b);
+        }
+
         // ---- Fabric Recipe (in product modal) ----
 
         const RECIPE_COMPONENT_TYPES = ['main', 'rear', 'panels', 'trimmings'];
@@ -7233,15 +7310,26 @@
             } else {
                 container.innerHTML = _currentRecipeRows.map((row, i) => {
                     const kg = totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—';
+                    const fabric = availableFabrics.find(f => f.id === row.fabric_id);
+                    const colourOpts = Array.isArray(fabric?.colour_options) ? fabric.colour_options : [];
+                    const colourSelect = colourOpts.length ? `<select onchange="_currentRecipeRows[${i}].colour_hex=this.value.split('||')[0];_currentRecipeRows[${i}].colour_pantone=this.value.split('||')[1]||''" class="px-2 py-1.5 rounded-lg text-sm" style="min-width:130px">
+                            <option value="">— Colour —</option>
+                            ${colourOpts.map(c => {
+                                const val = `${c.hex}||${c.pantone_code||''}`;
+                                const sel = row.colour_hex === c.hex ? 'selected' : '';
+                                return `<option value="${val}" ${sel}>${escHtml(c.pantone_code || c.hex)}</option>`;
+                            }).join('')}
+                        </select>` : `<span class="text-xs text-gray-500 px-2" style="min-width:130px">No colours</span>`;
                     return `<div class="flex items-center gap-2 mb-2 flex-wrap" id="recipe-row-${i}">
                         <select onchange="_currentRecipeRows[${i}].component_type=this.value;renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm" style="min-width:110px">
                             ${RECIPE_COMPONENT_TYPES.map(t => `<option value="${t}" ${row.component_type === t ? 'selected' : ''}
                                 ${(usedTypes.includes(t) && row.component_type !== t) ? 'disabled' : ''}>${RECIPE_COMPONENT_LABELS[t]}</option>`).join('')}
                         </select>
-                        <select onchange="_currentRecipeRows[${i}].fabric_id=this.value" class="px-2 py-1.5 rounded-lg text-sm flex-1" style="min-width:160px">
+                        <select onchange="_currentRecipeRows[${i}].fabric_id=this.value;_currentRecipeRows[${i}].colour_hex='';_currentRecipeRows[${i}].colour_pantone='';renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm flex-1" style="min-width:160px">
                             <option value="">— Select fabric —</option>
                             ${availableFabrics.map(f => `<option value="${f.id}" ${row.fabric_id === f.id ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
                         </select>
+                        ${colourSelect}
                         <input type="number" min="0" max="100" step="0.01" value="${row.allocation_pct || ''}" placeholder="%" style="width:72px"
                             class="px-2 py-1.5 rounded-lg text-sm"
                             oninput="_currentRecipeRows[${i}].allocation_pct=parseFloat(this.value)||0;renderFabricRecipeRows()">
@@ -7271,23 +7359,130 @@
 
         // ---- Fabric Forecast ----
 
-        async function renderForecastView() {
+        let _forecastSort = 'date';
+        let _forecastRows = [];
+
+        function applyForecastSort(rows) {
+            const sorted = [...rows];
+            if (_forecastSort === 'date') {
+                sorted.sort((a, b) => {
+                    if (!a.nearest_date && !b.nearest_date) return 0;
+                    if (!a.nearest_date) return 1;
+                    if (!b.nearest_date) return -1;
+                    return a.nearest_date.localeCompare(b.nearest_date);
+                });
+            } else if (_forecastSort === 'max_kg') {
+                sorted.sort((a, b) => b.max_kg - a.max_kg);
+            } else if (_forecastSort === 'min_kg') {
+                sorted.sort((a, b) => b.min_kg - a.min_kg);
+            } else if (_forecastSort === 'fabric') {
+                sorted.sort((a, b) => (a.fabric_name + (a.pantone_code||'')).localeCompare(b.fabric_name + (b.pantone_code||'')));
+            } else if (_forecastSort === 'count') {
+                sorted.sort((a, b) => b.contributor_count - a.contributor_count);
+            }
+            return sorted;
+        }
+
+        function renderForecastTable() {
             const el = document.getElementById('factory-view-forecast');
             if (!el) return;
-            el.innerHTML = '<div class="text-gray-400 text-sm py-8 text-center">Loading forecast data…</div>';
+            const sortedRows = applyForecastSort(_forecastRows);
+            const sortOptions = [
+                { key: 'date',   label: 'Nearest Deadline' },
+                { key: 'max_kg', label: 'Max KG ↓' },
+                { key: 'min_kg', label: 'Min KG ↓' },
+                { key: 'fabric', label: 'Fabric A→Z' },
+                { key: 'count',  label: 'Most Contributors ↓' }
+            ];
+            const sortBar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
+                <span class="text-xs text-gray-500 mr-1">Sort:</span>
+                ${sortOptions.map(s => `<button onclick="_forecastSort='${s.key}';renderForecastTable()"
+                    class="text-xs px-3 py-1 rounded-full border transition-colors ${_forecastSort===s.key ? 'bg-orange-500/20 border-orange-500/40 text-orange-300' : 'border-white/10 text-gray-400 hover:text-gray-200'}">${s.label}</button>`).join('')}
+            </div>`;
 
-            // Load clubs with forecast enabled
-            const { data: forecastClubs, error: clubsErr } = await supabase
+            if (sortedRows.length === 0) {
+                el.innerHTML = sortBar + `<div class="glass rounded-2xl p-10 text-center">
+                    <h3 class="font-semibold mb-2 text-gray-300">No forecast data yet</h3>
+                    <p class="text-gray-500 text-sm">To see a club forecast: add fabrics, set up fabric recipes on master products, then enable <em>fabric forecast</em> on a club with player/member count set.</p>
+                </div>`;
+                return;
+            }
+
+            el.innerHTML = sortBar + `
+                <div class="glass rounded-2xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                                <th class="text-left px-4 py-3">Fabric · Colour</th>
+                                <th class="text-right px-4 py-3">Min kg</th>
+                                <th class="text-right px-4 py-3">Max kg</th>
+                                <th class="text-left px-4 py-3">Contributors</th>
+                                <th class="text-left px-4 py-3">Needed By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sortedRows.map((r, i) => {
+                                const colourPill = r.colour_hex ? `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded ml-1" style="background:${r.colour_hex};color:${hexLuminance(r.colour_hex)>0.4?'#1e293b':'#f1f5f9'}">${escHtml(r.pantone_code||r.colour_hex)}</span>` : '';
+                                const monthsHtml = r.month_breakdown.length ? r.month_breakdown.map(m =>
+                                    `<tr class="border-b border-white/5"><td class="px-3 py-1.5 text-gray-400 whitespace-nowrap">${m.month}</td><td class="px-3 py-1.5 text-gray-400 max-w-xs truncate">${escHtml(m.source)}</td><td class="px-3 py-1.5 text-right text-gray-400">${m.min_kg>0?m.min_kg.toFixed(2):'—'}</td><td class="px-3 py-1.5 text-right font-medium">${m.max_kg.toFixed(2)}</td></tr>`
+                                ).join('') : '<tr><td colspan="4" class="px-3 py-2 text-gray-500 text-xs">No dated entries</td></tr>';
+                                return `<tr class="border-b border-white/5 hover:bg-white/5">
+                                    <td class="px-4 py-3 font-medium text-orange-300">${escHtml(r.fabric_label)}${colourPill}</td>
+                                    <td class="px-4 py-3 text-right text-gray-400">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
+                                    <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
+                                    <td class="px-4 py-3 text-gray-400 text-xs">${r.contributor_count} club${r.contributor_count!==1?'s':''}</td>
+                                    <td class="px-4 py-3">
+                                        <div class="relative inline-block">
+                                            <button onclick="toggleForecastPopup(event,${i})"
+                                                class="text-xs px-2 py-1 rounded border border-white/10 text-gray-400 hover:text-white hover:border-white/30">
+                                                ${r.nearest_date ? r.nearest_date : 'No date'} ▾
+                                            </button>
+                                            <div id="forecast-popup-${i}" class="hide absolute z-30 left-0 top-7 bg-gray-900 border border-white/10 rounded-xl shadow-xl p-3" style="min-width:360px">
+                                                <p class="text-xs font-semibold text-gray-300 mb-2">Month-by-month breakdown</p>
+                                                <table class="w-full text-xs">
+                                                    <thead><tr class="text-gray-500 border-b border-white/10"><th class="text-left px-3 py-1">Month</th><th class="text-left px-3 py-1">Source</th><th class="text-right px-3 py-1">Min kg</th><th class="text-right px-3 py-1">Max kg</th></tr></thead>
+                                                    <tbody>${monthsHtml}</tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        function toggleForecastPopup(event, idx) {
+            event.stopPropagation();
+            const popup = document.getElementById(`forecast-popup-${idx}`);
+            if (!popup) return;
+            const isOpen = !popup.classList.contains('hide');
+            // Close all popups
+            document.querySelectorAll('[id^="forecast-popup-"]').forEach(p => p.classList.add('hide'));
+            if (!isOpen) popup.classList.remove('hide');
+        }
+
+        async function loadForecast(silent = false) {
+            const el = document.getElementById('factory-view-forecast');
+            if (!el) return;
+            if (!silent) el.innerHTML = '<div class="text-gray-400 text-sm py-8 text-center">Loading forecast data…</div>';
+
+            // Load all clubs
+            const { data: allClubs, error: clubsErr } = await supabase
                 .from('clubs')
                 .select('id, name, number_of_players, fabric_forecast_enabled, fabric_forecast_due_date, fabric_forecast_min_pct')
                 .eq('brand_id', currentBrand.id);
-            if (clubsErr) { el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading clubs.</div>'; return; }
+            if (clubsErr) { if (!silent) el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading clubs.</div>'; return; }
 
-            // Load club products with master product + recipe
+            const clubIds = (allClubs || []).map(c => c.id);
+            if (!clubIds.length) { _forecastRows = []; if (!silent) renderForecastTable(); return; }
+
+            // Load club products with master product + recipe (including colour fields)
             const { data: clubProducts, error: cpErr } = await supabase
                 .from('club_products')
-                .select(`id, club_id, product_id, custom_name, products(id, item_name, total_fabric_kg, product_fabric_recipes(fabric_id, component_type, allocation_pct))`)
-                .in('club_id', (forecastClubs || []).map(c => c.id));
+                .select(`id, club_id, custom_name, products(id, item_name, total_fabric_kg, product_fabric_recipes(fabric_id, component_type, allocation_pct, colour_hex, colour_pantone))`)
+                .in('club_id', clubIds);
             if (cpErr) { el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading products.</div>'; return; }
 
             // Load confirmed order quantities
@@ -7303,9 +7498,9 @@
                 });
             }
 
-            // Build forecast rows
-            const forecastRows = [];
-            const clubMap = Object.fromEntries((forecastClubs || []).map(c => [c.id, c]));
+            // Build aggregated forecast map keyed by `${fabric_id}::${colour_hex||''}`
+            const forecastMap = {};
+            const clubMap = Object.fromEntries((allClubs || []).map(c => [c.id, c]));
 
             (clubProducts || []).forEach(cp => {
                 const club = clubMap[cp.club_id];
@@ -7313,93 +7508,76 @@
                 const product = cp.products;
                 if (!product || !product.total_fabric_kg) return;
                 const recipes = product.product_fabric_recipes || [];
+
                 recipes.forEach(recipe => {
                     const fabric = allFabrics.find(f => f.id === recipe.fabric_id);
                     if (!fabric) return;
+                    const colourHex = recipe.colour_hex || '';
+                    const key = `${recipe.fabric_id}::${colourHex}`;
+                    if (!forecastMap[key]) {
+                        const parts = [fabric.fabric_name];
+                        if (fabric.construction) parts.push(fabric.construction);
+                        if (fabric.gsm) parts.push(fabric.gsm + ' gsm');
+                        forecastMap[key] = {
+                            fabric_id: recipe.fabric_id,
+                            fabric_name: fabric.fabric_name,
+                            fabric_label: parts.join(' · '),
+                            colour_hex: colourHex,
+                            pantone_code: recipe.colour_pantone || '',
+                            min_kg: 0,
+                            max_kg: 0,
+                            nearest_date: null,
+                            contributor_count: 0,
+                            club_ids: new Set(),
+                            month_breakdown: {}
+                        };
+                    }
+                    const entry = forecastMap[key];
                     const allocPct = recipe.allocation_pct / 100;
                     const kgPerUnit = product.total_fabric_kg * allocPct;
 
-                    // Club forecast
+                    // Club forecast contribution
                     if (club.fabric_forecast_enabled && club.number_of_players) {
-                        const maxUnits = club.number_of_players;
                         const minPct = club.fabric_forecast_min_pct ?? 20;
-                        const minUnits = maxUnits * (minPct / 100);
-                        forecastRows.push({
-                            fabric_name: fabric.fabric_name,
-                            club_name: club.name,
-                            product_name: cp.custom_name || product.item_name,
-                            source: 'Club Forecast',
-                            min_kg: (minUnits * kgPerUnit).toFixed(2),
-                            max_kg: (maxUnits * kgPerUnit).toFixed(2),
-                            needed_by: club.fabric_forecast_due_date || '',
-                            club_id: club.id,
-                            fabric_id: fabric.id
-                        });
+                        entry.min_kg += club.number_of_players * (minPct / 100) * kgPerUnit;
+                        entry.max_kg += club.number_of_players * kgPerUnit;
+                        entry.club_ids.add(club.id);
+                        const dueDate = club.fabric_forecast_due_date;
+                        if (dueDate) {
+                            if (!entry.nearest_date || dueDate < entry.nearest_date) entry.nearest_date = dueDate;
+                            const monthKey = dueDate.slice(0, 7);
+                            if (!entry.month_breakdown[monthKey]) entry.month_breakdown[monthKey] = [];
+                            entry.month_breakdown[monthKey].push({ source: club.name, min_kg: club.number_of_players * (minPct/100) * kgPerUnit, max_kg: club.number_of_players * kgPerUnit });
+                        }
                     }
 
-                    // Live orders
+                    // Live orders contribution
                     const confirmedUnits = orderTotals[cp.id] || 0;
                     if (confirmedUnits > 0) {
-                        forecastRows.push({
-                            fabric_name: fabric.fabric_name,
-                            club_name: club.name,
-                            product_name: cp.custom_name || product.item_name,
-                            source: 'Live Orders',
-                            min_kg: '—',
-                            max_kg: (confirmedUnits * kgPerUnit).toFixed(2),
-                            needed_by: '',
-                            club_id: club.id,
-                            fabric_id: fabric.id
-                        });
+                        entry.max_kg += confirmedUnits * kgPerUnit;
+                        entry.club_ids.add(club.id);
+                        const monthKey = new Date().toISOString().slice(0,7);
+                        if (!entry.month_breakdown[monthKey]) entry.month_breakdown[monthKey] = [];
+                        entry.month_breakdown[monthKey].push({ source: `${club.name} (live order)`, min_kg: 0, max_kg: confirmedUnits * kgPerUnit });
                     }
                 });
             });
 
-            if (forecastRows.length === 0) {
-                el.innerHTML = `<div class="glass rounded-2xl p-10 text-center">
-                    <h3 class="font-semibold mb-2 text-gray-300">No forecast data yet</h3>
-                    <p class="text-gray-500 text-sm">To see a club forecast: add fabrics, set up fabric recipes on master products, then enable <em>fabric forecast</em> on a club with player/member count set.</p>
-                </div>`;
-                return;
-            }
+            // Flatten map and build month_breakdown array
+            _forecastRows = Object.values(forecastMap)
+                .filter(r => r.max_kg > 0)
+                .map(r => ({
+                    ...r,
+                    contributor_count: r.club_ids.size,
+                    month_breakdown: Object.entries(r.month_breakdown)
+                        .sort(([a],[b]) => a.localeCompare(b))
+                        .flatMap(([month, entries]) => entries.map(e => ({
+                            month: new Date(month+'-01').toLocaleDateString('en-GB',{month:'short',year:'numeric'}),
+                            source: e.source, min_kg: e.min_kg, max_kg: e.max_kg
+                        })))
+                }));
 
-            // Group by fabric
-            const byFabric = {};
-            forecastRows.forEach(r => {
-                if (!byFabric[r.fabric_name]) byFabric[r.fabric_name] = [];
-                byFabric[r.fabric_name].push(r);
-            });
-
-            el.innerHTML = `
-                <div class="glass rounded-2xl overflow-hidden">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
-                                <th class="text-left px-4 py-3">Fabric</th>
-                                <th class="text-left px-4 py-3">Club</th>
-                                <th class="text-left px-4 py-3">Product</th>
-                                <th class="text-left px-4 py-3">Source</th>
-                                <th class="text-right px-4 py-3">Min kg</th>
-                                <th class="text-right px-4 py-3">Max kg</th>
-                                <th class="text-left px-4 py-3">Needed By</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${forecastRows.map((r, i) => {
-                                const showFabric = i === 0 || forecastRows[i-1].fabric_name !== r.fabric_name;
-                                return `<tr class="border-b border-white/5 hover:bg-white/5">
-                                    <td class="px-4 py-3 font-medium text-orange-300">${showFabric ? escHtml(r.fabric_name) : ''}</td>
-                                    <td class="px-4 py-3 text-gray-300">${escHtml(r.club_name)}</td>
-                                    <td class="px-4 py-3 text-gray-400">${escHtml(r.product_name)}</td>
-                                    <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full ${r.source === 'Live Orders' ? 'bg-blue-500/15 text-blue-300' : 'bg-orange-500/15 text-orange-300'}">${r.source}</span></td>
-                                    <td class="px-4 py-3 text-right text-gray-400">${r.min_kg}</td>
-                                    <td class="px-4 py-3 text-right font-semibold">${r.max_kg}</td>
-                                    <td class="px-4 py-3 text-gray-400">${r.needed_by || '—'}</td>
-                                </tr>`;
-                            }).join('')}
-                        </tbody>
-                    </table>
-                </div>`;
+            if (!silent) renderForecastTable();
         }
 
         // ---- Product Development (placeholder) ----
@@ -7411,6 +7589,127 @@
                 <h3 class="font-semibold mb-2 text-gray-300">Product Development</h3>
                 <p class="text-gray-500">Coming soon.</p>
             </div>`;
+        }
+
+        // ---- Fabric Stock ----
+
+        let _stockData = [];
+        let _stockForecastTotals = {};
+
+        async function loadStockView() {
+            const el = document.getElementById('factory-view-stock');
+            if (!el) return;
+            el.innerHTML = '<div class="text-gray-400 text-sm py-8 text-center">Loading stock data…</div>';
+
+            // Ensure forecast data is available for annual totals (silent: no render)
+            if (!_forecastRows.length) await loadForecast(true);
+
+            // Build annual totals by fabric+colour from forecast data
+            _stockForecastTotals = {};
+            (_forecastRows || []).forEach(r => {
+                const key = `${r.fabric_id}::${r.colour_hex||''}`;
+                _stockForecastTotals[key] = { min_kg: r.min_kg, max_kg: r.max_kg, fabric_label: r.fabric_label, colour_hex: r.colour_hex, pantone_code: r.pantone_code };
+            });
+
+            // Load existing stock records
+            const { data: stockRows } = await supabase
+                .from('fabric_stock')
+                .select('*')
+                .eq('brand_id', currentBrand.id);
+            _stockData = stockRows || [];
+
+            renderStockTable(el);
+        }
+
+        function renderStockTable(el) {
+            // Merge forecast entries with any existing stock rows, ensuring all forecast combos appear
+            const stockMap = {};
+            _stockData.forEach(s => { stockMap[`${s.fabric_id}::${s.colour_hex||''}`] = s; });
+
+            const rows = Object.entries(_stockForecastTotals).map(([key, totals]) => {
+                const stock = stockMap[key] || {};
+                return { key, ...totals, ...stock };
+            });
+
+            if (rows.length === 0) {
+                el.innerHTML = `<div class="glass rounded-2xl p-10 text-center">
+                    <h3 class="font-semibold mb-2 text-gray-300">No forecast data</h3>
+                    <p class="text-gray-500 text-sm">Set up fabric recipes and club forecasts first — stock rows will appear here automatically.</p>
+                </div>`;
+                return;
+            }
+
+            el.innerHTML = `
+                <div class="glass rounded-2xl overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                                <th class="text-left px-4 py-3">Fabric · Colour</th>
+                                <th class="text-right px-4 py-3">Annual Min kg</th>
+                                <th class="text-right px-4 py-3">Annual Max kg</th>
+                                <th class="text-right px-4 py-3">Live Stock (kg)</th>
+                                <th class="text-right px-4 py-3">KG Ordered</th>
+                                <th class="text-left px-4 py-3">Date Expected</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map(r => {
+                                const colourPill = r.colour_hex ? `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded ml-1" style="background:${r.colour_hex};color:${hexLuminance(r.colour_hex)>0.4?'#1e293b':'#f1f5f9'}">${escHtml(r.pantone_code||r.colour_hex)}</span>` : '';
+                                const safeKey = escHtml(r.key);
+                                return `<tr class="border-b border-white/5 hover:bg-white/5">
+                                    <td class="px-4 py-3 font-medium text-orange-300">${escHtml(r.fabric_label||r.fabric_name||'')}${colourPill}</td>
+                                    <td class="px-4 py-3 text-right text-gray-400">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
+                                    <td class="px-4 py-3 text-right text-gray-400">${r.max_kg > 0 ? r.max_kg.toFixed(2) : '—'}</td>
+                                    <td class="px-4 py-3 text-right">
+                                        <input type="number" step="0.01" min="0" value="${r.live_stock_kg != null ? r.live_stock_kg : ''}" placeholder="0"
+                                            class="px-2 py-1 rounded-lg text-sm text-right w-24"
+                                            onblur="saveStockField('${r.fabric_id}','${r.colour_hex||''}','live_stock_kg',parseFloat(this.value)||0)">
+                                    </td>
+                                    <td class="px-4 py-3 text-right">
+                                        <input type="number" step="0.01" min="0" value="${r.kg_ordered != null ? r.kg_ordered : ''}" placeholder="—"
+                                            class="px-2 py-1 rounded-lg text-sm text-right w-24"
+                                            onblur="saveStockField('${r.fabric_id}','${r.colour_hex||''}','kg_ordered',parseFloat(this.value)||null)">
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        <input type="date" value="${r.date_expected_in_stock||''}"
+                                            class="px-2 py-1 rounded-lg text-sm"
+                                            onblur="saveStockField('${r.fabric_id}','${r.colour_hex||''}','date_expected_in_stock',this.value||null)">
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        async function saveStockField(fabricId, colourHex, field, value) {
+            const { error } = await supabase
+                .from('fabric_stock')
+                .upsert({
+                    brand_id: currentBrand.id,
+                    fabric_id: fabricId,
+                    colour_hex: colourHex || null,
+                    [field]: value,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'fabric_id,colour_hex' });
+            if (error) { showToast(error.message, 'error'); return; }
+            // Refresh local stockData
+            const idx = _stockData.findIndex(s => s.fabric_id === fabricId && (s.colour_hex||'') === (colourHex||''));
+            if (idx !== -1) _stockData[idx][field] = value;
+            else _stockData.push({ brand_id: currentBrand.id, fabric_id: fabricId, colour_hex: colourHex||null, [field]: value });
+        }
+
+        async function copyStockShareLink() {
+            if (!currentBrand) return;
+            const { data: brandRow } = await supabase.from('brands').select('fabric_view_token').eq('id', currentBrand.id).single();
+            if (!brandRow?.fabric_view_token) { showToast('No share token found', 'error'); return; }
+            const url = `${location.origin}/factory/stock.html?token=${brandRow.fabric_view_token}`;
+            try {
+                await navigator.clipboard.writeText(url);
+                showToast('Share link copied to clipboard');
+            } catch {
+                prompt('Copy this link:', url);
+            }
         }
 
         function renderSalespeopleList() {
@@ -8877,7 +9176,7 @@
             renderFabricRecipeRows();
             ensureFabricsLoaded().then(() => {
                 supabase.from('product_fabric_recipes')
-                    .select('component_type, fabric_id, allocation_pct')
+                    .select('component_type, fabric_id, allocation_pct, colour_hex, colour_pantone')
                     .eq('product_id', productId)
                     .order('sort_order')
                     .then(({ data: recipeRows }) => {
@@ -9865,6 +10164,8 @@
                     fabric_id: r.fabric_id,
                     component_type: r.component_type,
                     allocation_pct: parseFloat(r.allocation_pct) || 0,
+                    colour_hex: r.colour_hex || null,
+                    colour_pantone: r.colour_pantone || null,
                     sort_order: i
                 }));
                 const { error: recipeErr } = await supabase.from('product_fabric_recipes').insert(recipeInserts);
