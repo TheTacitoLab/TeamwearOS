@@ -16547,9 +16547,9 @@
                 <span class="sn-count" style="color:${!salesViewStageFilter ? '#2563eb' : '#475569'}">${liveJobs.length}</span>
                 <span class="sn-label" style="color:${!salesViewStageFilter ? '#2563eb' : '#94a3b8'}">All Live</span>
             </div>
-            <div class="stage-nav-btn stage-nav-btn-completed" onclick="showSalesView('completed')" title="View completed jobs">
+            <div class="stage-nav-btn stage-nav-btn-completed" onclick="switchSalesHomeTab('closed')" title="View closed jobs">
                 <span class="sn-count">${completedJobs.length}</span>
-                <span class="sn-label">Completed ✓</span>
+                <span class="sn-label">Closed</span>
             </div>`;
         }
 
@@ -16564,7 +16564,7 @@
         // =============================================
         function renderLiveJobs() {
             let filtered = jobs.filter(j => {
-                if (j.stage === 'completed') return false;
+                if (j.stage === 'completed' || j.stage === 'lost') return false;
                 if (viewScope === 'mine' && currentUser && j.created_by !== currentUser.id) return false;
                 return true;
             });
@@ -16584,7 +16584,7 @@
         }
 
         function renderCompletedJobs() {
-            const completed = jobs.filter(j => j.stage === 'completed' && (viewScope !== 'mine' || !currentUser || j.created_by === currentUser.id));
+            const completed = jobs.filter(j => (j.stage === 'completed' || j.stage === 'lost') && (viewScope !== 'mine' || !currentUser || j.created_by === currentUser.id));
             const container = document.getElementById('completed-jobs-list');
             if (!container) return;
             if (completed.length === 0) {
@@ -19962,6 +19962,7 @@
             'order_details': 'Order Details',
             'quoted':        'Quoted',
             'completed':     'Completed',
+            'lost':          'Lost',
         };
 
         async function loadJobKanbanStages() {
