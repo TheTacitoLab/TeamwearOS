@@ -2706,19 +2706,6 @@
             </div>
         </div>
 
-        <!-- Design Task Edit Modal -->
-        <div id="ds-edit-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
-            <div style="background:#fff;border-radius:14px;width:760px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25)">
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #e2e8f0;background:#f8fafc">
-                    <div style="font-size:14px;font-weight:800;color:#0f172a">Edit Task</div>
-                    <button onclick="closeDesignTaskEditModal()" style="width:28px;height:28px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;color:#64748b;cursor:pointer;font-size:16px;line-height:1">×</button>
-                </div>
-                <div id="ds-edit-modal-body" style="flex:1;overflow-y:auto;padding:16px 18px">
-                    <p style="font-size:12px;color:#94a3b8">Loading…</p>
-                </div>
-            </div>
-        </div>
-
         <div id="tool-mockups" class="hide w-full p-6 md:p-8 lg:px-12">
             <div class="flex items-center justify-between mb-8">
                 <div>
@@ -5908,6 +5895,31 @@
                             <input type="file" id="cdt-attach-input" class="hide" multiple
                                 accept=".ai,.svg,image/png,image/jpeg,.jpg,.pdf,.zip,.eps,.psd"
                                 onchange="_cdtAttachFileSelect(event)">
+                        </div>
+
+                        <!-- Factory Handover -->
+                        <div id="cdt-factory-section" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:12px">
+                            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#15803d;margin-bottom:8px">Factory Handover</div>
+                            <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:5px">Design Folder (Google Drive)</div>
+                            <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+                                <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
+                                    <input type="radio" name="cdt-drive-src" value="job" id="cdt-drive-src-job">
+                                    Use job's Drive <span id="cdt-drive-job-hint" style="color:#94a3b8;font-size:10px">(no job linked)</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
+                                    <input type="radio" name="cdt-drive-src" value="club" id="cdt-drive-src-club">
+                                    Use club's Drive <span id="cdt-drive-club-hint" style="color:#94a3b8;font-size:10px">(no club linked)</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
+                                    <input type="radio" name="cdt-drive-src" value="custom" id="cdt-drive-src-custom" checked>
+                                    Custom URL
+                                </label>
+                                <input type="url" id="cdt-drive-custom" placeholder="https://drive.google.com/…"
+                                    oninput="document.getElementById('cdt-drive-src-custom').checked=true"
+                                    style="width:100%;box-sizing:border-box;padding:6px 9px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;margin-top:2px">
+                            </div>
+                            <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:4px;border-top:1px solid #d1fae5;padding-top:8px">Required for Factory</div>
+                            <div id="cdt-fr-list" style="display:flex;flex-direction:column"></div>
                         </div>
 
                     </div><!-- end LEFT -->
@@ -21218,6 +21230,9 @@
         let _cdtSelectedProducts = [];
         let _cdtColours = { primary:{hex:'',pantone:''}, secondary:{hex:'',pantone:''}, accent:{hex:'',pantone:''} };
         let _cdtPendingAttachments = [];
+        let _cdtEditTaskId = null;     // set when the modal is opened for EDIT (not create)
+        let _cdtEditStage5Id = null;
+        let _cdtEditStage5CS = {};
 
         function cdtColourPick(key, hex) {
             if (!_cdtColours[key]) _cdtColours[key] = {};
@@ -21301,6 +21316,26 @@
                     if (linkedJobIdInput) linkedJobIdInput.value = '';
                 }
 
+                // Render factory requirements checklist (uses _DTR_FR_ITEMS) — empty for create
+                _cdtRenderFactoryReqs({});
+                // Reset Drive radio state
+                const customInp = document.getElementById('cdt-drive-custom');
+                if (customInp) customInp.value = '';
+                const customRadio = document.getElementById('cdt-drive-src-custom');
+                if (customRadio) customRadio.checked = true;
+                _cdtUpdateDriveHints();
+
+                // Reset edit-mode flags + title/button text (defaults: create flow)
+                _cdtEditTaskId = null;
+                _cdtEditStage5Id = null;
+                _cdtEditStage5CS = {};
+                const titleEl = document.querySelector('#create-design-task-modal h3');
+                if (titleEl) titleEl.textContent = 'New Design Task';
+                const subEl = titleEl?.nextElementSibling;
+                if (subEl) subEl.textContent = 'Fill in the task details on the left. Use the brief prompts on the right to build the design brief.';
+                const saveBtn = document.getElementById('cdt-save-btn');
+                if (saveBtn) saveBtn.textContent = 'Create Design Task';
+
                 modal.classList.remove('hide');
                 setTimeout(() => document.getElementById('cdt-name')?.focus(), 100);
                 // Load all products upfront (non-blocking)
@@ -21311,10 +21346,135 @@
             }
         }
 
+        // Render factory requirement checkboxes inside the create/edit modal
+        function _cdtRenderFactoryReqs(fr) {
+            const list = document.getElementById('cdt-fr-list');
+            if (!list) return;
+            fr = fr || {};
+            list.innerHTML = _DTR_FR_ITEMS.map(item => {
+                const main = `<label style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:#1e293b;cursor:pointer">
+                    <input type="checkbox" id="cdt-fr-${item.key}" ${fr[item.key]?'checked':''} style="accent-color:#6d28d9;width:14px;height:14px">
+                    ${escHtml(item.label)}
+                </label>`;
+                const subs = (item.subs||[]).map(sub => `
+                    <label style="display:flex;align-items:center;gap:8px;padding:3px 0 3px 24px;font-size:11px;color:#475569;cursor:pointer">
+                        <input type="checkbox" id="cdt-fr-${sub.key}" ${fr[sub.key]?'checked':''} style="accent-color:#6d28d9;width:13px;height:13px">
+                        ↳ ${escHtml(sub.label)}
+                    </label>`).join('');
+                return main + subs;
+            }).join('');
+        }
+
+        // Update the "Use job's / club's Drive" radio hints based on current dropdown selections
+        function _cdtUpdateDriveHints() {
+            const jobId = document.getElementById('cdt-job-id')?.value || document.getElementById('cdt-linked-job-id')?.value;
+            const clubId = document.getElementById('cdt-club-id')?.value;
+            const job  = jobId  ? (jobs  || []).find(j => j.id === jobId)  : null;
+            const club = clubId ? (clubs || []).find(c => c.id === clubId) : null;
+            const jobUrl  = job?.google_drive_url || '';
+            const clubUrl = club?.google_drive_url || '';
+            const jobHint  = document.getElementById('cdt-drive-job-hint');
+            const clubHint = document.getElementById('cdt-drive-club-hint');
+            const jobRadio  = document.getElementById('cdt-drive-src-job');
+            const clubRadio = document.getElementById('cdt-drive-src-club');
+            if (jobHint)  jobHint.textContent  = jobUrl  ? `— ${jobUrl}`  : '(not set)';
+            if (clubHint) clubHint.textContent = clubUrl ? `— ${clubUrl}` : '(not set)';
+            if (jobRadio)  jobRadio.disabled  = !jobUrl;
+            if (clubRadio) clubRadio.disabled = !clubUrl;
+        }
+
+        // Open the create modal in EDIT mode — pre-populated for an existing task
+        async function openDesignTaskEditModal(taskId) {
+            if (!taskId) return;
+            // 1) Open the create modal in its reset state (handles all the loading)
+            await openCreateDesignTaskModal(null);
+            // 2) Load the existing task with related data
+            const { data: task, error } = await supabase.from('design_tasks')
+                .select('*, clubs(*), jobs(*)').eq('id', taskId).single();
+            if (error || !task) { showToast('Task not found', 'error'); return; }
+            // 3) Load stage 5 so we can read the Drive URL
+            const { data: s5rows } = await supabase.from('design_stages')
+                .select('id, concept_statuses').eq('task_id', taskId).eq('stage_number', 5).limit(1);
+            const stage5 = (s5rows || [])[0] || null;
+            _cdtEditTaskId   = taskId;
+            _cdtEditStage5Id = stage5?.id || null;
+            _cdtEditStage5CS = stage5?.concept_statuses || {};
+            // 4) Pre-populate every field
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            set('cdt-name', task.task_name);
+            set('cdt-team', task.team);
+            set('cdt-season-event', task.season_event);
+            set('cdt-sport', task.sport);
+            set('cdt-due-date', task.due_date);
+            set('cdt-priority', task.priority || 'standard');
+            set('cdt-design-brief', task.design_brief);
+            set('cdt-key-notes', task.key_notes);
+            // Club + Job selects
+            const clubSel = document.getElementById('cdt-club-id');
+            if (clubSel && task.club_id) {
+                clubSel.value = task.club_id;
+                if (typeof cdtClubChanged === 'function') await cdtClubChanged(task.job_id || null);
+            }
+            const jobSel = document.getElementById('cdt-job-id');
+            if (jobSel && task.job_id) jobSel.value = task.job_id;
+            const linkedJobIdInput = document.getElementById('cdt-linked-job-id');
+            if (linkedJobIdInput) linkedJobIdInput.value = task.job_id || '';
+            // Designer
+            const dsnSel = document.getElementById('cdt-designer-id');
+            if (dsnSel && task.assigned_designer_id) dsnSel.value = task.assigned_designer_id;
+            // Owner dropdown (multi-user, always editable)
+            const ownerIds = Array.isArray(task.owner_ids) && task.owner_ids.length
+                ? task.owner_ids
+                : (task.assigned_designer_id ? [task.assigned_designer_id] : []);
+            if (typeof renderOwnerDropdown === 'function') renderOwnerDropdown('cdt', ownerIds);
+            // Colours
+            _cdtColours = task.custom_colours || { primary:{hex:'',pantone:''}, secondary:{hex:'',pantone:''}, accent:{hex:'',pantone:''} };
+            ['primary','secondary','accent'].forEach(k => {
+                const c = _cdtColours[k] || {};
+                const sw = document.getElementById(`cdt-sw-${k}`); if (sw) sw.style.background = c.hex || '#e8ecf0';
+                const cp = document.getElementById(`cdt-cp-${k}`); if (cp) cp.value = c.hex || '#000000';
+                const pan = document.getElementById(`cdt-pan-${k}`); if (pan) pan.value = c.pantone || '';
+            });
+            // Selected products
+            _cdtSelectedProducts = Array.isArray(task.products_required) ? [...task.products_required] : [];
+            _cdtSelectedCatalogueProducts = [];
+            if (typeof _cdtLoadAndRenderProducts === 'function') _cdtLoadAndRenderProducts(task.club_id || null);
+            // Factory requirements + Drive URL
+            _cdtRenderFactoryReqs(task.factory_requirements || {});
+            const savedDriveUrl = stage5?.concept_statuses?.drive_url || '';
+            const jobUrl  = task.jobs?.google_drive_url  || '';
+            const clubUrl = task.clubs?.google_drive_url || '';
+            // Choose initial radio
+            let initSrc = 'custom';
+            if (savedDriveUrl && savedDriveUrl === jobUrl)       initSrc = 'job';
+            else if (savedDriveUrl && savedDriveUrl === clubUrl) initSrc = 'club';
+            else if (!savedDriveUrl && jobUrl)  initSrc = 'job';
+            else if (!savedDriveUrl && clubUrl) initSrc = 'club';
+            _cdtUpdateDriveHints();
+            const radio = document.getElementById(`cdt-drive-src-${initSrc}`);
+            if (radio && !radio.disabled) radio.checked = true;
+            const customInp = document.getElementById('cdt-drive-custom');
+            if (customInp) customInp.value = (initSrc === 'custom') ? savedDriveUrl : '';
+            // 5) Repurpose title + save button for edit mode
+            const titleEl = document.querySelector('#create-design-task-modal h3');
+            if (titleEl) titleEl.textContent = 'Edit Design Task';
+            const subEl = titleEl?.nextElementSibling;
+            if (subEl) subEl.textContent = `Editing ${task.task_ref || ''} — make changes and click Save.`;
+            const saveBtn = document.getElementById('cdt-save-btn');
+            if (saveBtn) saveBtn.textContent = 'Save Changes';
+        }
+
+        // Legacy closer for the (now-removed) custom edit modal — keep as no-op alias
+        function closeDesignTaskEditModal() { hideCreateDesignTaskModal(); }
+
         async function cdtClubChanged(preselectJobId) {
             const clubId = document.getElementById('cdt-club-id')?.value;
-            _cdtSelectedProducts = [];
-            _cdtSelectedCatalogueProducts = [];
+            if (typeof _cdtUpdateDriveHints === 'function') _cdtUpdateDriveHints();
+            // Don't clear selected products if we're in edit mode (preserves pre-populated selection)
+            if (!_cdtEditTaskId) {
+                _cdtSelectedProducts = [];
+                _cdtSelectedCatalogueProducts = [];
+            }
             const countEl = document.getElementById('cdt-prod-count');
             if (countEl) countEl.textContent = '';
 
@@ -21497,6 +21657,7 @@
 
         async function cdtJobChanged() {
             const jobId = document.getElementById('cdt-job-id')?.value;
+            if (typeof _cdtUpdateDriveHints === 'function') _cdtUpdateDriveHints();
             _cdtJobProds = [];
             if (jobId) {
                 const { data: jpRows } = await supabase
@@ -21529,6 +21690,9 @@
 
         function hideCreateDesignTaskModal() {
             document.getElementById('create-design-task-modal')?.classList.add('hide');
+            _cdtEditTaskId = null;
+            _cdtEditStage5Id = null;
+            _cdtEditStage5CS = {};
         }
 
         function openBriefAssistant() {
@@ -21565,23 +21729,55 @@
             showToast('Brief built successfully', 'success');
         }
 
+        // Helper: collect factory_requirements from cdt-fr-* checkboxes
+        function _cdtCollectFactoryReqs() {
+            const fr = {};
+            _DTR_FR_ITEMS.forEach(item => {
+                fr[item.key] = document.getElementById(`cdt-fr-${item.key}`)?.checked || false;
+                if (item.subs) item.subs.forEach(sub => { fr[sub.key] = document.getElementById(`cdt-fr-${sub.key}`)?.checked || false; });
+            });
+            return fr;
+        }
+
+        // Helper: resolve which Drive URL the user picked
+        function _cdtResolveDriveUrl(taskJob, taskClub) {
+            const src = document.querySelector('input[name="cdt-drive-src"]:checked')?.value || 'custom';
+            if (src === 'job')  return (taskJob?.google_drive_url)  || '';
+            if (src === 'club') return (taskClub?.google_drive_url) || '';
+            return document.getElementById('cdt-drive-custom')?.value.trim() || '';
+        }
+
+        // Persist Drive URL on stage 5 (factory handover); create the stage row if missing
+        async function _cdtSaveDriveUrl(taskId, driveUrl) {
+            if (_cdtEditStage5Id) {
+                const cs = { ...(_cdtEditStage5CS || {}), drive_url: driveUrl || null };
+                await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', _cdtEditStage5Id);
+            } else if (driveUrl) {
+                await supabase.from('design_stages').insert({
+                    task_id: taskId, stage_number: 5, status: 'pending',
+                    concept_statuses: { drive_url: driveUrl }
+                });
+            }
+        }
+
         async function saveNewDesignTask() {
             const name = document.getElementById('cdt-name')?.value?.trim();
             if (!name) { showToast('Please enter a task name', 'warning'); return; }
             if (!currentBrand) { showToast('No brand selected', 'error'); return; }
 
             const btn = document.getElementById('cdt-save-btn');
-            if (btn) { btn.disabled = true; btn.textContent = 'Creating…'; }
+            const isEdit = !!_cdtEditTaskId;
+            if (btn) { btn.disabled = true; btn.textContent = isEdit ? 'Saving…' : 'Creating…'; }
 
             // Safety: always re-enable the button after 30s in case the async chain hangs
             const safetyTimer = setTimeout(() => {
-                if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
+                if (btn) { btn.disabled = false; btn.textContent = isEdit ? 'Save Changes' : 'Create Design Task'; }
                 showToast('Request timed out — please try again', 'error');
             }, 30000);
 
             try {
-                // Generate reference
-                const ref = await generateDesignRef();
+                // Generate reference (skip for edit — keep existing ref)
+                const ref = isEdit ? null : await generateDesignRef();
 
                 const clubId    = document.getElementById('cdt-club-id')?.value || null;
                 const linkedJobId = document.getElementById('cdt-job-id')?.value || document.getElementById('cdt-linked-job-id')?.value || null;
@@ -21615,17 +21811,13 @@
                 const productsRequired = [..._cdtSelectedProducts, ...catalogueClubProdIds];
 
                 const payload = {
-                    brand_id: currentBrand.id,
                     task_name: name,
-                    task_ref:  ref,
                     club_id:   clubId || null,
                     due_date:  document.getElementById('cdt-due-date')?.value || null,
                     job_id:    linkedJobId || null,
                     assigned_designer_id:   designerId || null,
                     assigned_designer_name: designerName || null,
                     owner_ids: getOwnerDropdownIds('cdt'),
-                    status: 'new',
-                    design_types: [],
                     team:         document.getElementById('cdt-team')?.value?.trim() || null,
                     season_event: document.getElementById('cdt-season-event')?.value?.trim() || null,
                     sport:        document.getElementById('cdt-sport')?.value?.trim() || null,
@@ -21634,20 +21826,48 @@
                     custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
                     key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
                     products_required: productsRequired,
-                    use_club_colours: true
+                    factory_requirements: _cdtCollectFactoryReqs(),
                 };
+                if (!isEdit) {
+                    payload.brand_id     = currentBrand.id;
+                    payload.task_ref     = ref;
+                    payload.status       = 'new';
+                    payload.design_types = [];
+                    payload.use_club_colours = true;
+                }
 
-                const { data, error } = await supabase.from('design_tasks').insert(payload).select().single();
+                let data, error;
+                if (isEdit) {
+                    const upd = await supabase.from('design_tasks').update(payload).eq('id', _cdtEditTaskId)
+                        .select('*, clubs(*), jobs(*)').single();
+                    data = upd.data; error = upd.error;
+                } else {
+                    const ins = await supabase.from('design_tasks').insert(payload).select().single();
+                    data = ins.data; error = ins.error;
+                }
                 clearTimeout(safetyTimer);
-                if (btn) { btn.disabled = false; btn.textContent = 'Create Task'; }
+                if (btn) { btn.disabled = false; btn.textContent = isEdit ? 'Save Changes' : 'Create Design Task'; }
 
                 if (error) {
-                    console.error('Design task insert error:', error);
-                    showToast('Error creating task: ' + (error.message || 'Unknown error'), 'error');
+                    console.error('Design task save error:', error);
+                    showToast('Error saving task: ' + (error.message || 'Unknown error'), 'error');
                     return;
                 }
 
+                // Save Drive URL on stage 5 (factory handover stage)
+                const taskId = data?.id || _cdtEditTaskId;
+                const driveUrl = _cdtResolveDriveUrl(data?.jobs, data?.clubs);
+                await _cdtSaveDriveUrl(taskId, driveUrl);
+
                 hideCreateDesignTaskModal();
+                if (isEdit) {
+                    showToast('Design task updated ✓');
+                    const idx = (allDesignTasks || []).findIndex(t => t.id === taskId);
+                    if (idx >= 0) allDesignTasks[idx] = data;
+                    renderDSDashboard();
+                    if (typeof renderDSPreviewPanel === 'function') renderDSPreviewPanel(taskId);
+                    return; // skip attachment upload + navigation
+                }
                 showToast(`Design task created: ${ref}`);
                 allDesignTasks.unshift(data);
                 renderDesignStudio();
@@ -22932,7 +23152,10 @@
                 <!-- Header: title + chips + action buttons -->
                 <div style="border-bottom:1px solid #f1f5f9;padding:12px 14px 10px;flex-shrink:0">
                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:7px">
-                        <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
+                        <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                            <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35">${escHtml(task.task_name || 'Untitled Task')}</div>
+                            ${task.task_ref ? `<span style="font-family:monospace;font-size:11px;color:#6d28d9;font-weight:700;background:#f5f3ff;padding:2px 8px;border-radius:6px;border:1px solid #ddd6fe">${escHtml(task.task_ref)}</span>` : ''}
+                        </div>
                         <div style="display:flex;gap:4px;flex-shrink:0;margin-top:1px">
                             ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;white-space:nowrap;line-height:1">▶ Start</button>` : ''}
                             <button id="dsp-uploads-btn-${task.id}" class="dsp-uploads-btn no-uploads" onclick="showDesignTask('${task.id}')">
@@ -22952,7 +23175,6 @@
                             <svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             ${escHtml(designerName)}
                         </span>
-                        ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.task_ref)}</span>` : ''}
                         ${task.clubs?.name ? `<span style="font-size:10px;color:#475569;font-weight:500;background:#f8fafc;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.clubs.name)}</span>` : ''}
                         <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${priBgs[pri]};color:${priColors[pri]};border:1px solid ${priBdrs[pri]};white-space:nowrap">${priLabels[pri]}</span>
                         ${dueLabel ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${dueBg};color:${dueCls};border:1px solid ${dueBdr};white-space:nowrap" title="${dueInfo?.text||''}">${dueLabel}</span>` : ''}
@@ -23114,166 +23336,6 @@
             _loadPreviewPanelActivity(taskId);
         }
 
-        // Edit modal: reuse the existing DTR edit-mode field set + saveDTRLeftPanel
-        let _dsEditOriginalMode = false;
-        async function openDesignTaskEditModal(taskId) {
-            const modal = document.getElementById('ds-edit-modal');
-            const body  = document.getElementById('ds-edit-modal-body');
-            if (!modal || !body) return;
-            // Load the full task + related data so the edit form has products etc.
-            const { data: task, error: taskErr } = await supabase.from('design_tasks').select('*, clubs(*), jobs(*)').eq('id', taskId).single();
-            if (!task || taskErr) {
-                console.error('task load failed', taskErr);
-                showToast('Task not found', 'error');
-                return;
-            }
-            const club = task.clubs || {};
-            // Load product lists
-            let clubProds = [], jobProds = [];
-            if (task.club_id) {
-                const r = await supabase.from('club_products').select('id, custom_name, image_urls, image_url, products(item_name, product_code, pattern_code)').eq('club_id', task.club_id);
-                clubProds = r.data || [];
-            }
-            if (task.job_id) {
-                const r = await supabase.from('job_products').select('id, custom_name, image_urls, image_url, products(item_name, product_code, pattern_code)').eq('job_id', task.job_id);
-                jobProds = r.data || [];
-            }
-            // Load stage 5 (factory handover stage) — Drive URL lives in stage.concept_statuses.drive_url
-            const { data: s5rows } = await supabase.from('design_stages')
-                .select('id, concept_statuses').eq('task_id', taskId).eq('stage_number', 5).limit(1);
-            const stage5 = (s5rows || [])[0] || null;
-            const jobDriveUrl  = task.jobs?.google_drive_url || '';
-            const clubDriveUrl = (club && club.google_drive_url) || '';
-            const savedDriveUrl = stage5?.concept_statuses?.drive_url || '';
-            // Decide which radio is initially selected
-            let initSource = 'custom';
-            if (savedDriveUrl && savedDriveUrl === jobDriveUrl)  initSource = 'job';
-            else if (savedDriveUrl && savedDriveUrl === clubDriveUrl) initSource = 'club';
-            else if (!savedDriveUrl && jobDriveUrl)  initSource = 'job';
-            else if (!savedDriveUrl && clubDriveUrl) initSource = 'club';
-            const initCustom = (initSource === 'custom') ? savedDriveUrl : '';
-
-            // Set globals that saveDTRLeftPanel + edit-mode HTML expect
-            window.currentDesignTaskRecord = task;
-            window.currentDesignTask = task;
-            window._dtrCachedClubProds = clubProds;
-            window._dtrCachedJobProds  = jobProds;
-            window._dtrCachedAssets    = [];
-            window._dsEditStage5Id     = stage5?.id || null;
-            window._dsEditStage5CS     = stage5?.concept_statuses || {};
-            _dsEditOriginalMode = (typeof _dtrEditMode !== 'undefined') ? _dtrEditMode : false;
-            window._dtrEditMode = true;
-
-            // Build the Factory Handover section (Drive folder source + requirements checklist)
-            const fr = task.factory_requirements || {};
-            const frChecks = _DTR_FR_ITEMS.map(item => {
-                const main = `<label style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:#1e293b;cursor:pointer">
-                    <input type="checkbox" id="dsfh-fr-${item.key}" ${fr[item.key]?'checked':''} style="accent-color:#6d28d9;width:14px;height:14px">
-                    ${escHtml(item.label)}
-                </label>`;
-                const subs = (item.subs||[]).map(sub => `
-                    <label style="display:flex;align-items:center;gap:8px;padding:3px 0 3px 24px;font-size:11px;color:#475569;cursor:pointer">
-                        <input type="checkbox" id="dsfh-fr-${sub.key}" ${fr[sub.key]?'checked':''} style="accent-color:#6d28d9;width:13px;height:13px">
-                        ↳ ${escHtml(sub.label)}
-                    </label>`).join('');
-                return main + subs;
-            }).join('');
-            const factoryHtml = `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:12px;margin-top:14px">
-                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#15803d;margin-bottom:8px">Factory Handover</div>
-                <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:5px">Design Folder (Google Drive)</div>
-                <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
-                    <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
-                        <input type="radio" name="dsfh-drive-src" value="job"    ${initSource==='job'?'checked':''}    ${jobDriveUrl?'':'disabled'}>
-                        Use job's Drive ${jobDriveUrl ? `<span style="color:#64748b;font-size:10px">— ${escHtml(jobDriveUrl)}</span>` : '<span style="color:#94a3b8;font-size:10px">(none set on job)</span>'}
-                    </label>
-                    <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
-                        <input type="radio" name="dsfh-drive-src" value="club"   ${initSource==='club'?'checked':''}   ${clubDriveUrl?'':'disabled'}>
-                        Use club's Drive ${clubDriveUrl ? `<span style="color:#64748b;font-size:10px">— ${escHtml(clubDriveUrl)}</span>` : '<span style="color:#94a3b8;font-size:10px">(none set on club)</span>'}
-                    </label>
-                    <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
-                        <input type="radio" name="dsfh-drive-src" value="custom" ${initSource==='custom'?'checked':''}>
-                        Custom URL
-                    </label>
-                    <input type="url" id="dsfh-drive-custom" value="${escHtml(initCustom)}" placeholder="https://drive.google.com/…"
-                        oninput="document.querySelector('input[name=dsfh-drive-src][value=custom]').checked=true"
-                        style="width:100%;box-sizing:border-box;padding:6px 9px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;margin-top:2px">
-                </div>
-                <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:4px;border-top:1px solid #d1fae5;padding-top:8px">Required for Factory</div>
-                <div style="display:flex;flex-direction:column">${frChecks}</div>
-            </div>`;
-
-            // Render the edit-mode HTML using the existing builder + the factory section
-            body.innerHTML = `<div id="dtr-left-tab-content">${_buildDTRBriefTab(task, club, [], clubProds, jobProds)}</div>
-                ${factoryHtml}
-                <div style="display:flex;justify-content:flex-end;gap:6px;padding:14px 0 0;border-top:1px solid #e2e8f0;margin-top:14px">
-                    <button onclick="closeDesignTaskEditModal()" style="padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#475569">Cancel</button>
-                    <button onclick="_dsSaveEditModal('${taskId}')" style="padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff">Save Changes</button>
-                </div>`;
-            modal.classList.remove('hide');
-            // Initialise owner dropdown after DOM is in place
-            if (typeof renderOwnerDropdown === 'function') {
-                setTimeout(() => renderOwnerDropdown('design-task', task.owner_ids || (task.assigned_designer_id ? [task.assigned_designer_id] : [])), 0);
-            }
-        }
-
-        function closeDesignTaskEditModal() {
-            const modal = document.getElementById('ds-edit-modal');
-            const body  = document.getElementById('ds-edit-modal-body');
-            if (modal) modal.classList.add('hide');
-            if (body) body.innerHTML = '<p style="font-size:12px;color:#94a3b8">Loading…</p>';
-            window._dtrEditMode = _dsEditOriginalMode;
-        }
-
-        async function _dsSaveEditModal(taskId) {
-            if (typeof saveDTRLeftPanel !== 'function') { showToast('Save handler not available', 'error'); return; }
-            try {
-                await saveDTRLeftPanel();
-            } catch (e) {
-                console.error('save failed', e);
-                showToast('Save failed: ' + (e.message || ''), 'error');
-                return;
-            }
-            // Collect factory requirements from the modal checkboxes
-            const fr = {};
-            _DTR_FR_ITEMS.forEach(item => {
-                fr[item.key] = document.getElementById(`dsfh-fr-${item.key}`)?.checked || false;
-                if (item.subs) item.subs.forEach(sub => { fr[sub.key] = document.getElementById(`dsfh-fr-${sub.key}`)?.checked || false; });
-            });
-            await supabase.from('design_tasks').update({ factory_requirements: fr }).eq('id', taskId);
-
-            // Resolve the Drive URL based on the chosen source
-            const src = document.querySelector('input[name="dsfh-drive-src"]:checked')?.value || 'custom';
-            let driveUrl = '';
-            if (src === 'job')        driveUrl = (currentDesignTaskRecord?.jobs?.google_drive_url) || '';
-            else if (src === 'club')  driveUrl = (currentDesignTaskRecord?.clubs?.google_drive_url) || '';
-            else                      driveUrl = document.getElementById('dsfh-drive-custom')?.value.trim() || '';
-
-            // Persist Drive URL on stage 5 (factory handover stage); create stage 5 row if missing
-            let stage5Id = window._dsEditStage5Id;
-            let stage5CS = window._dsEditStage5CS || {};
-            if (stage5Id) {
-                const cs = { ...stage5CS, drive_url: driveUrl || null };
-                await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', stage5Id);
-            } else if (driveUrl) {
-                // Create stage 5 with the URL if it doesn't exist yet
-                await supabase.from('design_stages').insert({
-                    task_id: taskId,
-                    stage_number: 5,
-                    status: 'pending',
-                    concept_statuses: { drive_url: driveUrl }
-                });
-            }
-
-            // Reload the task into local cache
-            const { data: fresh } = await supabase.from('design_tasks').select('*, clubs(*), jobs(*)').eq('id', taskId).single();
-            if (fresh) {
-                const idx = (allDesignTasks || []).findIndex(t => t.id === taskId);
-                if (idx >= 0) allDesignTasks[idx] = fresh;
-            }
-            closeDesignTaskEditModal();
-            renderDSDashboard();
-            renderDSPreviewPanel(taskId);
-        }
 
         async function _loadPreviewPanelUploadsCount(taskId) {
             const n = await _dsCountTaskUploads(taskId);
