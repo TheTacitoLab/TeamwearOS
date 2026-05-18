@@ -524,6 +524,7 @@
         .stage-paid        { background:rgba(22,163,74,0.12);   color:#15803d; }
         .stage-onboarding  { background:rgba(14,165,233,0.12);  color:#0284c7; }
         .stage-completed   { background:rgba(22,163,74,0.18);   color:#15803d; font-weight:800; }
+        .stage-lost        { background:rgba(239,68,68,0.12);   color:#dc2626; font-weight:800; }
 
         /* Completed stage nav button — solid green block */
         .stage-nav-btn-completed {
@@ -3917,6 +3918,9 @@
                     <button id="sh-tab-gtm" class="sh-tab" onclick="switchSalesHomeTab('gtm')">
                         GTM
                     </button>
+                    <button id="sh-tab-closed" class="sh-tab" onclick="switchSalesHomeTab('closed')">
+                        Closed <span id="stab-closed-count" class="sh-count">0</span>
+                    </button>
                 </div>
                 <div class="sh-topbar-right">
                     <div id="sh-actions-leads" class="sh-actions" style="margin:0">
@@ -3936,6 +3940,8 @@
                     </div>
                     <div id="sh-actions-gtm" class="sh-actions hide" style="margin:0">
                         <button onclick="_gtmRefresh()" class="sh-action-btn sh-action-btn-secondary">↻ Refresh</button>
+                    </div>
+                    <div id="sh-actions-closed" class="sh-actions hide" style="margin:0">
                     </div>
                 </div>
             </div>
@@ -4062,6 +4068,7 @@
                                 <option value="order_details">Order Details</option>
                                 <option value="quoted">Quoted</option>
                                 <option value="completed">Completed</option>
+                                <option value="lost">Lost</option>
                             </select>
                         </div>
                         <!-- Design Stage Pipeline -->
@@ -4287,6 +4294,7 @@
                                     <option value="order_details">Order Details</option>
                                     <option value="quoted">Quoted</option>
                                     <option value="completed">Completed</option>
+                                    <option value="lost">Lost</option>
                                 </select>
                             </div>
                         </div>
@@ -15354,7 +15362,8 @@
             { key: 'final_mockups', label: 'Final Mock-ups', colorClass: 'stage-awaiting',   color: '#d97706', bg: 'rgba(217,119,6,0.1)'   },
             { key: 'order_details', label: 'Order Details',  colorClass: 'stage-quote',      color: '#7c3aed', bg: 'rgba(124,58,237,0.1)'  },
             { key: 'quoted',        label: 'Quoted',         colorClass: 'stage-paid',       color: '#059669', bg: 'rgba(5,150,105,0.1)'   },
-            { key: 'completed',     label: 'Completed ✓',    colorClass: 'stage-completed',  color: '#16a34a', bg: 'rgba(22,163,74,0.12)'  }
+            { key: 'completed',     label: 'Completed ✓',    colorClass: 'stage-completed',  color: '#16a34a', bg: 'rgba(22,163,74,0.12)'  },
+            { key: 'lost',          label: 'Lost',           colorClass: 'stage-lost',       color: '#dc2626', bg: 'rgba(239,68,68,0.12)'  }
         ];
 
         const JOB_TYPE_LABELS = {
@@ -15398,19 +15407,21 @@
 
         function updateSalesTabCounts() {
             const activeLeads = leads.filter(l => l.status !== 'converted' && l.status !== 'archived').length;
-            const activeJobs  = jobs.filter(j => j.stage !== 'completed').length;
-            const doneJobs    = jobs.filter(j => j.stage === 'completed').length;
+            const activeJobs  = jobs.filter(j => j.stage !== 'completed' && j.stage !== 'lost').length;
+            const closedJobs  = jobs.filter(j => j.stage === 'completed' || j.stage === 'lost').length;
             const lcEl = document.getElementById('stab-leads-count');
             const jcEl = document.getElementById('stab-jobs-count');
             const ccEl = document.getElementById('stab-completed-count');
+            const clEl = document.getElementById('stab-closed-count');
             if (lcEl) lcEl.textContent = activeLeads;
             if (jcEl) jcEl.textContent = activeJobs;
-            if (ccEl) ccEl.textContent = doneJobs;
+            if (ccEl) ccEl.textContent = closedJobs;
+            if (clEl) clEl.textContent = closedJobs;
             // Launchpad stats
             const lpLive = document.getElementById('stat-jobs-live');
             const lpDone = document.getElementById('stat-jobs-done');
             if (lpLive) lpLive.textContent = `${activeJobs} live job${activeJobs !== 1 ? 's' : ''}`;
-            if (lpDone) lpDone.textContent = `${doneJobs} completed`;
+            if (lpDone) lpDone.textContent = `${closedJobs} closed`;
         }
 
         // Keep updateSalesBadges as shim for any other call sites
@@ -15894,21 +15905,26 @@
             _shForceOpen.clear();
 
             // Tabs
-            ['leads','jobs','gtm'].forEach(t => document.getElementById(`sh-tab-${t}`)?.classList.toggle('active', t === tab));
+            ['leads','jobs','gtm','closed'].forEach(t => document.getElementById(`sh-tab-${t}`)?.classList.toggle('active', t === tab));
 
             // Actions
             const aL = document.getElementById('sh-actions-leads');
             const aJ = document.getElementById('sh-actions-jobs');
             const aG = document.getElementById('sh-actions-gtm');
+            const aC = document.getElementById('sh-actions-closed');
             if (aL) aL.classList.toggle('hide', tab !== 'leads');
             if (aJ) aJ.classList.toggle('hide', tab !== 'jobs');
             if (aG) aG.classList.toggle('hide', tab !== 'gtm');
+            if (aC) aC.classList.toggle('hide', tab !== 'closed');
 
             // Show/hide split-screen vs GTM panel
             const kanbanWrapper = document.getElementById('sh-kanban-wrapper');
             const gtmPanel = document.getElementById('sh-gtm-panel');
             if (kanbanWrapper) kanbanWrapper.classList.toggle('hide', tab === 'gtm');
             if (gtmPanel) gtmPanel.classList.toggle('hide', tab !== 'gtm');
+            // Closed tab: hide preview panel (it's a flat list with no preview)
+            const shRight = document.getElementById('sh-right');
+            if (shRight) shRight.classList.toggle('hide', tab === 'closed');
 
             // Reset preview
             const previewEmpty = document.getElementById('sh-preview-empty');
@@ -15969,6 +15985,7 @@
 
         function renderSalesHome() {
             if (_shActiveTab === 'gtm') { _renderGTMDashboard(); return; }
+            if (_shActiveTab === 'closed') { _renderSHClosedJobs(); return; }
             const board = document.getElementById('sh-list');
             if (!board) return;
             const search = (document.getElementById('sh-search')?.value || '').toLowerCase().trim();
@@ -16055,7 +16072,7 @@
         }
 
         function _renderSHJobsKanban(board, search) {
-            let allJobs = jobs.slice();
+            let allJobs = jobs.filter(j => j.stage !== 'completed' && j.stage !== 'lost');
             if (search) allJobs = allJobs.filter(j =>
                 j.job_name?.toLowerCase().includes(search) ||
                 j.clubs?.name?.toLowerCase().includes(search) ||
@@ -16094,6 +16111,60 @@
             });
 
             board.innerHTML = cols.join('');
+        }
+
+        function _renderSHClosedJobs() {
+            const search = (document.getElementById('sh-search')?.value || '').toLowerCase().trim();
+            let closed = jobs.filter(j => j.stage === 'completed' || j.stage === 'lost');
+            if (search) closed = closed.filter(j =>
+                j.job_name?.toLowerCase().includes(search) ||
+                j.clubs?.name?.toLowerCase().includes(search) ||
+                j.job_number?.toLowerCase().includes(search)
+            );
+            // Use the full-width kanban wrapper as a flat list container
+            const wrapper = document.getElementById('sh-kanban-wrapper');
+            if (!wrapper) return;
+            wrapper.classList.remove('hide');
+            document.getElementById('sh-gtm-panel')?.classList.add('hide');
+            document.getElementById('sh-right')?.classList.add('hide');
+            const board = document.getElementById('sh-list');
+            if (!board) return;
+            if (closed.length === 0) {
+                board.innerHTML = `<div style="padding:40px;text-align:center;color:#94a3b8;font-size:13px">No closed jobs yet.</div>`;
+                return;
+            }
+            const completedList = closed.filter(j => j.stage === 'completed');
+            const lostList      = closed.filter(j => j.stage === 'lost');
+            const renderSection = (title, color, list) => {
+                if (list.length === 0) return '';
+                return `<div style="margin-bottom:24px;width:100%">
+                    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:${color};margin-bottom:10px;padding:0 4px">${title} (${list.length})</div>
+                    <div style="display:flex;flex-direction:column;gap:8px">
+                        ${list.map(j => {
+                            const stage = JOB_STAGES.find(s => s.key === j.stage) || JOB_STAGES[0];
+                            const clubName = j.clubs?.name || '—';
+                            const days = Math.floor((new Date() - new Date(j.created_at)) / 86400000);
+                            return `<div class="job-card" onclick="openJobRecord('${j.id}')" style="cursor:pointer">
+                                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                                    <div style="flex:1;min-width:0">
+                                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                                            <span class="job-number">${j.job_number || ''}</span>
+                                            <span class="stage-pill ${stage.colorClass}" style="font-size:10px">${stage.label}</span>
+                                        </div>
+                                        <div class="job-name truncate">${escHtml(j.job_name)}</div>
+                                        <div class="job-meta">${escHtml(clubName)} · ${JOB_TYPE_LABELS[j.job_type] || j.job_type || ''}</div>
+                                    </div>
+                                    <div style="font-size:11px;color:#94a3b8;flex-shrink:0">${days}d ago</div>
+                                </div>
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            };
+            board.style.flexDirection = 'column';
+            board.style.overflowX = 'hidden';
+            board.style.padding = '16px';
+            board.innerHTML = renderSection('Completed', '#16a34a', completedList) + renderSection('Lost', '#dc2626', lostList);
         }
 
         function selectSalesRecord(type, id) {
@@ -16283,39 +16354,30 @@
             const dueFmt = dueDate ? new Date(dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : null;
             const isOverdue = dueDate && new Date(dueDate) < new Date();
             const hist = Array.isArray(record.next_action_history) ? record.next_action_history : [];
-            const prevHtml = hist.length ? `
-                <div class="na-prev-header">Previous actions (${hist.length})</div>
-                ${hist.slice().reverse().map(h => {
+            const histHtml = hist.length ? `<details style="margin-top:8px"><summary style="font-size:11px;font-weight:700;color:#92400e;cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px"><span>▸</span> Completed actions (${hist.length})</summary>
+                <div class="sh-na-history" style="margin-top:6px">${hist.slice().reverse().map(h => {
                     const txt = h.action_text || h.action || h.text || '';
                     const completedAt = h.completed_at ? new Date(h.completed_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '';
                     const by = h.completed_by_name ? ` by ${escHtml(h.completed_by_name)}` : '';
-                    const wasDue = h.due_date ? ` · due ${new Date(h.due_date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}` : '';
-                    return `<div class="na-prev-item"><span class="na-prev-check">✓</span><div style="flex:1;min-width:0"><div class="na-prev-text">${escHtml(txt)}</div><div class="na-prev-meta">Completed ${completedAt}${by}${wasDue}</div></div></div>`;
-                }).join('')}` : '';
+                    return `<div class="sh-na-hist-item"><span class="sh-na-hist-check">✓</span><div style="flex:1;min-width:0"><div class="sh-na-hist-text">${escHtml(txt)}</div><div class="sh-na-hist-date">Completed ${completedAt}${by}</div></div></div>`;
+                }).join('')}</div></details>` : '';
 
-            return `<div class="next-action-card" id="na-card-${type}-${id}">
-                <div class="na-card-title"><span class="na-flag">⚑</span>Next Action</div>
+            return `<div class="sh-na-section" id="na-card-${type}-${id}">
+                <div class="sh-section-title" style="color:#92400e">Next Action</div>
                 ${hasAction ? `
-                    <div class="na-open-block">
-                        <div class="na-open-text">${escHtml(record.next_action)}</div>
-                        <div class="na-open-row">
-                            <label style="font-size:11px;color:#92400e;font-weight:700">Date Required:</label>
-                            <input type="date" class="sh-na-date" id="na-date-${type}-${id}" value="${dueDate || ''}" style="max-width:150px"
-                                onchange="naUpdateDate('${type}','${id}',this.value)">
-                            ${isOverdue ? '<span style="font-size:10px;color:#dc2626;font-weight:700">⚠ Overdue</span>' : ''}
-                            <span style="flex:1"></span>
-                            <button class="sh-na-complete-btn" onclick="completeNextAction('${type}','${id}')">✓ Complete</button>
-                        </div>
-                    </div>` : `
-                    <div class="na-empty-form">
-                        <input class="sh-na-input" id="na-text-${type}-${id}" placeholder="Set the next action…">
-                        <div style="display:flex;gap:6px;align-items:center">
-                            <label style="font-size:11px;color:#92400e;font-weight:700">Date Required:</label>
-                            <input type="date" class="sh-na-date" id="na-date-${type}-${id}" style="max-width:150px">
-                            <button class="sh-na-save-btn" onclick="saveNextAction('${type}','${id}')">Save</button>
-                        </div>
-                    </div>`}
-                ${prevHtml}
+                    <div class="sh-na-current">${escHtml(record.next_action)}</div>
+                    ${dueFmt ? `<div class="sh-na-due" style="${isOverdue ? 'color:#dc2626;font-weight:700' : ''}">Due: ${dueFmt}${isOverdue ? ' ⚠ Overdue' : ''}</div>` : ''}
+                    <button class="sh-na-complete-btn" onclick="completeNextAction('${type}','${id}')">✓ Mark Complete</button>
+                    <hr style="border:none;border-top:1px solid #fde68a;margin:10px 0">
+                ` : ''}
+                <div class="sh-na-form">
+                    <textarea class="sh-na-input" id="na-text-${type}-${id}" placeholder="${hasAction ? 'Update action…' : 'Set the next action…'}" rows="2" style="resize:vertical;min-height:52px">${hasAction ? escHtml(record.next_action) : ''}</textarea>
+                    <div style="display:flex;gap:6px;align-items:center">
+                        <input type="date" class="sh-na-date" id="na-date-${type}-${id}" value="${dueDate || ''}">
+                        <button class="sh-na-save-btn" onclick="saveNextAction('${type}','${id}')">Save</button>
+                    </div>
+                </div>
+                ${histHtml}
             </div>`;
         }
 
@@ -16466,9 +16528,9 @@
         function renderStageNavGrid() {
             const grid = document.getElementById('stage-nav-grid');
             if (!grid) return;
-            const liveJobs = jobs.filter(j => j.stage !== 'completed');
-            const completedJobs = jobs.filter(j => j.stage === 'completed');
-            const liveStages = JOB_STAGES.filter(s => s.key !== 'completed');
+            const liveJobs = jobs.filter(j => j.stage !== 'completed' && j.stage !== 'lost');
+            const completedJobs = jobs.filter(j => j.stage === 'completed' || j.stage === 'lost');
+            const liveStages = JOB_STAGES.filter(s => s.key !== 'completed' && s.key !== 'lost');
             grid.innerHTML = liveStages.map(s => {
                 const count = liveJobs.filter(j => j.stage === s.key).length;
                 const isActive = salesViewStageFilter === s.key;
