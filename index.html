@@ -23245,33 +23245,6 @@
             </div>`;
         }
 
-        async function _loadPreviewPanelNotifications(taskId) {
-            const { data } = await supabase.from('design_task_activity')
-                .select('*').eq('design_task_id', taskId)
-                .eq('task_completed', false)
-                .order('created_at', { ascending: false })
-                .limit(6);
-            const el = document.getElementById(`dsp-panel-notif-${taskId}`);
-            if (!el) return; // panel has changed since we started loading
-            if (!data?.length) return; // nothing unread
-            const typeInfo = { comment:'💬', sub_task:'📋', revision_request:'🔄' };
-            const items = data.map(entry => {
-                const icon = typeInfo[entry.activity_type] || '•';
-                const ts   = typeof dsRelativeTime === 'function' ? dsRelativeTime(entry.created_at) : '';
-                const isRev = entry.activity_type === 'revision_request';
-                return `<div style="display:flex;align-items:flex-start;gap:7px;padding:6px 8px;border-radius:8px;background:${isRev ? '#fef2f2' : '#fffef0'};border:1px solid ${isRev ? '#fecaca' : '#fde68a'};margin-bottom:4px">
-                    <span style="font-size:12px;flex-shrink:0;line-height:1.4">${icon}</span>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:11px;font-weight:600;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(entry.message || '')}</div>
-                        <div style="font-size:9px;color:#9ca3af;margin-top:1px">${escHtml(entry.user_name || 'Unknown')} · ${ts}</div>
-                    </div>
-                </div>`;
-            }).join('');
-            el.innerHTML = `<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:7px;padding-top:10px;border-top:1px solid #e8ecf0">
-                Unread Activity&nbsp;<span style="background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700">${data.length}</span>
-            </div>${items}`;
-        }
-
         async function _loadPreviewPanelProducts(taskId, productIds) {
             const el = document.getElementById(`dsp-products-${taskId}`);
             if (!el) return;
