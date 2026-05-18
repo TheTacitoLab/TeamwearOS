@@ -742,10 +742,25 @@
         /* Design Studio header area */
         .ds-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:0; position:sticky; top:96px; z-index:30; }
 
-        /* ── Design Studio 4-Column Kanban Dashboard ── */
-        .ds-studio-body { display:grid; grid-template-columns:1fr 1fr 1fr 1.5fr; height:calc(100vh - 152px); overflow:hidden; gap:2px; background:#e2e8f0; border-top:2px solid #e2e8f0; }
-        @media(max-width:1200px) { .ds-studio-body { grid-template-columns:1fr 1fr 1.6fr; } }
+        /* ── Design Studio 2-Column Layout ── */
+        .ds-studio-body { display:grid; grid-template-columns:25% 75%; height:calc(100vh - 152px); overflow:hidden; gap:0; background:#e2e8f0; border-top:2px solid #e2e8f0; }
         @media(max-width:900px)  { .ds-studio-body { grid-template-columns:1fr; height:auto; overflow:visible; } }
+
+        .ds-list-col     { background:#f8fafc; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; overflow:hidden; }
+        .ds-list-filters { padding:10px 12px; border-bottom:1px solid #e2e8f0; display:flex; flex-direction:column; gap:6px; background:#fff; }
+        .ds-list-filters select { font-size:11px; font-weight:600; padding:5px 8px; border-radius:7px; border:1.5px solid #e2e8f0; background:#f8fafc; color:#64748b; cursor:pointer; }
+        .ds-list-tabs    { display:flex; gap:4px; padding:8px 10px; border-bottom:1px solid #e2e8f0; background:#fff; }
+        .ds-list-tab     { flex:1; padding:7px 8px; border-radius:8px; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; cursor:pointer; background:#f1f5f9; color:#64748b; border:1px solid transparent; display:flex; align-items:center; justify-content:center; gap:6px; }
+        .ds-list-tab.active { background:#eef2ff; color:#4338ca; border-color:#c7d2fe; }
+        .ds-list-tab .tab-count { background:rgba(0,0,0,0.08); padding:1px 7px; border-radius:10px; font-size:10px; font-weight:800; }
+        .ds-list-tab.active .tab-count { background:#4338ca; color:#fff; }
+        .ds-list-body    { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px; }
+
+        .dsp-uploads-btn { display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid; }
+        .dsp-uploads-btn.has-uploads { background:rgba(22,163,74,0.1); color:#15803d; border-color:rgba(22,163,74,0.3); }
+        .dsp-uploads-btn.no-uploads  { background:rgba(239,68,68,0.1); color:#dc2626; border-color:rgba(239,68,68,0.3); }
+        .dsp-uploads-btn .status-dot { width:8px; height:8px; border-radius:50%; background:currentColor; }
+        .dsp-uploads-btn .count-badge{ background:rgba(0,0,0,0.12); padding:1px 7px; border-radius:10px; font-size:10px; font-weight:800; }
 
         /* Kanban columns */
         .ds-kanban-col { background:#fff; display:flex; flex-direction:column; overflow:hidden; }
@@ -2501,29 +2516,6 @@
                     <input id="ds-search" class="ds-toolbar-search" placeholder="Search tasks or clubs…" oninput="renderDSDashboard()">
                 </div>
 
-                <!-- Due date filter dropdown -->
-                <select id="ds-due-select" onchange="setDSDueFilter(this.value)"
-                    style="font-size:11px;font-weight:600;padding:4px 8px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;flex-shrink:0">
-                    <option value="all">All Dates</option>
-                    <option value="today">Due Today</option>
-                    <option value="week">Due This Week</option>
-                    <option value="overdue">Overdue</option>
-                </select>
-
-                <!-- Stage filter dropdown -->
-                <select id="ds-stage-select" onchange="setDSStageFilter(this.value)"
-                    style="font-size:11px;font-weight:600;padding:4px 8px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;flex-shrink:0;border-left:1px solid #e2e8f0">
-                    <option value="all">All Stages</option>
-                    <option value="new">New</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="in_review">In Review</option>
-                </select>
-
-                <!-- Substage filter dropdown (shown when In Progress or In Review selected) -->
-                <select id="ds-substage-select" onchange="setDSSubstageFilter(this.value)"
-                    style="display:none;font-size:11px;font-weight:600;padding:4px 8px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;flex-shrink:0">
-                </select>
-
                 <!-- Hidden legacy chip container kept so JS refs don't break -->
                 <div id="ds-substage-chips" style="display:none"></div>
 
@@ -2543,46 +2535,37 @@
                 <span id="ds-unread-badge-hdr" class="ds-notif-badge hide" style="position:absolute;opacity:0;pointer-events:none">0</span>
             </div>
 
-            <!-- 4-column kanban dashboard -->
+            <!-- 2-column layout: task list (25%) + preview (75%) -->
             <div class="ds-studio-body">
 
-                <!-- COL 1: New Jobs -->
-                <div class="ds-kanban-col" id="ds-col-new">
-                    <div class="ds-kanban-col-hdr">
-                        <span class="ds-kanban-col-dot" style="background:#dc2626"></span>
-                        <span class="ds-kanban-col-title" style="color:#dc2626">New Jobs</span>
-                        <span class="ds-kanban-col-count" id="ds-col-count-new">—</span>
+                <!-- LEFT COLUMN (25%) -->
+                <div class="ds-list-col">
+                    <div class="ds-list-filters">
+                        <select id="ds-due-select" onchange="setDSDueFilter(this.value)">
+                            <option value="all">All Dates</option>
+                            <option value="today">Due Today</option>
+                            <option value="week">Due This Week</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                        <select id="ds-stage-select" onchange="setDSStageFilter(this.value)">
+                            <option value="all">All Stages</option>
+                            <option value="new">New</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="in_review">In Review</option>
+                        </select>
+                        <select id="ds-substage-select" onchange="setDSSubstageFilter(this.value)" style="display:none"></select>
                     </div>
-                    <div class="ds-kanban-col-body" id="ds-col-body-new">
+                    <div class="ds-list-tabs">
+                        <button class="ds-list-tab active" data-tab="new"        onclick="setDSListTab('new')">New <span class="tab-count" id="ds-tab-count-new">0</span></button>
+                        <button class="ds-list-tab"        data-tab="inprogress" onclick="setDSListTab('inprogress')">In Progress <span class="tab-count" id="ds-tab-count-inprogress">0</span></button>
+                        <button class="ds-list-tab"        data-tab="inreview"   onclick="setDSListTab('inreview')">In Review <span class="tab-count" id="ds-tab-count-inreview">0</span></button>
+                    </div>
+                    <div class="ds-list-body" id="ds-list-body">
                         <div style="padding:20px 14px;color:#94a3b8;font-size:12px">Loading…</div>
                     </div>
                 </div>
 
-                <!-- COL 2: In Progress -->
-                <div class="ds-kanban-col" id="ds-col-inprogress">
-                    <div class="ds-kanban-col-hdr">
-                        <span class="ds-kanban-col-dot" style="background:#2563eb"></span>
-                        <span class="ds-kanban-col-title" style="color:#2563eb">In Progress</span>
-                        <span class="ds-kanban-col-count" id="ds-col-count-inprogress">—</span>
-                    </div>
-                    <div class="ds-kanban-col-body" id="ds-col-body-inprogress">
-                        <div style="padding:20px 14px;color:#94a3b8;font-size:12px">Loading…</div>
-                    </div>
-                </div>
-
-                <!-- COL 3: In Review -->
-                <div class="ds-kanban-col" id="ds-col-inreview">
-                    <div class="ds-kanban-col-hdr">
-                        <span class="ds-kanban-col-dot" style="background:#b45309"></span>
-                        <span class="ds-kanban-col-title" style="color:#b45309">In Review</span>
-                        <span class="ds-kanban-col-count" id="ds-col-count-inreview">—</span>
-                    </div>
-                    <div class="ds-kanban-col-body" id="ds-col-body-inreview">
-                        <div style="padding:20px 14px;color:#94a3b8;font-size:12px">Loading…</div>
-                    </div>
-                </div>
-
-                <!-- COL 4: Summary Pane -->
+                <!-- RIGHT COLUMN (75%) — Preview Window -->
                 <div class="ds-preview-panel" id="ds-preview-panel" style="display:flex;flex-direction:column;overflow:hidden">
                     <div id="dsp-empty" class="ds-preview-empty">
                         <svg width="40" height="40" fill="none" stroke="#e2e8f0" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h6M9 12h6M9 15h4"/></svg>
@@ -2595,6 +2578,7 @@
                 <!-- Hidden legacy elements for JS compat -->
                 <div id="ds-task-list-wrap" class="hide"></div>
                 <div id="ds-task-list-panel" class="hide"></div>
+                <div class="hide"><div id="ds-col-body-new"></div><div id="ds-col-body-inprogress"></div><div id="ds-col-body-inreview"></div><span id="ds-col-count-new"></span><span id="ds-col-count-inprogress"></span><span id="ds-col-count-inreview"></span></div>
 
             </div>
 
@@ -18204,6 +18188,7 @@
         let _dsDueFilter = 'all';
         let _dsStageFilter = 'all';
         let _dsSubstageFilter = 'all';
+        let _dsListTab = 'new'; // 'new' | 'inprogress' | 'inreview'
         let allDesignTasks = [];
         let designBriefLog = [];
 
@@ -22609,6 +22594,19 @@
             renderDSDashboard();
         }
 
+        function setDSListTab(tab) {
+            _dsListTab = tab;
+            document.querySelectorAll('.ds-list-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+            renderDSDashboard();
+        }
+
+        function _dtBucket(t) {
+            if (t.status === 'new') return 'new';
+            if (t.status === 'in_progress') return 'inprogress';
+            if (t.status === 'in_review') return 'inreview';
+            return null;
+        }
+
         function renderDSDashboard() {
             const allTasks = (allDesignTasks || []).filter(t => t.status !== 'completed');
             const completedTasks = (allDesignTasks || []).filter(t => t.status === 'completed');
@@ -22650,27 +22648,26 @@
 
             const filtered = allTasks.filter(matchesFilters);
 
-            const emptyMsg = (query || _dsDueFilter !== 'all') ? 'No tasks match your filter' : 'No tasks here';
+            const emptyMsg = (query || _dsDueFilter !== 'all') ? 'No tasks match your filter' : 'No tasks in this view';
 
-            // Three kanban columns
-            const cols = [
-                { bodyId: 'ds-col-body-new',        countId: 'ds-col-count-new',        colId: 'ds-col-new',        match: t => t.status === 'new' },
-                { bodyId: 'ds-col-body-inprogress',  countId: 'ds-col-count-inprogress', colId: 'ds-col-inprogress', match: t => t.status === 'in_progress' },
-                { bodyId: 'ds-col-body-inreview',    countId: 'ds-col-count-inreview',   colId: 'ds-col-inreview',   match: t => t.status === 'in_review' },
-            ];
-
-            const colCounts = cols.map(({ bodyId, countId, colId, match }) => {
-                const tasks = filtered.filter(match);
-                const body  = document.getElementById(bodyId);
-                const cnt   = document.getElementById(countId);
-                if (cnt) cnt.textContent = tasks.length;
-                if (body) {
-                    body.innerHTML = tasks.length === 0
-                        ? `<div style="padding:24px 14px;text-align:center"><p style="font-size:11px;color:#b0b8c4;font-style:italic">${emptyMsg}</p></div>`
-                        : tasks.map(t => _renderDSKanbanCard(t, _dsUnreadByTask[t.id] || 0)).join('');
-                }
-                return tasks.length;
+            // Compute counts for all 3 tabs (so badges reflect filtered totals)
+            const counts = { new: 0, inprogress: 0, inreview: 0 };
+            filtered.forEach(t => {
+                const bucket = _dtBucket(t);
+                if (bucket && counts[bucket] !== undefined) counts[bucket]++;
             });
+            const cn = document.getElementById('ds-tab-count-new');         if (cn) cn.textContent = counts.new;
+            const cp = document.getElementById('ds-tab-count-inprogress');  if (cp) cp.textContent = counts.inprogress;
+            const cr = document.getElementById('ds-tab-count-inreview');    if (cr) cr.textContent = counts.inreview;
+
+            // Render the single tab-filtered list
+            const list = filtered.filter(t => _dtBucket(t) === _dsListTab);
+            const listBody = document.getElementById('ds-list-body');
+            if (listBody) {
+                listBody.innerHTML = list.length === 0
+                    ? `<div style="padding:24px 14px;text-align:center"><p style="font-size:11px;color:#b0b8c4;font-style:italic">${emptyMsg}</p></div>`
+                    : list.map(t => _renderDSKanbanCard(t, _dsUnreadByTask[t.id] || 0)).join('');
+            }
 
             // Auto-select first active task on first render
             const allActive = filtered.filter(t => ['new','in_progress','in_review'].includes(t.status));
@@ -22893,9 +22890,10 @@
                         <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
                         <div style="display:flex;gap:4px;flex-shrink:0;margin-top:1px">
                             ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;white-space:nowrap;line-height:1" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">▶ Start</button>` : ''}
-                            <button onclick="showDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff;white-space:nowrap;line-height:1;display:flex;align-items:center;gap:4px" onmouseover="this.style.background='#5b21b6'" onmouseout="this.style.background='#6d28d9'">
-                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
-                                Open
+                            <button id="dsp-uploads-btn-${task.id}" class="dsp-uploads-btn no-uploads" onclick="showDesignTask('${task.id}')">
+                                <span class="status-dot"></span>
+                                Design Uploads
+                                <span class="count-badge" id="dsp-uploads-count-${task.id}">0</span>
                             </button>
                         </div>
                     </div>
@@ -22947,6 +22945,12 @@
                     </div>
                 </div>
 
+                <!-- Factory Handover (async) -->
+                <div id="dsp-factory-${task.id}"></div>
+
+                <!-- Task Attachments (async, read-only file list) -->
+                <div id="dsp-attachments-${task.id}"></div>
+
                 <!-- Uploads / Assets (async) -->
                 <div id="dsp-assets-${task.id}"></div>
 
@@ -22959,6 +22963,75 @@
             _loadPreviewPanelProducts(task.id, task.products_required || []);
             _loadPreviewPanelAssets(task.id);
             _loadPreviewPanelNotifications(task.id);
+            _loadPreviewPanelFactoryHandover(task);
+            _loadPreviewPanelAttachments(task.id);
+            _loadPreviewPanelUploadsCount(task.id);
+        }
+
+        // Count active stage_uploads rows (concept/range/finalise) for a task
+        async function _dsCountTaskUploads(taskId) {
+            const { data: stages } = await supabase.from('design_stages')
+                .select('id').eq('task_id', taskId).in('stage_number', [2,3,4]);
+            const stageIds = (stages || []).map(s => s.id);
+            if (!stageIds.length) return 0;
+            const { count, error } = await supabase.from('stage_uploads')
+                .select('id', { count: 'exact', head: true })
+                .in('stage_id', stageIds)
+                .eq('is_archived', false);
+            if (error) return 0;
+            return count || 0;
+        }
+
+        async function _loadPreviewPanelUploadsCount(taskId) {
+            const n = await _dsCountTaskUploads(taskId);
+            const btn = document.getElementById(`dsp-uploads-btn-${taskId}`);
+            const cnt = document.getElementById(`dsp-uploads-count-${taskId}`);
+            if (!btn || !cnt) return;
+            cnt.textContent = n;
+            btn.classList.toggle('has-uploads', n > 0);
+            btn.classList.toggle('no-uploads', n === 0);
+        }
+
+        async function _loadPreviewPanelFactoryHandover(task) {
+            const el = document.getElementById(`dsp-factory-${task.id}`);
+            if (!el) return;
+            // Find stage 5 for this task
+            const { data: stages } = await supabase.from('design_stages')
+                .select('*').eq('task_id', task.id).eq('stage_number', 5).limit(1);
+            if (!document.getElementById(`dsp-factory-${task.id}`)) return;
+            const stage5 = (stages || [])[0] || null;
+            try {
+                el.innerHTML = buildDTRFactoryHandoverCol(task, stage5);
+            } catch (e) {
+                console.error('factory handover render failed', e);
+                el.innerHTML = '';
+            }
+        }
+
+        async function _loadPreviewPanelAttachments(taskId) {
+            const el = document.getElementById(`dsp-attachments-${taskId}`);
+            if (!el) return;
+            const { data, error } = await supabase
+                .from('design_task_assets')
+                .select('id, file_name, file_url, file_type, file_size')
+                .eq('design_task_id', taskId)
+                .order('created_at', { ascending: false });
+            if (!document.getElementById(`dsp-attachments-${taskId}`)) return;
+            if (error || !data?.length) { el.innerHTML = ''; return; }
+            const rows = data.map(f => {
+                const sizeStr = f.file_size ? (f.file_size > 1048576 ? (f.file_size/1048576).toFixed(1)+'MB' : Math.round(f.file_size/1024)+'KB') : '';
+                return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+                    <span style="font-size:11px;font-weight:600;color:#1e293b;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(f.file_name||'')}">${escHtml(f.file_name||'—')}</span>
+                    ${sizeStr ? `<span style="font-size:9px;color:#94a3b8;flex-shrink:0">${escHtml(sizeStr)}</span>` : ''}
+                    <a href="${escHtml(f.file_url)}" target="_blank" title="Download" style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#f1f5f9;color:#475569;text-decoration:none">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+                    </a>
+                </div>`;
+            }).join('');
+            el.innerHTML = `<div style="border:1px solid #e8ecf0;border-radius:10px;padding:10px 12px;background:#fff">
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Task Attachments</div>
+                ${rows}
+            </div>`;
         }
 
         async function _loadPreviewPanelNotifications(taskId) {
@@ -24454,7 +24527,11 @@
                         </div>
                     </div>
                     <div class="dtr-activity-col" id="dtr-activity-col" style="display:flex;flex-direction:column;gap:12px;overflow-y:auto">
-                        ${buildDTRFactoryHandoverCol(task, stage5)}
+                        <!-- Feedback Portal header -->
+                        <div style="background:#fff;border-radius:12px;border:1px solid #dde3ea;padding:10px 14px;box-shadow:0 1px 2px rgba(15,23,42,0.04)">
+                            <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#6d28d9;margin-bottom:2px">Feedback Portal</div>
+                            <div style="font-size:11px;color:#64748b">Revisions, annotation comments & sub-tasks</div>
+                        </div>
                         <!-- Next Action card -->
                         <div class="next-action-card" id="design-task-next-action-card"></div>
                         <!-- Activity feed -->
