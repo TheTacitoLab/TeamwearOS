@@ -22922,6 +22922,14 @@
                 return `<div style="font-size:10px;color:#475569;display:flex;align-items:center;gap:3px">${swatch}<span style="font-weight:600">${label}:</span> ${escHtml(text)}</div>`;
             }).filter(Boolean).join('');
 
+            const _statusOptsList = [
+                ['new','New'],['in_progress','In Progress'],['in_review','In Review'],
+                ['revisions','Revisions'],['factory_handover','Factory Handover'],
+                ['awaiting_approval','Awaiting Approval'],['delivered','Delivered'],['completed','Completed'],
+            ];
+            const _currentStatusVal = task.sub_stage || task.status || 'new';
+            const _statusOpts = _statusOptsList.map(([v,l]) => `<option value="${v}"${v===_currentStatusVal?' selected':''}>${l}</option>`).join('');
+
             panel.innerHTML = `<div style="height:100%;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden">
 
                 <!-- Header: title + chips + action buttons -->
@@ -22929,16 +22937,20 @@
                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:7px">
                         <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
                         <div style="display:flex;gap:4px;flex-shrink:0;margin-top:1px">
-                            ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;white-space:nowrap;line-height:1" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">▶ Start</button>` : ''}
+                            ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;white-space:nowrap;line-height:1">▶ Start</button>` : ''}
                             <button id="dsp-uploads-btn-${task.id}" class="dsp-uploads-btn no-uploads" onclick="showDesignTask('${task.id}')">
                                 <span class="status-dot"></span>
                                 Design Uploads
                                 <span class="count-badge" id="dsp-uploads-count-${task.id}">0</span>
                             </button>
+                            <button onclick="openDesignTaskEditModal('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#475569;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;gap:4px">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                Edit
+                            </button>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}${task.sub_stage && DS_SUBSTAGE_LABELS[task.sub_stage] ? ` · ${DS_SUBSTAGE_LABELS[task.sub_stage]}` : ''}</span>
+                        <select onchange="_dspChangeStatus('${task.id}', this.value)" style="font-size:10px;font-weight:700;padding:2px 22px 2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22${encodeURIComponent(colorText[nextAct.color])}%22 stroke-width=%222.5%22><path d=%22M6 9l6 6 6-6%22/></svg>');background-repeat:no-repeat;background-position:right 5px center">${_statusOpts}</select>
                         ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.task_ref)}</span>` : ''}
                         ${task.clubs?.name ? `<span style="font-size:10px;color:#475569;font-weight:500;background:#f8fafc;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.clubs.name)}</span>` : ''}
                         <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${priBgs[pri]};color:${priColors[pri]};border:1px solid ${priBdrs[pri]};white-space:nowrap">${priLabels[pri]}</span>
@@ -22946,61 +22958,63 @@
                     </div>
                 </div>
 
-                <!-- Main body — scrollable -->
-                <div style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box">
+                <!-- 3-column body: Details+Brief | Products+Factory | NextAction+Activity -->
+                <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px 14px;overflow:hidden;box-sizing:border-box;min-height:0">
 
-                    <!-- ROW 1: Owner | Next Action | Task Details + Colours -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:start">
-                        <!-- Owner -->
-                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:9px 11px">
-                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Owner</div>
-                            <div style="font-size:11px;font-weight:700;color:#1e293b">${escHtml(designerName)}</div>
-                        </div>
-                        <!-- Next Action — full interactive card -->
-                        <div id="dsp-na-card-${task.id}">
-                            <div class="sh-na-section" style="margin-bottom:0">
-                                <div class="sh-section-title" style="color:#92400e">Next Action</div>
-                                <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                    <!-- LEFT: Task Details + Brief -->
+                    <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;padding-right:2px">
+                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Task Details</div>
+                            <div style="display:flex;flex-direction:column;gap:6px">
+                                <div><span style="font-size:10px;font-weight:700;color:#94a3b8">Owner: </span><span style="font-size:11px;font-weight:600;color:#1e293b">${escHtml(designerName)}</span></div>
+                                ${hasColours ? `<div><div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">Brand Colours</div><div style="display:flex;flex-direction:column;gap:3px">${colourDots}</div></div>` : ''}
+                                ${notes ? `<div><div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">Notes</div><p style="font-size:11px;color:#374151;line-height:1.5;margin:0;white-space:pre-wrap">${escHtml(notes)}</p></div>` : ''}
                             </div>
                         </div>
-                        <!-- Task Details + Colours -->
-                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:9px 11px;display:flex;flex-direction:column;gap:6px">
-                            ${notes ? `<div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:3px">Task Details</div><p style="font-size:11px;color:#374151;line-height:1.5;margin:0;white-space:pre-wrap">${escHtml(notes)}</p></div>` : ''}
-                            ${hasColours ? `<div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Brand Colours</div><div style="display:flex;flex-direction:column;gap:3px">${colourDots}</div></div>` : ''}
-                            ${!notes && !hasColours ? `<div style="font-size:11px;color:#94a3b8;font-style:italic">No details</div>` : ''}
+                        <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Brief</div>
+                            ${brief ? `<p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>` : `<p style="font-size:11px;color:#94a3b8;font-style:italic;margin:0">No brief set.</p>`}
                         </div>
                     </div>
 
-                    <!-- ROW 2: Brief | Products | Factory Handover -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:start">
-                        <!-- Brief -->
-                        <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff">
-                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Brief</div>
-                            ${brief ? `<p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>` : `<p style="font-size:11px;color:#94a3b8;font-style:italic;margin:0">No brief set.</p>`}
-                        </div>
-                        <!-- Products (async) -->
-                        <div id="dsp-products-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff">
+                    <!-- MIDDLE: Products + Factory Handover -->
+                    <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;padding-right:2px">
+                        <div id="dsp-products-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
                             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div>
                             <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
                         </div>
-                        <!-- Factory Handover (async) -->
-                        <div id="dsp-factory-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff">
+                        <div id="dsp-factory-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
                             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Factory Handover</div>
                             <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
                         </div>
                     </div>
 
-                    <!-- ROW 3: Activity feed (full width) -->
-                    <div id="dsp-panel-notif-${task.id}"></div>
+                    <!-- RIGHT: Next Action + Activity Feed -->
+                    <div style="display:flex;flex-direction:column;gap:8px;overflow:hidden;min-height:0">
+                        <div id="dsp-na-card-${task.id}" style="flex-shrink:0">
+                            <div class="sh-na-section" style="margin-bottom:0">
+                                <div class="sh-section-title" style="color:#92400e">Next Action</div>
+                                <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                            </div>
+                        </div>
+                        <div id="dsp-activity-${task.id}" style="flex:1;display:flex;flex-direction:column;background:#fff;border:1px solid #e2e8f0;border-radius:9px;overflow:hidden;min-height:0">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;padding:10px 12px 6px;flex-shrink:0">Activity</div>
+                            <div id="dsp-activity-list-${task.id}" style="flex:1;overflow-y:auto;padding:0 12px"><p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p></div>
+                            <div style="display:flex;gap:5px;padding:8px 10px;border-top:1px solid #f1f5f9;background:#f8fafc;flex-shrink:0">
+                                <input type="text" id="dsp-activity-input-${task.id}" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')_dspAddActivity('${task.id}')" style="flex:1;font-size:11px;padding:5px 9px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;outline:none">
+                                <button onclick="_dspAddActivity('${task.id}')" style="padding:5px 10px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff">Post</button>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
             </div>`;
 
             // Load data asynchronously
             _loadPreviewPanelProducts(task.id, task.products_required || []);
-            _loadPreviewPanelNotifications(task.id);
             _loadPreviewPanelFactoryHandover(task);
             _loadPreviewPanelUploadsCount(task.id);
+            _loadPreviewPanelActivity(task.id);
             // Load Next Action card using the shared naCardHtml system
             loadNextActionCard('design_task', task.id, `dsp-na-card-${task.id}`);
         }
@@ -23017,6 +23031,155 @@
                 .eq('is_archived', false);
             if (error) return 0;
             return count || 0;
+        }
+
+        // Inline status change from the preview header dropdown
+        async function _dspChangeStatus(taskId, value) {
+            // Map value → { status, sub_stage } mirroring setDTRStageFromDropdown
+            const subMap = { in_design:'in_progress', revisions:'in_progress', factory_handover:'in_progress', internal_review:'in_review', awaiting_approval:'in_review' };
+            const isSub = !!subMap[value];
+            const payload = isSub
+                ? { status: subMap[value], sub_stage: value }
+                : { status: value, sub_stage: null };
+            const { error } = await supabase.from('design_tasks').update(payload).eq('id', taskId);
+            if (error) { showToast('Error: '+error.message, 'error'); return; }
+            // Update local cache
+            const t = (allDesignTasks || []).find(x => x.id === taskId);
+            if (t) Object.assign(t, payload);
+            showToast('Status updated', 'success');
+            renderDSDashboard();
+            renderDSPreviewPanel(taskId);
+        }
+
+        // Activity feed in the preview (mirrors the uploads-page Feedback Portal feed)
+        async function _loadPreviewPanelActivity(taskId) {
+            const list = document.getElementById(`dsp-activity-list-${taskId}`);
+            if (!list) return;
+            const { data, error } = await supabase
+                .from('design_task_activity')
+                .select('id, message, activity_type, user_name, created_at, task_completed')
+                .eq('design_task_id', taskId)
+                .order('created_at', { ascending: false })
+                .limit(50);
+            if (!document.getElementById(`dsp-activity-list-${taskId}`)) return;
+            if (error || !data?.length) {
+                list.innerHTML = '<p style="font-size:11px;color:#94a3b8;margin:0;padding:8px 0;font-style:italic">No activity yet.</p>';
+                return;
+            }
+            const iconFor = (type) => {
+                if (type === 'comment')          return '💬';
+                if (type === 'sub_task')         return '✓';
+                if (type === 'revision_request') return '⚑';
+                if (type === 'next_action')      return '→';
+                if (type === 'next_action_complete') return '✓';
+                return '·';
+            };
+            list.innerHTML = data.map(row => {
+                const when = new Date(row.created_at);
+                const ago  = (() => {
+                    const m = Math.round((Date.now() - when.getTime())/60000);
+                    if (m < 1)    return 'just now';
+                    if (m < 60)   return `${m}m ago`;
+                    if (m < 1440) return `${Math.round(m/60)}h ago`;
+                    return when.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+                })();
+                const author = row.user_name ? escHtml(row.user_name) : 'Someone';
+                return `<div style="display:flex;gap:7px;padding:6px 0;border-bottom:1px solid #f1f5f9">
+                    <span style="font-size:11px;flex-shrink:0;line-height:1.4">${iconFor(row.activity_type)}</span>
+                    <div style="flex:1;min-width:0">
+                        <div style="font-size:11px;color:#1e293b;line-height:1.4;${row.task_completed?'text-decoration:line-through;color:#94a3b8':''}">${escHtml(row.message || '')}</div>
+                        <div style="font-size:9px;color:#94a3b8;margin-top:1px">${author} · ${ago}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function _dspAddActivity(taskId) {
+            const input = document.getElementById(`dsp-activity-input-${taskId}`);
+            if (!input) return;
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = '';
+            const { error } = await supabase.from('design_task_activity').insert({
+                design_task_id: taskId,
+                brand_id: currentBrand?.id,
+                user_id: currentUser?.id,
+                user_name: userDisplayName(currentUserProfile),
+                message: text,
+                activity_type: 'comment',
+                task_completed: false
+            });
+            if (error) { showToast('Error: '+error.message, 'error'); return; }
+            _loadPreviewPanelActivity(taskId);
+        }
+
+        // Edit modal: reuse the existing DTR edit-mode field set + saveDTRLeftPanel
+        let _dsEditOriginalMode = false;
+        async function openDesignTaskEditModal(taskId) {
+            const modal = document.getElementById('ds-edit-modal');
+            const body  = document.getElementById('ds-edit-modal-body');
+            if (!modal || !body) return;
+            // Load the full task + related data so the edit form has products etc.
+            const { data: task } = await supabase.from('design_tasks').select('*, clubs(*), jobs(*)').eq('id', taskId).single();
+            if (!task) { showToast('Task not found', 'error'); return; }
+            const club = task.clubs || {};
+            // Load product lists
+            let clubProds = [], jobProds = [];
+            if (task.club_id) {
+                const r = await supabase.from('club_products').select('id, custom_name, image_urls, image_url, products(item_name, product_code, pattern_code)').eq('club_id', task.club_id);
+                clubProds = r.data || [];
+            }
+            if (task.job_id) {
+                const r = await supabase.from('job_products').select('id, custom_name, image_urls, image_url, products(item_name, product_code, pattern_code)').eq('job_id', task.job_id);
+                jobProds = r.data || [];
+            }
+            // Set globals that saveDTRLeftPanel + edit-mode HTML expect
+            window.currentDesignTaskRecord = task;
+            window.currentDesignTask = task;
+            window._dtrCachedClubProds = clubProds;
+            window._dtrCachedJobProds  = jobProds;
+            window._dtrCachedAssets    = [];
+            _dsEditOriginalMode = (typeof _dtrEditMode !== 'undefined') ? _dtrEditMode : false;
+            window._dtrEditMode = true;
+            // Render the edit-mode HTML using the existing builder
+            body.innerHTML = `<div id="dtr-left-tab-content">${_buildDTRBriefTab(task, club, [], clubProds, jobProds)}</div>
+                <div style="display:flex;justify-content:flex-end;gap:6px;padding:14px 0 0;border-top:1px solid #e2e8f0;margin-top:14px">
+                    <button onclick="closeDesignTaskEditModal()" style="padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#475569">Cancel</button>
+                    <button onclick="_dsSaveEditModal('${taskId}')" style="padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff">Save Changes</button>
+                </div>`;
+            modal.classList.remove('hide');
+            // Initialise owner dropdown after DOM is in place
+            if (typeof renderOwnerDropdown === 'function') {
+                setTimeout(() => renderOwnerDropdown('design-task', task.owner_ids || (task.assigned_designer_id ? [task.assigned_designer_id] : [])), 0);
+            }
+        }
+
+        function closeDesignTaskEditModal() {
+            const modal = document.getElementById('ds-edit-modal');
+            const body  = document.getElementById('ds-edit-modal-body');
+            if (modal) modal.classList.add('hide');
+            if (body) body.innerHTML = '<p style="font-size:12px;color:#94a3b8">Loading…</p>';
+            window._dtrEditMode = _dsEditOriginalMode;
+        }
+
+        async function _dsSaveEditModal(taskId) {
+            if (typeof saveDTRLeftPanel !== 'function') { showToast('Save handler not available', 'error'); return; }
+            try {
+                await saveDTRLeftPanel();
+            } catch (e) {
+                console.error('save failed', e);
+                showToast('Save failed: ' + (e.message || ''), 'error');
+                return;
+            }
+            // Reload the task into local cache
+            const { data: fresh } = await supabase.from('design_tasks').select('*, clubs(*), jobs(*)').eq('id', taskId).single();
+            if (fresh) {
+                const idx = (allDesignTasks || []).findIndex(t => t.id === taskId);
+                if (idx >= 0) allDesignTasks[idx] = fresh;
+            }
+            closeDesignTaskEditModal();
+            renderDSDashboard();
+            renderDSPreviewPanel(taskId);
         }
 
         async function _loadPreviewPanelUploadsCount(taskId) {
