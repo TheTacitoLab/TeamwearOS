@@ -2278,23 +2278,21 @@
                                     <button id="cogs-mode-formula-btn" onclick="toggleCOGSFormulaMode(true)" class="px-2.5 py-1 font-semibold transition-colors" style="background:transparent;color:#6b7280">Formula</button>
                                 </div>
                             </div>
-                            <!-- Manual mode -->
-                            <div id="cogs-manual-wrap">
-                                <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
-                            </div>
-                            <!-- Formula mode -->
-                            <div id="cogs-formula-wrap" class="hide">
-                                <div class="mb-2">
-                                    <input type="number" step="0.01" min="0" id="prod-unit-cost" placeholder="Unit Cost e.g. 10.00" oninput="updateCOGSPreview()" class="w-full px-3 py-2 rounded-lg text-sm">
+                            <!-- Formula inputs (unit cost + breakdown) — only shown in formula mode -->
+                            <div id="cogs-formula-wrap" class="hide" style="margin-bottom:6px">
+                                <div class="mb-1">
+                                    <label class="text-gray-500 text-xs mb-1 block">Unit Cost (£)</label>
+                                    <input type="number" step="0.01" min="0" id="prod-unit-cost" placeholder="e.g. 10.00" oninput="updateCOGSPreview()" class="w-full px-3 py-2 rounded-lg text-sm">
                                 </div>
-                                <div id="cogs-formula-preview" class="rounded-lg px-3 py-2 text-xs space-y-1" style="background:#111827;border:1px solid #1f2937">
+                                <div id="cogs-formula-preview" class="rounded-lg px-3 py-2 text-xs space-y-1 mb-1" style="background:#111827;border:1px solid #1f2937">
                                     <div class="flex justify-between" style="color:#9ca3af"><span>Unit Cost</span><span id="cogs-prev-unit">—</span></div>
                                     <div class="flex justify-between" style="color:#9ca3af"><span>VAT (20%)</span><span id="cogs-prev-vat">—</span></div>
                                     <div class="flex justify-between" style="color:#9ca3af"><span>Payment Fee</span><span id="cogs-prev-fee">—</span></div>
-                                    <div class="flex justify-between font-bold" style="color:#fff;border-top:1px solid #374151;padding-top:4px;margin-top:4px"><span>COGS</span><span id="cogs-prev-total">—</span></div>
                                 </div>
-                                <input type="hidden" id="prod-cogs-formula-value">
                             </div>
+                            <!-- COGS field — always visible; read-only + highlighted when formula is active -->
+                            <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
+                            <p id="cogs-formula-hint" class="hide text-xs mt-1" style="color:#6b7280">Auto-calculated — edit Unit Cost above to change</p>
                         </div>
                     </div>
                     <!-- Hidden legacy fit_type for backward compat -->
@@ -6809,38 +6807,47 @@
         }
 
         function toggleCOGSFormulaMode(useFormula) {
-            const manualWrap  = document.getElementById('cogs-manual-wrap');
             const formulaWrap = document.getElementById('cogs-formula-wrap');
             const manualBtn   = document.getElementById('cogs-mode-manual-btn');
             const formulaBtn  = document.getElementById('cogs-mode-formula-btn');
-            if (!manualWrap || !formulaWrap) return;
+            const cogsInput   = document.getElementById('prod-cogs');
+            const hint        = document.getElementById('cogs-formula-hint');
+            if (!formulaWrap || !cogsInput) return;
             if (useFormula) {
-                manualWrap.classList.add('hide');
                 formulaWrap.classList.remove('hide');
+                if (hint) hint.classList.remove('hide');
+                cogsInput.readOnly = true;
+                cogsInput.style.background = '#1f2937';
+                cogsInput.style.color = '#9ca3af';
+                cogsInput.style.cursor = 'default';
                 if (manualBtn)  { manualBtn.style.background = 'transparent'; manualBtn.style.color = '#6b7280'; }
                 if (formulaBtn) { formulaBtn.style.background = '#374151';    formulaBtn.style.color = '#d1d5db'; }
                 updateCOGSPreview();
             } else {
-                manualWrap.classList.remove('hide');
                 formulaWrap.classList.add('hide');
+                if (hint) hint.classList.add('hide');
+                cogsInput.readOnly = false;
+                cogsInput.style.background = '';
+                cogsInput.style.color = '';
+                cogsInput.style.cursor = '';
                 if (manualBtn)  { manualBtn.style.background = '#374151'; manualBtn.style.color = '#d1d5db'; }
                 if (formulaBtn) { formulaBtn.style.background = 'transparent'; formulaBtn.style.color = '#6b7280'; }
             }
         }
 
         function updateCOGSPreview() {
-            const unitCost = parseFloat(document.getElementById('prod-unit-cost')?.value) || 0;
-            const fee      = parseFloat(currentBrand?.cogs_payment_fee ?? 0);
-            const vat      = unitCost * 0.20;
-            const total    = unitCost + vat + fee;
+            const unitCost  = parseFloat(document.getElementById('prod-unit-cost')?.value) || 0;
+            const fee       = parseFloat(currentBrand?.cogs_payment_fee ?? 0);
+            const vat       = unitCost * 0.20;
+            const total     = unitCost + vat + fee;
             const fmt = v => v > 0 ? `£${v.toFixed(2)}` : '—';
             const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
             setEl('cogs-prev-unit', fmt(unitCost));
             setEl('cogs-prev-vat',  unitCost > 0 ? `£${vat.toFixed(2)}` : '—');
             setEl('cogs-prev-fee',  fmt(fee));
-            setEl('cogs-prev-total', unitCost > 0 ? `£${total.toFixed(2)}` : '—');
-            const hiddenEl = document.getElementById('prod-cogs-formula-value');
-            if (hiddenEl) hiddenEl.value = unitCost > 0 ? total.toFixed(2) : '';
+            // Write the calculated total directly into the visible COGS field
+            const cogsInput = document.getElementById('prod-cogs');
+            if (cogsInput) cogsInput.value = unitCost > 0 ? total.toFixed(2) : '';
         }
 
         function _isCOGSFormulaMode() {
@@ -9223,9 +9230,7 @@
                 weight_grams:  parseInt(document.getElementById('prod-weight').value) || 450,
                 cogs_formula_enabled: _isCOGSFormulaMode(),
                 unit_cost: _isCOGSFormulaMode() ? (parseFloat(document.getElementById('prod-unit-cost')?.value) || null) : null,
-                cogs: _isCOGSFormulaMode()
-                    ? (parseFloat(document.getElementById('prod-cogs-formula-value')?.value) || null)
-                    : (parseFloat(document.getElementById('prod-cogs')?.value) || null),
+                cogs: parseFloat(document.getElementById('prod-cogs')?.value) || null,
                 sizes:         document.getElementById('prod-sizes').value.trim(),
                 youth_sizes:   document.getElementById('prod-youth-sizes')?.value.trim() || null,
                 women_sizes:   document.getElementById('prod-women-sizes')?.value.trim() || null,
