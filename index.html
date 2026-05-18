@@ -23234,20 +23234,36 @@
                         </div>
                     </div>
 
-                    <!-- RIGHT: Next Action + Activity Feed -->
-                    <div style="display:flex;flex-direction:column;gap:8px;overflow:hidden;min-height:0">
-                        <div id="dsp-na-card-${task.id}" style="flex-shrink:0">
-                            <div class="sh-na-section" style="margin-bottom:0">
-                                <div class="sh-section-title" style="color:#92400e">Next Action</div>
-                                <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                    <!-- RIGHT: Activity Feed (mirrors the uploads page Feedback Portal) -->
+                    <div style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                        <div style="display:flex;flex-direction:column;background:#fff;border:1px solid #dde3ea;border-radius:12px;overflow:hidden;flex:1;min-height:0;box-shadow:0 1px 2px rgba(15,23,42,0.04)">
+                            <div class="dtr-activity-header" style="flex-shrink:0;padding:10px 12px;border-bottom:1px solid #f1f5f9">
+                                <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+                                    <h4 style="font-size:12px;font-weight:800;color:#0f172a;margin:0">Activity</h4>
+                                    <select class="dsp-act-filter-select" onchange="filterDTRActivity(null,this.value)" style="font-size:11px;font-weight:600;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:3px 8px;background:#f8fafc;cursor:pointer;outline:none">
+                                        <option value="all">All Active</option>
+                                        <option value="comment">Comments</option>
+                                        <option value="sub_task">Sub-Tasks</option>
+                                        <option value="revision_request">Revisions</option>
+                                        <option value="history">History</option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
-                        <div id="dsp-activity-${task.id}" style="flex:1;display:flex;flex-direction:column;background:#fff;border:1px solid #e2e8f0;border-radius:9px;overflow:hidden;min-height:0">
-                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;padding:10px 12px 6px;flex-shrink:0">Activity</div>
-                            <div id="dsp-activity-list-${task.id}" style="flex:1;overflow-y:auto;padding:0 12px"><p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p></div>
-                            <div style="display:flex;gap:5px;padding:8px 10px;border-top:1px solid #f1f5f9;background:#f8fafc;flex-shrink:0">
-                                <input type="text" id="dsp-activity-input-${task.id}" placeholder="Add a comment…" onkeydown="if(event.key==='Enter')_dspAddActivity('${task.id}')" style="flex:1;font-size:11px;padding:5px 9px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;outline:none">
-                                <button onclick="_dspAddActivity('${task.id}')" style="padding:5px 10px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff">Post</button>
+                            <div style="overflow-y:auto;flex:1;padding:8px 12px">
+                                <div class="dsp-act-list">
+                                    <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
+                                </div>
+                            </div>
+                            <div class="dtr-activity-composer" style="flex-shrink:0;border-top:1px solid #f1f5f9;padding:8px 10px;background:#f8fafc">
+                                <div class="dtr-composer-tabs" style="display:flex;gap:4px;margin-bottom:6px">
+                                    <button class="dsp-act-comment-btn act-tab-btn active" onclick="setDTInputType('comment')">+ Comment</button>
+                                    <button class="dsp-act-task-btn act-tab-btn task-tab" onclick="setDTInputType('sub_task')">+ Sub-Task</button>
+                                </div>
+                                <div style="display:flex;gap:5px">
+                                    <input type="text" class="dsp-act-input dtr-composer-input" placeholder="Add a comment…" style="flex:1"
+                                        onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
+                                    <button onclick="addDesignTaskActivity()" class="dtr-composer-post-btn">Post</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -23255,11 +23271,16 @@
                 </div>
             </div>`;
 
+            // Set currentDesignTaskRecord so the shared activity composer
+            // (addDesignTaskActivity) targets this task while the preview is open.
+            currentDesignTaskRecord = task;
+
             // Load data asynchronously
             _loadPreviewPanelProducts(task.id, task.products_required || []);
             _loadPreviewPanelFactoryHandover(task);
             _loadPreviewPanelUploadsCount(task.id);
-            _loadPreviewPanelActivity(task.id);
+            // Use the shared loader so the preview activity feed mirrors the uploads page
+            loadDesignTaskActivity(task.id);
             // Load Next Action card using the shared naCardHtml system
             loadNextActionCard('design_task', task.id, `dsp-na-card-${task.id}`);
         }
@@ -23295,69 +23316,6 @@
             renderDSDashboard();
             renderDSPreviewPanel(taskId);
         }
-
-        // Activity feed in the preview (mirrors the uploads-page Feedback Portal feed)
-        async function _loadPreviewPanelActivity(taskId) {
-            const list = document.getElementById(`dsp-activity-list-${taskId}`);
-            if (!list) return;
-            const { data, error } = await supabase
-                .from('design_task_activity')
-                .select('id, message, activity_type, user_name, created_at, task_completed')
-                .eq('design_task_id', taskId)
-                .order('created_at', { ascending: false })
-                .limit(50);
-            if (!document.getElementById(`dsp-activity-list-${taskId}`)) return;
-            if (error || !data?.length) {
-                list.innerHTML = '<p style="font-size:11px;color:#94a3b8;margin:0;padding:8px 0;font-style:italic">No activity yet.</p>';
-                return;
-            }
-            const iconFor = (type) => {
-                if (type === 'comment')          return '💬';
-                if (type === 'sub_task')         return '✓';
-                if (type === 'revision_request') return '⚑';
-                if (type === 'next_action')      return '→';
-                if (type === 'next_action_complete') return '✓';
-                return '·';
-            };
-            list.innerHTML = data.map(row => {
-                const when = new Date(row.created_at);
-                const ago  = (() => {
-                    const m = Math.round((Date.now() - when.getTime())/60000);
-                    if (m < 1)    return 'just now';
-                    if (m < 60)   return `${m}m ago`;
-                    if (m < 1440) return `${Math.round(m/60)}h ago`;
-                    return when.toLocaleDateString('en-GB', { day:'numeric', month:'short' });
-                })();
-                const author = row.user_name ? escHtml(row.user_name) : 'Someone';
-                return `<div style="display:flex;gap:7px;padding:6px 0;border-bottom:1px solid #f1f5f9">
-                    <span style="font-size:11px;flex-shrink:0;line-height:1.4">${iconFor(row.activity_type)}</span>
-                    <div style="flex:1;min-width:0">
-                        <div style="font-size:11px;color:#1e293b;line-height:1.4;${row.task_completed?'text-decoration:line-through;color:#94a3b8':''}">${escHtml(row.message || '')}</div>
-                        <div style="font-size:9px;color:#94a3b8;margin-top:1px">${author} · ${ago}</div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        async function _dspAddActivity(taskId) {
-            const input = document.getElementById(`dsp-activity-input-${taskId}`);
-            if (!input) return;
-            const text = input.value.trim();
-            if (!text) return;
-            input.value = '';
-            const { error } = await supabase.from('design_task_activity').insert({
-                design_task_id: taskId,
-                brand_id: currentBrand?.id,
-                user_id: currentUser?.id,
-                user_name: userDisplayName(currentUserProfile),
-                message: text,
-                activity_type: 'comment',
-                task_completed: false
-            });
-            if (error) { showToast('Error: '+error.message, 'error'); return; }
-            _loadPreviewPanelActivity(taskId);
-        }
-
 
         async function _loadPreviewPanelUploadsCount(taskId) {
             const n = await _dsCountTaskUploads(taskId);
@@ -27951,10 +27909,10 @@
 
         function filterDTRActivity(btn, filter) {
             _dtrActivityFilter = filter;
-            const sel = document.getElementById('dtr-act-filter-select');
-            if (sel && sel.value !== filter) sel.value = filter;
-            const composer = document.querySelector('.dtr-activity-composer');
-            if (composer) composer.style.display = filter === 'feed' ? 'none' : '';
+            // Sync ALL filter selects across surfaces (uploads page + preview)
+            document.querySelectorAll('#dtr-act-filter-select, .dsp-act-filter-select').forEach(sel => { if (sel.value !== filter) sel.value = filter; });
+            // Hide composer when viewing feed-only history
+            document.querySelectorAll('.dtr-activity-composer').forEach(c => c.style.display = filter === 'feed' ? 'none' : '');
             if (filter === 'feed' && currentDesignTaskRecord?.id) {
                 supabase.from('design_activity_feed').select('*').eq('task_id', currentDesignTaskRecord.id)
                     .order('created_at', { ascending: false }).limit(200)
@@ -27966,12 +27924,10 @@
 
         function setDTInputType(type) {
             _dtActivityInputType = type;
-            const commentBtn = document.getElementById('dt-act-comment-btn');
-            const taskBtn    = document.getElementById('dt-act-task-btn');
-            const placeholder = document.getElementById('dt-act-input');
-            if (commentBtn) commentBtn.classList.toggle('active', type === 'comment');
-            if (taskBtn)    taskBtn.classList.toggle('active', type === 'sub_task');
-            if (placeholder) placeholder.placeholder = type === 'sub_task' ? 'Add a sub-task…' : 'Add a comment…';
+            // Toggle classes on BOTH the uploads-page and preview tab buttons
+            document.querySelectorAll('#dt-act-comment-btn, .dsp-act-comment-btn').forEach(b => b.classList.toggle('active', type === 'comment'));
+            document.querySelectorAll('#dt-act-task-btn, .dsp-act-task-btn').forEach(b => b.classList.toggle('active', type === 'sub_task'));
+            document.querySelectorAll('#dt-act-input, .dsp-act-input').forEach(el => { el.placeholder = type === 'sub_task' ? 'Add a sub-task…' : 'Add a comment…'; });
         }
 
         async function loadDesignTaskActivity(taskId) {
@@ -28001,8 +27957,14 @@
         };
 
         function renderDesignTaskActivity() {
-            const list = document.getElementById('dt-act-list');
-            if (!list) return;
+            // Render to ALL containers: the uploads-page #dt-act-list AND any preview .dsp-act-list.
+            // Use a shim object whose `innerHTML` setter writes to every target — keeps the
+            // function body untouched while mirroring output across surfaces.
+            const targets = [];
+            const ul = document.getElementById('dt-act-list'); if (ul) targets.push(ul);
+            document.querySelectorAll('.dsp-act-list').forEach(el => targets.push(el));
+            if (!targets.length) return;
+            const list = { set innerHTML(v) { targets.forEach(t => t.innerHTML = v); } };
 
             if (_dtrActivityFilter === 'feed') {
                 if (!_dtActivityFeed.length) {
@@ -28125,7 +28087,10 @@
         }
 
         async function addDesignTaskActivity() {
-            const input = document.getElementById('dt-act-input');
+            // Pick whichever input has content — works for both the uploads page (#dt-act-input)
+            // and the preview's mirrored composer (.dsp-act-input)
+            const inputs = [document.getElementById('dt-act-input'), ...document.querySelectorAll('.dsp-act-input')].filter(Boolean);
+            const input = inputs.find(el => (el.value || '').trim()) || inputs[0];
             const msg = input?.value?.trim();
             if (!msg) return;
             if (!currentDesignTaskRecord?.id || !currentBrand?.id) return;
@@ -28152,7 +28117,8 @@
 
             // Prepend to local log and re-render
             _dtActivityLog.unshift(data);
-            if (input) input.value = '';
+            // Clear every mirrored composer input
+            inputs.forEach(el => { el.value = ''; });
             // Increment unread dot for this task (newly added activity starts unread)
             const tid = currentDesignTaskRecord?.id;
             if (tid) {
