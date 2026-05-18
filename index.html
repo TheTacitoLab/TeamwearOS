@@ -375,7 +375,7 @@
         .sh-na-hist-date { font-size: 10px; color: #94a3b8; margin-top: 1px; }
         .sh-rev-badge { display: inline-block; padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 700; background: rgba(16,185,129,0.1); color: #059669; }
         /* Dedicated Next Action card placed above the activity sidebar on each record */
-        .jr-right-col { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 96px; align-self: start; max-height: calc(100vh - 94px); }
+        .jr-right-col { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 48px; align-self: start; max-height: calc(100vh - 46px); }
         .next-action-card { background: #fffbeb; border: 1px solid #fde68a; border-left: 3px solid #d97706; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex-shrink: 0; }
         .na-card-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #92400e; margin-bottom: 10px; }
         .na-card-title .na-flag { color: #d97706; font-size: 13px; }
@@ -740,10 +740,10 @@
            ============================================= */
 
         /* Design Studio header area */
-        .ds-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:0; position:sticky; top:96px; z-index:30; }
+        .ds-header { background:#fff; border-bottom:1px solid #e2e8f0; padding:0; position:sticky; top: 48px; z-index:30; }
 
         /* ── Design Studio 2-Column Layout ── */
-        .ds-studio-body { display:grid; grid-template-columns:25% 75%; height:calc(100vh - 152px); overflow:hidden; gap:0; background:#e2e8f0; border-top:2px solid #e2e8f0; }
+        .ds-studio-body { display:grid; grid-template-columns:25% 75%; height:calc(100vh - 104px); overflow:hidden; gap:0; background:#e2e8f0; border-top:2px solid #e2e8f0; }
         @media(max-width:900px)  { .ds-studio-body { grid-template-columns:1fr; height:auto; overflow:visible; } }
 
         .ds-list-col     { background:#f8fafc; border-right:1px solid #e2e8f0; display:flex; flex-direction:column; overflow:hidden; }
@@ -942,7 +942,7 @@
         .ds-grid-card.completed-card { border-left:3px solid #22c55e; }
 
         /* Design Task Record page */
-        .dt-top-nav { background:#fff; border-bottom:1px solid #e2e8f0; position:sticky; top:96px; z-index:30; }
+        .dt-top-nav { background:#fff; border-bottom:1px solid #e2e8f0; position:sticky; top: 48px; z-index:30; }
         .dt-record-header { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:16px 24px 0; }
         .dt-countdown { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700; padding:4px 10px; border-radius:8px; background:#f1f5f9; color:#475569; }
         .dt-countdown.soon { background:rgba(249,115,22,0.12); color:#ea580c; }
@@ -1018,7 +1018,7 @@
         .ds-stage-badge.skipped        { background:rgba(34,197,94,0.08); color:#16a34a; border:1px dashed #86efac; }
 
         /* Activity feed panel */
-        .ds-feed-panel { background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:0; overflow:hidden; position:sticky; top:140px; }
+        .ds-feed-panel { background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:0; overflow:hidden; position:sticky; top: 92px; }
         .ds-feed-header { padding:14px 16px; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; background:#fff; }
         .ds-feed-header h3 { font-size:13px; font-weight:700; color:#0f172a; margin:0; }
         .ds-feed-list { max-height:calc(100vh - 250px); overflow-y:auto; }
@@ -1635,7 +1635,7 @@
         /* Left column: collapsible info card + sticky nav */
         .jr-left-col {
             display: flex; flex-direction: column; gap: 0;
-            position: sticky; top: 96px; align-self: start;
+            position: sticky; top: 48px; align-self: start;
         }
         .jr-left-col-inner { display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
         @media (max-width: 767px) { .jr-left-col { position: static; } }
@@ -1646,10 +1646,10 @@
 
         /* Right column: activity sidebar — light theme */
         .jr-activity-sidebar {
-            position: sticky; top: 96px;
+            position: sticky; top: 48px;
             background: #ffffff; border: 1px solid #e2e8f0;
             border-radius: 14px; display: flex; flex-direction: column;
-            max-height: calc(100vh - 94px); overflow: hidden;
+            max-height: calc(100vh - 46px); overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
         }
         .jr-activity-sidebar-header {
@@ -1867,26 +1867,10 @@
     <div id="main-app" class="hide">
         <!-- Header -->
         <header class="glass sticky top-0 z-40" style="border-bottom:1px solid #e2e8f0">
-            <!-- Top row: logo + user controls -->
-            <div class="px-6 md:px-10 lg:px-12 flex items-center justify-between" style="padding-top:12px;padding-bottom:10px">
-                <div class="flex items-center gap-3">
-                    <button onclick="showLaunchpad()" class="text-2xl font-bold text-brand-400 hover:text-brand-300">TeamwearOS</button>
-                    <div id="brand-selector" class="hide flex items-center gap-2">
-                        <select id="brand-select" onchange="switchBrand(this.value)" class="text-sm px-3 py-1 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#2563eb">
-                        </select>
-                        <button onclick="showCreateBrand()" class="text-brand-400 hover:text-brand-300 text-sm px-2">+ New</button>
-                    </div>
-                    <span id="brand-badge" class="bg-brand-500/20 text-brand-400 text-xs px-2 py-1 rounded-full"></span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <span id="user-role" class="text-purple-400 text-xs hide">SUPER ADMIN</span>
-                    <span id="user-email" class="text-gray-400 text-sm"></span>
-                    <button onclick="showProfileSettings()" class="text-gray-400 hover:text-white text-sm px-2 py-1 rounded-lg hover:bg-white/5 transition">⚙ Settings</button>
-                    <button onclick="handleLogout()" class="text-gray-400 hover:text-white text-sm">Logout</button>
-                </div>
-            </div>
-            <!-- Global section nav -->
-            <div id="global-nav" style="padding:8px 24px 10px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;border-top:1px solid #f1f5f9">
+            <!-- Single thin row: favicon + nav buttons + brand selector + user controls -->
+            <div id="global-nav" style="display:flex;align-items:center;gap:8px;padding:6px 16px;min-height:48px">
+                <!-- T-in-circle favicon: clicks to launchpad -->
+                <button onclick="showLaunchpad()" title="Launchpad" style="flex-shrink:0;width:30px;height:30px;border-radius:50%;background:#2563eb;color:#fff;font-size:14px;font-weight:800;border:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;letter-spacing:-0.5px">T</button>
                 <button class="gnav-btn" id="gnav-launchpad" onclick="showLaunchpad()">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     Launchpad
@@ -1919,6 +1903,19 @@
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                     Products
                 </button>
+                <!-- Right-aligned: brand selector + user controls -->
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                    <div id="brand-selector" class="hide" style="display:flex;align-items:center;gap:4px">
+                        <select id="brand-select" onchange="switchBrand(this.value)" class="text-sm px-2 py-1 rounded-lg" style="background:#f8fafc;border:1px solid #e2e8f0;color:#2563eb;font-size:12px">
+                        </select>
+                        <button onclick="showCreateBrand()" class="text-brand-400 hover:text-brand-300 text-xs px-1">+</button>
+                    </div>
+                    <span id="brand-badge" class="bg-brand-500/20 text-brand-400 text-xs px-2 py-1 rounded-full"></span>
+                    <span id="user-role" class="text-purple-400 text-xs hide">SUPER ADMIN</span>
+                    <span id="user-email" class="text-gray-400" style="font-size:11px"></span>
+                    <button onclick="showProfileSettings()" class="text-gray-400 hover:text-gray-700" style="font-size:12px;padding:4px 8px;border-radius:6px" title="Settings">⚙</button>
+                    <button onclick="handleLogout()" class="text-gray-400 hover:text-gray-700" style="font-size:11px">Logout</button>
+                </div>
             </div>
         </header>
 
@@ -2620,7 +2617,7 @@
         <!-- TOOL: Design Task Record -->
         <div id="tool-design-task" class="hide w-full">
             <!-- Sticky header: single slim bar + progress + stage tabs -->
-            <div class="dt-top-nav" style="position:sticky;top:96px;z-index:30;background:#fff;">
+            <div class="dt-top-nav" style="position:sticky;top: 48px;z-index:30;background:#fff;">
 
                 <!-- Identity elements kept hidden for JS compat — visual identity is shown in the record body -->
                 <div style="display:none">
@@ -2885,7 +2882,7 @@
         <!-- TOOL: Store Generator -->
         <div id="tool-generator" class="hide w-full">
             <!-- Sticky header -->
-            <div style="position:sticky;top:96px;z-index:30;background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;min-height:44px;display:flex;align-items:center;gap:12px">
+            <div style="position:sticky;top: 48px;z-index:30;background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;min-height:44px;display:flex;align-items:center;gap:12px">
                 <span style="font-size:13px;font-weight:700;color:#0f172a">Store Generator</span>
                 <div style="margin-left:auto;display:flex;gap:8px">
                     <button onclick="resetStoreGenerator()" style="padding:5px 14px;border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;color:#64748b;font-size:12px;font-weight:600;cursor:pointer">Reset</button>
@@ -5848,12 +5845,6 @@
                                     <input id="cdt-pan-accent" type="text" placeholder="e.g. 485 C" style="flex:1;padding:6px 9px;border:1.5px solid #e2e8f0;border-radius:7px;font-size:11px;font-family:monospace;outline:none;box-sizing:border-box;transition:border-color 0.15s" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0';_cdtColours.accent.pantone=this.value">
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Task Details -->
-                        <div>
-                            <label style="font-size:11px;color:#64748b;font-weight:600;display:block;margin-bottom:4px">Task Details</label>
-                            <textarea id="cdt-key-notes" placeholder="Free text notes about this task…" rows="2" style="width:100%;padding:8px 11px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;font-family:inherit;resize:vertical;outline:none;box-sizing:border-box;transition:border-color 0.15s;line-height:1.5" onfocus="this.style.borderColor='#00e5cc'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
                         </div>
 
                         <!-- Products Required -->
@@ -21248,7 +21239,7 @@
             try {
                 await loadBrandUsers();
                 // Reset all fields
-                ['cdt-name','cdt-team','cdt-season-event','cdt-sport','cdt-design-brief','cdt-key-notes'].forEach(id => {
+                ['cdt-name','cdt-team','cdt-season-event','cdt-sport','cdt-design-brief'].forEach(id => {
                     const el = document.getElementById(id); if (el) el.value = '';
                 });
                 const cdtDueDate = document.getElementById('cdt-due-date'); if (cdtDueDate) cdtDueDate.value = '';
@@ -21408,7 +21399,6 @@
             set('cdt-due-date', task.due_date);
             set('cdt-priority', task.priority || 'standard');
             set('cdt-design-brief', task.design_brief);
-            set('cdt-key-notes', task.key_notes);
             // Club + Job selects
             const clubSel = document.getElementById('cdt-club-id');
             if (clubSel && task.club_id) {
@@ -21846,7 +21836,6 @@
                     priority:     document.getElementById('cdt-priority')?.value || 'standard',
                     design_brief: document.getElementById('cdt-design-brief')?.value?.trim() || null,
                     custom_colours: (_cdtColours.primary.hex||_cdtColours.secondary.hex||_cdtColours.accent.hex||_cdtColours.primary.pantone||_cdtColours.secondary.pantone||_cdtColours.accent.pantone) ? _cdtColours : null,
-                    key_notes:    document.getElementById('cdt-key-notes')?.value?.trim() || null,
                     products_required: productsRequired,
                     factory_requirements: _cdtCollectFactoryReqs(),
                 };
@@ -23206,19 +23195,19 @@
                 <!-- 3-column body: Details+Brief | Products+Factory | NextAction+Activity -->
                 <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px 14px;overflow:hidden;box-sizing:border-box;min-height:0">
 
-                    <!-- LEFT: Task Details + Brief -->
+                    <!-- LEFT: Brief + Colours + Attachments -->
                     <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;padding-right:2px">
-                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px">
-                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Task Details</div>
-                            <div style="display:flex;flex-direction:column;gap:6px">
-                                ${hasColours ? `<div><div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">Brand Colours</div><div style="display:flex;flex-direction:column;gap:3px">${colourDots}</div></div>` : ''}
-                                ${notes ? `<div><div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">Notes</div><p style="font-size:11px;color:#374151;line-height:1.5;margin:0;white-space:pre-wrap">${escHtml(notes)}</p></div>` : ''}
-                                ${!hasColours && !notes ? `<div style="font-size:11px;color:#94a3b8;font-style:italic">No details set.</div>` : ''}
-                            </div>
-                        </div>
                         <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
                             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Brief</div>
                             ${brief ? `<p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>` : `<p style="font-size:11px;color:#94a3b8;font-style:italic;margin:0">No brief set.</p>`}
+                        </div>
+                        <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Brand Colours</div>
+                            ${hasColours ? `<div style="display:flex;flex-direction:column;gap:4px">${colourDots}</div>` : `<p style="font-size:11px;color:#94a3b8;font-style:italic;margin:0">No colours set.</p>`}
+                        </div>
+                        <div id="dsp-attachments-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Attachments</div>
+                            <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
                         </div>
                     </div>
 
@@ -23254,16 +23243,14 @@
                                     <p style="color:#94a3b8;font-size:12px;margin:0;padding:4px 0">Loading…</p>
                                 </div>
                             </div>
-                            <div class="dtr-activity-composer" style="flex-shrink:0;border-top:1px solid #f1f5f9;padding:8px 10px;background:#f8fafc">
-                                <div class="dtr-composer-tabs" style="display:flex;gap:4px;margin-bottom:6px">
+                            <div class="dtr-activity-composer" style="flex-shrink:0">
+                                <div class="dtr-composer-tabs">
                                     <button class="dsp-act-comment-btn act-tab-btn active" onclick="setDTInputType('comment')">+ Comment</button>
                                     <button class="dsp-act-task-btn act-tab-btn task-tab" onclick="setDTInputType('sub_task')">+ Sub-Task</button>
                                 </div>
-                                <div style="display:flex;gap:5px">
-                                    <input type="text" class="dsp-act-input dtr-composer-input" placeholder="Add a comment…" style="flex:1"
-                                        onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
-                                    <button onclick="addDesignTaskActivity()" class="dtr-composer-post-btn">Post</button>
-                                </div>
+                                <input type="text" class="dsp-act-input dtr-composer-input" placeholder="Add a comment…"
+                                    onkeydown="if(event.key==='Enter')addDesignTaskActivity()">
+                                <button onclick="addDesignTaskActivity()" class="dtr-composer-post-btn">Post</button>
                             </div>
                         </div>
                     </div>
@@ -23279,8 +23266,48 @@
             _loadPreviewPanelProducts(task.id, task.products_required || []);
             _loadPreviewPanelFactoryHandover(task);
             _loadPreviewPanelUploadsCount(task.id);
+            _loadPreviewPanelAttachments(task.id);
             // Use the shared loader so the preview activity feed mirrors the uploads page
             loadDesignTaskActivity(task.id);
+        }
+
+        async function _loadPreviewPanelAttachments(taskId) {
+            const el = document.getElementById(`dsp-attachments-${taskId}`);
+            if (!el) return;
+            const { data, error } = await supabase
+                .from('design_task_assets')
+                .select('id, file_name, file_url, file_type, file_size')
+                .eq('design_task_id', taskId)
+                .order('created_at', { ascending: false });
+            if (!document.getElementById(`dsp-attachments-${taskId}`)) return;
+            const header = '<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Attachments</div>';
+            if (error || !data?.length) {
+                el.innerHTML = header + '<p style="font-size:10px;color:#94a3b8;margin:0;font-style:italic">No attachments yet.</p>';
+                return;
+            }
+            const rows = data.map(f => {
+                const sizeStr = f.file_size ? (f.file_size > 1048576 ? (f.file_size/1048576).toFixed(1)+'MB' : Math.round(f.file_size/1024)+'KB') : '';
+                return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+                    <span style="font-size:11px;font-weight:600;color:#1e293b;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(f.file_name||'')}">${escHtml(f.file_name||'—')}</span>
+                    ${sizeStr ? `<span style="font-size:9px;color:#94a3b8;flex-shrink:0">${escHtml(sizeStr)}</span>` : ''}
+                    <a href="${escHtml(f.file_url)}" target="_blank" title="Download" style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#f1f5f9;color:#475569;text-decoration:none" onmouseover="this.style.background='#e0f2fe';this.style.color='#0369a1'" onmouseout="this.style.background='#f1f5f9';this.style.color='#475569'">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
+                    </a>
+                    <button onclick="_dspDeleteAttachment('${f.id}','${taskId}',event)" title="Delete" style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#fef2f2;color:#dc2626;border:none;cursor:pointer" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">
+                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 7h22M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3"/></svg>
+                    </button>
+                </div>`;
+            }).join('');
+            el.innerHTML = header + rows;
+        }
+
+        async function _dspDeleteAttachment(assetId, taskId, event) {
+            event?.stopPropagation();
+            if (!confirm('Delete this attachment?')) return;
+            const { error } = await supabase.from('design_task_assets').delete().eq('id', assetId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            showToast('Attachment deleted');
+            _loadPreviewPanelAttachments(taskId);
         }
 
         // Count active stage_uploads rows (concept/range/finalise) for a task
