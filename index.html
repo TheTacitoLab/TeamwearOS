@@ -3239,7 +3239,7 @@
                         <button class="btn-secondary text-sm" onclick="loadForecast()">Refresh</button>
                     </div>
                     <div id="factory-actions-stock" class="sh-actions hide">
-                        <button class="btn-secondary text-sm" id="factory-stock-share-btn" onclick="copyStockShareLink()">Share Stock View</button>
+                        <button class="btn-secondary text-sm" id="factory-stock-share-btn" onclick="copyFactoryShareLink()">Share Factory View</button>
                     </div>
                     <div id="factory-actions-development" class="sh-actions hide"></div>
                 </div>
@@ -7130,8 +7130,10 @@
                                     <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${f.status === 'archived' ? 'bg-gray-700 text-gray-400' : 'bg-green-500/10 text-green-400'}">${f.status === 'archived' ? 'Archived' : 'Active'}</span>
                                 </td>
                                 <td class="px-4 py-3 flex items-center gap-2">
+                                    <button onclick="event.stopPropagation();openFabricModal('${f.id}')"
+                                        class="text-xs text-orange-400 hover:text-orange-300 underline">Edit</button>
                                     <button onclick="event.stopPropagation();archiveFabric('${f.id}','${f.status === 'archived' ? 'active' : 'archived'}')"
-                                        class="text-xs text-gray-500 hover:text-gray-300 underline">${f.status === 'archived' ? 'Restore' : 'Archive'}</button>
+                                        class="text-xs text-gray-500 hover:text-gray-300 underline ml-1">${f.status === 'archived' ? 'Restore' : 'Archive'}</button>
                                     <button onclick="event.stopPropagation();deleteFabric('${f.id}')"
                                         class="text-xs text-red-600 hover:text-red-400 underline ml-1">Delete</button>
                                 </td>
@@ -7608,7 +7610,7 @@
             _stockForecastTotals = {};
             (_forecastRows || []).forEach(r => {
                 const key = `${r.fabric_id}::${r.colour_hex||''}`;
-                _stockForecastTotals[key] = { min_kg: r.min_kg, max_kg: r.max_kg, fabric_label: r.fabric_label, colour_hex: r.colour_hex, pantone_code: r.pantone_code };
+                _stockForecastTotals[key] = { fabric_id: r.fabric_id, min_kg: r.min_kg, max_kg: r.max_kg, fabric_label: r.fabric_label, colour_hex: r.colour_hex, pantone_code: r.pantone_code };
             });
 
             // Load existing stock records
@@ -7699,11 +7701,12 @@
             else _stockData.push({ brand_id: currentBrand.id, fabric_id: fabricId, colour_hex: colourHex||null, [field]: value });
         }
 
-        async function copyStockShareLink() {
+        async function copyFactoryShareLink() {
             if (!currentBrand) return;
             const { data: brandRow } = await supabase.from('brands').select('fabric_view_token').eq('id', currentBrand.id).single();
             if (!brandRow?.fabric_view_token) { showToast('No share token found', 'error'); return; }
-            const url = `${location.origin}/factory/stock.html?token=${brandRow.fabric_view_token}`;
+            const basePath = location.pathname.replace(/[^/]+$/, '');
+            const url = `${location.origin}${basePath}factory/view.html?token=${brandRow.fabric_view_token}`;
             try {
                 await navigator.clipboard.writeText(url);
                 showToast('Share link copied to clipboard');

@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Factory View</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+    body { background: #0f172a; color: #e2e8f0; font-family: system-ui, sans-serif; }
+    .glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
+    input[type="number"], input[type="date"] {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #e2e8f0;
+        border-radius: 0.5rem;
+        padding: 0.25rem 0.5rem;
+    }
+    input:focus { outline: 2px solid #f97316; outline-offset: 1px; }
+    .saved-flash { animation: flash 0.6s ease; }
+    @keyframes flash { 0%,100% { background: transparent; } 50% { background: rgba(249,115,22,0.15); } }
+    .tab-btn {
+        padding: 0.6rem 1.1rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #94a3b8;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+        background: transparent;
+    }
+    .tab-btn:hover { color: #e2e8f0; }
+    .tab-btn.active { color: #fb923c; border-bottom-color: #fb923c; }
+    .sort-chip {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #94a3b8;
+        cursor: pointer;
+        background: transparent;
+    }
+    .sort-chip.active { background: rgba(249,115,22,0.2); border-color: rgba(249,115,22,0.4); color: #fed7aa; }
+    .popup {
+        position: absolute;
+        z-index: 30;
+        left: 0; top: 1.75rem;
+        background: #0f172a;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        padding: 0.75rem;
+        min-width: 360px;
+    }
+</style>
+</head>
+<body class="min-h-screen p-6">
+
+<div id="app">
+    <div class="text-gray-400 text-center py-20">Loading…</div>
+</div>
+
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm font-medium hidden" style="background:#1e293b;border:1px solid rgba(255,255,255,0.1)"></div>
+
+<script type="module">
+    const { createClient } = supabase;
+    const SUPABASE_URL = 'https://odfpmwgwnyexuxqbusvi.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9kZnBtd2d3bnlleHV4cWJ1c3ZpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAzNzk5ODcsImV4cCI6MjA4NTk1NTk4N30.HWndMOL2InGTbE_Mb96qtcjgcyQPOhV8VnuX6AP_8eM';
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const params = new URLSearchParams(location.search);
+    const token = params.get('token');
+
+    let brand = null;
+    let allFabrics = [];
+    let stockData = [];
+    let forecastRows = [];
+    let activeTab = 'fabrics';
+    let forecastSort = 'date';
+
+    function showToast(msg) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        setTimeout(() => el.classList.add('hidden'), 2500);
+    }
+
+    function hexLuminance(hex) {
+        if (!hex || hex.length < 7) return 0.5;
+        const r = parseInt(hex.slice(1,3),16)/255;
+        const g = parseInt(hex.slice(3,5),16)/255;
+        const b = parseInt(hex.slice(5,7),16)/255;
+        const toLinear = c => c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4);
+        return 0.2126*toLinear(r) + 0.7152*toLinear(g) + 0.0722*toLinear(b);
+    }
+
+    function esc(str) {
+        const d = document.createElement('div');
+        d.textContent = (str == null ? '' : String(str));
+        return d.innerHTML;
+    }
+
+    function colourPill(hex, label) {
+        if (!hex) return '<span class="text-gray-600 text-xs">—</span>';
+        const textCol = hexLuminance(hex) > 0.4 ? '#1e293b' : '#f1f5f9';
+        return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded" style="background:${hex};color:${textCol}">${esc(label || hex)}</span>`;
+    }
+
+    async function init() {
+        const app = document.getElementById('app');
+        if (!token) {
+            app.innerHTML = '<div class="text-center py-20 text-red-400">Invalid link — no token provided.</div>';
+            return;
+        }
+
+        const { data: brandRow, error: brandErr } = await db
+            .from('brands')
+            .select('id, name, logo_url')
+            .eq('fabric_view_token', token)
+            .single();
+        if (brandErr || !brandRow) {
+            app.innerHTML = '<div class="text-center py-20 text-red-400">Link not found or expired.</div>';
+            return;
+        }
+        brand = brandRow;
+
+        const { data: fabrics } = await db.from('fabrics')
+            .select('id, fabric_name, construction, gsm, colour_options, notes, supplier, status')
+            .eq('brand_id', brand.id).eq('status','active').order('fabric_name');
+        allFabrics = fabrics || [];
+
+        const { data: stock } = await db.from('fabric_stock').select('*').eq('brand_id', brand.id);
+        stockData = stock || [];
+
+        await loadForecast();
+
+        renderShell();
+    }
+
+    async function loadForecast() {
+        const { data: clubs } = await db.from('clubs')
+            .select('id, name, number_of_players, fabric_forecast_enabled, fabric_forecast_due_date, fabric_forecast_min_pct')
+            .eq('brand_id', brand.id);
+        const clubIds = (clubs || []).map(c => c.id);
+        if (!clubIds.length) { forecastRows = []; return; }
+
+        const { data: clubProducts } = await db.from('club_products')
+            .select(`id, club_id, products(id, item_name, total_fabric_kg, product_fabric_recipes(fabric_id, allocation_pct, colour_hex, colour_pantone))`)
+            .in('club_id', clubIds);
+
+        const cpIds = (clubProducts || []).map(cp => cp.id);
+        const orderTotals = {};
+        if (cpIds.length) {
+            const { data: ositems } = await db.from('order_submission_items')
+                .select('club_product_id, quantity').in('club_product_id', cpIds);
+            (ositems || []).forEach(it => {
+                orderTotals[it.club_product_id] = (orderTotals[it.club_product_id]||0) + (it.quantity||0);
+            });
+        }
+
+        const clubMap = Object.fromEntries((clubs||[]).map(c => [c.id, c]));
+        const fmap = {};
+        (clubProducts||[]).forEach(cp => {
+            const club = clubMap[cp.club_id]; if (!club) return;
+            const p = cp.products; if (!p || !p.total_fabric_kg) return;
+            (p.product_fabric_recipes||[]).forEach(rec => {
+                const fab = allFabrics.find(f => f.id === rec.fabric_id); if (!fab) return;
+                const colourHex = rec.colour_hex || '';
+                const key = `${rec.fabric_id}::${colourHex}`;
+                if (!fmap[key]) {
+                    const parts = [fab.fabric_name];
+                    if (fab.construction) parts.push(fab.construction);
+                    if (fab.gsm) parts.push(fab.gsm + ' gsm');
+                    fmap[key] = {
+                        fabric_id: rec.fabric_id, fabric_name: fab.fabric_name,
+                        fabric_label: parts.join(' · '), colour_hex: colourHex,
+                        pantone_code: rec.colour_pantone || '',
+                        min_kg: 0, max_kg: 0, nearest_date: null,
+                        club_ids: new Set(), month_breakdown: {}
+                    };
+                }
+                const e = fmap[key];
+                const kgPerUnit = p.total_fabric_kg * (rec.allocation_pct/100);
+                if (club.fabric_forecast_enabled && club.number_of_players) {
+                    const minPct = club.fabric_forecast_min_pct ?? 20;
+                    e.min_kg += club.number_of_players * (minPct/100) * kgPerUnit;
+                    e.max_kg += club.number_of_players * kgPerUnit;
+                    e.club_ids.add(club.id);
+                    if (club.fabric_forecast_due_date) {
+                        const d = club.fabric_forecast_due_date;
+                        if (!e.nearest_date || d < e.nearest_date) e.nearest_date = d;
+                        const mk = d.slice(0,7);
+                        (e.month_breakdown[mk] = e.month_breakdown[mk]||[]).push({
+                            source: club.name, min_kg: club.number_of_players*(minPct/100)*kgPerUnit, max_kg: club.number_of_players*kgPerUnit
+                        });
+                    }
+                }
+                const units = orderTotals[cp.id] || 0;
+                if (units > 0) {
+                    e.max_kg += units * kgPerUnit;
+                    e.club_ids.add(club.id);
+                    const mk = new Date().toISOString().slice(0,7);
+                    (e.month_breakdown[mk] = e.month_breakdown[mk]||[]).push({
+                        source: `${club.name} (live order)`, min_kg: 0, max_kg: units*kgPerUnit
+                    });
+                }
+            });
+        });
+        forecastRows = Object.values(fmap).filter(r => r.max_kg > 0).map(r => ({
+            ...r, contributor_count: r.club_ids.size,
+            month_breakdown: Object.entries(r.month_breakdown).sort(([a],[b]) => a.localeCompare(b))
+                .flatMap(([m, items]) => items.map(it => ({
+                    month: new Date(m+'-01').toLocaleDateString('en-GB',{month:'short',year:'numeric'}),
+                    source: it.source, min_kg: it.min_kg, max_kg: it.max_kg
+                })))
+        }));
+    }
+
+    function renderShell() {
+        const app = document.getElementById('app');
+        app.innerHTML = `
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center gap-4 mb-6">
+                    ${brand.logo_url ? `<img src="${esc(brand.logo_url)}" class="h-12 w-12 rounded-xl object-contain" alt="">` : ''}
+                    <div>
+                        <h1 class="text-2xl font-bold">${esc(brand.name)} — Factory</h1>
+                        <p class="text-gray-400 text-sm">Shared factory view</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 border-b border-white/10 mb-6">
+                    <button class="tab-btn ${activeTab==='fabrics'?'active':''}" data-tab="fabrics">Fabric List</button>
+                    <button class="tab-btn ${activeTab==='forecast'?'active':''}" data-tab="forecast">Fabric Forecast</button>
+                    <button class="tab-btn ${activeTab==='stock'?'active':''}" data-tab="stock">Fabric Stock</button>
+                    <button class="tab-btn ${activeTab==='development'?'active':''}" data-tab="development">Product Development</button>
+                </div>
+                <div id="tab-content"></div>
+            </div>`;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => { activeTab = btn.dataset.tab; renderShell(); });
+        });
+        renderTab();
+    }
+
+    function renderTab() {
+        const el = document.getElementById('tab-content');
+        if (activeTab === 'fabrics') return renderFabrics(el);
+        if (activeTab === 'forecast') return renderForecast(el);
+        if (activeTab === 'stock') return renderStock(el);
+        if (activeTab === 'development') return renderDevelopment(el);
+    }
+
+    function renderFabrics(el) {
+        if (allFabrics.length === 0) {
+            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No fabrics configured.</div>';
+            return;
+        }
+        el.innerHTML = `
+            <div class="glass rounded-2xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                            <th class="text-left px-4 py-3">Fabric</th>
+                            <th class="text-left px-4 py-3">Construction</th>
+                            <th class="text-left px-4 py-3">GSM</th>
+                            <th class="text-left px-4 py-3">Colours</th>
+                            <th class="text-left px-4 py-3">Supplier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allFabrics.map(f => {
+                            const cols = Array.isArray(f.colour_options) ? f.colour_options : [];
+                            return `<tr class="border-b border-white/5 hover:bg-white/5">
+                                <td class="px-4 py-3 font-medium">${esc(f.fabric_name)}</td>
+                                <td class="px-4 py-3 text-gray-400">${esc(f.construction||'—')}</td>
+                                <td class="px-4 py-3 text-gray-400">${f.gsm ? f.gsm + ' gsm' : '—'}</td>
+                                <td class="px-4 py-3">${cols.length ? cols.slice(0,6).map(c => colourPill(c.hex, c.pantone_code)).join(' ') : '<span class="text-gray-600 text-xs">—</span>'}</td>
+                                <td class="px-4 py-3 text-gray-400">${esc(f.supplier||'—')}</td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-gray-600 mt-3">Read-only view — fabric records are managed by the brand.</p>`;
+    }
+
+    function renderForecast(el) {
+        const sortOptions = [
+            { key: 'date',   label: 'Nearest Deadline' },
+            { key: 'max_kg', label: 'Max KG ↓' },
+            { key: 'min_kg', label: 'Min KG ↓' },
+            { key: 'fabric', label: 'Fabric A→Z' },
+            { key: 'count',  label: 'Most Contributors ↓' }
+        ];
+        const sortBar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
+            <span class="text-xs text-gray-500 mr-1">Sort:</span>
+            ${sortOptions.map(s => `<button class="sort-chip ${forecastSort===s.key?'active':''}" data-sort="${s.key}">${s.label}</button>`).join('')}
+        </div>`;
+
+        if (forecastRows.length === 0) {
+            el.innerHTML = sortBar + '<div class="glass rounded-2xl p-10 text-center text-gray-500">No forecast data yet.</div>';
+            attachSortHandlers();
+            return;
+        }
+        const sorted = [...forecastRows];
+        if (forecastSort === 'date') sorted.sort((a,b) => (!a.nearest_date) - (!b.nearest_date) || (a.nearest_date||'').localeCompare(b.nearest_date||''));
+        else if (forecastSort === 'max_kg') sorted.sort((a,b) => b.max_kg - a.max_kg);
+        else if (forecastSort === 'min_kg') sorted.sort((a,b) => b.min_kg - a.min_kg);
+        else if (forecastSort === 'fabric') sorted.sort((a,b) => (a.fabric_name+(a.pantone_code||'')).localeCompare(b.fabric_name+(b.pantone_code||'')));
+        else if (forecastSort === 'count') sorted.sort((a,b) => b.contributor_count - a.contributor_count);
+
+        el.innerHTML = sortBar + `
+            <div class="glass rounded-2xl overflow-visible">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                            <th class="text-left px-4 py-3">Fabric · Colour</th>
+                            <th class="text-right px-4 py-3">Min kg</th>
+                            <th class="text-right px-4 py-3">Max kg</th>
+                            <th class="text-left px-4 py-3">Contributors</th>
+                            <th class="text-left px-4 py-3">Needed By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${sorted.map((r, i) => {
+                            const pill = r.colour_hex ? ' ' + colourPill(r.colour_hex, r.pantone_code) : '';
+                            const months = r.month_breakdown.length ? r.month_breakdown.map(m =>
+                                `<tr class="border-b border-white/5"><td class="px-3 py-1.5 text-gray-400 whitespace-nowrap">${esc(m.month)}</td><td class="px-3 py-1.5 text-gray-400">${esc(m.source)}</td><td class="px-3 py-1.5 text-right text-gray-400">${m.min_kg>0?m.min_kg.toFixed(2):'—'}</td><td class="px-3 py-1.5 text-right font-medium">${m.max_kg.toFixed(2)}</td></tr>`
+                            ).join('') : '<tr><td colspan="4" class="px-3 py-2 text-gray-500 text-xs">No dated entries</td></tr>';
+                            return `<tr class="border-b border-white/5 hover:bg-white/5">
+                                <td class="px-4 py-3 font-medium text-orange-300">${esc(r.fabric_label)}${pill}</td>
+                                <td class="px-4 py-3 text-right text-gray-400">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
+                                <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
+                                <td class="px-4 py-3 text-gray-400 text-xs">${r.contributor_count} club${r.contributor_count!==1?'s':''}</td>
+                                <td class="px-4 py-3">
+                                    <div class="relative inline-block">
+                                        <button class="popup-toggle text-xs px-2 py-1 rounded border border-white/10 text-gray-400 hover:text-white hover:border-white/30" data-idx="${i}">
+                                            ${r.nearest_date ? esc(r.nearest_date) : 'No date'} ▾
+                                        </button>
+                                        <div id="popup-${i}" class="popup hidden">
+                                            <p class="text-xs font-semibold text-gray-300 mb-2">Month-by-month breakdown</p>
+                                            <table class="w-full text-xs">
+                                                <thead><tr class="text-gray-500 border-b border-white/10"><th class="text-left px-3 py-1">Month</th><th class="text-left px-3 py-1">Source</th><th class="text-right px-3 py-1">Min kg</th><th class="text-right px-3 py-1">Max kg</th></tr></thead>
+                                                <tbody>${months}</tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+        attachSortHandlers();
+        document.querySelectorAll('.popup-toggle').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = btn.dataset.idx;
+                const all = document.querySelectorAll('[id^="popup-"]');
+                const target = document.getElementById(`popup-${idx}`);
+                const wasOpen = !target.classList.contains('hidden');
+                all.forEach(p => p.classList.add('hidden'));
+                if (!wasOpen) target.classList.remove('hidden');
+            });
+        });
+    }
+
+    function attachSortHandlers() {
+        document.querySelectorAll('.sort-chip').forEach(c => {
+            c.addEventListener('click', () => { forecastSort = c.dataset.sort; renderTab(); });
+        });
+    }
+
+    function renderStock(el) {
+        const stockMap = {};
+        stockData.forEach(s => { stockMap[`${s.fabric_id}::${s.colour_hex||''}`] = s; });
+
+        const rowMap = {};
+        forecastRows.forEach(r => {
+            rowMap[`${r.fabric_id}::${r.colour_hex||''}`] = {
+                fabric_id: r.fabric_id, fabric_label: r.fabric_label,
+                colour_hex: r.colour_hex, pantone_code: r.pantone_code,
+                min_kg: r.min_kg, max_kg: r.max_kg
+            };
+        });
+        allFabrics.forEach(f => {
+            const cols = Array.isArray(f.colour_options) ? f.colour_options : [];
+            const parts = [f.fabric_name];
+            if (f.construction) parts.push(f.construction);
+            if (f.gsm) parts.push(f.gsm + ' gsm');
+            const label = parts.join(' · ');
+            if (cols.length === 0) {
+                const k = `${f.id}::`;
+                if (!rowMap[k]) rowMap[k] = { fabric_id: f.id, fabric_label: label, colour_hex: '', pantone_code: '', min_kg: 0, max_kg: 0 };
+            } else {
+                cols.forEach(c => {
+                    const k = `${f.id}::${c.hex||''}`;
+                    if (!rowMap[k]) rowMap[k] = { fabric_id: f.id, fabric_label: label, colour_hex: c.hex||'', pantone_code: c.pantone_code||'', min_kg: 0, max_kg: 0 };
+                });
+            }
+        });
+
+        const rows = Object.values(rowMap);
+        if (rows.length === 0) {
+            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No stock rows yet.</div>';
+            return;
+        }
+
+        el.innerHTML = `
+            <div class="glass rounded-2xl overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                            <th class="text-left px-4 py-3">Fabric · Colour</th>
+                            <th class="text-right px-4 py-3">Annual Min kg</th>
+                            <th class="text-right px-4 py-3">Annual Max kg</th>
+                            <th class="text-right px-4 py-3">Live Stock (kg)</th>
+                            <th class="text-right px-4 py-3">KG Ordered</th>
+                            <th class="text-left px-4 py-3">Date Expected</th>
+                        </tr>
+                    </thead>
+                    <tbody id="stock-tbody">
+                        ${rows.map((r, i) => {
+                            const s = stockMap[`${r.fabric_id}::${r.colour_hex||''}`] || {};
+                            const pill = r.colour_hex ? ' ' + colourPill(r.colour_hex, r.pantone_code) : '';
+                            return `<tr id="row-${i}" class="border-b border-white/5 hover:bg-white/5">
+                                <td class="px-4 py-3 font-medium text-orange-300">${esc(r.fabric_label)}${pill}</td>
+                                <td class="px-4 py-3 text-right text-gray-400">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
+                                <td class="px-4 py-3 text-right text-gray-400">${r.max_kg > 0 ? r.max_kg.toFixed(2) : '—'}</td>
+                                <td class="px-4 py-3 text-right">
+                                    <input type="number" step="0.01" min="0" value="${s.live_stock_kg != null ? s.live_stock_kg : ''}" placeholder="0"
+                                        class="w-24 text-right" data-row="${i}" data-field="live_stock_kg"
+                                        data-fabric="${esc(r.fabric_id)}" data-colour="${esc(r.colour_hex||'')}" data-pantone="${esc(r.pantone_code||'')}">
+                                </td>
+                                <td class="px-4 py-3 text-right">
+                                    <input type="number" step="0.01" min="0" value="${s.kg_ordered != null ? s.kg_ordered : ''}" placeholder="—"
+                                        class="w-24 text-right" data-row="${i}" data-field="kg_ordered"
+                                        data-fabric="${esc(r.fabric_id)}" data-colour="${esc(r.colour_hex||'')}" data-pantone="${esc(r.pantone_code||'')}">
+                                </td>
+                                <td class="px-4 py-3">
+                                    <input type="date" value="${s.date_expected_in_stock||''}"
+                                        data-row="${i}" data-field="date_expected_in_stock"
+                                        data-fabric="${esc(r.fabric_id)}" data-colour="${esc(r.colour_hex||'')}" data-pantone="${esc(r.pantone_code||'')}">
+                                </td>
+                            </tr>`;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-xs text-gray-600 mt-3 text-center">Changes save automatically on leaving each field.</p>`;
+        document.querySelectorAll('#stock-tbody input').forEach(input => {
+            input.addEventListener('blur', handleStockEdit);
+        });
+    }
+
+    function renderDevelopment(el) {
+        el.innerHTML = '<div class="glass rounded-2xl p-10 text-center"><h3 class="font-semibold mb-2 text-gray-300">Product Development</h3><p class="text-gray-500">Coming soon.</p></div>';
+    }
+
+    async function handleStockEdit(e) {
+        const input = e.target;
+        const fabricId = input.dataset.fabric;
+        if (!fabricId || fabricId === 'undefined') { showToast('Save failed: missing fabric id'); return; }
+        const colourHex = input.dataset.colour || null;
+        const colourPantone = input.dataset.pantone || null;
+        const field = input.dataset.field;
+        let value = input.value;
+        if (field === 'date_expected_in_stock') {
+            value = value || null;
+        } else {
+            value = value !== '' ? parseFloat(value) : null;
+        }
+
+        const payload = {
+            brand_id: brand.id,
+            fabric_id: fabricId,
+            colour_hex: colourHex || null,
+            colour_pantone: colourPantone || null,
+            [field]: value,
+            updated_at: new Date().toISOString()
+        };
+        const { error } = await db.from('fabric_stock').upsert(payload, { onConflict: 'fabric_id,colour_hex' });
+
+        if (error) {
+            showToast('Save failed: ' + error.message);
+        } else {
+            const row = document.getElementById(`row-${input.dataset.row}`);
+            if (row) { row.classList.add('saved-flash'); setTimeout(() => row.classList.remove('saved-flash'), 700); }
+            const key = `${fabricId}::${colourHex||''}`;
+            const idx = stockData.findIndex(s => `${s.fabric_id}::${s.colour_hex||''}` === key);
+            if (idx !== -1) stockData[idx][field] = value;
+            else stockData.push({ brand_id: brand.id, fabric_id: fabricId, colour_hex: colourHex, colour_pantone: colourPantone, [field]: value });
+        }
+    }
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('[id^="popup-"]').forEach(p => p.classList.add('hidden'));
+    });
+
+    init();
+</script>
+</body>
+</html>
