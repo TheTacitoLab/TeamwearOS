@@ -2271,8 +2271,30 @@
                             <input type="number" id="prod-weight" placeholder="450" class="w-full px-3 py-2 rounded-lg">
                         </div>
                         <div>
-                            <label class="text-gray-400 text-sm mb-1 block">COGS (£)</label>
-                            <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-gray-400 text-sm">COGS (£)</label>
+                                <div class="flex rounded-lg overflow-hidden" style="border:1px solid #374151;font-size:10px">
+                                    <button id="cogs-mode-manual-btn" onclick="toggleCOGSFormulaMode(false)" class="px-2.5 py-1 font-semibold transition-colors" style="background:#374151;color:#d1d5db">Manual</button>
+                                    <button id="cogs-mode-formula-btn" onclick="toggleCOGSFormulaMode(true)" class="px-2.5 py-1 font-semibold transition-colors" style="background:transparent;color:#6b7280">Formula</button>
+                                </div>
+                            </div>
+                            <!-- Manual mode -->
+                            <div id="cogs-manual-wrap">
+                                <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
+                            </div>
+                            <!-- Formula mode -->
+                            <div id="cogs-formula-wrap" class="hide">
+                                <div class="mb-2">
+                                    <input type="number" step="0.01" min="0" id="prod-unit-cost" placeholder="Unit Cost e.g. 10.00" oninput="updateCOGSPreview()" class="w-full px-3 py-2 rounded-lg text-sm">
+                                </div>
+                                <div id="cogs-formula-preview" class="rounded-lg px-3 py-2 text-xs space-y-1" style="background:#111827;border:1px solid #1f2937">
+                                    <div class="flex justify-between" style="color:#9ca3af"><span>Unit Cost</span><span id="cogs-prev-unit">—</span></div>
+                                    <div class="flex justify-between" style="color:#9ca3af"><span>VAT (20%)</span><span id="cogs-prev-vat">—</span></div>
+                                    <div class="flex justify-between" style="color:#9ca3af"><span>Payment Fee</span><span id="cogs-prev-fee">—</span></div>
+                                    <div class="flex justify-between font-bold" style="color:#fff;border-top:1px solid #374151;padding-top:4px;margin-top:4px"><span>COGS</span><span id="cogs-prev-total">—</span></div>
+                                </div>
+                                <input type="hidden" id="prod-cogs-formula-value">
+                            </div>
                         </div>
                     </div>
                     <!-- Hidden legacy fit_type for backward compat -->
@@ -3222,7 +3244,30 @@
                 <button onclick="saveDesignSettings()" class="mt-4 btn-primary text-sm">Save Design Settings</button>
             </div>
 
-            <!-- SKU Format -->
+            <!-- COGS Formula Settings -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-1">COGS Formula Settings</h3>
+                <p class="text-gray-500 text-sm mb-4">Set the master formula for calculating Cost of Goods Sold on products. Each product can use this formula or have COGS entered manually.</p>
+                <div class="bg-gray-800/50 rounded-lg px-4 py-3 mb-4 text-sm">
+                    <span class="text-gray-400">Formula: </span>
+                    <span class="font-mono text-brand-300">Unit Cost + 20% VAT + Payment Fee = COGS</span>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Payment Fee (£ per item)</label>
+                        <input type="number" step="0.01" min="0" id="cogs-payment-fee" placeholder="0.30" class="w-full px-3 py-2 rounded-lg text-sm">
+                        <p class="text-gray-500 text-xs mt-1">Fixed fee added per item (e.g. payment processing)</p>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-2 block">New Products Default</label>
+                        <label class="flex items-center gap-3 cursor-pointer select-none">
+                            <input type="checkbox" id="cogs-formula-default-on" class="w-4 h-4 accent-brand-500">
+                            <span class="text-sm text-gray-300">Enable formula on new products by default</span>
+                        </label>
+                    </div>
+                </div>
+                <button onclick="saveCOGSSettings()" class="btn-primary text-sm">Save COGS Settings</button>
+            </div>
             <div class="glass rounded-2xl p-6 mb-6">
                 <h3 class="font-semibold mb-1">SKU Format</h3>
                 <p class="text-gray-500 text-sm mb-4">Define how product SKUs are structured for this brand. The club suffix and size are always appended automatically — configure the tokens and separators to match your brand's convention.</p>
@@ -6738,8 +6783,69 @@
             renderSalespeopleList();
             loadShopifyConfigUI();
             renderFeatureToggles();
-            // Load design studio settings (prefix input)
             if (typeof loadDesignSettings === 'function') loadDesignSettings();
+            loadCOGSSettings();
+        }
+
+        function loadCOGSSettings() {
+            if (!currentBrand) return;
+            const feeEl = document.getElementById('cogs-payment-fee');
+            const defEl = document.getElementById('cogs-formula-default-on');
+            if (feeEl) feeEl.value = currentBrand.cogs_payment_fee ?? 0;
+            if (defEl) defEl.checked = !!currentBrand.cogs_formula_default_on;
+        }
+
+        async function saveCOGSSettings() {
+            if (!currentBrand?.id) return;
+            const fee = parseFloat(document.getElementById('cogs-payment-fee')?.value) || 0;
+            const defOn = document.getElementById('cogs-formula-default-on')?.checked || false;
+            const { error } = await supabase.from('brands')
+                .update({ cogs_payment_fee: fee, cogs_formula_default_on: defOn })
+                .eq('id', currentBrand.id);
+            if (error) { showToast('Error saving COGS settings', 'error'); return; }
+            currentBrand.cogs_payment_fee = fee;
+            currentBrand.cogs_formula_default_on = defOn;
+            showToast('COGS settings saved ✓');
+        }
+
+        function toggleCOGSFormulaMode(useFormula) {
+            const manualWrap  = document.getElementById('cogs-manual-wrap');
+            const formulaWrap = document.getElementById('cogs-formula-wrap');
+            const manualBtn   = document.getElementById('cogs-mode-manual-btn');
+            const formulaBtn  = document.getElementById('cogs-mode-formula-btn');
+            if (!manualWrap || !formulaWrap) return;
+            if (useFormula) {
+                manualWrap.classList.add('hide');
+                formulaWrap.classList.remove('hide');
+                if (manualBtn)  { manualBtn.style.background = 'transparent'; manualBtn.style.color = '#6b7280'; }
+                if (formulaBtn) { formulaBtn.style.background = '#374151';    formulaBtn.style.color = '#d1d5db'; }
+                updateCOGSPreview();
+            } else {
+                manualWrap.classList.remove('hide');
+                formulaWrap.classList.add('hide');
+                if (manualBtn)  { manualBtn.style.background = '#374151'; manualBtn.style.color = '#d1d5db'; }
+                if (formulaBtn) { formulaBtn.style.background = 'transparent'; formulaBtn.style.color = '#6b7280'; }
+            }
+        }
+
+        function updateCOGSPreview() {
+            const unitCost = parseFloat(document.getElementById('prod-unit-cost')?.value) || 0;
+            const fee      = parseFloat(currentBrand?.cogs_payment_fee ?? 0);
+            const vat      = unitCost * 0.20;
+            const total    = unitCost + vat + fee;
+            const fmt = v => v > 0 ? `£${v.toFixed(2)}` : '—';
+            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+            setEl('cogs-prev-unit', fmt(unitCost));
+            setEl('cogs-prev-vat',  unitCost > 0 ? `£${vat.toFixed(2)}` : '—');
+            setEl('cogs-prev-fee',  fmt(fee));
+            setEl('cogs-prev-total', unitCost > 0 ? `£${total.toFixed(2)}` : '—');
+            const hiddenEl = document.getElementById('prod-cogs-formula-value');
+            if (hiddenEl) hiddenEl.value = unitCost > 0 ? total.toFixed(2) : '';
+        }
+
+        function _isCOGSFormulaMode() {
+            const formulaWrap = document.getElementById('cogs-formula-wrap');
+            return formulaWrap && !formulaWrap.classList.contains('hide');
         }
 
         function renderSalespeopleList() {
@@ -8071,6 +8177,9 @@
             });
             document.getElementById('prod-weight').value = '450';
             document.getElementById('prod-cogs').value = '';
+            const unitCostEl = document.getElementById('prod-unit-cost');
+            if (unitCostEl) unitCostEl.value = '';
+            toggleCOGSFormulaMode(!!currentBrand?.cogs_formula_default_on);
             const mto = document.getElementById('prod-made-to-order');
             if (mto) mto.checked = true;
 
@@ -8122,8 +8231,17 @@
             const patternCodeEl = document.getElementById('prod-pattern-code');
             if (patternCodeEl) patternCodeEl.value = product.pattern_code || '';
             document.getElementById('prod-weight').value      = product.weight_grams || 450;
-            document.getElementById('prod-cogs').value        = product.cogs || '';
             document.getElementById('prod-description').value = product.description || '';
+            // COGS formula toggle
+            const formulaOn = product.cogs_formula_enabled ?? !!currentBrand?.cogs_formula_default_on;
+            toggleCOGSFormulaMode(formulaOn);
+            if (formulaOn) {
+                const ucEl = document.getElementById('prod-unit-cost');
+                if (ucEl) ucEl.value = product.unit_cost || '';
+                updateCOGSPreview();
+            } else {
+                document.getElementById('prod-cogs').value = product.cogs || '';
+            }
 
             // Shopify fields
             populateTemplateSuffixSelect(product.shopify_template_suffix || '');
@@ -9103,7 +9221,11 @@
                 fit_type:      document.getElementById('prod-fit-type').value,
                 available_fits: availFits,
                 weight_grams:  parseInt(document.getElementById('prod-weight').value) || 450,
-                cogs:          parseFloat(document.getElementById('prod-cogs')?.value) || null,
+                cogs_formula_enabled: _isCOGSFormulaMode(),
+                unit_cost: _isCOGSFormulaMode() ? (parseFloat(document.getElementById('prod-unit-cost')?.value) || null) : null,
+                cogs: _isCOGSFormulaMode()
+                    ? (parseFloat(document.getElementById('prod-cogs-formula-value')?.value) || null)
+                    : (parseFloat(document.getElementById('prod-cogs')?.value) || null),
                 sizes:         document.getElementById('prod-sizes').value.trim(),
                 youth_sizes:   document.getElementById('prod-youth-sizes')?.value.trim() || null,
                 women_sizes:   document.getElementById('prod-women-sizes')?.value.trim() || null,
@@ -23162,6 +23284,68 @@
             content.innerHTML = _dtrBuildTabContent(tab, task, club, _dtrCachedAssets, _dtrCachedClubProds);
         }
 
+        function _refreshDTRStatusSection() {
+            const sec = document.getElementById('dtr-status-section');
+            if (!sec || !currentDesignTaskRecord) return;
+            const task = currentDesignTaskRecord;
+            const dropVal =
+                task.status === 'in_progress' && task.sub_stage === 'revisions' ? 'in_revisions' :
+                task.status === 'in_progress' ? 'in_progress' :
+                task.status === 'in_review'   ? 'in_review' :
+                task.status === 'completed'   ? 'completed' : 'new';
+            const subLbl = task.sub_stage && (typeof DS_SUBSTAGE_LABELS !== 'undefined') ? DS_SUBSTAGE_LABELS[task.sub_stage] : null;
+            const opts = [['new','New'],['in_progress','In Progress'],['in_revisions','In Revisions'],['in_review','In Review'],['completed','Completed']];
+            sec.innerHTML = `<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                <select onchange="setDTRStageFromDropdown(this.value)" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#0f172a;cursor:pointer;outline:none;appearance:auto">
+                    ${opts.map(([k,l])=>`<option value="${k}"${k===dropVal?' selected':''}>${l}</option>`).join('')}
+                </select>
+                ${subLbl ? `<span class="ds-substage-badge ds-substage-${task.sub_stage}">${subLbl}</span>` : ''}
+            </div>`;
+        }
+
+        async function setDTRStageFromDropdown(value) {
+            if (!currentDesignTaskRecord?.id) return;
+            const map = {
+                new:           { status: 'new',         sub_stage: null },
+                in_progress:   { status: 'in_progress', sub_stage: currentDesignTaskRecord.sub_stage === 'factory_handover' ? 'factory_handover' : 'in_design' },
+                in_revisions:  { status: 'in_progress', sub_stage: 'revisions' },
+                in_review:     { status: 'in_review',   sub_stage: currentDesignTaskRecord.sub_stage === 'awaiting_approval' ? 'awaiting_approval' : 'internal_review' },
+                completed:     { status: 'completed',   sub_stage: null }
+            };
+            const target = map[value];
+            if (!target) return;
+            const { error } = await supabase.from('design_tasks')
+                .update({ status: target.status, sub_stage: target.sub_stage })
+                .eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error updating status', 'error'); return; }
+            currentDesignTaskRecord.status    = target.status;
+            currentDesignTaskRecord.sub_stage = target.sub_stage;
+            const t = (allDesignTasks||[]).find(t => t.id === currentDesignTaskRecord.id);
+            if (t) { t.status = target.status; t.sub_stage = target.sub_stage; }
+            // Refresh just the status section
+            const sec = document.getElementById('dtr-status-section');
+            if (sec) {
+                const dropVal = value;
+                const subLbl  = target.sub_stage && (typeof DS_SUBSTAGE_LABELS !== 'undefined') ? DS_SUBSTAGE_LABELS[target.sub_stage] : null;
+                const opts = [['new','New'],['in_progress','In Progress'],['in_revisions','In Revisions'],['in_review','In Review'],['completed','Completed']];
+                sec.innerHTML = `<div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                    <select onchange="setDTRStageFromDropdown(this.value)" style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#0f172a;cursor:pointer;outline:none;appearance:auto">
+                        ${opts.map(([k,l])=>`<option value="${k}"${k===dropVal?' selected':''}>${l}</option>`).join('')}
+                    </select>
+                    ${subLbl ? `<span class="ds-substage-badge ds-substage-${target.sub_stage}">${subLbl}</span>` : ''}
+                </div>`;
+            }
+            // Update hidden badge
+            const badge = document.getElementById('dt-status-badge');
+            if (badge) {
+                const subLabel = target.sub_stage && DS_SUBSTAGE_LABELS?.[target.sub_stage] ? ` · ${DS_SUBSTAGE_LABELS[target.sub_stage]}` : '';
+                badge.textContent = (DS_STATUS_LABELS?.[target.status] || target.status) + subLabel;
+                badge.className = `badge design-status-${target.status} text-xs`;
+            }
+            renderDSDashboard();
+            showToast('Status updated');
+        }
+
         async function toggleDTREditMode() {
             _dtrEditMode = !_dtrEditMode;
             const btn = document.getElementById('dt-edit-btn');
@@ -23454,13 +23638,13 @@
                 return escHtml(designerName);
             })();
 
-            const roStatusLabel = (DS_STATUS_LABELS||{})[task.status||'new'] || 'Not Started';
-            const roStatusColors = {
-                new:'#64748b,#f1f5f9', in_progress:'#1d4ed8,#dbeafe', in_review:'#b45309,#fef3c7',
-                revisions:'#b45309,#fef3c7', factory_handover:'#0e7490,#ecfeff',
-                awaiting_approval:'#7c3aed,#f5f3ff', delivered:'#065f46,#d1fae5', completed:'#166534,#dcfce7',
-            }[task.status||'new'] || '#64748b,#f1f5f9';
-            const [roStatusFg, roStatusBg] = roStatusColors.split(',');
+            // Compute which dropdown option is selected based on status + sub_stage
+            const _dtrDropdownVal =
+                task.status === 'in_progress' && task.sub_stage === 'revisions' ? 'in_revisions' :
+                task.status === 'in_progress' ? 'in_progress' :
+                task.status === 'in_review'   ? 'in_review' :
+                task.status === 'completed'   ? 'completed' : 'new';
+            const _subLabel = task.sub_stage && (typeof DS_SUBSTAGE_LABELS !== 'undefined') ? DS_SUBSTAGE_LABELS[task.sub_stage] : null;
 
             return `
                 <!-- Club identity header -->
@@ -23477,9 +23661,19 @@
                     </div>
                 </div>
 
-                <!-- § Status badge -->
-                <div class="dtr-ro-section" style="padding-top:8px;padding-bottom:8px">
-                    <span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:${roStatusBg};color:${roStatusFg}">${escHtml(roStatusLabel)}</span>
+                <!-- § Status + Substage -->
+                <div class="dtr-ro-section" id="dtr-status-section" style="padding-top:8px;padding-bottom:8px">
+                    <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+                        <select onchange="setDTRStageFromDropdown(this.value)"
+                            style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#0f172a;cursor:pointer;outline:none;appearance:auto">
+                            <option value="new"          ${_dtrDropdownVal==='new'          ? 'selected' : ''}>New</option>
+                            <option value="in_progress"  ${_dtrDropdownVal==='in_progress'  ? 'selected' : ''}>In Progress</option>
+                            <option value="in_revisions" ${_dtrDropdownVal==='in_revisions' ? 'selected' : ''}>In Revisions</option>
+                            <option value="in_review"    ${_dtrDropdownVal==='in_review'    ? 'selected' : ''}>In Review</option>
+                            <option value="completed"    ${_dtrDropdownVal==='completed'    ? 'selected' : ''}>Completed</option>
+                        </select>
+                        ${_subLabel ? `<span class="ds-substage-badge ds-substage-${task.sub_stage}">${_subLabel}</span>` : ''}
+                    </div>
                 </div>
 
                 <!-- § Club + Linked Job -->
@@ -24694,6 +24888,7 @@
             if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
             await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Concepts' });
             showToast('Concepts delivered for review ✓');
+            _refreshDTRStatusSection();
             await _dtrRefreshConceptsStage();
         }
 
@@ -24760,7 +24955,7 @@
             showToast('Revision request sent ✓');
             if (textarea) textarea.value = '';
             document.getElementById(`dtr-revision-form-${stageId}`)?.classList.add('hide');
-
+            _refreshDTRStatusSection();
             // Reload activity
             if (currentDesignTaskRecord.id) loadDesignTaskActivity(currentDesignTaskRecord.id);
             await _dtrRefreshConceptsStage();
@@ -24894,6 +25089,7 @@
                 if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_delivered', { label });
             }
+            _refreshDTRStatusSection();
             await _dtrRefreshStagesCol();
         }
         async function dtrStageRevisions(stageId, stageNum) {
@@ -24906,6 +25102,7 @@
                 if (t) { t.status = 'in_progress'; t.sub_stage = 'revisions'; }
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'revisions_requested', {});
             }
+            _refreshDTRStatusSection();
             await _dtrRefreshStagesCol();
         }
         async function dtrCompleteStage(stageId, stageNum, label) {
@@ -25760,6 +25957,7 @@
             const t = (allDesignTasks||[]).find(t=>t.id===stage.task_id);
             if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
             await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: stage.stage_name });
+            _refreshDTRStatusSection();
             renderStageTabs();
             renderStagePanel(stageNum);
             showToast('Stage submitted for review — task moved to Review queue');
