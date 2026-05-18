@@ -374,6 +374,22 @@
         .sh-na-hist-text { font-size: 11px; color: #64748b; line-height: 1.4; }
         .sh-na-hist-date { font-size: 10px; color: #94a3b8; margin-top: 1px; }
         .sh-rev-badge { display: inline-block; padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 700; background: rgba(16,185,129,0.1); color: #059669; }
+        /* Dedicated Next Action card placed above the activity sidebar on each record */
+        .jr-right-col { display: flex; flex-direction: column; gap: 12px; position: sticky; top: 96px; align-self: start; max-height: calc(100vh - 94px); }
+        .next-action-card { background: #fffbeb; border: 1px solid #fde68a; border-left: 3px solid #d97706; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex-shrink: 0; }
+        .na-card-title { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #92400e; margin-bottom: 10px; }
+        .na-card-title .na-flag { color: #d97706; font-size: 13px; }
+        .na-open-block { background: #fff; border: 1px solid #fde68a; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+        .na-open-text { font-size: 13px; font-weight: 600; color: #1e293b; line-height: 1.4; margin-bottom: 6px; }
+        .na-open-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .na-empty-form .sh-na-input { margin-bottom: 6px; }
+        .na-prev-header { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin: 10px 0 6px; }
+        .na-prev-item { display: flex; gap: 8px; padding: 6px 8px; border-radius: 7px; background: rgba(148,163,184,0.08); margin-bottom: 4px; opacity: 0.7; }
+        .na-prev-check { color: #10b981; font-size: 12px; flex-shrink: 0; margin-top: 1px; font-weight: 700; }
+        .na-prev-text { font-size: 11px; color: #475569; line-height: 1.4; text-decoration: line-through; }
+        .na-prev-meta { font-size: 10px; color: #94a3b8; margin-top: 1px; }
+        /* Use jr-right-col with the existing activity sidebar; remove sticky from sidebar so wrapper is sticky */
+        .jr-right-col > .jr-activity-sidebar { position: static; top: auto; max-height: none; flex: 1; min-height: 0; }
         @media (max-width: 900px) {
             .sh-wrapper { flex-direction: column; height: auto; }
             .sh-left { flex: none; width: 100%; height: 55vh; border-right: none; border-bottom: 1px solid #e2e8f0; }
@@ -4024,8 +4040,8 @@
                             <span class="text-xs text-gray-600 block mb-1.5">Owner</span>
                             <div class="owner-dp dark" id="owner-dp-job"></div>
                         </div>
-                        <!-- Next Action -->
-                        <div id="jr-next-action" class="mt-3 pt-3 border-t border-gray-800"></div>
+                        <!-- Legacy Next Action slot (kept hidden for JS compatibility; primary card now above activity sidebar) -->
+                        <div id="jr-next-action" class="hide"></div>
                     </div>
                 </div>
 
@@ -4181,7 +4197,9 @@
                 </div><!-- /record-content -->
                 </div><!-- /jr-middle-col -->
 
-                <!-- ── Column 3: Activity & Comments sidebar ── -->
+                <!-- ── Column 3: Next Action card + Activity & Comments sidebar ── -->
+                <div class="jr-right-col">
+                <div class="next-action-card" id="job-next-action-card"></div>
                 <div class="jr-activity-sidebar">
                     <div class="jr-activity-sidebar-header">
                         <div class="flex items-center justify-between mb-2">
@@ -4209,6 +4227,7 @@
                         </div>
                     </div>
                 </div><!-- /jr-activity-sidebar -->
+                </div><!-- /jr-right-col -->
 
             </div><!-- /jr-three-col -->
         </div>
@@ -4925,7 +4944,9 @@
                 </div><!-- /record-content -->
                 </div><!-- /jr-middle-col -->
 
-                <!-- ── Column 3: Activity & Comments sidebar ── -->
+                <!-- ── Column 3: Next Action card + Activity & Comments sidebar ── -->
+                <div class="jr-right-col">
+                <div class="next-action-card" id="club-next-action-card"></div>
                 <div class="jr-activity-sidebar">
                     <div class="jr-activity-sidebar-header">
                         <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-0.5">Activity</h4>
@@ -4941,6 +4962,7 @@
                         </div>
                     </div>
                 </div><!-- /jr-activity-sidebar -->
+                </div><!-- /jr-right-col -->
 
             </div><!-- /2-col grid -->
         </div>
@@ -5031,7 +5053,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-4 mb-3">
                         <div>
-                            <label class="text-gray-400 text-xs mb-1 block">Salesperson *</label>
+                            <label class="text-gray-400 text-xs mb-1 block">Salesperson <span class="text-gray-600 font-normal">(Shopify CSV)</span> *</label>
                             <select id="club-salesperson-id" class="w-full px-3 py-2 rounded-lg text-sm">
                                 <option value="">Select salesperson...</option>
                             </select>
@@ -5040,6 +5062,10 @@
                             <label class="text-gray-400 text-xs mb-1 block">League</label>
                             <input type="text" id="club-league" placeholder="e.g. Southern Counties" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-gray-400 text-xs mb-1 block">Owner <span class="text-gray-600 font-normal">(TeamwearOS user(s) responsible)</span></label>
+                        <div class="owner-dp dark" id="owner-dp-club-modal"></div>
                     </div>
                     <div class="mb-3">
                         <label class="text-gray-400 text-xs mb-1 block">URL Slug <span class="text-gray-600">(auto-generated from Shopify collection)</span></label>
@@ -12751,6 +12777,11 @@
             if (fcEnabledEl) fcEnabledEl.checked = false;
             const suffixStatus = document.getElementById('suffix-status');
             if (suffixStatus) suffixStatus.textContent = '';
+            // Owner dropdown (empty for new club)
+            (async () => {
+                if (!brandUsers || brandUsers.length === 0) { try { await loadBrandUsers(); } catch(e){} }
+                renderOwnerDropdown('club-modal', []);
+            })();
             document.getElementById('create-club-modal').classList.remove('hide');
         }
 
@@ -13117,6 +13148,8 @@
             renderClubOverviewInfo();
             updateOverviewStats();
             renderClubTimeline(); // re-render with product data loaded
+            // Populate the dedicated Next Action card above the activity sidebar
+            if (currentClub?.id) loadNextActionCard('club', currentClub.id, 'club-next-action-card');
         }
 
         // Dynamic tier name/badge lookup (works with any brand tier)
@@ -15411,6 +15444,61 @@
         function _gtmLoadTarget() { return parseFloat(localStorage.getItem(_gtmTargetKey()) || '0') || 0; }
         function _gtmSaveTarget(val) { localStorage.setItem(_gtmTargetKey(), String(val)); }
 
+        // Aggregated next actions across job/club/design_task, filtered to current user (assigned OR created)
+        async function loadMyNextActions() {
+            if (!currentUser?.id || !currentBrand?.id) return [];
+            const me = currentUser.id;
+            const brandId = currentBrand.id;
+            const csFilter = `{"${me}"}`;
+            try {
+                const [jobsRes, tasksRes, clubsRes] = await Promise.all([
+                    supabase.from('jobs')
+                        .select('id, job_name, job_number, next_action, next_action_due_date, next_action_created_by, assigned_user_id, assigned_user_ids')
+                        .eq('brand_id', brandId).not('next_action','is',null)
+                        .or(`assigned_user_id.eq.${me},assigned_user_ids.cs.${csFilter},next_action_created_by.eq.${me}`),
+                    supabase.from('design_tasks')
+                        .select('id, task_name, task_ref, next_action, next_action_due_date, next_action_created_by, owner_ids')
+                        .eq('brand_id', brandId).not('next_action','is',null)
+                        .or(`owner_ids.cs.${csFilter},next_action_created_by.eq.${me}`),
+                    supabase.from('clubs')
+                        .select('id, name, next_action, next_action_due_date, next_action_created_by, assigned_user_id, assigned_user_ids')
+                        .eq('brand_id', brandId).not('next_action','is',null)
+                        .or(`assigned_user_id.eq.${me},assigned_user_ids.cs.${csFilter},next_action_created_by.eq.${me}`)
+                ]);
+                const rows = [];
+                (jobsRes.data || []).forEach(j => rows.push({
+                    type: 'job', recordId: j.id, recordName: j.job_name || j.job_number || 'Job',
+                    action_text: j.next_action, due_date: j.next_action_due_date
+                }));
+                (tasksRes.data || []).forEach(t => rows.push({
+                    type: 'design_task', recordId: t.id, recordName: t.task_name || t.task_ref || 'Design Task',
+                    action_text: t.next_action, due_date: t.next_action_due_date
+                }));
+                (clubsRes.data || []).forEach(c => rows.push({
+                    type: 'club', recordId: c.id, recordName: c.name || 'Club',
+                    action_text: c.next_action, due_date: c.next_action_due_date
+                }));
+                // Sort by due_date asc, nulls last
+                rows.sort((a,b) => {
+                    if (!a.due_date && !b.due_date) return 0;
+                    if (!a.due_date) return 1;
+                    if (!b.due_date) return -1;
+                    return a.due_date.localeCompare(b.due_date);
+                });
+                return rows;
+            } catch (e) { console.error('loadMyNextActions error:', e); return []; }
+        }
+
+        // Open the parent record from a Next Action GTM row
+        async function _gtmOpenNextActionRecord(type, recordId) {
+            if (!recordId) return;
+            try {
+                if (type === 'job' && typeof openJobRecord === 'function') return openJobRecord(recordId);
+                if (type === 'club' && typeof openClubDashboard === 'function') return openClubDashboard(recordId);
+                if (type === 'design_task' && typeof loadDesignTaskRecordV2 === 'function') return loadDesignTaskRecordV2(recordId);
+            } catch (e) { console.error('_gtmOpenNextActionRecord error:', e); }
+        }
+
         async function _renderGTMDashboard() {
             const panel = document.getElementById('sh-gtm-panel');
             if (!panel) return;
@@ -15461,36 +15549,8 @@
             const monthPct = yearlyTarget > 0 ? Math.min(Math.round((monthRev / (yearlyTarget/12)) * 100), 999) : null;
             const tgtColor = pct => pct === null ? '#94a3b8' : pct >= 100 ? '#059669' : pct >= 70 ? '#d97706' : '#ef4444';
 
-            // ── Activity feed from job_activity ──
-            const myJobIds = myJobs.map(j => j.id);
-            let activityItems = [];
-            try {
-                if (myJobIds.length) {
-                    let q = supabase.from('job_activity')
-                        .select('id, job_id, message, activity_type, task_completed, user_name, created_at')
-                        .in('job_id', myJobIds)
-                        .order('created_at', { ascending: false })
-                        .limit(60);
-                    if (_gtmFeedFilter === 'task')   q = q.eq('activity_type', 'task');
-                    if (_gtmFeedFilter === 'note')   q = q.eq('activity_type', 'note');
-                    if (_gtmFeedFilter === 'action') q = q.in('activity_type', ['next_action', 'next_action_complete']);
-                    const { data: actRows } = await q;
-                    activityItems = (actRows || []).map(a => ({
-                        ...a,
-                        jobName: myJobs.find(j => j.id === a.job_id)?.job_name || myJobs.find(j => j.id === a.job_id)?.job_number || 'Job'
-                    }));
-                }
-            } catch(e) { console.error('GTM activity error', e); }
-
-            // ── Activity type labels & colours ──
-            const actTypeInfo = {
-                note:                 { label: 'Note',     color: '#64748b' },
-                task:                 { label: 'Task',     color: '#7c3aed' },
-                next_action:          { label: 'Action',   color: '#d97706' },
-                next_action_complete: { label: 'Done',     color: '#059669' },
-                stage_change:         { label: 'Stage',    color: '#0369a1' },
-                comment:              { label: 'Comment',  color: '#0891b2' },
-            };
+            // ── Next Actions feed: open actions on records assigned to me OR created by me ──
+            const nextActions = await loadMyNextActions();
             function relTime(isoStr) {
                 const diff = Math.round((Date.now() - new Date(isoStr)) / 60000);
                 if (diff < 1)   return 'just now';
@@ -15498,20 +15558,30 @@
                 if (diff < 1440) return `${Math.round(diff/60)}h ago`;
                 return new Date(isoStr).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
             }
-            const feedHtml = activityItems.length ? activityItems.map(a => {
-                const info = actTypeInfo[a.activity_type] || { label: a.activity_type, color: '#94a3b8' };
-                const isDone = a.activity_type === 'next_action_complete' || (a.activity_type === 'task' && a.task_completed);
-                return `<div class="gtm-feed-item${isDone?' done':''}">
-                    <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.04)">
-                        <span style="flex-shrink:0;margin-top:2px;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;background:${info.color}22;color:${info.color};letter-spacing:0.3px;text-transform:uppercase">${info.label}</span>
+            function fmtDueDate(d) {
+                if (!d) return '';
+                const dueDate = new Date(d + 'T00:00:00');
+                const today = new Date(); today.setHours(0,0,0,0);
+                const overdue = dueDate < today;
+                const txt = dueDate.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+                return `<span style="font-size:10px;font-weight:700;color:${overdue?'#dc2626':'#92400e'}">${overdue?'⚠ ':''}Due ${txt}</span>`;
+            }
+            const typeLabels = { job: 'Job', club: 'Club', design_task: 'Design Task' };
+            const typeColors = { job: '#0369a1', club: '#7c3aed', design_task: '#d97706' };
+            const feedHtml = nextActions.length ? nextActions.map(a => {
+                const color = typeColors[a.type] || '#64748b';
+                return `<div class="gtm-feed-item" style="cursor:pointer" onclick="_gtmOpenNextActionRecord('${a.type}','${a.recordId}')">
+                    <div style="display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04)">
+                        <span style="flex-shrink:0;margin-top:2px;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;background:${color}22;color:${color};letter-spacing:0.3px;text-transform:uppercase">${typeLabels[a.type]||a.type}</span>
                         <div style="flex:1;min-width:0">
-                            <div class="gtm-feed-job" style="font-size:10px;color:#94a3b8;margin-bottom:2px">${escHtml(a.jobName)}</div>
-                            <div class="gtm-feed-text" style="${isDone?'text-decoration:line-through;color:#64748b':''}">${escHtml(a.message||'')}</div>
-                            <div class="gtm-feed-meta" style="margin-top:3px">${escHtml(a.user_name||'')} · ${relTime(a.created_at)}</div>
+                            <div class="gtm-feed-job" style="font-size:10px;color:#94a3b8;margin-bottom:2px">${escHtml(a.recordName)}</div>
+                            <div class="gtm-feed-text" style="font-weight:600">${escHtml(a.action_text)}</div>
+                            <div class="gtm-feed-meta" style="margin-top:3px;display:flex;gap:8px;align-items:center">${fmtDueDate(a.due_date)}</div>
                         </div>
+                        <button class="sh-na-complete-btn" style="flex-shrink:0" onclick="event.stopPropagation();completeNextAction('${a.type}','${a.recordId}').then(()=>_renderGTMDashboard())">✓</button>
                     </div>
                 </div>`;
-            }).join('') : `<p style="font-size:12px;color:#94a3b8;padding:16px 14px;margin:0">No activity yet.</p>`;
+            }).join('') : `<p style="font-size:12px;color:#94a3b8;padding:16px 14px;margin:0">No open next actions — set one from any record.</p>`;
 
             // ── Notes for selected date ──
             const allNotes = _gtmLoadNotes();
@@ -15560,16 +15630,11 @@
 
                 <!-- 3-column body -->
                 <div class="gtm-body">
-                    <!-- Col 1: Activity Feed -->
+                    <!-- Col 1: Next Actions -->
                     <div class="gtm-card">
                         <div class="gtm-card-hdr">
-                            <span class="gtm-card-title">Activity Feed</span>
-                            <div class="gtm-feed-toggle">
-                                <button class="gtm-feed-btn${_gtmFeedFilter==='all'?' active':''}"    onclick="_gtmFeedFilter='all';_renderGTMDashboard()">All</button>
-                                <button class="gtm-feed-btn${_gtmFeedFilter==='task'?' active':''}"   onclick="_gtmFeedFilter='task';_renderGTMDashboard()">Tasks</button>
-                                <button class="gtm-feed-btn${_gtmFeedFilter==='note'?' active':''}"   onclick="_gtmFeedFilter='note';_renderGTMDashboard()">Notes</button>
-                                <button class="gtm-feed-btn${_gtmFeedFilter==='action'?' active':''}" onclick="_gtmFeedFilter='action';_renderGTMDashboard()">Actions</button>
-                            </div>
+                            <span class="gtm-card-title">Next Actions <span style="font-size:10px;color:#94a3b8;font-weight:500;margin-left:6px">(${nextActions.length})</span></span>
+                            <button onclick="_renderGTMDashboard()" class="sh-action-btn" style="font-size:10px;padding:3px 8px">Refresh</button>
                         </div>
                         <div class="gtm-card-scroll" id="gtm-feed-list" style="padding:0">${feedHtml}</div>
                     </div>
@@ -15599,6 +15664,7 @@
                         <div class="gtm-list-toggle">
                             <button id="gtm-list-btn-todo"    class="gtm-list-btn${_gtmActiveList==='todo'?' active':''}"    onclick="gtmSwitchList('todo')">To-Do</button>
                             <button id="gtm-list-btn-project" class="gtm-list-btn${_gtmActiveList==='project'?' active':''}" onclick="gtmSwitchList('project')">Projects</button>
+                            <button id="gtm-list-btn-next"    class="gtm-list-btn${_gtmActiveList==='next'?' active':''}"    onclick="gtmSwitchList('next')">Next Tasks</button>
                         </div>
                         <div class="gtm-todo-add">
                             <input id="gtm-todo-input" class="gtm-todo-input" placeholder="Add item…" onkeydown="if(event.key==='Enter')gtmAddTodo()">
@@ -15609,6 +15675,28 @@
         }
 
         function _gtmBuildTodoList() {
+            // "Next Tasks" tab: top 3 must-do / top-3 items across all lists (filters localStorage To-Do)
+            if (_gtmActiveList === 'next') {
+                const all = _gtmLoadTodos();
+                const next = all
+                    .filter(t => !t.completed && (t.priority === 'mustdo' || t.priority === 'top3'))
+                    .sort((a,b) => (a.priority === 'mustdo' ? 0 : 1) - (b.priority === 'mustdo' ? 0 : 1))
+                    .slice(0, 3);
+                if (!next.length) return `<p style="font-size:12px;color:#94a3b8;padding:12px 16px;margin:0">No top priority tasks. Mark a to-do as Top 3 or Must Do to see it here.</p>`;
+                return next.map(t => {
+                    const p = t.priority || 'normal';
+                    return `<div class="gtm-todo-item">
+                        <div class="gtm-priority-dot ${p}"></div>
+                        <div style="flex:1;min-width:0">
+                            <div class="gtm-todo-title">${escHtml(t.title)}</div>
+                            <div class="gtm-todo-meta">
+                                <span style="font-size:9px;font-weight:800;color:${p==='mustdo'?'#dc2626':'#059669'};text-transform:uppercase;letter-spacing:0.4px">${p==='mustdo'?'Must Do':'Top 3'}</span>
+                                <button onclick="gtmToggleTodoDone('${t.id}')" class="gtm-todo-btn">Done</button>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
             const todos = _gtmLoadTodos().filter(t => t.type === _gtmActiveList);
             if (!todos.length) return `<p style="font-size:12px;color:#94a3b8;padding:12px 16px;margin:0">No ${_gtmActiveList === 'todo' ? 'to-dos' : 'projects'} yet.</p>`;
             // Sort: mustdo first, then top3, then normal; completed last
@@ -15646,6 +15734,10 @@
             _gtmActiveList = type;
             document.getElementById('gtm-list-btn-todo')?.classList.toggle('active', type === 'todo');
             document.getElementById('gtm-list-btn-project')?.classList.toggle('active', type === 'project');
+            document.getElementById('gtm-list-btn-next')?.classList.toggle('active', type === 'next');
+            // Next Tasks is read-only — hide the Add input
+            const addWrap = document.querySelector('.gtm-todo-add');
+            if (addWrap) addWrap.style.display = type === 'next' ? 'none' : '';
             const list = document.getElementById('gtm-todo-list');
             if (list) list.innerHTML = _gtmBuildTodoList();
         }
@@ -15654,6 +15746,7 @@
             const inp = document.getElementById('gtm-todo-input');
             const title = (inp?.value || '').trim();
             if (!title) { inp?.focus(); return; }
+            if (_gtmActiveList === 'next') { showToast('Switch to To-Do or Projects to add items', 'info'); return; }
             const todos = _gtmLoadTodos();
             todos.push({ id: _gtmUid(), title, type: _gtmActiveList, priority: 'normal', completed: false, subtasks: [], created_at: new Date().toISOString() });
             _gtmSaveTodos(todos);
@@ -16149,78 +16242,209 @@
             </div>`;
         }
 
-        // Shared helper: build next-action section HTML (used in both preview + job record card)
+        // ── Next Action: generic across job / club / design_task ──
+        const NA_TYPES = {
+            job:         { table: 'jobs',         activityTable: 'job_activity',         parentField: 'job_id',         nameField: 'job_name'  },
+            club:        { table: 'clubs',        activityTable: 'club_activity',        parentField: 'club_id',        nameField: 'name'      },
+            design_task: { table: 'design_tasks', activityTable: 'design_task_activity', parentField: 'design_task_id', nameField: 'task_name' }
+        };
+
+        // Build the compact next-action form (used by job preview pane) — open + simple history dropdown
         function _buildNextActionHtml(job) {
             const hasAction = !!job.next_action;
             const dueDate = job.next_action_due_date;
             const dueFmt = dueDate ? new Date(dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : null;
-            const isOverdue = dueDate && new Date(dueDate) < new Date() && !job.next_action_completed;
+            const isOverdue = dueDate && new Date(dueDate) < new Date();
             return `<div class="sh-na-section">
                 <div class="sh-section-title" style="color:#92400e">Next Action</div>
                 ${hasAction ? `
                     <div class="sh-na-current">${escHtml(job.next_action)}</div>
                     ${dueFmt ? `<div class="sh-na-due" style="${isOverdue ? 'color:#dc2626;font-weight:700' : ''}">Due: ${dueFmt}${isOverdue ? ' ⚠ Overdue' : ''}</div>` : ''}
-                    <button class="sh-na-complete-btn" onclick="completeNextAction('${job.id}')">✓ Mark Complete</button>
+                    <button class="sh-na-complete-btn" onclick="completeNextAction('job','${job.id}')">✓ Mark Complete</button>
                     <hr style="border:none;border-top:1px solid #fde68a;margin:10px 0">
                 ` : ''}
                 <div class="sh-na-form">
                     <input class="sh-na-input" id="sh-na-text-${job.id}" placeholder="${hasAction ? 'Update action…' : 'Add next action…'}" value="${hasAction ? escHtml(job.next_action) : ''}">
                     <div style="display:flex;gap:6px;align-items:center">
                         <input type="date" class="sh-na-date" id="sh-na-date-${job.id}" value="${dueDate || ''}">
-                        <button class="sh-na-save-btn" onclick="saveNextAction('${job.id}')">Save</button>
+                        <button class="sh-na-save-btn" onclick="saveNextAction('job','${job.id}')">Save</button>
                     </div>
                 </div>
             </div>`;
         }
 
-        // Shared helper: render next action in job record left card (interactive)
+        // Build the dedicated Next Action CARD shown above the activity sidebar on each record.
+        // type: 'job' | 'club' | 'design_task'; record must include next_action, next_action_due_date, next_action_history
+        function naCardHtml(type, record) {
+            if (!record) return '';
+            const id = record.id;
+            const hasAction = !!record.next_action;
+            const dueDate = record.next_action_due_date;
+            const dueFmt = dueDate ? new Date(dueDate + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : null;
+            const isOverdue = dueDate && new Date(dueDate) < new Date();
+            const hist = Array.isArray(record.next_action_history) ? record.next_action_history : [];
+            const prevHtml = hist.length ? `
+                <div class="na-prev-header">Previous actions (${hist.length})</div>
+                ${hist.slice().reverse().map(h => {
+                    const txt = h.action_text || h.action || h.text || '';
+                    const completedAt = h.completed_at ? new Date(h.completed_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '';
+                    const by = h.completed_by_name ? ` by ${escHtml(h.completed_by_name)}` : '';
+                    const wasDue = h.due_date ? ` · due ${new Date(h.due_date+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}` : '';
+                    return `<div class="na-prev-item"><span class="na-prev-check">✓</span><div style="flex:1;min-width:0"><div class="na-prev-text">${escHtml(txt)}</div><div class="na-prev-meta">Completed ${completedAt}${by}${wasDue}</div></div></div>`;
+                }).join('')}` : '';
+
+            return `<div class="next-action-card" id="na-card-${type}-${id}">
+                <div class="na-card-title"><span class="na-flag">⚑</span>Next Action</div>
+                ${hasAction ? `
+                    <div class="na-open-block">
+                        <div class="na-open-text">${escHtml(record.next_action)}</div>
+                        <div class="na-open-row">
+                            <label style="font-size:11px;color:#92400e;font-weight:700">Date Required:</label>
+                            <input type="date" class="sh-na-date" id="na-date-${type}-${id}" value="${dueDate || ''}" style="max-width:150px"
+                                onchange="naUpdateDate('${type}','${id}',this.value)">
+                            ${isOverdue ? '<span style="font-size:10px;color:#dc2626;font-weight:700">⚠ Overdue</span>' : ''}
+                            <span style="flex:1"></span>
+                            <button class="sh-na-complete-btn" onclick="completeNextAction('${type}','${id}')">✓ Complete</button>
+                        </div>
+                    </div>` : `
+                    <div class="na-empty-form">
+                        <input class="sh-na-input" id="na-text-${type}-${id}" placeholder="Set the next action…">
+                        <div style="display:flex;gap:6px;align-items:center">
+                            <label style="font-size:11px;color:#92400e;font-weight:700">Date Required:</label>
+                            <input type="date" class="sh-na-date" id="na-date-${type}-${id}" style="max-width:150px">
+                            <button class="sh-na-save-btn" onclick="saveNextAction('${type}','${id}')">Save</button>
+                        </div>
+                    </div>`}
+                ${prevHtml}
+            </div>`;
+        }
+
+        // Render the dedicated Next Action card into a container.
+        async function loadNextActionCard(type, recordId, containerId) {
+            const cfg = NA_TYPES[type]; if (!cfg) return;
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const { data: row, error } = await supabase.from(cfg.table)
+                .select('id, next_action, next_action_due_date, next_action_created_by, next_action_history')
+                .eq('id', recordId).single();
+            if (error) { container.innerHTML = ''; return; }
+            container.innerHTML = naCardHtml(type, row || { id: recordId });
+        }
+
+        // Legacy helper: render in job record card if container exists (currently moved to right col)
         function _renderJobNextAction(container, job) {
             if (!container) return;
             if (!job) { container.innerHTML = ''; return; }
             container.innerHTML = _buildNextActionHtml(job);
         }
 
-        async function saveNextAction(jobId) {
-            const textEl  = document.getElementById(`sh-na-text-${jobId}`);
-            const dateEl  = document.getElementById(`sh-na-date-${jobId}`);
+        async function saveNextAction(type, recordId) {
+            const cfg = NA_TYPES[type]; if (!cfg) return;
+            // Pick up text from either the dedicated card form OR the legacy preview form (which uses id `sh-na-text-${recordId}`)
+            let textEl = document.getElementById(`na-text-${type}-${recordId}`);
+            let dateEl = document.getElementById(`na-date-${type}-${recordId}`);
+            if (!textEl) textEl = document.getElementById(`sh-na-text-${recordId}`);
+            if (!dateEl) dateEl = document.getElementById(`sh-na-date-${recordId}`);
             const actionText = textEl?.value.trim();
             if (!actionText) { showToast('Please enter an action', 'error'); return; }
             const dueDate = dateEl?.value || null;
-            const { error } = await supabase.from('jobs').update({
+            const { error } = await supabase.from(cfg.table).update({
                 next_action: actionText,
-                next_action_due_date: dueDate
-            }).eq('id', jobId);
+                next_action_due_date: dueDate,
+                next_action_created_by: currentUser?.id || null
+            }).eq('id', recordId);
             if (error) { showToast('Error: ' + error.message, 'error'); return; }
-            const job = jobs.find(j => j.id === jobId);
-            if (job) { job.next_action = actionText; job.next_action_due_date = dueDate; }
-            // Update job record left card if open
-            if (currentJob?.id === jobId) { currentJob.next_action = actionText; currentJob.next_action_due_date = dueDate; _renderJobNextAction(document.getElementById('jr-next-action'), currentJob); }
+            // Update local cache (jobs only — other types refresh from DB on next open)
+            if (type === 'job') {
+                const job = jobs.find(j => j.id === recordId);
+                if (job) { job.next_action = actionText; job.next_action_due_date = dueDate; job.next_action_created_by = currentUser?.id; }
+                if (currentJob?.id === recordId) { currentJob.next_action = actionText; currentJob.next_action_due_date = dueDate; }
+            }
+            // Log to activity feed (homepage feed picks this up automatically)
+            supabase.from(cfg.activityTable).insert({
+                [cfg.parentField]: recordId,
+                brand_id: currentBrand?.id,
+                user_id: currentUser?.id,
+                user_name: userDisplayName(currentUserProfile),
+                message: `Next action: ${actionText}${dueDate ? ` (due ${dueDate})` : ''}`,
+                activity_type: 'next_action',
+                task_completed: false
+            }).then(() => {});
+            // Re-render whichever cards are mounted
+            await loadNextActionCard(type, recordId, `${type === 'job' ? 'job' : (type === 'club' ? 'club' : 'design-task')}-next-action-card`);
+            // Job preview (sales hub) refresh
+            if (type === 'job') {
+                const preview = document.getElementById('sh-preview');
+                if (preview && !preview.classList.contains('hide') && typeof _shSelectedId !== 'undefined' && _shSelectedId === recordId) _renderJobPreview(preview, recordId);
+                // Legacy slot
+                const legacy = document.getElementById('jr-next-action');
+                if (legacy && currentJob?.id === recordId) _renderJobNextAction(legacy, currentJob);
+            }
             showToast('Next action saved', 'success');
-            // Log to activity feed
-            supabase.from('job_activity').insert({ job_id: jobId, brand_id: currentBrand?.id, user_id: currentUser?.id, user_name: userDisplayName(currentUserProfile), message: `Next action: ${actionText}`, activity_type: 'next_action', task_completed: false }).then(() => {});
-            // Re-render preview
-            const preview = document.getElementById('sh-preview');
-            if (preview && !preview.classList.contains('hide') && _shSelectedId === jobId) _renderJobPreview(preview, jobId);
         }
 
-        async function completeNextAction(jobId) {
-            const job = jobs.find(j => j.id === jobId);
-            if (!job?.next_action) return;
-            const histItem = { action: job.next_action, due_date: job.next_action_due_date || null, completed_at: new Date().toISOString() };
-            const history  = Array.isArray(job.next_action_history) ? [...job.next_action_history, histItem] : [histItem];
-            const { error } = await supabase.from('jobs').update({
+        async function completeNextAction(type, recordId) {
+            const cfg = NA_TYPES[type]; if (!cfg) return;
+            // Fetch current open action
+            const { data: row, error: fetchErr } = await supabase.from(cfg.table)
+                .select('next_action, next_action_due_date, next_action_created_by, next_action_history')
+                .eq('id', recordId).single();
+            if (fetchErr || !row?.next_action) return;
+            const histItem = {
+                action_text: row.next_action,
+                due_date: row.next_action_due_date || null,
+                completed_at: new Date().toISOString(),
+                completed_by: currentUser?.id || null,
+                completed_by_name: userDisplayName(currentUserProfile) || null,
+                created_by: row.next_action_created_by || null
+            };
+            const history = Array.isArray(row.next_action_history) ? [...row.next_action_history, histItem] : [histItem];
+            const { error } = await supabase.from(cfg.table).update({
                 next_action: null,
                 next_action_due_date: null,
+                next_action_created_by: null,
                 next_action_history: history
-            }).eq('id', jobId);
+            }).eq('id', recordId);
             if (error) { showToast('Error: ' + error.message, 'error'); return; }
-            job.next_action = null; job.next_action_due_date = null; job.next_action_history = history;
-            if (currentJob?.id === jobId) { Object.assign(currentJob, { next_action: null, next_action_due_date: null, next_action_history: history }); _renderJobNextAction(document.getElementById('jr-next-action'), currentJob); }
+            // Update local cache (jobs only)
+            if (type === 'job') {
+                const job = jobs.find(j => j.id === recordId);
+                if (job) Object.assign(job, { next_action: null, next_action_due_date: null, next_action_created_by: null, next_action_history: history });
+                if (currentJob?.id === recordId) Object.assign(currentJob, { next_action: null, next_action_due_date: null, next_action_created_by: null, next_action_history: history });
+            }
+            // Activity feed
+            supabase.from(cfg.activityTable).insert({
+                [cfg.parentField]: recordId,
+                brand_id: currentBrand?.id,
+                user_id: currentUser?.id,
+                user_name: userDisplayName(currentUserProfile),
+                message: `Completed: ${histItem.action_text}`,
+                activity_type: 'next_action_complete',
+                task_completed: true
+            }).then(() => {});
+            await loadNextActionCard(type, recordId, `${type === 'job' ? 'job' : (type === 'club' ? 'club' : 'design-task')}-next-action-card`);
+            if (type === 'job') {
+                const preview = document.getElementById('sh-preview');
+                if (preview && !preview.classList.contains('hide') && typeof _shSelectedId !== 'undefined' && _shSelectedId === recordId) _renderJobPreview(preview, recordId);
+                const legacy = document.getElementById('jr-next-action');
+                if (legacy && currentJob?.id === recordId) _renderJobNextAction(legacy, currentJob);
+            }
             showToast('Action marked complete ✓', 'success');
-            // Log to activity feed
-            supabase.from('job_activity').insert({ job_id: jobId, brand_id: currentBrand?.id, user_id: currentUser?.id, user_name: userDisplayName(currentUserProfile), message: `Completed: ${job.next_action}`, activity_type: 'next_action_complete', task_completed: true }).then(() => {});
-            const preview = document.getElementById('sh-preview');
-            if (preview && !preview.classList.contains('hide') && _shSelectedId === jobId) _renderJobPreview(preview, jobId);
+        }
+
+        // Inline date-only update (when user changes the date picker on an open action without changing text)
+        async function naUpdateDate(type, recordId, newDate) {
+            const cfg = NA_TYPES[type]; if (!cfg) return;
+            const { error } = await supabase.from(cfg.table)
+                .update({ next_action_due_date: newDate || null })
+                .eq('id', recordId);
+            if (error) { showToast('Error updating date', 'error'); return; }
+            if (type === 'job') {
+                const job = jobs.find(j => j.id === recordId);
+                if (job) job.next_action_due_date = newDate || null;
+                if (currentJob?.id === recordId) currentJob.next_action_due_date = newDate || null;
+            }
+            showToast('Due date updated', 'success');
         }
 
         async function deleteJob(jobId) {
@@ -16633,6 +16857,8 @@
                 orderTargetEl.textContent = ot ? ot.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
             }
             _renderJobNextAction(document.getElementById('jr-next-action'), currentJob);
+            // Populate the new dedicated Next Action card (above the activity sidebar)
+            if (currentJob?.id) loadNextActionCard('job', currentJob.id, 'job-next-action-card');
             renderJobStagePills();
             renderDesignStagePills();
         }
@@ -20433,14 +20659,20 @@
                     recordType = 'club'; recordId = activity.clubs.id;
                     recordName = activity.clubs.name || 'Club';
                 }
-                const typeIcon = isTask ? '📋' : '💬';
-                const typeColor = isTask ? '#c2410c' : '#2563eb';
+                // Resolve display label/icon/colour for each activity type
+                const at = activity.activity_type;
+                let typeIcon = '💬', typeColor = '#2563eb', typeLabel = 'Comment';
+                if (at === 'task' || at === 'sub_task') { typeIcon = '📋'; typeColor = '#c2410c'; typeLabel = at === 'sub_task' ? 'Sub-task' : 'Task'; }
+                else if (at === 'next_action')          { typeIcon = '⚑';  typeColor = '#d97706'; typeLabel = 'Next action'; }
+                else if (at === 'next_action_complete') { typeIcon = '✓';  typeColor = '#059669'; typeLabel = 'Action done'; }
+                else if (at === 'stage_change')         { typeIcon = '↻';  typeColor = '#0369a1'; typeLabel = 'Stage'; }
+                else if (at === 'assignment')           { typeIcon = '👤'; typeColor = '#7c3aed'; typeLabel = 'Assignment'; }
                 const viewBtn = recordId ? `<button onclick="navigateFromFeed('${recordType}','${recordId}')" class="feed-action-btn" title="View record" style="background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;font-size:9px;font-weight:700">→</button>` : '';
                 return `<div class="home-feed-item${isTask ? ' task-feed-item' : ''}">
                     <div style="font-size:16px;flex-shrink:0;margin-top:2px">${typeIcon}</div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold truncate" style="color:${typeColor}">${isTask ? 'Task' : 'Comment'} · <span style="color:#64748b;font-weight:600">${escHtml(recordName)}</span></p>
-                        <p class="text-xs text-gray-600 mt-0.5 truncate">${escHtml(activity.message)}</p>
+                        <p class="text-xs font-bold truncate" style="color:${typeColor}">${typeLabel} · <span style="color:#64748b;font-weight:600">${escHtml(recordName)}</span></p>
+                        <p class="text-xs text-gray-600 mt-0.5 truncate" style="${at==='next_action_complete'?'text-decoration:line-through':''}">${escHtml(activity.message)}</p>
                         <p class="text-xs text-gray-400 mt-0.5">${escHtml(activity.user_name)} · ${ts}</p>
                     </div>
                     <div class="flex flex-col gap-1">
@@ -24158,8 +24390,10 @@
                             ${buildDTRDesignUploadsSection(stage2, conceptUploads)}
                         </div>
                     </div>
-                    <div class="dtr-activity-col" id="dtr-activity-col" style="display:flex;flex-direction:column;gap:14px;overflow-y:auto">
+                    <div class="dtr-activity-col" id="dtr-activity-col" style="display:flex;flex-direction:column;gap:12px;overflow-y:auto">
                         ${buildDTRFactoryHandoverCol(task, stage5)}
+                        <!-- Next Action card -->
+                        <div class="next-action-card" id="design-task-next-action-card"></div>
                         <!-- Activity feed -->
                         <div id="dtr-activity-inner" style="display:flex;flex-direction:column;background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden;flex:1;min-height:200px">
                             <div class="dtr-activity-header" style="flex-shrink:0">
@@ -27227,6 +27461,8 @@
             _dtActivityLog = actResult.data || [];
             _dtActivityFeed = feedResult.data || [];
             renderDesignTaskActivity();
+            // Populate the dedicated Next Action card above the activity feed
+            loadNextActionCard('design_task', taskId, 'design-task-next-action-card');
         }
 
         const _feedActionLabels = {
