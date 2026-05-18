@@ -4029,7 +4029,7 @@
             <!-- 3-COLUMN LAYOUT: left (info) | middle (pipelines+content) | right (activity) -->
             <div class="jr-three-col">
 
-                <!-- ── Column 1: Job info card ── -->
+                <!-- ── Column 1: Job info card + Pipelines ── -->
                 <div class="jr-left-col">
                     <!-- Compact job info card -->
                     <div class="glass rounded-2xl p-4">
@@ -4053,34 +4053,31 @@
                         <!-- Legacy Next Action slot (kept hidden for JS compatibility; primary card now above activity sidebar) -->
                         <div id="jr-next-action" class="hide"></div>
                     </div>
+                    <!-- Job Stage Pipeline (moved from middle column) -->
+                    <div class="glass rounded-2xl p-4 mt-3">
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Job Stage</span>
+                        <div class="flex flex-wrap gap-1" id="jr-stage-pills">
+                            <!-- Populated by renderJobStagePills() -->
+                        </div>
+                        <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
+                            <option value="discovery">Discovery</option>
+                            <option value="concepts">Concepts</option>
+                            <option value="final_mockups">Final Mock-ups</option>
+                            <option value="order_details">Order Details</option>
+                            <option value="quoted">Quoted</option>
+                            <option value="completed">Completed</option>
+                            <option value="lost">Lost</option>
+                        </select>
+                    </div>
+                    <!-- Design Pipeline (moved from middle column — shows current design status) -->
+                    <div class="glass rounded-2xl p-4 mt-3">
+                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Pipeline</span>
+                        <div class="design-stage-row" id="jr-design-stage-pills" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px"></div>
+                    </div>
                 </div>
 
-                <!-- ── Column 2: Pipeline rows + tab content ── -->
+                <!-- ── Column 2: Tab content (pipelines removed; details shifted up) ── -->
                 <div class="jr-middle-col">
-                    <!-- Pipeline cards (slim at top, overview tab only) -->
-                    <div class="jr-pipelines-col" id="jr-pipelines-col">
-                        <!-- Job Stage Pipeline -->
-                        <div class="glass rounded-2xl p-4">
-                            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Job Stage</span>
-                            <div class="flex flex-wrap gap-1" id="jr-stage-pills">
-                                <!-- Populated by renderJobStagePills() -->
-                            </div>
-                            <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
-                                <option value="discovery">Discovery</option>
-                                <option value="concepts">Concepts</option>
-                                <option value="final_mockups">Final Mock-ups</option>
-                                <option value="order_details">Order Details</option>
-                                <option value="quoted">Quoted</option>
-                                <option value="completed">Completed</option>
-                                <option value="lost">Lost</option>
-                            </select>
-                        </div>
-                        <!-- Design Stage Pipeline -->
-                        <div class="glass rounded-2xl p-4">
-                            <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Pipeline</span>
-                            <div class="design-stage-row" id="jr-design-stage-pills" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px"></div>
-                        </div>
-                    </div>
                     <!-- Tab content area -->
                     <div class="record-content">
 
@@ -22951,6 +22948,10 @@
                     </div>
                     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
                         <select onchange="_dspChangeStatus('${task.id}', this.value)" style="font-size:10px;font-weight:700;padding:2px 22px 2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22${encodeURIComponent(colorText[nextAct.color])}%22 stroke-width=%222.5%22><path d=%22M6 9l6 6 6-6%22/></svg>');background-repeat:no-repeat;background-position:right 5px center">${_statusOpts}</select>
+                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;white-space:nowrap;display:inline-flex;align-items:center;gap:4px" title="Owner">
+                            <svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            ${escHtml(designerName)}
+                        </span>
                         ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.task_ref)}</span>` : ''}
                         ${task.clubs?.name ? `<span style="font-size:10px;color:#475569;font-weight:500;background:#f8fafc;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.clubs.name)}</span>` : ''}
                         <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${priBgs[pri]};color:${priColors[pri]};border:1px solid ${priBdrs[pri]};white-space:nowrap">${priLabels[pri]}</span>
@@ -22966,9 +22967,9 @@
                         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px">
                             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Task Details</div>
                             <div style="display:flex;flex-direction:column;gap:6px">
-                                <div><span style="font-size:10px;font-weight:700;color:#94a3b8">Owner: </span><span style="font-size:11px;font-weight:600;color:#1e293b">${escHtml(designerName)}</span></div>
                                 ${hasColours ? `<div><div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">Brand Colours</div><div style="display:flex;flex-direction:column;gap:3px">${colourDots}</div></div>` : ''}
                                 ${notes ? `<div><div style="font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:3px">Notes</div><p style="font-size:11px;color:#374151;line-height:1.5;margin:0;white-space:pre-wrap">${escHtml(notes)}</p></div>` : ''}
+                                ${!hasColours && !notes ? `<div style="font-size:11px;color:#94a3b8;font-style:italic">No details set.</div>` : ''}
                             </div>
                         </div>
                         <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
@@ -23120,8 +23121,12 @@
             const body  = document.getElementById('ds-edit-modal-body');
             if (!modal || !body) return;
             // Load the full task + related data so the edit form has products etc.
-            const { data: task } = await supabase.from('design_tasks').select('*, clubs(*), jobs(*)').eq('id', taskId).single();
-            if (!task) { showToast('Task not found', 'error'); return; }
+            const { data: task, error: taskErr } = await supabase.from('design_tasks').select('*, clubs(*), jobs(*)').eq('id', taskId).single();
+            if (!task || taskErr) {
+                console.error('task load failed', taskErr);
+                showToast('Task not found', 'error');
+                return;
+            }
             const club = task.clubs || {};
             // Load product lists
             let clubProds = [], jobProds = [];
@@ -23133,16 +23138,73 @@
                 const r = await supabase.from('job_products').select('id, custom_name, image_urls, image_url, products(item_name, product_code, pattern_code)').eq('job_id', task.job_id);
                 jobProds = r.data || [];
             }
+            // Load stage 5 (factory handover stage) — Drive URL lives in stage.concept_statuses.drive_url
+            const { data: s5rows } = await supabase.from('design_stages')
+                .select('id, concept_statuses').eq('task_id', taskId).eq('stage_number', 5).limit(1);
+            const stage5 = (s5rows || [])[0] || null;
+            const jobDriveUrl  = task.jobs?.google_drive_url || '';
+            const clubDriveUrl = (club && club.google_drive_url) || '';
+            const savedDriveUrl = stage5?.concept_statuses?.drive_url || '';
+            // Decide which radio is initially selected
+            let initSource = 'custom';
+            if (savedDriveUrl && savedDriveUrl === jobDriveUrl)  initSource = 'job';
+            else if (savedDriveUrl && savedDriveUrl === clubDriveUrl) initSource = 'club';
+            else if (!savedDriveUrl && jobDriveUrl)  initSource = 'job';
+            else if (!savedDriveUrl && clubDriveUrl) initSource = 'club';
+            const initCustom = (initSource === 'custom') ? savedDriveUrl : '';
+
             // Set globals that saveDTRLeftPanel + edit-mode HTML expect
             window.currentDesignTaskRecord = task;
             window.currentDesignTask = task;
             window._dtrCachedClubProds = clubProds;
             window._dtrCachedJobProds  = jobProds;
             window._dtrCachedAssets    = [];
+            window._dsEditStage5Id     = stage5?.id || null;
+            window._dsEditStage5CS     = stage5?.concept_statuses || {};
             _dsEditOriginalMode = (typeof _dtrEditMode !== 'undefined') ? _dtrEditMode : false;
             window._dtrEditMode = true;
-            // Render the edit-mode HTML using the existing builder
+
+            // Build the Factory Handover section (Drive folder source + requirements checklist)
+            const fr = task.factory_requirements || {};
+            const frChecks = _DTR_FR_ITEMS.map(item => {
+                const main = `<label style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:12px;color:#1e293b;cursor:pointer">
+                    <input type="checkbox" id="dsfh-fr-${item.key}" ${fr[item.key]?'checked':''} style="accent-color:#6d28d9;width:14px;height:14px">
+                    ${escHtml(item.label)}
+                </label>`;
+                const subs = (item.subs||[]).map(sub => `
+                    <label style="display:flex;align-items:center;gap:8px;padding:3px 0 3px 24px;font-size:11px;color:#475569;cursor:pointer">
+                        <input type="checkbox" id="dsfh-fr-${sub.key}" ${fr[sub.key]?'checked':''} style="accent-color:#6d28d9;width:13px;height:13px">
+                        ↳ ${escHtml(sub.label)}
+                    </label>`).join('');
+                return main + subs;
+            }).join('');
+            const factoryHtml = `<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:12px;margin-top:14px">
+                <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#15803d;margin-bottom:8px">Factory Handover</div>
+                <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:5px">Design Folder (Google Drive)</div>
+                <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
+                    <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
+                        <input type="radio" name="dsfh-drive-src" value="job"    ${initSource==='job'?'checked':''}    ${jobDriveUrl?'':'disabled'}>
+                        Use job's Drive ${jobDriveUrl ? `<span style="color:#64748b;font-size:10px">— ${escHtml(jobDriveUrl)}</span>` : '<span style="color:#94a3b8;font-size:10px">(none set on job)</span>'}
+                    </label>
+                    <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
+                        <input type="radio" name="dsfh-drive-src" value="club"   ${initSource==='club'?'checked':''}   ${clubDriveUrl?'':'disabled'}>
+                        Use club's Drive ${clubDriveUrl ? `<span style="color:#64748b;font-size:10px">— ${escHtml(clubDriveUrl)}</span>` : '<span style="color:#94a3b8;font-size:10px">(none set on club)</span>'}
+                    </label>
+                    <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
+                        <input type="radio" name="dsfh-drive-src" value="custom" ${initSource==='custom'?'checked':''}>
+                        Custom URL
+                    </label>
+                    <input type="url" id="dsfh-drive-custom" value="${escHtml(initCustom)}" placeholder="https://drive.google.com/…"
+                        oninput="document.querySelector('input[name=dsfh-drive-src][value=custom]').checked=true"
+                        style="width:100%;box-sizing:border-box;padding:6px 9px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;margin-top:2px">
+                </div>
+                <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:4px;border-top:1px solid #d1fae5;padding-top:8px">Required for Factory</div>
+                <div style="display:flex;flex-direction:column">${frChecks}</div>
+            </div>`;
+
+            // Render the edit-mode HTML using the existing builder + the factory section
             body.innerHTML = `<div id="dtr-left-tab-content">${_buildDTRBriefTab(task, club, [], clubProds, jobProds)}</div>
+                ${factoryHtml}
                 <div style="display:flex;justify-content:flex-end;gap:6px;padding:14px 0 0;border-top:1px solid #e2e8f0;margin-top:14px">
                     <button onclick="closeDesignTaskEditModal()" style="padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#475569">Cancel</button>
                     <button onclick="_dsSaveEditModal('${taskId}')" style="padding:7px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#6d28d9;color:#fff">Save Changes</button>
@@ -23171,6 +23233,37 @@
                 showToast('Save failed: ' + (e.message || ''), 'error');
                 return;
             }
+            // Collect factory requirements from the modal checkboxes
+            const fr = {};
+            _DTR_FR_ITEMS.forEach(item => {
+                fr[item.key] = document.getElementById(`dsfh-fr-${item.key}`)?.checked || false;
+                if (item.subs) item.subs.forEach(sub => { fr[sub.key] = document.getElementById(`dsfh-fr-${sub.key}`)?.checked || false; });
+            });
+            await supabase.from('design_tasks').update({ factory_requirements: fr }).eq('id', taskId);
+
+            // Resolve the Drive URL based on the chosen source
+            const src = document.querySelector('input[name="dsfh-drive-src"]:checked')?.value || 'custom';
+            let driveUrl = '';
+            if (src === 'job')        driveUrl = (currentDesignTaskRecord?.jobs?.google_drive_url) || '';
+            else if (src === 'club')  driveUrl = (currentDesignTaskRecord?.clubs?.google_drive_url) || '';
+            else                      driveUrl = document.getElementById('dsfh-drive-custom')?.value.trim() || '';
+
+            // Persist Drive URL on stage 5 (factory handover stage); create stage 5 row if missing
+            let stage5Id = window._dsEditStage5Id;
+            let stage5CS = window._dsEditStage5CS || {};
+            if (stage5Id) {
+                const cs = { ...stage5CS, drive_url: driveUrl || null };
+                await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', stage5Id);
+            } else if (driveUrl) {
+                // Create stage 5 with the URL if it doesn't exist yet
+                await supabase.from('design_stages').insert({
+                    task_id: taskId,
+                    stage_number: 5,
+                    status: 'pending',
+                    concept_statuses: { drive_url: driveUrl }
+                });
+            }
+
             // Reload the task into local cache
             const { data: fresh } = await supabase.from('design_tasks').select('*, clubs(*), jobs(*)').eq('id', taskId).single();
             if (fresh) {
