@@ -672,6 +672,14 @@
         .design-status-in_review         { background:rgba(168,85,247,0.1);   color:#7c3aed; }
         .design-status-awaiting_approval { background:rgba(249,115,22,0.1);   color:#ea580c; }
         .design-status-complete          { background:rgba(34,197,94,0.1);    color:#16a34a; }
+        .design-status-completed         { background:rgba(34,197,94,0.1);    color:#16a34a; }
+        /* Substage badges */
+        .ds-substage-badge { display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:1px 6px;border-radius:5px;white-space:nowrap; }
+        .ds-substage-in_design        { background:rgba(59,130,246,0.1);   color:#2563eb; }
+        .ds-substage-revisions        { background:rgba(234,179,8,0.1);    color:#b45309; }
+        .ds-substage-factory_handover { background:rgba(6,182,212,0.1);    color:#0e7490; }
+        .ds-substage-internal_review  { background:rgba(168,85,247,0.1);   color:#7c3aed; }
+        .ds-substage-awaiting_approval{ background:rgba(249,115,22,0.1);   color:#ea580c; }
 
         /* Pantone swatch */
         .pantone-swatch { width: 32px; height: 32px; border-radius: 8px; border: 1px solid #e2e8f0; display: inline-block; cursor: pointer; flex-shrink: 0; }
@@ -2434,6 +2442,16 @@
                     <button id="ds-due-chip-week"    class="ds-due-chip"               onclick="setDSDueFilter('week')">Due This Week</button>
                     <button id="ds-due-chip-overdue" class="ds-due-chip"               onclick="setDSDueFilter('overdue')">Overdue</button>
                 </div>
+
+                <!-- Stage filter chips -->
+                <div style="display:flex;align-items:center;gap:4px;border-left:1px solid #e2e8f0;padding-left:10px">
+                    <button id="ds-stage-chip-all"         class="ds-due-chip ds-due-active" onclick="setDSStageFilter('all')">All Stages</button>
+                    <button id="ds-stage-chip-new"         class="ds-due-chip"               onclick="setDSStageFilter('new')">New</button>
+                    <button id="ds-stage-chip-in_progress" class="ds-due-chip"               onclick="setDSStageFilter('in_progress')">In Progress</button>
+                    <button id="ds-stage-chip-in_review"   class="ds-due-chip"               onclick="setDSStageFilter('in_review')">In Review</button>
+                </div>
+                <!-- Substage filter (shown when In Progress or In Review selected) -->
+                <div id="ds-substage-chips" style="display:none;align-items:center;gap:4px"></div>
 
                 <!-- Right actions -->
                 <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -16792,20 +16810,22 @@
             await supabase.from('design_versions').update({ status: 'pending' }).eq('design_task_id', task.id);
             const { error } = await supabase.from('design_versions').update({ status: 'approved', approved_at: new Date().toISOString() }).eq('id', versionId);
             if (error) { showToast('Error approving version', 'error'); return; }
-            // Update design task status to awaiting_approval
-            await supabase.from('design_tasks').update({ status: 'awaiting_approval' }).eq('id', task.id);
-            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'awaiting_approval';
-            if (currentDesignTask) currentDesignTask.status = 'awaiting_approval';
+            // Update design task to In Review / Awaiting Approval substage
+            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'awaiting_approval' }).eq('id', task.id);
+            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = 'awaiting_approval'; }
+            if (currentDesignTask) { currentDesignTask.status = 'in_review'; currentDesignTask.sub_stage = 'awaiting_approval'; }
+            const taskInList = (allDesignTasks||[]).find(t=>t.id===task.id);
+            if (taskInList) { taskInList.status = 'in_review'; taskInList.sub_stage = 'awaiting_approval'; }
             // Log
             const userName = userDisplayName(currentUserProfile) || 'Unknown';
             await supabase.from('design_brief_log').insert({
                 design_task_id: task.id, user_id: currentUser?.id, user_name: userName,
-                old_status: oldStatus, new_status: 'awaiting_approval'
+                old_status: oldStatus, new_status: 'in_review'
             }).catch(() => {});
             // Update versions in memory
             currentDesignVersions.forEach(v => { v.status = v.id === versionId ? 'approved' : (v.status === 'approved' ? 'pending' : v.status); });
             // Refresh appropriate view
-            if (currentDesignTaskRecord?.id) { renderDtVersionsList(); renderDtStatusButtons('awaiting_approval'); const b = document.getElementById('dt-status-badge'); if (b) { b.textContent = 'Awaiting Approval'; b.className = 'badge design-status-awaiting_approval text-xs'; } }
+            if (currentDesignTaskRecord?.id) { renderDtVersionsList(); renderDtStatusButtons('in_review', 'awaiting_approval'); const b = document.getElementById('dt-status-badge'); if (b) { b.textContent = 'In Review · Awaiting Approval'; b.className = 'badge design-status-in_review text-xs'; } }
             else { const vList = document.getElementById('design-versions-list'); if (vList) vList.innerHTML = renderDesignVersions(); }
             showToast('Version approved — awaiting client approval');
         }
@@ -16835,6 +16855,8 @@
         let designStudioFilter = 'all';
         let designStageFilter = 'all';
         let _dsDueFilter = 'all';
+        let _dsStageFilter = 'all';
+        let _dsSubstageFilter = 'all';
         let allDesignTasks = [];
         let designBriefLog = [];
 
@@ -16957,7 +16979,7 @@
             }
             // Update stage counts (always from full filtered set)
             const stageCounts = { all: tasks.length };
-            ['new','in_progress','revisions','in_review','awaiting_approval','complete'].forEach(s => {
+            ['new','in_progress','in_review','completed'].forEach(s => {
                 stageCounts[s] = tasks.filter(dt => dt.status === s).length;
             });
             Object.entries(stageCounts).forEach(([s, c]) => {
@@ -16978,7 +17000,7 @@
                 return;
             }
             empty.classList.add('hide');
-            const statusColour = { new:'#3b82f6', in_progress:'#d97706', revisions:'#dc2626', in_review:'#7c3aed', awaiting_approval:'#c2410c', complete:'#15803d' };
+            const statusColour = { new:'#3b82f6', in_progress:'#d97706', in_review:'#7c3aed', completed:'#15803d' };
             container.innerHTML = tasks.map(dt => {
                 const job = dt.jobs;
                 const club = job?.clubs;
@@ -19659,9 +19681,15 @@
             'Artwork Setup', 'Mockup Creation'
         ];
         const DS_STATUS_LABELS = {
-            new:'Not Started', in_progress:'In Progress', revisions:'Revisions',
-            in_review:'In Review', factory_handover:'Factory Handover',
-            awaiting_approval:'Awaiting Approval', delivered:'Delivered', completed:'Completed'
+            new:'New', in_progress:'In Progress', in_review:'In Review', completed:'Completed'
+        };
+        const DS_SUBSTAGE_LABELS = {
+            in_design:'In Design', revisions:'Revisions', factory_handover:'Factory Handover',
+            internal_review:'Internal Review', awaiting_approval:'Awaiting Approval'
+        };
+        const DS_SUBSTAGE_COLORS = {
+            in_design:'#2563eb', revisions:'#b45309', factory_handover:'#0e7490',
+            internal_review:'#7c3aed', awaiting_approval:'#ea580c'
         };
 
         // ── Load & Render Design Studio ──────────────────────────────────────
@@ -19708,8 +19736,8 @@
         }
 
         function renderDesignStudio() {
-            const pending   = allDesignTasks.filter(t => ['new','in_progress','revisions','in_review','awaiting_approval'].includes(t.status));
-            const delivered = allDesignTasks.filter(t => t.status === 'delivered');
+            const pending   = allDesignTasks.filter(t => ['new','in_progress','in_review'].includes(t.status));
+            const delivered = allDesignTasks.filter(t => t.status === 'in_review');
             const completed = allDesignTasks.filter(t => t.status === 'completed');
 
             // Badge counts
@@ -19744,7 +19772,7 @@
 
         // ── Kanban (Pending tasks) ────────────────────────────────────────────
         function renderDSKanban(tasks) {
-            const cols = ['new','in_progress','revisions','in_review'];
+            const cols = ['new','in_progress','in_review'];
             let hasAny = false;
             cols.forEach(col => {
                 const colTasks = tasks.filter(t => t.status === col);
@@ -19762,21 +19790,6 @@
                     body.innerHTML = colTasks.map(t => renderDSKanbanCard(t)).join('');
                 }
             });
-            // Also count awaiting_approval tasks in in_review column
-            const aaCount = tasks.filter(t => t.status === 'awaiting_approval').length;
-            const countEl = document.getElementById('dsk-count-in_review');
-            if (countEl) {
-                const inR = tasks.filter(t => t.status === 'in_review').length;
-                countEl.textContent = inR + aaCount;
-                const body = document.getElementById('dsk-body-in_review');
-                if (body) {
-                    const aaTasks = tasks.filter(t => t.status === 'awaiting_approval');
-                    if (aaTasks.length) {
-                        hasAny = true;
-                        body.innerHTML += aaTasks.map(t => renderDSKanbanCard(t)).join('');
-                    }
-                }
-            }
 
             const emptyState = document.getElementById('ds-kanban-empty');
             const board      = document.getElementById('ds-kanban-board');
@@ -19797,7 +19810,7 @@
             const dueClass  = dueInfo ? (dueInfo.urgency === 'overdue' ? 'overdue' : dueInfo.urgency === 'soon' ? 'soon' : '') : '';
             const designerBadge = task.assigned_designer_name
                 ? `<span class="dt-card-designer">${escHtml(task.assigned_designer_name.split(' ')[0])}</span>` : '';
-            const statusBadge = task.status === 'awaiting_approval'
+            const statusBadge = task.sub_stage === 'awaiting_approval'
                 ? `<span class="dt-type-chip" style="background:rgba(234,179,8,0.1);color:#b45309">Awaiting</span>` : '';
             return `<div class="dt-kanban-card ${urgClass}" onclick="showDesignTask('${task.id}')">
                 <div class="flex items-start justify-between gap-2 mb-1">
@@ -20422,14 +20435,14 @@
             // Deliver/Complete buttons
             const btnDeliver  = document.getElementById('btn-dt-deliver');
             const btnComplete = document.getElementById('btn-dt-complete');
-            if (btnDeliver)  btnDeliver.classList.toggle('hide', ['delivered','completed'].includes(task.status));
-            if (btnComplete) btnComplete.classList.toggle('hide', task.status !== 'delivered');
+            if (btnDeliver)  btnDeliver.classList.toggle('hide', task.status === 'completed');
+            if (btnComplete) btnComplete.classList.toggle('hide', true);
 
             // Form fields
             dtFillOverviewForm(task);
             renderDtJobTypeGrid(task.job_type);
             renderDtDesignTypesGrid(task.design_types || []);
-            renderDtStatusButtons(task.status);
+            renderDtStatusButtons(task.status, task.sub_stage);
             dtUpdateCountdown();
             renderDtProductsList(task);
 
@@ -20526,40 +20539,88 @@
             currentDesignTaskRecord.design_types = types;
         }
 
-        function renderDtStatusButtons(currentStatus) {
+        function renderDtStatusButtons(currentStatus, currentSubstage) {
             const container = document.getElementById('dt-status-buttons');
             if (!container) return;
-            const statuses = [
-                { key:'new',               label:'New',               color:'#4b5563', icon:'○' },
-                { key:'in_progress',       label:'In Progress',       color:'#2563eb', icon:'✏' },
-                { key:'revisions',         label:'Revisions',         color:'#b45309', icon:'↺' },
-                { key:'in_review',         label:'In Review',         color:'#7c3aed', icon:'👁' },
-                { key:'awaiting_approval', label:'Awaiting Approval', color:'#ea580c', icon:'⏳' }
+            const sub = currentSubstage || currentDesignTaskRecord?.sub_stage || null;
+            const mainStages = [
+                { key:'new',         label:'New',         color:'#4b5563', icon:'○' },
+                { key:'in_progress', label:'In Progress', color:'#2563eb', icon:'✏' },
+                { key:'in_review',   label:'In Review',   color:'#7c3aed', icon:'👁' },
+                { key:'completed',   label:'Completed',   color:'#16a34a', icon:'✓' }
             ];
-            container.innerHTML = statuses.map(s => `
+            const substageMap = {
+                in_progress: [
+                    { key:'in_design',        label:'In Design',        color:'#2563eb' },
+                    { key:'revisions',        label:'Revisions',        color:'#b45309' },
+                    { key:'factory_handover', label:'Factory Handover', color:'#0e7490' }
+                ],
+                in_review: [
+                    { key:'internal_review',   label:'Internal Review',   color:'#7c3aed' },
+                    { key:'awaiting_approval', label:'Awaiting Approval', color:'#ea580c' }
+                ]
+            };
+            const stageHtml = mainStages.map(s => `
                 <button class="dt-status-btn dt-status-${s.key} ${s.key === currentStatus ? 'active' : ''}"
-                    style="color:${s.color}" onclick="setDesignTaskStatus('${s.key}')">
+                    style="color:${s.color}" onclick="setDesignTaskStage('${s.key}')">
                     <span style="font-size:14px">${s.icon}</span>
                     <span>${s.label}</span>
                     ${s.key === currentStatus ? '<svg class="w-4 h-4 ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>' : ''}
                 </button>`).join('');
+            const substages = substageMap[currentStatus] || [];
+            const substageHtml = substages.length ? `
+                <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
+                    <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:5px">Substage</div>
+                    <div style="display:flex;gap:5px;flex-wrap:wrap">
+                        ${substages.map(s => `<button onclick="setDesignTaskSubstage('${s.key}')" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:7px;cursor:pointer;border:1.5px solid ${sub===s.key ? s.color : '#e2e8f0'};color:${sub===s.key ? s.color : '#64748b'};background:${sub===s.key ? s.color+'18' : '#f8fafc'};transition:all 0.15s">${s.label}</button>`).join('')}
+                    </div>
+                </div>` : '';
+            container.innerHTML = stageHtml + substageHtml;
+        }
+
+        async function setDesignTaskStage(newStatus) {
+            if (!currentDesignTaskRecord?.id) return;
+            const defaultSub = { in_progress: 'in_design', in_review: 'internal_review' };
+            const newSub = defaultSub[newStatus] || null;
+            const { error } = await supabase.from('design_tasks').update({ status: newStatus, sub_stage: newSub }).eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error updating status', 'error'); return; }
+            currentDesignTaskRecord.status = newStatus;
+            currentDesignTaskRecord.sub_stage = newSub;
+            renderDtStatusButtons(newStatus, newSub);
+            const badge = document.getElementById('dt-status-badge');
+            const subLabel = newSub && DS_SUBSTAGE_LABELS[newSub] ? ` · ${DS_SUBSTAGE_LABELS[newSub]}` : '';
+            if (badge) { badge.textContent = (DS_STATUS_LABELS[newStatus] || newStatus) + subLabel; badge.className = `badge design-status-${newStatus} text-xs`; }
+            const btnDeliver  = document.getElementById('btn-dt-deliver');
+            const btnComplete = document.getElementById('btn-dt-complete');
+            if (btnDeliver)  btnDeliver.classList.toggle('hide', newStatus === 'completed');
+            if (btnComplete) btnComplete.classList.toggle('hide', true);
+            showToast(`Stage → ${DS_STATUS_LABELS[newStatus] || newStatus}${subLabel}`);
+            allDesignTasks = allDesignTasks.map(t => t.id === currentDesignTaskRecord.id ? { ...t, status: newStatus, sub_stage: newSub } : t);
+            renderDSDashboard();
+        }
+
+        async function setDesignTaskSubstage(newSub) {
+            if (!currentDesignTaskRecord?.id) return;
+            const { error } = await supabase.from('design_tasks').update({ sub_stage: newSub }).eq('id', currentDesignTaskRecord.id);
+            if (error) { showToast('Error updating substage', 'error'); return; }
+            currentDesignTaskRecord.sub_stage = newSub;
+            renderDtStatusButtons(currentDesignTaskRecord.status, newSub);
+            const badge = document.getElementById('dt-status-badge');
+            const subLabel = DS_SUBSTAGE_LABELS[newSub] ? ` · ${DS_SUBSTAGE_LABELS[newSub]}` : '';
+            if (badge) { badge.textContent = (DS_STATUS_LABELS[currentDesignTaskRecord.status] || currentDesignTaskRecord.status) + subLabel; badge.className = `badge design-status-${currentDesignTaskRecord.status} text-xs`; }
+            showToast(`Substage → ${DS_SUBSTAGE_LABELS[newSub] || newSub}`);
+            allDesignTasks = allDesignTasks.map(t => t.id === currentDesignTaskRecord.id ? { ...t, sub_stage: newSub } : t);
+            renderDSDashboard();
         }
 
         async function setDesignTaskStatus(newStatus) {
-            if (!currentDesignTaskRecord?.id) return;
-            const { error } = await supabase.from('design_tasks').update({ status: newStatus }).eq('id', currentDesignTaskRecord.id);
-            if (error) { showToast('Error updating status', 'error'); return; }
-            currentDesignTaskRecord.status = newStatus;
-            renderDtStatusButtons(newStatus);
-            const badge = document.getElementById('dt-status-badge');
-            if (badge) { badge.textContent = DS_STATUS_LABELS[newStatus]; badge.className = `badge design-status-${newStatus} text-xs`; }
-            const btnDeliver  = document.getElementById('btn-dt-deliver');
-            const btnComplete = document.getElementById('btn-dt-complete');
-            if (btnDeliver)  btnDeliver.classList.toggle('hide', ['delivered','completed'].includes(newStatus));
-            if (btnComplete) btnComplete.classList.toggle('hide', newStatus !== 'delivered');
-            showToast(`Status → ${DS_STATUS_LABELS[newStatus]}`);
-            // Refresh kanban if studio is open
-            allDesignTasks = allDesignTasks.map(t => t.id === currentDesignTaskRecord.id ? { ...t, status: newStatus } : t);
+            // Legacy wrapper — maps old granular statuses to new stage+substage model
+            const stageMap = { revisions:'in_progress', factory_handover:'in_progress', awaiting_approval:'in_review', delivered:'completed' };
+            const subMap   = { revisions:'revisions', factory_handover:'factory_handover', awaiting_approval:'awaiting_approval' };
+            const mappedStatus = stageMap[newStatus] || newStatus;
+            const mappedSub    = subMap[newStatus] || (mappedStatus === 'in_progress' ? 'in_design' : mappedStatus === 'in_review' ? 'internal_review' : null);
+            await setDesignTaskStage(mappedStatus);
+            if (mappedSub && currentDesignTaskRecord?.sub_stage !== mappedSub) await setDesignTaskSubstage(mappedSub);
         }
 
         // ── Due Date / Countdown ──────────────────────────────────────────────
@@ -20710,10 +20771,11 @@
         async function markDesignDelivered() {
             if (!currentDesignTaskRecord?.id) return;
             const { error } = await supabase.from('design_tasks').update({
-                status: 'delivered', delivered_at: new Date().toISOString()
+                status: 'completed', sub_stage: null, delivered_at: new Date().toISOString()
             }).eq('id', currentDesignTaskRecord.id);
             if (error) { showToast('Error', 'error'); return; }
-            currentDesignTaskRecord.status = 'delivered';
+            currentDesignTaskRecord.status = 'completed';
+            currentDesignTaskRecord.sub_stage = null;
             currentDesignTaskRecord.delivered_at = new Date().toISOString();
             allDesignTasks = allDesignTasks.map(t => t.id === currentDesignTaskRecord.id ? currentDesignTaskRecord : t);
             renderDesignTaskRecord();
@@ -21130,21 +21192,25 @@
         let _dtrPanelEl = null;
 
         function getDSTaskGroup(task) {
-            if (task.status === 'new') return 'new';
+            if (task.status === 'new')      return 'new';
             if (task.status === 'in_review') return 'review';
-            return 'active'; // in_progress (includes stages with revisions_required)
+            if (task.status === 'completed') return 'completed';
+            return 'active';
         }
 
         function getDSTaskNextAction(task) {
+            const sub = task.sub_stage;
             switch (task.status) {
-                case 'new':              return { label: 'Start this design task', color: 'grey', icon: '→' };
-                case 'in_progress':      return { label: 'Upload design concepts for review', color: 'blue', icon: '✏' };
-                case 'revisions':        return { label: 'Apply revisions and re-upload', color: 'red', icon: '↩' };
-                case 'in_review':        return { label: 'Awaiting internal review', color: 'amber', icon: '👀' };
-                case 'factory_handover': return { label: 'Prepare factory handover pack', color: 'blue', icon: '📦' };
-                case 'awaiting_approval':return { label: 'Awaiting customer approval', color: 'amber', icon: '⏳' };
-                case 'delivered':        return { label: 'Prepare final artwork for delivery', color: 'green', icon: '✓' };
-                default:                 return { label: 'Continue task', color: 'blue', icon: '→' };
+                case 'new':         return { label: 'Start this design task', color: 'grey', icon: '→' };
+                case 'in_progress':
+                    if (sub === 'revisions')        return { label: 'Apply revisions and re-upload', color: 'red', icon: '↩' };
+                    if (sub === 'factory_handover') return { label: 'Prepare factory handover pack', color: 'blue', icon: '📦' };
+                    return { label: 'Upload design concepts for review', color: 'blue', icon: '✏' };
+                case 'in_review':
+                    if (sub === 'awaiting_approval') return { label: 'Awaiting customer approval', color: 'amber', icon: '⏳' };
+                    return { label: 'Awaiting internal review', color: 'amber', icon: '👀' };
+                case 'completed':   return { label: 'Task complete', color: 'green', icon: '✓' };
+                default:            return { label: 'Continue task', color: 'blue', icon: '→' };
             }
         }
 
@@ -21156,12 +21222,48 @@
             renderDSDashboard();
         }
 
+        function setDSStageFilter(stage) {
+            _dsStageFilter = stage;
+            _dsSubstageFilter = 'all';
+            ['all','new','in_progress','in_review'].forEach(s => {
+                document.getElementById(`ds-stage-chip-${s}`)?.classList.toggle('ds-due-active', s === stage);
+            });
+            // Update substage chip row
+            const subWrap = document.getElementById('ds-substage-chips');
+            if (subWrap) {
+                if (stage === 'in_progress') {
+                    subWrap.style.display = 'flex';
+                    subWrap.innerHTML = [
+                        ['all','All'],['in_design','In Design'],['revisions','Revisions'],['factory_handover','Factory Handover']
+                    ].map(([k,l]) => `<button id="ds-sub-chip-${k}" class="ds-due-chip${k==='all'?' ds-due-active':''}" onclick="setDSSubstageFilter('${k}')">${l}</button>`).join('');
+                } else if (stage === 'in_review') {
+                    subWrap.style.display = 'flex';
+                    subWrap.innerHTML = [
+                        ['all','All'],['internal_review','Internal Review'],['awaiting_approval','Awaiting Approval']
+                    ].map(([k,l]) => `<button id="ds-sub-chip-${k}" class="ds-due-chip${k==='all'?' ds-due-active':''}" onclick="setDSSubstageFilter('${k}')">${l}</button>`).join('');
+                } else {
+                    subWrap.style.display = 'none';
+                    subWrap.innerHTML = '';
+                }
+            }
+            renderDSDashboard();
+        }
+
+        function setDSSubstageFilter(substage) {
+            _dsSubstageFilter = substage;
+            document.querySelectorAll('[id^="ds-sub-chip-"]').forEach(el => {
+                const k = el.id.replace('ds-sub-chip-', '');
+                el.classList.toggle('ds-due-active', k === substage);
+            });
+            renderDSDashboard();
+        }
+
         function renderDSDashboard() {
-            const allTasks = (allDesignTasks || []).filter(t => !['completed'].includes(t.status));
+            const allTasks = (allDesignTasks || []).filter(t => t.status !== 'completed');
             const completedTasks = (allDesignTasks || []).filter(t => t.status === 'completed');
 
             const countEl = document.getElementById('ds-active-count');
-            const activeTasks = allTasks.filter(t => !['delivered','completed'].includes(t.status));
+            const activeTasks = allTasks;
             if (countEl) countEl.textContent = `${activeTasks.length} active task${activeTasks.length !== 1 ? 's' : ''}`;
 
             const tabBadge = document.getElementById('ds-completed-tab-count');
@@ -21187,6 +21289,11 @@
                     if (_dsDueFilter === 'week')    return due >= todayStart && due <= weekEnd;
                     if (_dsDueFilter === 'overdue') return due < todayStart;
                 }
+                if (_dsStageFilter !== 'all' && t.status !== _dsStageFilter) return false;
+                if (_dsSubstageFilter !== 'all') {
+                    const sub = t.sub_stage || 'in_design';
+                    if (sub !== _dsSubstageFilter) return false;
+                }
                 return true;
             };
 
@@ -21197,8 +21304,8 @@
             // Three kanban columns
             const cols = [
                 { bodyId: 'ds-col-body-new',        countId: 'ds-col-count-new',        colId: 'ds-col-new',        match: t => t.status === 'new' },
-                { bodyId: 'ds-col-body-inprogress',  countId: 'ds-col-count-inprogress', colId: 'ds-col-inprogress', match: t => ['in_progress','revisions'].includes(t.status) },
-                { bodyId: 'ds-col-body-inreview',    countId: 'ds-col-count-inreview',   colId: 'ds-col-inreview',   match: t => ['in_review','factory_handover'].includes(t.status) },
+                { bodyId: 'ds-col-body-inprogress',  countId: 'ds-col-count-inprogress', colId: 'ds-col-inprogress', match: t => t.status === 'in_progress' },
+                { bodyId: 'ds-col-body-inreview',    countId: 'ds-col-count-inreview',   colId: 'ds-col-inreview',   match: t => t.status === 'in_review' },
             ];
 
             const colCounts = cols.map(({ bodyId, countId, colId, match }) => {
@@ -21215,7 +21322,7 @@
             });
 
             // Auto-select first active task on first render
-            const allActive = filtered.filter(t => ['new','in_progress','revisions','in_review','factory_handover'].includes(t.status));
+            const allActive = filtered.filter(t => ['new','in_progress','in_review'].includes(t.status));
             if (!_dsSelectedTaskId && allActive.length > 0) {
                 _dsSelectedTaskId = allActive[0].id;
                 document.querySelector(`.ds-kanban-card[data-task-id="${_dsSelectedTaskId}"]`)?.classList.add('ds-selected');
@@ -21239,14 +21346,13 @@
                 ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:15px;height:15px;border-radius:8px;background:#2563eb;color:#fff;font-size:9px;font-weight:700;padding:0 4px;margin-left:4px;flex-shrink:0">${unreadCount}</span>`
                 : '';
 
-            // Status action badge
+            // Status action badge / substage badge
             let actionBadge = '';
             if (task.status === 'new') {
                 actionBadge = `<button onclick="event.stopPropagation();startDesignTask('${task.id}')" style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;border:1.5px solid #16a34a;color:#fff;background:#16a34a;cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1.4">▶ Start</button>`;
-            } else if (task.status === 'revisions') {
-                actionBadge = `<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid #b4530920;color:#b45309;background:#fffbeb;white-space:nowrap;flex-shrink:0">Revisions</span>`;
-            } else if (task.status === 'factory_handover') {
-                actionBadge = `<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid #0891b220;color:#0e7490;background:#ecfeff;white-space:nowrap;flex-shrink:0">Factory</span>`;
+            } else if (task.sub_stage && DS_SUBSTAGE_LABELS[task.sub_stage]) {
+                const col = DS_SUBSTAGE_COLORS[task.sub_stage] || '#64748b';
+                actionBadge = `<span class="ds-substage-badge ds-substage-${task.sub_stage}" style="flex-shrink:0">${DS_SUBSTAGE_LABELS[task.sub_stage]}</span>`;
             }
 
             const ownerNames = (() => {
@@ -21405,7 +21511,7 @@
             const colorBdr  = { red:'#fecaca', amber:'#fde68a', blue:'#bfdbfe', green:'#bbf7d0', grey:'#e2e8f0' };
             const colorText = { red:'#dc2626', amber:'#b45309', blue:'#1d4ed8', green:'#16a34a', grey:'#64748b' };
 
-            const statusLabels = { new:'New', in_progress:'In Progress', revisions:'Revisions', in_review:'In Review', factory_handover:'Factory Handover', awaiting_approval:'Awaiting Approval', delivered:'Delivered', completed:'Completed' };
+            const statusLabels = { new:'New', in_progress:'In Progress', in_review:'In Review', completed:'Completed' };
             const priLabels    = { urgent:'Urgent', high:'High', standard:'Standard' };
             const priColors    = { urgent:'#dc2626', high:'#ea580c', standard:'#64748b' };
             const priBgs       = { urgent:'#fef2f2', high:'#fff7ed', standard:'#f8fafc' };
@@ -21444,7 +21550,7 @@
                     </div>
                     <!-- Chips row: status · ref · club · priority · due date -->
                     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}</span>
+                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}${task.sub_stage && DS_SUBSTAGE_LABELS[task.sub_stage] ? ` · ${DS_SUBSTAGE_LABELS[task.sub_stage]}` : ''}</span>
                         ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.task_ref)}</span>` : ''}
                         ${task.clubs?.name ? `<span style="font-size:10px;color:#475569;font-weight:500;background:#f8fafc;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.clubs.name)}</span>` : ''}
                         <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${priBgs[pri]};color:${priColors[pri]};border:1px solid ${priBdrs[pri]};white-space:nowrap">${priLabels[pri]}</span>
@@ -21828,9 +21934,10 @@
         async function startDesignTask(taskId) {
             const task = (allDesignTasks || []).find(t => t.id === taskId);
             if (!task) return;
-            const { error } = await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', taskId);
+            const { error } = await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'in_design' }).eq('id', taskId);
             if (error) { showToast('Error starting task', 'error'); return; }
             task.status = 'in_progress';
+            task.sub_stage = 'in_design';
             const stages = task._stages || [];
             const conceptsStage = stages.find(s => s.stage_number === 2);
             if (conceptsStage && conceptsStage.status === 'not_started') {
@@ -21846,11 +21953,12 @@
         async function completeDesignTask() {
             if (!currentDesignTaskRecord?.id) return;
             if (!confirm('Mark this design task as complete? It will be moved to the Completed list.')) return;
-            const { error } = await supabase.from('design_tasks').update({ status: 'completed' }).eq('id', currentDesignTaskRecord.id);
+            const { error } = await supabase.from('design_tasks').update({ status: 'completed', sub_stage: null }).eq('id', currentDesignTaskRecord.id);
             if (error) { showToast('Error completing task: ' + error.message, 'error'); return; }
             currentDesignTaskRecord.status = 'completed';
+            currentDesignTaskRecord.sub_stage = null;
             const task = (allDesignTasks || []).find(t => t.id === currentDesignTaskRecord.id);
-            if (task) task.status = 'completed';
+            if (task) { task.status = 'completed'; task.sub_stage = null; }
             if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, null, 'task_completed', {});
             showToast('Task completed! ✓');
             _dsSelectedTaskId = null;
@@ -21892,8 +22000,8 @@
             // Update launchpad stats
             const elA = document.getElementById('stat-design-active');
             const elR = document.getElementById('stat-design-review');
-            const activeTasks = allTasks.filter(t => !['completed','delivered'].includes(t.status));
-            const reviewTasks = allTasks.filter(t => ['in_review','awaiting_approval'].includes(t.status));
+            const activeTasks = allTasks.filter(t => !['completed'].includes(t.status));
+            const reviewTasks = allTasks.filter(t => t.status === 'in_review');
             if (elA) elA.textContent = `${activeTasks.length} active`;
             if (elR) elR.textContent = `${reviewTasks.length} in review`;
 
@@ -21905,8 +22013,8 @@
 
             const cols = {
                 new:         _sortTasksForKanban(allTasks.filter(t => t.status === 'new')),
-                in_progress: _sortTasksForKanban(allTasks.filter(t => ['in_progress','revisions','in_review','awaiting_approval'].includes(t.status))),
-                delivered:   _sortTasksForKanban(allTasks.filter(t => t.status === 'delivered')),
+                in_progress: _sortTasksForKanban(allTasks.filter(t => t.status === 'in_progress')),
+                delivered:   _sortTasksForKanban(allTasks.filter(t => t.status === 'in_review')),
                 completed:   _sortTasksForKanban(allTasks.filter(t => t.status === 'completed')),
             };
 
@@ -21953,7 +22061,7 @@
                 ? (dueInfo.urgency === 'overdue' ? 'color:#dc2626;font-weight:700' : dueInfo.urgency === 'soon' ? 'color:#ea580c;font-weight:700' : 'color:#64748b')
                 : 'color:#64748b';
 
-            const hasRevisions = task.status === 'revisions'
+            const hasRevisions = task.sub_stage === 'revisions'
                 || stages.some(s => s.status === 'revisions_required');
 
             const priorityBadge = task.priority && task.priority !== 'standard'
@@ -22124,7 +22232,7 @@
             // Update filter chip counts
             const countNew       = allTasks.filter(t => t.status === 'new').length;
             const countInProg    = allTasks.filter(t => t.status === 'in_progress').length;
-            const countInReview  = allTasks.filter(t => ['in_review','awaiting_approval'].includes(t.status)).length;
+            const countInReview  = allTasks.filter(t => t.status === 'in_review').length;
             const countCompleted = allTasks.filter(t => t.status === 'completed').length;
             const setCount = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
             setCount('ds-fcount-new', countNew);
@@ -22135,15 +22243,15 @@
             let tasks = allTasks;
             if (dsFilter === 'new') tasks = tasks.filter(t => t.status === 'new');
             else if (dsFilter === 'in_progress') tasks = tasks.filter(t => t.status === 'in_progress');
-            else if (dsFilter === 'in_review') tasks = tasks.filter(t => ['in_review','awaiting_approval'].includes(t.status));
+            else if (dsFilter === 'in_review') tasks = tasks.filter(t => t.status === 'in_review');
             else if (dsFilter === 'completed') tasks = tasks.filter(t => t.status === 'completed');
             else tasks = tasks.filter(t => t.status !== 'completed');
 
             // Update launchpad stats
             const elA = document.getElementById('stat-design-active');
             const elR = document.getElementById('stat-design-review');
-            const activeTasks = (allDesignTasks||[]).filter(t => !['completed','delivered'].includes(t.status));
-            const reviewTasks = (allDesignTasks||[]).filter(t => ['in_review','awaiting_approval'].includes(t.status));
+            const activeTasks = (allDesignTasks||[]).filter(t => t.status !== 'completed');
+            const reviewTasks = (allDesignTasks||[]).filter(t => t.status === 'in_review');
             if (elA) elA.textContent = `${activeTasks.length} active`;
             if (elR) elR.textContent = `${reviewTasks.length} in review`;
 
@@ -24183,12 +24291,13 @@
             if (!stage) return;
             const ok = await updateStageStatus(stage, 'approved', 'Design Uploads complete');
             if (!ok) return;
-            // Set task to Factory Handover status
+            // Set task to In Progress / Factory Handover substage
             if (currentDesignTaskRecord?.id) {
-                await supabase.from('design_tasks').update({ status: 'factory_handover' }).eq('id', currentDesignTaskRecord.id);
-                currentDesignTaskRecord.status = 'factory_handover';
+                await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'factory_handover' }).eq('id', currentDesignTaskRecord.id);
+                currentDesignTaskRecord.status = 'in_progress';
+                currentDesignTaskRecord.sub_stage = 'factory_handover';
                 const t = (allDesignTasks || []).find(t => t.id === currentDesignTaskRecord.id);
-                if (t) t.status = 'factory_handover';
+                if (t) { t.status = 'in_progress'; t.sub_stage = 'factory_handover'; }
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_approved', { stage_name: 'Design Uploads' });
             }
             showToast('Design Uploads complete — Factory Handover ✓');
@@ -24203,8 +24312,11 @@
             await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', stageId);
             stage.status = 'in_progress';
             if (currentDesignTaskRecord?.id) {
-                await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', currentDesignTaskRecord.id);
+                await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'in_design' }).eq('id', currentDesignTaskRecord.id);
                 currentDesignTaskRecord.status = 'in_progress';
+                currentDesignTaskRecord.sub_stage = 'in_design';
+                const t = (allDesignTasks || []).find(t => t.id === currentDesignTaskRecord.id);
+                if (t) { t.status = 'in_progress'; t.sub_stage = 'in_design'; }
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_reverted', { stage_name: 'Design Uploads' });
             }
             await _dtrRefreshConceptsStage();
@@ -24576,8 +24688,10 @@
             if (!stage) return;
             const ok = await updateStageStatus(stage, 'in_review', 'Concepts delivered for review');
             if (!ok) return;
-            await supabase.from('design_tasks').update({ status: 'in_review' }).eq('id', stage.task_id);
-            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_review';
+            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'internal_review' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = 'internal_review'; }
+            const t = (allDesignTasks || []).find(t => t.id === stage.task_id);
+            if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
             await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Concepts' });
             showToast('Concepts delivered for review ✓');
             await _dtrRefreshConceptsStage();
@@ -24590,8 +24704,10 @@
                 if (!stage) return;
                 const ok = await updateStageStatus(stage, 'revisions_required', comment);
                 if (!ok) return;
-                await supabase.from('design_tasks').update({ status: 'revisions' }).eq('id', stage.task_id);
-                if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'revisions';
+                await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'revisions' }).eq('id', stage.task_id);
+                if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_progress'; currentDesignTaskRecord.sub_stage = 'revisions'; }
+                const t = (allDesignTasks || []).find(t => t.id === stage.task_id);
+                if (t) { t.status = 'in_progress'; t.sub_stage = 'revisions'; }
                 await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: 'Concepts', comment });
                 showToast('Revisions requested');
                 await _dtrRefreshConceptsStage();
@@ -24632,13 +24748,13 @@
                 task_completed: false
             });
 
-            // Update stage status to revisions_required; task status → revisions
+            // Update stage status to revisions_required; task → in_progress / revisions substage
             const ok = await updateStageStatus(stage, 'revisions_required', msg);
             if (!ok) return;
-            await supabase.from('design_tasks').update({ status: 'revisions' }).eq('id', stage.task_id);
-            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'revisions';
+            await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'revisions' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_progress'; currentDesignTaskRecord.sub_stage = 'revisions'; }
             const t = (allDesignTasks || []).find(t => t.id === stage.task_id);
-            if (t) t.status = 'revisions';
+            if (t) { t.status = 'in_progress'; t.sub_stage = 'revisions'; }
             await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: stage.stage_name, comment: msg });
 
             showToast('Revision request sent ✓');
@@ -24771,7 +24887,11 @@
         async function dtrDeliverStage(stageId, stageNum, label) {
             await supabase.from('design_stages').update({ status: 'in_review' }).eq('id', stageId);
             if (currentDesignTaskRecord?.id) {
-                await supabase.from('design_tasks').update({ status: 'in_review' }).eq('id', currentDesignTaskRecord.id);
+                await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'internal_review' }).eq('id', currentDesignTaskRecord.id);
+                currentDesignTaskRecord.status = 'in_review';
+                currentDesignTaskRecord.sub_stage = 'internal_review';
+                const t = (allDesignTasks||[]).find(t=>t.id===currentDesignTaskRecord.id);
+                if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_delivered', { label });
             }
             await _dtrRefreshStagesCol();
@@ -24779,10 +24899,11 @@
         async function dtrStageRevisions(stageId, stageNum) {
             await supabase.from('design_stages').update({ status: 'revisions_required' }).eq('id', stageId);
             if (currentDesignTaskRecord?.id) {
-                await supabase.from('design_tasks').update({ status: 'revisions' }).eq('id', currentDesignTaskRecord.id);
-                currentDesignTaskRecord.status = 'revisions';
+                await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'revisions' }).eq('id', currentDesignTaskRecord.id);
+                currentDesignTaskRecord.status = 'in_progress';
+                currentDesignTaskRecord.sub_stage = 'revisions';
                 const t = (allDesignTasks||[]).find(t=>t.id===currentDesignTaskRecord.id);
-                if (t) t.status = 'revisions';
+                if (t) { t.status = 'in_progress'; t.sub_stage = 'revisions'; }
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'revisions_requested', {});
             }
             await _dtrRefreshStagesCol();
@@ -25633,9 +25754,11 @@
             if (!stage) return;
             const ok = await updateStageStatus(stage, 'in_review', 'Submitted for review');
             if (!ok) return;
-            // Update the parent task status to 'in_review' so it surfaces in the dashboard Review queue
-            await supabase.from('design_tasks').update({ status: 'in_review' }).eq('id', stage.task_id);
-            if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_review';
+            // Update the parent task to In Review / Internal Review substage
+            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'internal_review' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = 'internal_review'; }
+            const t = (allDesignTasks||[]).find(t=>t.id===stage.task_id);
+            if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
             await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: stage.stage_name });
             renderStageTabs();
             renderStagePanel(stageNum);
