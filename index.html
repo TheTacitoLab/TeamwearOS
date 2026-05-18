@@ -1864,6 +1864,10 @@
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                     Production
                 </button>
+                <button class="gnav-btn" id="gnav-factory" onclick="showTool('factory')">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    Factory
+                </button>
                 <button class="gnav-btn" id="gnav-generator" onclick="showTool('generator')">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
                     Store
@@ -2006,6 +2010,17 @@
                     <div class="mt-4 flex items-center gap-2">
                         <span id="stat-design-active" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#fce7f3;color:#be185d">0 active</span>
                         <span id="stat-design-review" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#f1f5f9;color:#64748b">0 in review</span>
+                    </div>
+                </div>
+
+                <!-- Factory -->
+                <div id="fc-factory" onclick="showTool('factory')" class="feature-card accent-orange">
+                    <span class="card-badge badge-new" id="badge-factory" style="display:none">Off</span>
+                    <div class="card-icon" style="background:#ffedd5"><svg class="w-7 h-7" fill="none" stroke="#c2410c" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg></div>
+                    <h3>Factory</h3>
+                    <p>Fabrics, recipes, and production forecasting</p>
+                    <div class="mt-4 flex items-center gap-2">
+                        <span id="stat-fabrics" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#ffedd5;color:#c2410c">0 fabrics</span>
                     </div>
                 </div>
 
@@ -2379,6 +2394,20 @@
                             <div id="prod-tag-dropdown" class="hide" style="position:absolute;left:0;right:0;top:100%;margin-top:4px;z-index:999;max-height:200px;overflow-y:auto;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:#1e293b;box-shadow:0 8px 32px rgba(0,0,0,0.45)"></div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Fabric Recipe -->
+                <div class="bg-gray-800/50 rounded-xl p-4 mb-4" id="prod-fabric-recipe-section">
+                    <h4 class="font-semibold mb-3 text-orange-400">Fabric Recipe</h4>
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <label class="text-gray-400 text-sm mb-1 block">Total Fabric (kg per garment)</label>
+                            <input type="number" step="0.0001" id="prod-total-fabric-kg" placeholder="0.5000" oninput="renderFabricRecipeRows()" class="w-full px-3 py-2 rounded-lg">
+                        </div>
+                    </div>
+                    <div id="prod-fabric-recipe-rows"></div>
+                    <button type="button" id="prod-add-fabric-btn" onclick="addFabricRecipeRow()" class="btn-secondary text-sm mt-2">+ Add Fabric Component</button>
+                    <p id="prod-fabric-recipe-warn" class="text-xs text-amber-400 mt-2 hide">Allocations do not total 100% — please review before saving.</p>
                 </div>
 
                 <!-- Description -->
@@ -3189,6 +3218,110 @@
                     <button onclick="hidePoDetailModal()" class="px-6 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Close</button>
                     <button onclick="editCurrentPo()" class="bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-lg font-semibold transition">Edit PO</button>
                     <button onclick="deleteCurrentPo()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold transition">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOOL: Factory -->
+        <div id="tool-factory" class="hide w-full p-6 md:p-8 lg:px-12">
+            <div class="sh-topbar">
+                <div class="sh-tabs">
+                    <button id="factory-tab-fabrics" class="sh-tab active" onclick="switchFactoryTab('fabrics')">Fabric List <span id="ftab-fabrics-count" class="sh-count">0</span></button>
+                    <button id="factory-tab-forecast" class="sh-tab" onclick="switchFactoryTab('forecast')">Fabric Forecast</button>
+                    <button id="factory-tab-development" class="sh-tab" onclick="switchFactoryTab('development')">Product Development</button>
+                </div>
+                <div class="sh-topbar-right">
+                    <div id="factory-actions-fabrics" class="sh-actions">
+                        <button class="btn-primary" onclick="openFabricModal()">+ New Fabric</button>
+                    </div>
+                    <div id="factory-actions-forecast" class="sh-actions hide">
+                        <button class="btn-secondary text-sm" onclick="loadForecast()">Refresh</button>
+                    </div>
+                    <div id="factory-actions-development" class="sh-actions hide"></div>
+                </div>
+            </div>
+            <div id="factory-view-fabrics"></div>
+            <div id="factory-view-forecast" class="hide"></div>
+            <div id="factory-view-development" class="hide"></div>
+        </div>
+
+        <!-- MODAL: Fabric -->
+        <div id="fabric-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4" style="max-height:90vh;overflow-y:auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold" id="fabric-modal-title">New Fabric</h3>
+                    <button onclick="closeFabricModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                </div>
+
+                <input type="hidden" id="edit-fabric-id">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Fabric Name <span class="text-red-400">*</span></label>
+                        <input type="text" id="fabric-name" placeholder="Dull Interlock" class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Construction</label>
+                        <input type="text" id="fabric-construction" placeholder="e.g. Dull Interlock, Mini Birdeye" class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">GSM</label>
+                        <input type="number" id="fabric-gsm" placeholder="180" class="w-full px-3 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Status</label>
+                        <select id="fabric-status" class="w-full px-3 py-2 rounded-lg">
+                            <option value="active">Active</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Colours <span class="text-gray-500 text-xs">(comma-separated)</span></label>
+                    <input type="text" id="fabric-colours" placeholder="White, Black, Navy, Red" class="w-full px-3 py-2 rounded-lg">
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Notes</label>
+                    <textarea id="fabric-notes" rows="2" placeholder="Any notes about this fabric…" class="w-full px-3 py-2 rounded-lg"></textarea>
+                </div>
+
+                <!-- Procurement details (collapsible) -->
+                <div class="mb-4">
+                    <button type="button" onclick="toggleFabricProcurement()" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white mb-2">
+                        <svg id="fabric-proc-chevron" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        Procurement Details
+                    </button>
+                    <div id="fabric-procurement-fields" class="hide">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-gray-400 text-sm mb-1 block">Supplier</label>
+                                <input type="text" id="fabric-supplier" placeholder="Supplier name" class="w-full px-3 py-2 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-gray-400 text-sm mb-1 block">Fabric Width (cm)</label>
+                                <input type="number" step="0.01" id="fabric-width" placeholder="150.00" class="w-full px-3 py-2 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-gray-400 text-sm mb-1 block">Cost per kg (£)</label>
+                                <input type="number" step="0.01" id="fabric-cost-per-kg" placeholder="8.50" class="w-full px-3 py-2 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-gray-400 text-sm mb-1 block">Min Order Qty (kg)</label>
+                                <input type="number" step="0.01" id="fabric-min-order-qty" placeholder="50" class="w-full px-3 py-2 rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-gray-400 text-sm mb-1 block">Lead Time (days)</label>
+                                <input type="number" id="fabric-lead-time" placeholder="21" class="w-full px-3 py-2 rounded-lg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-2">
+                    <button onclick="closeFabricModal()" class="flex-1 btn-secondary py-3">Cancel</button>
+                    <button onclick="saveFabric()" class="flex-1 btn-primary py-3">Save Fabric</button>
                 </div>
             </div>
         </div>
@@ -4999,6 +5132,34 @@
                     </div>
                 </div>
 
+                <!-- Forecast Settings -->
+                <div class="modal-section mt-4">
+                    <p class="modal-section-title">Fabric Forecast Settings</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Number of Teams</label>
+                            <input type="number" id="club-num-teams" placeholder="4" min="0" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Number of Players / Members</label>
+                            <input type="number" id="club-num-players" placeholder="80" min="0" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Minimum Scenario %</label>
+                            <input type="number" id="club-forecast-min-pct" placeholder="20" min="0" max="100" step="5" class="w-full px-3 py-2 rounded-lg text-sm">
+                            <p class="text-gray-500 text-xs mt-0.5">Minimum expectation as % of total players</p>
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Forecast Due Date</label>
+                            <input type="date" id="club-forecast-due-date" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                    </div>
+                    <label class="flex items-center gap-2 cursor-pointer text-sm">
+                        <input type="checkbox" id="club-forecast-enabled" class="rounded">
+                        <span class="text-gray-300">Enable fabric forecast for this club</span>
+                    </label>
+                </div>
+
                 <!-- Hidden legacy partner checkbox for JS compatibility -->
                 <input type="hidden" id="club-is-partner" value="false">
 
@@ -6679,7 +6840,8 @@
                 'production':     { card: 'fc-production',  badge: 'badge-production',  onclick: "showTool('po-tracker')" },
                 'design_studio':  { card: 'fc-design',      badge: 'badge-design',      onclick: "showTool('design-studio')" },
                 'store_generator':{ card: 'fc-store',       badge: 'badge-store',       onclick: "showTool('generator')" },
-                'products':       { card: 'fc-products',    badge: 'badge-products',    onclick: "showTool('products')" }
+                'products':       { card: 'fc-products',    badge: 'badge-products',    onclick: "showTool('products')" },
+                'factory':        { card: 'fc-factory',     badge: 'badge-factory',     onclick: "showTool('factory')" }
             };
             Object.entries(featureMap).forEach(([feature, cfg]) => {
                 const card = document.getElementById(cfg.card);
@@ -6716,7 +6878,7 @@
                 const TOOL_LABELS = { products: 'Product Database', clubs: 'Clubs', 'design-studio': 'Design Studio',
                     mockups: 'Mock-Ups', generator: 'Store Generator', orders: 'Factory Orders',
                     settings: 'Brand Settings', users: 'User Management', 'po-tracker': 'Production',
-                    prospecting: 'Prospecting', sales: 'Sales', 'order-forms': 'Order Forms' };
+                    prospecting: 'Prospecting', sales: 'Sales', 'order-forms': 'Order Forms', factory: 'Factory' };
                 navTrail = [{ label: 'Home', type: 'launchpad' }, { label: TOOL_LABELS[tool] || tool, type: 'tool', tool }];
                 renderBreadcrumb();
             }
@@ -6758,6 +6920,10 @@
                     break;
                 case 'po-tracker':
                     loadPoTracker();
+                    break;
+                case 'factory':
+                    loadFactory();
+                    switchFactoryTab(_factoryActiveTab || 'fabrics');
                     break;
                 case 'sales':
                     Promise.all([loadLeads(), loadKanbanStages(), loadJobs(), loadJobKanbanStages()]).then(() => {
@@ -6853,6 +7019,398 @@
         function _isCOGSFormulaMode() {
             const formulaWrap = document.getElementById('cogs-formula-wrap');
             return formulaWrap && !formulaWrap.classList.contains('hide');
+        }
+
+        // =============================================
+        // FACTORY MODULE
+        // =============================================
+
+        let _factoryActiveTab = 'fabrics';
+        let allFabrics = [];
+        let _currentRecipeRows = [];
+        let _fabricSearchVal = '';
+
+        async function ensureFabricsLoaded() {
+            if (!currentBrand || allFabrics.length > 0) return;
+            const { data } = await supabase
+                .from('fabrics').select('*').eq('brand_id', currentBrand.id).eq('status','active').order('fabric_name');
+            allFabrics = data || [];
+        }
+
+        async function loadFactory() {
+            if (!currentBrand) return;
+            const { data, error } = await supabase
+                .from('fabrics').select('*').eq('brand_id', currentBrand.id).order('fabric_name');
+            if (error) { showToast('Error loading fabrics', 'error'); return; }
+            allFabrics = data || [];
+            const countEl = document.getElementById('ftab-fabrics-count');
+            if (countEl) countEl.textContent = allFabrics.filter(f => f.status !== 'archived').length;
+            const statEl = document.getElementById('stat-fabrics');
+            if (statEl) statEl.textContent = allFabrics.filter(f => f.status !== 'archived').length + ' fabrics';
+            renderFactoryActiveView();
+        }
+
+        function switchFactoryTab(tab) {
+            _factoryActiveTab = tab;
+            ['fabrics','forecast','development'].forEach(t => {
+                const btn = document.getElementById(`factory-tab-${t}`);
+                const view = document.getElementById(`factory-view-${t}`);
+                const actions = document.getElementById(`factory-actions-${t}`);
+                if (btn) btn.classList.toggle('active', t === tab);
+                if (view) view.classList.toggle('hide', t !== tab);
+                if (actions) actions.classList.toggle('hide', t !== tab);
+            });
+            renderFactoryActiveView();
+        }
+
+        function renderFactoryActiveView() {
+            if (_factoryActiveTab === 'fabrics')     renderFabricsTable();
+            if (_factoryActiveTab === 'forecast')    renderForecastView();
+            if (_factoryActiveTab === 'development') renderDevelopmentView();
+        }
+
+        // ---- Fabric List ----
+
+        function renderFabricsTable() {
+            const el = document.getElementById('factory-view-fabrics');
+            if (!el) return;
+            const search = (_fabricSearchVal || '').toLowerCase();
+            const rows = allFabrics.filter(f => {
+                if (search && !f.fabric_name.toLowerCase().includes(search) && !(f.construction || '').toLowerCase().includes(search)) return false;
+                return true;
+            });
+
+            el.innerHTML = `
+                <div class="flex items-center gap-3 mb-4">
+                    <input type="text" placeholder="Search fabrics…" value="${escHtml(search)}"
+                        oninput="setFabricSearch(this.value)"
+                        class="px-3 py-2 rounded-lg text-sm" style="min-width:220px">
+                    <label class="flex items-center gap-2 text-sm text-gray-400 cursor-pointer">
+                        <input type="checkbox" id="fabric-show-archived" ${_fabricShowArchived?'checked':''} onchange="_fabricShowArchived=this.checked;renderFabricsTable()">
+                        Show archived
+                    </label>
+                </div>
+                ${rows.length === 0 ? `<div class="glass rounded-2xl p-10 text-center text-gray-500">No fabrics found. Click <strong>+ New Fabric</strong> to add your first.</div>` : `
+                <div class="glass rounded-2xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                                <th class="text-left px-4 py-3">Fabric Name</th>
+                                <th class="text-left px-4 py-3">Construction</th>
+                                <th class="text-left px-4 py-3">GSM</th>
+                                <th class="text-left px-4 py-3">Colours</th>
+                                <th class="text-left px-4 py-3">Status</th>
+                                <th class="text-left px-4 py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows.map(f => `
+                            <tr class="border-b border-white/5 hover:bg-white/5 cursor-pointer" onclick="openFabricModal(${JSON.stringify(f.id)})">
+                                <td class="px-4 py-3 font-medium">${escHtml(f.fabric_name)}</td>
+                                <td class="px-4 py-3 text-gray-400">${escHtml(f.construction || '—')}</td>
+                                <td class="px-4 py-3 text-gray-400">${f.gsm || '—'}</td>
+                                <td class="px-4 py-3">${(f.colours || []).slice(0,4).map(c => `<span class="inline-block text-xs px-1.5 py-0.5 rounded mr-1" style="background:rgba(255,255,255,0.08);color:#cbd5e1">${escHtml(c)}</span>`).join('')}</td>
+                                <td class="px-4 py-3">
+                                    <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${f.status === 'archived' ? 'bg-gray-700 text-gray-400' : 'bg-green-500/10 text-green-400'}">${f.status === 'archived' ? 'Archived' : 'Active'}</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <button onclick="event.stopPropagation();archiveFabric('${f.id}','${f.status === 'archived' ? 'active' : 'archived'}')"
+                                        class="text-xs text-gray-500 hover:text-gray-300 underline">${f.status === 'archived' ? 'Restore' : 'Archive'}</button>
+                                </td>
+                            </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>`}`;
+        }
+
+        let _fabricShowArchived = false;
+        function setFabricSearch(val) { _fabricSearchVal = val; renderFabricsTable(); }
+
+        function openFabricModal(fabricId) {
+            const fabric = fabricId ? allFabrics.find(f => f.id === fabricId) : null;
+            document.getElementById('fabric-modal-title').textContent = fabric ? 'Edit Fabric' : 'New Fabric';
+            document.getElementById('edit-fabric-id').value = fabric?.id || '';
+            document.getElementById('fabric-name').value = fabric?.fabric_name || '';
+            document.getElementById('fabric-construction').value = fabric?.construction || '';
+            document.getElementById('fabric-gsm').value = fabric?.gsm || '';
+            document.getElementById('fabric-status').value = fabric?.status || 'active';
+            document.getElementById('fabric-colours').value = (fabric?.colours || []).join(', ');
+            document.getElementById('fabric-notes').value = fabric?.notes || '';
+            document.getElementById('fabric-supplier').value = fabric?.supplier || '';
+            document.getElementById('fabric-width').value = fabric?.fabric_width || '';
+            document.getElementById('fabric-cost-per-kg').value = fabric?.cost_per_kg || '';
+            document.getElementById('fabric-min-order-qty').value = fabric?.min_order_qty || '';
+            document.getElementById('fabric-lead-time').value = fabric?.lead_time_days || '';
+            // Collapse procurement section
+            const procFields = document.getElementById('fabric-procurement-fields');
+            const procChevron = document.getElementById('fabric-proc-chevron');
+            if (procFields) procFields.classList.add('hide');
+            if (procChevron) procChevron.style.transform = '';
+            document.getElementById('fabric-modal').classList.remove('hide');
+        }
+
+        function closeFabricModal() {
+            document.getElementById('fabric-modal').classList.add('hide');
+        }
+
+        function toggleFabricProcurement() {
+            const fields = document.getElementById('fabric-procurement-fields');
+            const chevron = document.getElementById('fabric-proc-chevron');
+            if (!fields) return;
+            const open = !fields.classList.contains('hide');
+            fields.classList.toggle('hide', open);
+            if (chevron) chevron.style.transform = open ? '' : 'rotate(90deg)';
+        }
+
+        async function saveFabric() {
+            if (!currentBrand) return;
+            const fabricId = document.getElementById('edit-fabric-id').value;
+            const name = document.getElementById('fabric-name').value.trim();
+            if (!name) { showToast('Fabric name is required', 'error'); return; }
+            const coloursRaw = document.getElementById('fabric-colours').value;
+            const colours = coloursRaw ? coloursRaw.split(',').map(c => c.trim()).filter(Boolean) : [];
+            const fabricData = {
+                brand_id: currentBrand.id,
+                fabric_name: name,
+                construction: document.getElementById('fabric-construction').value.trim() || null,
+                gsm: parseInt(document.getElementById('fabric-gsm').value) || null,
+                colours: colours.length ? colours : null,
+                notes: document.getElementById('fabric-notes').value.trim() || null,
+                status: document.getElementById('fabric-status').value || 'active',
+                supplier: document.getElementById('fabric-supplier').value.trim() || null,
+                fabric_width: parseFloat(document.getElementById('fabric-width').value) || null,
+                cost_per_kg: parseFloat(document.getElementById('fabric-cost-per-kg').value) || null,
+                min_order_qty: parseFloat(document.getElementById('fabric-min-order-qty').value) || null,
+                lead_time_days: parseInt(document.getElementById('fabric-lead-time').value) || null,
+                updated_at: new Date().toISOString()
+            };
+            let result;
+            if (fabricId) {
+                result = await supabase.from('fabrics').update(fabricData).eq('id', fabricId).select().single();
+            } else {
+                result = await supabase.from('fabrics').insert(fabricData).select().single();
+            }
+            if (result.error) { showToast(result.error.message, 'error'); return; }
+            if (fabricId) {
+                const idx = allFabrics.findIndex(f => f.id === fabricId);
+                if (idx !== -1) allFabrics[idx] = result.data; else allFabrics.push(result.data);
+            } else {
+                allFabrics.push(result.data);
+                allFabrics.sort((a, b) => a.fabric_name.localeCompare(b.fabric_name));
+            }
+            const countEl = document.getElementById('ftab-fabrics-count');
+            if (countEl) countEl.textContent = allFabrics.filter(f => f.status !== 'archived').length;
+            const statEl = document.getElementById('stat-fabrics');
+            if (statEl) statEl.textContent = allFabrics.filter(f => f.status !== 'archived').length + ' fabrics';
+            closeFabricModal();
+            renderFabricsTable();
+            showToast(fabricId ? 'Fabric updated' : 'Fabric added');
+        }
+
+        async function archiveFabric(fabricId, newStatus) {
+            const { error } = await supabase.from('fabrics').update({ status: newStatus }).eq('id', fabricId);
+            if (error) { showToast(error.message, 'error'); return; }
+            const idx = allFabrics.findIndex(f => f.id === fabricId);
+            if (idx !== -1) allFabrics[idx].status = newStatus;
+            renderFabricsTable();
+            showToast(newStatus === 'archived' ? 'Fabric archived' : 'Fabric restored');
+        }
+
+        // ---- Fabric Recipe (in product modal) ----
+
+        const RECIPE_COMPONENT_TYPES = ['main', 'rear', 'panels', 'trimmings'];
+        const RECIPE_COMPONENT_LABELS = { main: 'Main', rear: 'Rear', panels: 'Panels', trimmings: 'Trimmings' };
+
+        function renderFabricRecipeRows() {
+            const container = document.getElementById('prod-fabric-recipe-rows');
+            if (!container) return;
+            const totalKg = parseFloat(document.getElementById('prod-total-fabric-kg')?.value) || 0;
+            const usedTypes = _currentRecipeRows.map(r => r.component_type);
+            const availableFabrics = allFabrics.filter(f => f.status !== 'archived');
+
+            if (_currentRecipeRows.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-xs mb-2">No fabric components added yet.</p>';
+            } else {
+                container.innerHTML = _currentRecipeRows.map((row, i) => {
+                    const kg = totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—';
+                    return `<div class="flex items-center gap-2 mb-2 flex-wrap" id="recipe-row-${i}">
+                        <select onchange="_currentRecipeRows[${i}].component_type=this.value;renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm" style="min-width:110px">
+                            ${RECIPE_COMPONENT_TYPES.map(t => `<option value="${t}" ${row.component_type === t ? 'selected' : ''}
+                                ${(usedTypes.includes(t) && row.component_type !== t) ? 'disabled' : ''}>${RECIPE_COMPONENT_LABELS[t]}</option>`).join('')}
+                        </select>
+                        <select onchange="_currentRecipeRows[${i}].fabric_id=this.value" class="px-2 py-1.5 rounded-lg text-sm flex-1" style="min-width:160px">
+                            <option value="">— Select fabric —</option>
+                            ${availableFabrics.map(f => `<option value="${f.id}" ${row.fabric_id === f.id ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
+                        </select>
+                        <input type="number" min="0" max="100" step="0.01" value="${row.allocation_pct || ''}" placeholder="%" style="width:72px"
+                            class="px-2 py-1.5 rounded-lg text-sm"
+                            oninput="_currentRecipeRows[${i}].allocation_pct=parseFloat(this.value)||0;renderFabricRecipeRows()">
+                        <span class="text-xs text-gray-400" style="min-width:72px">→ ${kg} kg</span>
+                        <button type="button" onclick="_currentRecipeRows.splice(${i},1);renderFabricRecipeRows()" class="text-gray-500 hover:text-red-400 text-lg leading-none">&times;</button>
+                    </div>`;
+                }).join('');
+            }
+
+            // Warn if allocations don't total 100
+            const total = _currentRecipeRows.reduce((s, r) => s + (parseFloat(r.allocation_pct) || 0), 0);
+            const warnEl = document.getElementById('prod-fabric-recipe-warn');
+            if (warnEl) warnEl.classList.toggle('hide', _currentRecipeRows.length === 0 || Math.abs(total - 100) < 0.01);
+
+            // Disable add button when all 4 types are used or all types present
+            const addBtn = document.getElementById('prod-add-fabric-btn');
+            if (addBtn) addBtn.disabled = _currentRecipeRows.length >= RECIPE_COMPONENT_TYPES.length;
+        }
+
+        function addFabricRecipeRow() {
+            const usedTypes = _currentRecipeRows.map(r => r.component_type);
+            const nextType = RECIPE_COMPONENT_TYPES.find(t => !usedTypes.includes(t));
+            if (!nextType) return;
+            _currentRecipeRows.push({ component_type: nextType, fabric_id: '', allocation_pct: 0 });
+            renderFabricRecipeRows();
+        }
+
+        // ---- Fabric Forecast ----
+
+        async function renderForecastView() {
+            const el = document.getElementById('factory-view-forecast');
+            if (!el) return;
+            el.innerHTML = '<div class="text-gray-400 text-sm py-8 text-center">Loading forecast data…</div>';
+
+            // Load clubs with forecast enabled
+            const { data: forecastClubs, error: clubsErr } = await supabase
+                .from('clubs')
+                .select('id, name, number_of_players, fabric_forecast_enabled, fabric_forecast_due_date, fabric_forecast_min_pct')
+                .eq('brand_id', currentBrand.id);
+            if (clubsErr) { el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading clubs.</div>'; return; }
+
+            // Load club products with master product + recipe
+            const { data: clubProducts, error: cpErr } = await supabase
+                .from('club_products')
+                .select(`id, club_id, product_id, custom_name, products(id, item_name, total_fabric_kg, product_fabric_recipes(fabric_id, component_type, allocation_pct))`)
+                .in('club_id', (forecastClubs || []).map(c => c.id));
+            if (cpErr) { el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading products.</div>'; return; }
+
+            // Load confirmed order quantities
+            const cpIds = (clubProducts || []).map(cp => cp.id);
+            let orderTotals = {};
+            if (cpIds.length) {
+                const { data: ositems } = await supabase
+                    .from('order_submission_items')
+                    .select('club_product_id, quantity')
+                    .in('club_product_id', cpIds);
+                (ositems || []).forEach(item => {
+                    orderTotals[item.club_product_id] = (orderTotals[item.club_product_id] || 0) + (item.quantity || 0);
+                });
+            }
+
+            // Build forecast rows
+            const forecastRows = [];
+            const clubMap = Object.fromEntries((forecastClubs || []).map(c => [c.id, c]));
+
+            (clubProducts || []).forEach(cp => {
+                const club = clubMap[cp.club_id];
+                if (!club) return;
+                const product = cp.products;
+                if (!product || !product.total_fabric_kg) return;
+                const recipes = product.product_fabric_recipes || [];
+                recipes.forEach(recipe => {
+                    const fabric = allFabrics.find(f => f.id === recipe.fabric_id);
+                    if (!fabric) return;
+                    const allocPct = recipe.allocation_pct / 100;
+                    const kgPerUnit = product.total_fabric_kg * allocPct;
+
+                    // Club forecast
+                    if (club.fabric_forecast_enabled && club.number_of_players) {
+                        const maxUnits = club.number_of_players;
+                        const minPct = club.fabric_forecast_min_pct ?? 20;
+                        const minUnits = maxUnits * (minPct / 100);
+                        forecastRows.push({
+                            fabric_name: fabric.fabric_name,
+                            club_name: club.name,
+                            product_name: cp.custom_name || product.item_name,
+                            source: 'Club Forecast',
+                            min_kg: (minUnits * kgPerUnit).toFixed(2),
+                            max_kg: (maxUnits * kgPerUnit).toFixed(2),
+                            needed_by: club.fabric_forecast_due_date || '',
+                            club_id: club.id,
+                            fabric_id: fabric.id
+                        });
+                    }
+
+                    // Live orders
+                    const confirmedUnits = orderTotals[cp.id] || 0;
+                    if (confirmedUnits > 0) {
+                        forecastRows.push({
+                            fabric_name: fabric.fabric_name,
+                            club_name: club.name,
+                            product_name: cp.custom_name || product.item_name,
+                            source: 'Live Orders',
+                            min_kg: '—',
+                            max_kg: (confirmedUnits * kgPerUnit).toFixed(2),
+                            needed_by: '',
+                            club_id: club.id,
+                            fabric_id: fabric.id
+                        });
+                    }
+                });
+            });
+
+            if (forecastRows.length === 0) {
+                el.innerHTML = `<div class="glass rounded-2xl p-10 text-center">
+                    <h3 class="font-semibold mb-2 text-gray-300">No forecast data yet</h3>
+                    <p class="text-gray-500 text-sm">To see a club forecast: add fabrics, set up fabric recipes on master products, then enable <em>fabric forecast</em> on a club with player/member count set.</p>
+                </div>`;
+                return;
+            }
+
+            // Group by fabric
+            const byFabric = {};
+            forecastRows.forEach(r => {
+                if (!byFabric[r.fabric_name]) byFabric[r.fabric_name] = [];
+                byFabric[r.fabric_name].push(r);
+            });
+
+            el.innerHTML = `
+                <div class="glass rounded-2xl overflow-hidden">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                                <th class="text-left px-4 py-3">Fabric</th>
+                                <th class="text-left px-4 py-3">Club</th>
+                                <th class="text-left px-4 py-3">Product</th>
+                                <th class="text-left px-4 py-3">Source</th>
+                                <th class="text-right px-4 py-3">Min kg</th>
+                                <th class="text-right px-4 py-3">Max kg</th>
+                                <th class="text-left px-4 py-3">Needed By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${forecastRows.map((r, i) => {
+                                const showFabric = i === 0 || forecastRows[i-1].fabric_name !== r.fabric_name;
+                                return `<tr class="border-b border-white/5 hover:bg-white/5">
+                                    <td class="px-4 py-3 font-medium text-orange-300">${showFabric ? escHtml(r.fabric_name) : ''}</td>
+                                    <td class="px-4 py-3 text-gray-300">${escHtml(r.club_name)}</td>
+                                    <td class="px-4 py-3 text-gray-400">${escHtml(r.product_name)}</td>
+                                    <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full ${r.source === 'Live Orders' ? 'bg-blue-500/15 text-blue-300' : 'bg-orange-500/15 text-orange-300'}">${r.source}</span></td>
+                                    <td class="px-4 py-3 text-right text-gray-400">${r.min_kg}</td>
+                                    <td class="px-4 py-3 text-right font-semibold">${r.max_kg}</td>
+                                    <td class="px-4 py-3 text-gray-400">${r.needed_by || '—'}</td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        // ---- Product Development (placeholder) ----
+
+        function renderDevelopmentView() {
+            const el = document.getElementById('factory-view-development');
+            if (!el) return;
+            el.innerHTML = `<div class="glass rounded-2xl p-10 text-center">
+                <h3 class="font-semibold mb-2 text-gray-300">Product Development</h3>
+                <p class="text-gray-500">Coming soon.</p>
+            </div>`;
         }
 
         function renderSalespeopleList() {
@@ -8215,6 +8773,12 @@
             currentProductTags = [];
             renderProductTagsUI();
 
+            // Reset fabric recipe
+            const tfkgEl = document.getElementById('prod-total-fabric-kg');
+            if (tfkgEl) tfkgEl.value = '';
+            _currentRecipeRows = [];
+            ensureFabricsLoaded().then(() => renderFabricRecipeRows());
+
             document.getElementById('product-modal').classList.remove('hide');
         }
 
@@ -8305,6 +8869,22 @@
             const rawTags = product.shopify_tags;
             currentProductTags = Array.isArray(rawTags) ? [...rawTags] : (rawTags ? (typeof rawTags === 'string' ? JSON.parse(rawTags) : []) : []);
             renderProductTagsUI();
+
+            // Fabric recipe
+            const tfkgEl = document.getElementById('prod-total-fabric-kg');
+            if (tfkgEl) tfkgEl.value = product.total_fabric_kg || '';
+            _currentRecipeRows = [];
+            renderFabricRecipeRows();
+            ensureFabricsLoaded().then(() => {
+                supabase.from('product_fabric_recipes')
+                    .select('component_type, fabric_id, allocation_pct')
+                    .eq('product_id', productId)
+                    .order('sort_order')
+                    .then(({ data: recipeRows }) => {
+                        _currentRecipeRows = recipeRows || [];
+                        renderFabricRecipeRows();
+                    });
+            });
 
             document.getElementById('product-modal').classList.remove('hide');
         }
@@ -9240,7 +9820,8 @@
                 // New fields
                 shopify_template_suffix:  document.getElementById('prod-template-suffix')?.value.trim() || null,
                 shopify_product_category: document.getElementById('prod-shopify-category')?.value.trim() || null,
-                is_made_to_order:         document.getElementById('prod-made-to-order')?.checked !== false
+                is_made_to_order:         document.getElementById('prod-made-to-order')?.checked !== false,
+                total_fabric_kg:          parseFloat(document.getElementById('prod-total-fabric-kg')?.value) || null
             };
 
             if (!productData.product_code || !productData.item_name || !productData.category || !productData.range_name) {
@@ -9273,6 +9854,21 @@
             if (result.error) {
                 showToast(result.error.message, 'error');
                 return;
+            }
+
+            // Save fabric recipe (delete-then-insert)
+            const savedProductId = result.data.id;
+            await supabase.from('product_fabric_recipes').delete().eq('product_id', savedProductId);
+            if (_currentRecipeRows.length > 0) {
+                const recipeInserts = _currentRecipeRows.map((r, i) => ({
+                    product_id: savedProductId,
+                    fabric_id: r.fabric_id,
+                    component_type: r.component_type,
+                    allocation_pct: parseFloat(r.allocation_pct) || 0,
+                    sort_order: i
+                }));
+                const { error: recipeErr } = await supabase.from('product_fabric_recipes').insert(recipeInserts);
+                if (recipeErr) console.error('Recipe save error:', recipeErr);
             }
 
             // Update local state
@@ -11833,6 +12429,14 @@
             if (logoPreview) logoPreview.innerHTML = '<svg class="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z"/></svg>';
             const logoExisting = document.getElementById('club-logo-url-existing');
             if (logoExisting) logoExisting.value = '';
+            // Clear forecast fields
+            ['club-num-teams','club-num-players','club-forecast-due-date'].forEach(id => {
+                const el = document.getElementById(id); if (el) el.value = '';
+            });
+            const fcMinEl = document.getElementById('club-forecast-min-pct');
+            if (fcMinEl) fcMinEl.value = '20';
+            const fcEnabledEl = document.getElementById('club-forecast-enabled');
+            if (fcEnabledEl) fcEnabledEl.checked = false;
             const suffixStatus = document.getElementById('suffix-status');
             if (suffixStatus) suffixStatus.textContent = '';
             document.getElementById('create-club-modal').classList.remove('hide');
@@ -11869,6 +12473,17 @@
             document.getElementById('club-contact-name').value = currentClub.contact_name || '';
             document.getElementById('club-contact-email').value = currentClub.contact_email || '';
             document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
+            // Forecast settings
+            const numTeamsEl = document.getElementById('club-num-teams');
+            if (numTeamsEl) numTeamsEl.value = currentClub.number_of_teams || '';
+            const numPlayersEl = document.getElementById('club-num-players');
+            if (numPlayersEl) numPlayersEl.value = currentClub.number_of_players || '';
+            const forecastEnabledEl = document.getElementById('club-forecast-enabled');
+            if (forecastEnabledEl) forecastEnabledEl.checked = !!currentClub.fabric_forecast_enabled;
+            const forecastDueDateEl = document.getElementById('club-forecast-due-date');
+            if (forecastDueDateEl) forecastDueDateEl.value = currentClub.fabric_forecast_due_date || '';
+            const forecastMinPctEl = document.getElementById('club-forecast-min-pct');
+            if (forecastMinPctEl) forecastMinPctEl.value = currentClub.fabric_forecast_min_pct ?? 20;
             const suffixStatus = document.getElementById('suffix-status');
             if (suffixStatus) { suffixStatus.textContent = '✓ Saved'; suffixStatus.className = 'absolute right-2 top-1/2 -translate-y-1/2 text-xs text-green-400'; }
             // Logo preview
@@ -12074,6 +12689,11 @@
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
                 logo_url: logoUrl,
+                number_of_teams: parseInt(document.getElementById('club-num-teams')?.value) || null,
+                number_of_players: parseInt(document.getElementById('club-num-players')?.value) || null,
+                fabric_forecast_enabled: !!document.getElementById('club-forecast-enabled')?.checked,
+                fabric_forecast_due_date: document.getElementById('club-forecast-due-date')?.value || null,
+                fabric_forecast_min_pct: parseFloat(document.getElementById('club-forecast-min-pct')?.value) || 20,
                 ...(() => {
                     const ownerIds = getOwnerDropdownIds('club-modal');
                     return { assigned_user_id: ownerIds[0] || null, assigned_user_ids: ownerIds };
