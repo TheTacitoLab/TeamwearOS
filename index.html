@@ -2484,23 +2484,31 @@
                     <input id="ds-search" class="ds-toolbar-search" placeholder="Search tasks or clubs…" oninput="renderDSDashboard()">
                 </div>
 
-                <!-- Due date filter chips -->
-                <div style="display:flex;align-items:center;gap:4px">
-                    <button id="ds-due-chip-all"     class="ds-due-chip ds-due-active" onclick="setDSDueFilter('all')">All</button>
-                    <button id="ds-due-chip-today"   class="ds-due-chip"               onclick="setDSDueFilter('today')">Due Today</button>
-                    <button id="ds-due-chip-week"    class="ds-due-chip"               onclick="setDSDueFilter('week')">Due This Week</button>
-                    <button id="ds-due-chip-overdue" class="ds-due-chip"               onclick="setDSDueFilter('overdue')">Overdue</button>
-                </div>
+                <!-- Due date filter dropdown -->
+                <select id="ds-due-select" onchange="setDSDueFilter(this.value)"
+                    style="font-size:11px;font-weight:600;padding:4px 8px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;flex-shrink:0">
+                    <option value="all">All Dates</option>
+                    <option value="today">Due Today</option>
+                    <option value="week">Due This Week</option>
+                    <option value="overdue">Overdue</option>
+                </select>
 
-                <!-- Stage filter chips -->
-                <div style="display:flex;align-items:center;gap:4px;border-left:1px solid #e2e8f0;padding-left:10px">
-                    <button id="ds-stage-chip-all"         class="ds-due-chip ds-due-active" onclick="setDSStageFilter('all')">All Stages</button>
-                    <button id="ds-stage-chip-new"         class="ds-due-chip"               onclick="setDSStageFilter('new')">New</button>
-                    <button id="ds-stage-chip-in_progress" class="ds-due-chip"               onclick="setDSStageFilter('in_progress')">In Progress</button>
-                    <button id="ds-stage-chip-in_review"   class="ds-due-chip"               onclick="setDSStageFilter('in_review')">In Review</button>
-                </div>
-                <!-- Substage filter (shown when In Progress or In Review selected) -->
-                <div id="ds-substage-chips" style="display:none;align-items:center;gap:4px"></div>
+                <!-- Stage filter dropdown -->
+                <select id="ds-stage-select" onchange="setDSStageFilter(this.value)"
+                    style="font-size:11px;font-weight:600;padding:4px 8px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;flex-shrink:0;border-left:1px solid #e2e8f0">
+                    <option value="all">All Stages</option>
+                    <option value="new">New</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="in_review">In Review</option>
+                </select>
+
+                <!-- Substage filter dropdown (shown when In Progress or In Review selected) -->
+                <select id="ds-substage-select" onchange="setDSSubstageFilter(this.value)"
+                    style="display:none;font-size:11px;font-weight:600;padding:4px 8px;border-radius:7px;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;flex-shrink:0">
+                </select>
+
+                <!-- Hidden legacy chip container kept so JS refs don't break -->
+                <div id="ds-substage-chips" style="display:none"></div>
 
                 <!-- Right actions -->
                 <div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0">
@@ -22267,34 +22275,33 @@
 
         function setDSDueFilter(filter) {
             _dsDueFilter = filter;
-            ['all','today','week','overdue'].forEach(f => {
-                document.getElementById(`ds-due-chip-${f}`)?.classList.toggle('ds-due-active', f === filter);
-            });
+            const sel = document.getElementById('ds-due-select');
+            if (sel) sel.value = filter;
             renderDSDashboard();
         }
 
         function setDSStageFilter(stage) {
             _dsStageFilter = stage;
             _dsSubstageFilter = 'all';
-            ['all','new','in_progress','in_review'].forEach(s => {
-                document.getElementById(`ds-stage-chip-${s}`)?.classList.toggle('ds-due-active', s === stage);
-            });
-            // Update substage chip row
-            const subWrap = document.getElementById('ds-substage-chips');
-            if (subWrap) {
+            const sel = document.getElementById('ds-stage-select');
+            if (sel) sel.value = stage;
+            const subSel = document.getElementById('ds-substage-select');
+            if (subSel) {
                 if (stage === 'in_progress') {
-                    subWrap.style.display = 'flex';
-                    subWrap.innerHTML = [
-                        ['all','All'],['in_design','In Design'],['revisions','Revisions'],['factory_handover','Factory Handover']
-                    ].map(([k,l]) => `<button id="ds-sub-chip-${k}" class="ds-due-chip${k==='all'?' ds-due-active':''}" onclick="setDSSubstageFilter('${k}')">${l}</button>`).join('');
+                    subSel.style.display = '';
+                    subSel.innerHTML = [
+                        ['all','All Sub-stages'],['in_design','In Design'],['revisions','Revisions'],['factory_handover','Factory Handover']
+                    ].map(([k,l]) => `<option value="${k}">${l}</option>`).join('');
+                    subSel.value = 'all';
                 } else if (stage === 'in_review') {
-                    subWrap.style.display = 'flex';
-                    subWrap.innerHTML = [
-                        ['all','All'],['internal_review','Internal Review'],['awaiting_approval','Awaiting Approval']
-                    ].map(([k,l]) => `<button id="ds-sub-chip-${k}" class="ds-due-chip${k==='all'?' ds-due-active':''}" onclick="setDSSubstageFilter('${k}')">${l}</button>`).join('');
+                    subSel.style.display = '';
+                    subSel.innerHTML = [
+                        ['all','All Sub-stages'],['internal_review','Internal Review'],['awaiting_approval','Awaiting Approval']
+                    ].map(([k,l]) => `<option value="${k}">${l}</option>`).join('');
+                    subSel.value = 'all';
                 } else {
-                    subWrap.style.display = 'none';
-                    subWrap.innerHTML = '';
+                    subSel.style.display = 'none';
+                    subSel.innerHTML = '';
                 }
             }
             renderDSDashboard();
@@ -22302,10 +22309,8 @@
 
         function setDSSubstageFilter(substage) {
             _dsSubstageFilter = substage;
-            document.querySelectorAll('[id^="ds-sub-chip-"]').forEach(el => {
-                const k = el.id.replace('ds-sub-chip-', '');
-                el.classList.toggle('ds-due-active', k === substage);
-            });
+            const subSel = document.getElementById('ds-substage-select');
+            if (subSel) subSel.value = substage;
             renderDSDashboard();
         }
 
