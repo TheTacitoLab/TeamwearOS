@@ -21751,13 +21751,35 @@
         async function _cdtSaveDriveUrl(taskId, driveUrl) {
             if (_cdtEditStage5Id) {
                 const cs = { ...(_cdtEditStage5CS || {}), drive_url: driveUrl || null };
-                await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', _cdtEditStage5Id);
-            } else if (driveUrl) {
-                await supabase.from('design_stages').insert({
-                    task_id: taskId, stage_number: 5, status: 'pending',
-                    concept_statuses: { drive_url: driveUrl }
-                });
+                const { error } = await supabase.from('design_stages')
+                    .update({ concept_statuses: cs })
+                    .eq('id', _cdtEditStage5Id);
+                if (error) { console.error('_cdtSaveDriveUrl update error:', error); showToast('Drive URL save failed: ' + error.message, 'error'); }
+                return;
             }
+            // No stage 5 yet — try to look one up (it may exist but wasn't loaded), otherwise insert
+            const { data: existing } = await supabase.from('design_stages')
+                .select('id, concept_statuses').eq('task_id', taskId).eq('stage_number', 5).limit(1);
+            if (existing && existing.length) {
+                const row = existing[0];
+                const cs = { ...(row.concept_statuses || {}), drive_url: driveUrl || null };
+                const { error } = await supabase.from('design_stages')
+                    .update({ concept_statuses: cs }).eq('id', row.id);
+                if (error) { console.error('_cdtSaveDriveUrl update error:', error); showToast('Drive URL save failed: ' + error.message, 'error'); }
+                _cdtEditStage5Id = row.id;
+                _cdtEditStage5CS = cs;
+                return;
+            }
+            if (!driveUrl) return;  // nothing to save
+            const { error } = await supabase.from('design_stages').insert({
+                task_id: taskId,
+                brand_id: currentBrand?.id,
+                stage_number: 5,
+                stage_name: 'Upload To Drive',
+                status: 'not_started',
+                concept_statuses: { drive_url: driveUrl }
+            });
+            if (error) { console.error('_cdtSaveDriveUrl insert error:', error); showToast('Drive URL save failed: ' + error.message, 'error'); }
         }
 
         async function saveNewDesignTask() {
