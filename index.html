@@ -22881,11 +22881,10 @@
                 return `<div style="font-size:10px;color:#475569;display:flex;align-items:center;gap:3px">${swatch}<span style="font-weight:600">${label}:</span> ${escHtml(text)}</div>`;
             }).filter(Boolean).join('');
 
-            panel.innerHTML = `<div style="overflow-y:auto;height:100%;padding:14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box">
+            panel.innerHTML = `<div style="height:100%;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden">
 
                 <!-- Header: title + chips + action buttons -->
-                <div style="border-bottom:1px solid #f1f5f9;padding-bottom:10px">
-                    <!-- Title row with action buttons top-right -->
+                <div style="border-bottom:1px solid #f1f5f9;padding:12px 14px 10px;flex-shrink:0">
                     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:7px">
                         <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35;flex:1;min-width:0">${escHtml(task.task_name || 'Untitled Task')}</div>
                         <div style="display:flex;gap:4px;flex-shrink:0;margin-top:1px">
@@ -22897,7 +22896,6 @@
                             </button>
                         </div>
                     </div>
-                    <!-- Chips row: status · ref · club · priority · due date -->
                     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
                         <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};white-space:nowrap">${statusLabels[task.status] || task.status}${task.sub_stage && DS_SUBSTAGE_LABELS[task.sub_stage] ? ` · ${DS_SUBSTAGE_LABELS[task.sub_stage]}` : ''}</span>
                         ${task.task_ref ? `<span style="font-family:monospace;font-size:10px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.task_ref)}</span>` : ''}
@@ -22907,65 +22905,63 @@
                     </div>
                 </div>
 
-                <!-- Owner + Next Action -->
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
-                    <div style="background:#f8fafc;border-radius:7px;padding:7px 9px">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:2px">Owner</div>
-                        <div style="font-size:11px;font-weight:600;color:#1e293b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(designerName)}</div>
+                <!-- Main body — scrollable -->
+                <div style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-sizing:border-box">
+
+                    <!-- ROW 1: Owner | Next Action | Task Details + Colours -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:start">
+                        <!-- Owner -->
+                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:9px 11px">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Owner</div>
+                            <div style="font-size:11px;font-weight:700;color:#1e293b">${escHtml(designerName)}</div>
+                        </div>
+                        <!-- Next Action — full interactive card -->
+                        <div id="dsp-na-card-${task.id}">
+                            <div class="sh-na-section" style="margin-bottom:0">
+                                <div class="sh-section-title" style="color:#92400e">Next Action</div>
+                                <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                            </div>
+                        </div>
+                        <!-- Task Details + Colours -->
+                        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:9px 11px;display:flex;flex-direction:column;gap:6px">
+                            ${notes ? `<div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:3px">Task Details</div><p style="font-size:11px;color:#374151;line-height:1.5;margin:0;white-space:pre-wrap">${escHtml(notes)}</p></div>` : ''}
+                            ${hasColours ? `<div><div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Brand Colours</div><div style="display:flex;flex-direction:column;gap:3px">${colourDots}</div></div>` : ''}
+                            ${!notes && !hasColours ? `<div style="font-size:11px;color:#94a3b8;font-style:italic">No details</div>` : ''}
+                        </div>
                     </div>
-                    <div style="padding:7px 9px;border-radius:7px;background:${colorBg[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]}">
-                        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:${colorText[nextAct.color]};margin-bottom:2px">Next Action</div>
-                        <div style="font-size:10px;font-weight:700;color:#0f172a;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(nextAct.label)}">${nextAct.icon} ${nextAct.label}</div>
+
+                    <!-- ROW 2: Brief | Products | Factory Handover -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:start">
+                        <!-- Brief -->
+                        <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Brief</div>
+                            ${brief ? `<p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>` : `<p style="font-size:11px;color:#94a3b8;font-style:italic;margin:0">No brief set.</p>`}
+                        </div>
+                        <!-- Products (async) -->
+                        <div id="dsp-products-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div>
+                            <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                        </div>
+                        <!-- Factory Handover (async) -->
+                        <div id="dsp-factory-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px;background:#fff">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Factory Handover</div>
+                            <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                        </div>
                     </div>
+
+                    <!-- ROW 3: Activity feed (full width) -->
+                    <div id="dsp-panel-notif-${task.id}"></div>
+
                 </div>
-
-                <!-- Task Details -->
-                ${notes ? `<div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px">
-                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Task Details</div>
-                    <p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(notes)}</p>
-                </div>` : ''}
-
-                <!-- Design Brief -->
-                ${brief ? `<div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px">
-                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Brief</div>
-                    <p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>
-                </div>` : ''}
-
-                <!-- Brand Colours -->
-                ${hasColours ? `<div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px">
-                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Brand Colours</div>
-                    <div style="display:flex;flex-direction:column;gap:4px">${colourDots}</div>
-                </div>` : ''}
-
-                <!-- Products Required (async) -->
-                <div id="dsp-products-${task.id}">
-                    <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px">
-                        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div>
-                        <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
-                    </div>
-                </div>
-
-                <!-- Factory Handover (async) -->
-                <div id="dsp-factory-${task.id}"></div>
-
-                <!-- Task Attachments (async, read-only file list) -->
-                <div id="dsp-attachments-${task.id}"></div>
-
-                <!-- Uploads / Assets (async) -->
-                <div id="dsp-assets-${task.id}"></div>
-
-                <!-- Unread activity (async injected) -->
-                <div id="dsp-panel-notif-${task.id}"></div>
-
             </div>`;
 
             // Load data asynchronously
             _loadPreviewPanelProducts(task.id, task.products_required || []);
-            _loadPreviewPanelAssets(task.id);
             _loadPreviewPanelNotifications(task.id);
             _loadPreviewPanelFactoryHandover(task);
-            _loadPreviewPanelAttachments(task.id);
             _loadPreviewPanelUploadsCount(task.id);
+            // Load Next Action card using the shared naCardHtml system
+            loadNextActionCard('design_task', task.id, `dsp-na-card-${task.id}`);
         }
 
         // Count active stage_uploads rows (concept/range/finalise) for a task
@@ -22995,17 +22991,28 @@
         async function _loadPreviewPanelFactoryHandover(task) {
             const el = document.getElementById(`dsp-factory-${task.id}`);
             if (!el) return;
-            // Find stage 5 for this task
             const { data: stages } = await supabase.from('design_stages')
                 .select('*').eq('task_id', task.id).eq('stage_number', 5).limit(1);
             if (!document.getElementById(`dsp-factory-${task.id}`)) return;
             const stage5 = (stages || [])[0] || null;
-            try {
-                el.innerHTML = buildDTRFactoryHandoverCol(task, stage5);
-            } catch (e) {
-                console.error('factory handover render failed', e);
-                el.innerHTML = '';
-            }
+            const fr = task.factory_requirements || {};
+            const driveUrl = stage5?.concept_statuses?.drive_url || task.jobs?.google_drive_url || '';
+            const items = typeof _DTR_FR_ITEMS !== 'undefined' ? _DTR_FR_ITEMS : [];
+            const itemsHtml = items.map(item => {
+                const done = !!fr[item.key];
+                const subs = (item.subs || []).filter(s => fr[s.key]);
+                return `<div style="display:flex;align-items:flex-start;gap:6px;padding:3px 0">
+                    <span style="font-size:11px;color:${done?'#16a34a':'#cbd5e1'};flex-shrink:0;line-height:1.4">${done?'✓':'○'}</span>
+                    <span style="font-size:10px;color:${done?'#374151':'#94a3b8'};line-height:1.4;font-weight:${done?'600':'400'}">${escHtml(item.label)}${subs.length?` <span style="color:#64748b;font-size:9px">(${subs.map(s=>s.label).join(', ')})</span>`:''}</span>
+                </div>`;
+            }).join('');
+            el.innerHTML = `
+                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Factory Handover</div>
+                ${driveUrl ? `<a href="${escHtml(driveUrl)}" target="_blank" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:3px 8px;text-decoration:none;margin-bottom:8px">
+                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m4-10h-6m6 0v6m0-6L10 14"/></svg>
+                    Google Drive
+                </a>` : `<span style="font-size:10px;color:#94a3b8;display:block;margin-bottom:8px;font-style:italic">No Drive folder linked</span>`}
+                ${itemsHtml || '<span style="font-size:10px;color:#94a3b8">No requirements set.</span>'}`;
         }
 
         async function _loadPreviewPanelAttachments(taskId) {
@@ -23065,7 +23072,7 @@
             const el = document.getElementById(`dsp-products-${taskId}`);
             if (!el) return;
             if (!productIds || !productIds.length) {
-                el.innerHTML = '';
+                el.innerHTML = '<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div><p style="font-size:10px;color:#94a3b8;margin:0;font-style:italic">No products selected.</p>';
                 return;
             }
             // productIds are club_product UUIDs
@@ -23075,7 +23082,7 @@
                 .in('id', productIds);
             if (!document.getElementById(`dsp-products-${taskId}`)) return;
             if (error || !data?.length) {
-                el.innerHTML = '';
+                el.innerHTML = '<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div><p style="font-size:10px;color:#94a3b8;margin:0;font-style:italic">No products linked.</p>';
                 return;
             }
             const rows = data.map(cp => {
@@ -23083,15 +23090,12 @@
                 const name = cp.custom_name || prod.item_name || '—';
                 const sku  = prod.product_code ? `<span style="font-family:monospace;font-size:10px;color:#6366f1;background:#eef2ff;border-radius:4px;padding:1px 5px">${escHtml(prod.product_code)}</span>` : '';
                 const pc   = prod.pattern_code ? `<span style="font-family:monospace;font-size:10px;color:#6b7280;background:#f3f4f6;border-radius:4px;padding:1px 5px">${escHtml(prod.pattern_code)}</span>` : '';
-                return `<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid #f1f5f9">
+                return `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f1f5f9">
                     <span style="font-size:11px;font-weight:600;color:#1e293b;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(name)}</span>
                     <div style="display:flex;gap:3px;flex-shrink:0">${sku}${pc}</div>
                 </div>`;
             }).join('');
-            el.innerHTML = `<div style="border:1px solid #e8ecf0;border-radius:10px;padding:10px 12px;background:#fff">
-                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:7px">Products Required</div>
-                ${rows}
-            </div>`;
+            el.innerHTML = `<div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Products Required</div>${rows}`;
         }
 
         async function _loadPreviewPanelAssets(taskId) {
@@ -24511,7 +24515,7 @@
                                 </button>
                             </div>
                             <div class="dtr-left-tab-content" id="dtr-left-tab-content" style="overflow-y:auto;flex:1">
-                                ${buildDTRLeftColumn(task, club, assets, clubProds, jobProds)}
+                                ${_buildDTRSlimColumn(task, clubProds, jobProds)}
                             </div>
                         </div>
                         <div class="dtr-left-collapsed" id="dtr-left-collapsed"${leftOpen ? ' style="display:none"' : ''}>
@@ -24532,8 +24536,6 @@
                             <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#6d28d9;margin-bottom:2px">Feedback Portal</div>
                             <div style="font-size:11px;color:#64748b">Revisions, annotation comments & sub-tasks</div>
                         </div>
-                        <!-- Next Action card -->
-                        <div class="next-action-card" id="design-task-next-action-card"></div>
                         <!-- Activity feed -->
                         <div id="dtr-activity-inner" style="display:flex;flex-direction:column;background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden;flex:1;min-height:200px">
                             <div class="dtr-activity-header" style="flex-shrink:0">
@@ -24672,6 +24674,32 @@
             if (tab === 'products') return _buildDTRProductsTab(task, clubProds, jobProds || _dtrCachedJobProds);
             if (tab === 'assets')   return _buildDTRAssetsTab(assets);
             return _buildDTRBriefTab(task, club);
+        }
+
+        // ── Slim left column for the uploads page: brief + products only ─────
+        function _buildDTRSlimColumn(task, clubProds, jobProds) {
+            clubProds = clubProds || _dtrCachedClubProds || [];
+            jobProds  = jobProds  || _dtrCachedJobProds  || [];
+            const brief = task.design_brief || task.design_summary || '';
+            const _selIds = new Set(task.products_required || []);
+            const _allAvail = [...jobProds, ...clubProds.filter(cp => !jobProds.find(jp => jp.id === cp.id))];
+            const _sel = _allAvail.filter(cp => _selIds.has(cp.id));
+            const prodRows = _sel.length
+                ? _sel.map(cp => {
+                    const nm = escHtml(cp.custom_name || cp.products?.item_name || 'Product');
+                    return `<div style="padding:5px 0;border-bottom:1px solid #f1f5f9;font-size:11px;font-weight:600;color:#1e293b">${nm}</div>`;
+                }).join('')
+                : `<p style="font-size:11px;color:#94a3b8;margin:0;font-style:italic">No products selected.</p>`;
+            return `<div style="padding:12px 14px;display:flex;flex-direction:column;gap:14px">
+                <div>
+                    <div class="dtr-brief-section-title">Design Brief</div>
+                    ${brief ? `<p style="font-size:11px;color:#374151;line-height:1.65;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>` : `<p style="font-size:11px;color:#94a3b8;margin:0;font-style:italic">No brief set.</p>`}
+                </div>
+                <div>
+                    <div class="dtr-brief-section-title">Products Required</div>
+                    ${prodRows}
+                </div>
+            </div>`;
         }
 
         // ── Left column (single scrollable column — no tabs) ──────────────────
