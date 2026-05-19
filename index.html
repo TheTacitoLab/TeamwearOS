@@ -21791,42 +21791,33 @@
             return document.getElementById('cdt-drive-custom')?.value.trim() || '';
         }
 
-        // Persist Drive URL on stage 5 (factory handover); create the stage row if missing
+        // Persist Drive URL on stage 5 (factory handover).
+        // Uses the upsert_stage5_drive_url RPC (SECURITY DEFINER) so it works even
+        // when the stage 5 row has brand_id = null and RLS would otherwise block it.
         async function _cdtSaveDriveUrl(taskId, driveUrl) {
-            // Always look up stage 5 fresh so we update the correct row,
-            // even if _cdtEditStage5Id was stale or set on a different row.
-            const { data: existing } = await supabase.from('design_stages')
-                .select('id, concept_statuses, brand_id')
-                .eq('task_id', taskId).eq('stage_number', 5).limit(1);
-            if (existing && existing.length) {
-                const row = existing[0];
-                const cs = { ...(row.concept_statuses || {}), drive_url: driveUrl || null };
-                const updatePayload = { concept_statuses: cs };
-                // Repair missing brand_id if needed (legacy rows may have null)
-                if (!row.brand_id && currentBrand?.id) updatePayload.brand_id = currentBrand.id;
-                const { error } = await supabase.from('design_stages')
-                    .update(updatePayload).eq('id', row.id);
-                if (error) { console.error('_cdtSaveDriveUrl update error:', error); showToast('Drive URL save failed: ' + error.message, 'error'); }
-                _cdtEditStage5Id = row.id;
-                _cdtEditStage5CS = cs;
-                return;
-            }
-            if (!driveUrl) return;  // nothing to save, no row to create
-            // No stage 5 yet — insert one
-            const { data: ins, error } = await supabase.from('design_stages').insert({
-                task_id: taskId,
-                brand_id: currentBrand?.id,
-                stage_number: 5,
-                stage_name: 'Upload To Drive',
-                status: 'not_started',
-                concept_statuses: { drive_url: driveUrl }
-            }).select('id, concept_statuses').single();
-            if (error) {
-                console.error('_cdtSaveDriveUrl insert error:', error);
-                showToast('Drive URL save failed: ' + error.message, 'error');
-            } else if (ins) {
-                _cdtEditStage5Id = ins.id;
-                _cdtEditStage5CS = ins.concept_statuses || {};
+            if (!taskId || !currentBrand?.id) return;
+            // Primary path: RPC upsert that bypasses null-brand_id RLS issues
+            const { error: rpcErr } = await supabase.rpc('upsert_stage5_drive_url', {
+                p_task_id:   taskId,
+                p_brand_id:  currentBrand.id,
+                p_drive_url: driveUrl || ''
+            });
+            if (rpcErr) {
+                console.warn('_cdtSaveDriveUrl RPC failed, trying direct update:', rpcErr.message);
+                // Fallback: direct update (works when brand_id is already correct)
+                const { data: existing } = await supabase.from('design_stages')
+                    .select('id, concept_statuses')
+                    .eq('task_id', taskId).eq('stage_number', 5).limit(1);
+                if (existing?.length) {
+                    const cs = { ...(existing[0].concept_statuses || {}), drive_url: driveUrl || null };
+                    await supabase.from('design_stages').update({ concept_statuses: cs, brand_id: currentBrand.id }).eq('id', existing[0].id);
+                } else if (driveUrl) {
+                    await supabase.from('design_stages').insert({
+                        task_id: taskId, brand_id: currentBrand.id,
+                        stage_number: 5, stage_name: 'Upload To Drive',
+                        status: 'not_started', concept_statuses: { drive_url: driveUrl }
+                    });
+                }
             }
         }
 
