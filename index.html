@@ -5169,7 +5169,7 @@
                     </div>
                 </div>
 
-                <!-- Contact details -->
+                <!-- Key Contact + Google Drive -->
                 <div class="modal-section">
                     <p class="modal-section-title">Key Contact</p>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -5185,6 +5185,11 @@
                             <label class="text-gray-400 text-xs mb-1 block">Phone</label>
                             <input type="tel" id="club-contact-phone" placeholder="+44 7700 000000" class="w-full px-3 py-2 rounded-lg text-sm">
                         </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="text-gray-400 text-xs mb-1 block">Google Drive Folder URL</label>
+                        <input type="url" id="club-google-drive-url" placeholder="https://drive.google.com/…" class="w-full px-3 py-2 rounded-lg text-sm">
+                        <p class="text-gray-500 text-xs mt-1">Used as the design folder for design tasks linked to this club.</p>
                     </div>
                 </div>
 
@@ -5921,16 +5926,9 @@
                                     Use job's Drive <span id="cdt-drive-job-hint" style="color:#94a3b8;font-size:10px">(no job linked)</span>
                                 </label>
                                 <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
-                                    <input type="radio" name="cdt-drive-src" value="club" id="cdt-drive-src-club">
+                                    <input type="radio" name="cdt-drive-src" value="club" id="cdt-drive-src-club" checked>
                                     Use club's Drive <span id="cdt-drive-club-hint" style="color:#94a3b8;font-size:10px">(no club linked)</span>
                                 </label>
-                                <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
-                                    <input type="radio" name="cdt-drive-src" value="custom" id="cdt-drive-src-custom" checked>
-                                    Custom URL
-                                </label>
-                                <input type="url" id="cdt-drive-custom" placeholder="https://drive.google.com/…"
-                                    oninput="document.getElementById('cdt-drive-src-custom').checked=true"
-                                    style="width:100%;box-sizing:border-box;padding:6px 9px;border-radius:7px;border:1px solid #cbd5e1;font-size:11px;margin-top:2px">
                             </div>
                             <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:4px;border-top:1px solid #d1fae5;padding-top:8px">Required for Factory</div>
                             <div id="cdt-fr-list" style="display:flex;flex-direction:column"></div>
@@ -12879,6 +12877,8 @@
             document.getElementById('club-contact-name').value = currentClub.contact_name || '';
             document.getElementById('club-contact-email').value = currentClub.contact_email || '';
             document.getElementById('club-contact-phone').value = currentClub.contact_phone || '';
+            const clubDriveEl = document.getElementById('club-google-drive-url');
+            if (clubDriveEl) clubDriveEl.value = currentClub.google_drive_url || '';
             // Forecast settings
             const numTeamsEl = document.getElementById('club-num-teams');
             if (numTeamsEl) numTeamsEl.value = currentClub.number_of_teams || '';
@@ -13094,6 +13094,7 @@
                 contact_name: document.getElementById('club-contact-name').value.trim() || null,
                 contact_email: document.getElementById('club-contact-email').value.trim() || null,
                 contact_phone: document.getElementById('club-contact-phone').value.trim() || null,
+                google_drive_url: document.getElementById('club-google-drive-url')?.value.trim() || null,
                 logo_url: logoUrl,
                 number_of_teams: parseInt(document.getElementById('club-num-teams')?.value) || null,
                 number_of_players: parseInt(document.getElementById('club-num-players')?.value) || null,
@@ -13556,9 +13557,12 @@
                 ['Email', currentClub.contact_email || '—'],
                 ['Phone', currentClub.contact_phone || '—'],
             ];
+            const driveUrl = currentClub.google_drive_url || '';
             el.innerHTML = rows.map(([label, value]) =>
                 `<div class="info-row"><span class="info-label">${escHtml(label)}</span><span class="info-value">${escHtml(value)}</span></div>`
-            ).join('');
+            ).join('') + (driveUrl
+                ? `<div class="info-row"><span class="info-label">Google Drive</span><span class="info-value"><a href="${escHtml(driveUrl)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;color:#2563eb;font-weight:600;text-decoration:none;font-size:12px" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Open Drive Folder ↗</a></span></div>`
+                : `<div class="info-row"><span class="info-label">Google Drive</span><span class="info-value" style="color:#94a3b8;font-style:italic">Not set</span></div>`);
 
             // Update branding panel — prefer logo_url, fall back to club_crest_url
             const crestEl = document.getElementById('club-crest-display');
@@ -21354,11 +21358,9 @@
 
                 // Render factory requirements checklist (uses _DTR_FR_ITEMS) — empty for create
                 _cdtRenderFactoryReqs({});
-                // Reset Drive radio state
-                const customInp = document.getElementById('cdt-drive-custom');
-                if (customInp) customInp.value = '';
-                const customRadio = document.getElementById('cdt-drive-src-custom');
-                if (customRadio) customRadio.checked = true;
+                // Reset Drive radio state — default to club source
+                const clubRadioReset = document.getElementById('cdt-drive-src-club');
+                if (clubRadioReset) clubRadioReset.checked = true;
                 _cdtUpdateDriveHints();
 
                 // Reset edit-mode flags + title/button text (defaults: create flow)
@@ -21476,20 +21478,13 @@
             if (typeof _cdtLoadAndRenderProducts === 'function') _cdtLoadAndRenderProducts(task.club_id || null);
             // Factory requirements + Drive URL
             _cdtRenderFactoryReqs(task.factory_requirements || {});
-            const savedDriveUrl = stage5?.concept_statuses?.drive_url || '';
             const jobUrl  = task.jobs?.google_drive_url  || '';
             const clubUrl = task.clubs?.google_drive_url || '';
-            // Choose initial radio
-            let initSrc = 'custom';
-            if (savedDriveUrl && savedDriveUrl === jobUrl)       initSrc = 'job';
-            else if (savedDriveUrl && savedDriveUrl === clubUrl) initSrc = 'club';
-            else if (!savedDriveUrl && jobUrl)  initSrc = 'job';
-            else if (!savedDriveUrl && clubUrl) initSrc = 'club';
+            // Pick job if job has a Drive URL, otherwise default to club
             _cdtUpdateDriveHints();
+            const initSrc = jobUrl ? 'job' : 'club';
             const radio = document.getElementById(`cdt-drive-src-${initSrc}`);
             if (radio && !radio.disabled) radio.checked = true;
-            const customInp = document.getElementById('cdt-drive-custom');
-            if (customInp) customInp.value = (initSrc === 'custom') ? savedDriveUrl : '';
             // 5) Repurpose title + save button for edit mode
             const titleEl = document.querySelector('#create-design-task-modal h3');
             if (titleEl) titleEl.textContent = 'Edit Design Task';
@@ -21776,19 +21771,17 @@
 
         // Helper: resolve which Drive URL the user picked
         function _cdtResolveDriveUrl(taskJob, taskClub) {
-            const src = document.querySelector('input[name="cdt-drive-src"]:checked')?.value || 'custom';
+            const src = document.querySelector('input[name="cdt-drive-src"]:checked')?.value || 'club';
             if (src === 'job') {
                 // taskJob may be undefined if insert/update response lacks joins; fall back to global jobs list
                 if (taskJob?.google_drive_url) return taskJob.google_drive_url;
                 const jobId = document.getElementById('cdt-job-id')?.value || document.getElementById('cdt-linked-job-id')?.value;
                 return (jobs || []).find(j => j.id === jobId)?.google_drive_url || '';
             }
-            if (src === 'club') {
-                if (taskClub?.google_drive_url) return taskClub.google_drive_url;
-                const clubId = document.getElementById('cdt-club-id')?.value;
-                return (clubs || []).find(c => c.id === clubId)?.google_drive_url || '';
-            }
-            return document.getElementById('cdt-drive-custom')?.value.trim() || '';
+            // Default: club source
+            if (taskClub?.google_drive_url) return taskClub.google_drive_url;
+            const clubId = document.getElementById('cdt-club-id')?.value;
+            return (clubs || []).find(c => c.id === clubId)?.google_drive_url || '';
         }
 
         // Persist Drive URL on stage 5 (factory handover).
