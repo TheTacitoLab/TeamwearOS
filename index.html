@@ -5922,12 +5922,16 @@
                             <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:5px">Design Folder (Google Drive)</div>
                             <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">
                                 <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
+                                    <input type="radio" name="cdt-drive-src" value="club" id="cdt-drive-src-club" checked>
+                                    Use club's Drive <span id="cdt-drive-club-hint" style="color:#94a3b8;font-size:10px">(no club linked)</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
                                     <input type="radio" name="cdt-drive-src" value="job" id="cdt-drive-src-job">
                                     Use job's Drive <span id="cdt-drive-job-hint" style="color:#94a3b8;font-size:10px">(no job linked)</span>
                                 </label>
                                 <label style="display:flex;align-items:center;gap:7px;font-size:11px;color:#1e293b;cursor:pointer">
-                                    <input type="radio" name="cdt-drive-src" value="club" id="cdt-drive-src-club" checked>
-                                    Use club's Drive <span id="cdt-drive-club-hint" style="color:#94a3b8;font-size:10px">(no club linked)</span>
+                                    <input type="radio" name="cdt-drive-src" value="none" id="cdt-drive-src-none">
+                                    No Drive link
                                 </label>
                             </div>
                             <div style="font-size:10px;font-weight:700;color:#475569;margin-bottom:4px;border-top:1px solid #d1fae5;padding-top:8px">Required for Factory</div>
@@ -21106,13 +21110,13 @@
             // Load tasks for this brand (brand_id or via job brand_id for legacy tasks)
             const { data: brandTasks } = await supabase
                 .from('design_tasks')
-                .select('*, clubs(id, name, logo_url), jobs(id, job_name, job_number, brand_id)')
+                .select('*, clubs(id, name, logo_url, google_drive_url), jobs(id, job_name, job_number, brand_id, google_drive_url)')
                 .eq('brand_id', currentBrand.id)
                 .order('updated_at', { ascending: false });
             // Also load legacy tasks that have job_id but no brand_id
             const { data: legacyTasks } = await supabase
                 .from('design_tasks')
-                .select('*, clubs(id, name, logo_url), jobs(id, job_name, job_number, brand_id)')
+                .select('*, clubs(id, name, logo_url, google_drive_url), jobs(id, job_name, job_number, brand_id, google_drive_url)')
                 .is('brand_id', null)
                 .not('job_id', 'is', null)
                 .order('updated_at', { ascending: false });
@@ -21360,7 +21364,9 @@
                 _cdtRenderFactoryReqs({});
                 // Reset Drive radio state — default to club source
                 const clubRadioReset = document.getElementById('cdt-drive-src-club');
-                if (clubRadioReset) clubRadioReset.checked = true;
+                if (clubRadioReset) { clubRadioReset.checked = true; clubRadioReset.disabled = false; }
+                const jobRadioReset = document.getElementById('cdt-drive-src-job');
+                if (jobRadioReset) jobRadioReset.disabled = false;
                 _cdtUpdateDriveHints();
 
                 // Reset edit-mode flags + title/button text (defaults: create flow)
@@ -21478,13 +21484,24 @@
             if (typeof _cdtLoadAndRenderProducts === 'function') _cdtLoadAndRenderProducts(task.club_id || null);
             // Factory requirements + Drive URL
             _cdtRenderFactoryReqs(task.factory_requirements || {});
+            const savedDriveUrl = stage5?.concept_statuses?.drive_url;
             const jobUrl  = task.jobs?.google_drive_url  || '';
             const clubUrl = task.clubs?.google_drive_url || '';
-            // Pick job if job has a Drive URL, otherwise default to club
+            // Determine which radio to select based on saved state
+            let initSrc = 'club';
+            if (savedDriveUrl === null || savedDriveUrl === '') {
+                // Explicitly saved as "no link" — or not yet set, default to club
+                initSrc = (savedDriveUrl === null) ? 'none' : 'club';
+            } else if (savedDriveUrl && jobUrl && savedDriveUrl === jobUrl) {
+                initSrc = 'job';
+            } else if (savedDriveUrl && clubUrl && savedDriveUrl === clubUrl) {
+                initSrc = 'club';
+            } else if (jobUrl) {
+                initSrc = 'job';
+            }
             _cdtUpdateDriveHints();
-            const initSrc = jobUrl ? 'job' : 'club';
             const radio = document.getElementById(`cdt-drive-src-${initSrc}`);
-            if (radio && !radio.disabled) radio.checked = true;
+            if (radio) radio.checked = true;
             // 5) Repurpose title + save button for edit mode
             const titleEl = document.querySelector('#create-design-task-modal h3');
             if (titleEl) titleEl.textContent = 'Edit Design Task';
@@ -21772,8 +21789,8 @@
         // Helper: resolve which Drive URL the user picked
         function _cdtResolveDriveUrl(taskJob, taskClub) {
             const src = document.querySelector('input[name="cdt-drive-src"]:checked')?.value || 'club';
+            if (src === 'none') return null; // explicit "no link" — save null to clear it
             if (src === 'job') {
-                // taskJob may be undefined if insert/update response lacks joins; fall back to global jobs list
                 if (taskJob?.google_drive_url) return taskJob.google_drive_url;
                 const jobId = document.getElementById('cdt-job-id')?.value || document.getElementById('cdt-linked-job-id')?.value;
                 return (jobs || []).find(j => j.id === jobId)?.google_drive_url || '';
@@ -21785,15 +21802,17 @@
         }
 
         // Persist Drive URL on stage 5 (factory handover).
+        // driveUrl === null means "no link" (explicit clear); '' also clears; string = URL.
         // Uses the upsert_stage5_drive_url RPC (SECURITY DEFINER) so it works even
         // when the stage 5 row has brand_id = null and RLS would otherwise block it.
         async function _cdtSaveDriveUrl(taskId, driveUrl) {
             if (!taskId || !currentBrand?.id) return;
+            const urlToSave = (driveUrl === null) ? '' : (driveUrl || '');
             // Primary path: RPC upsert that bypasses null-brand_id RLS issues
             const { error: rpcErr } = await supabase.rpc('upsert_stage5_drive_url', {
                 p_task_id:   taskId,
                 p_brand_id:  currentBrand.id,
-                p_drive_url: driveUrl || ''
+                p_drive_url: urlToSave
             });
             if (rpcErr) {
                 console.warn('_cdtSaveDriveUrl RPC failed, trying direct update:', rpcErr.message);
@@ -23424,7 +23443,12 @@
             if (!el) return;
             const stage5 = (stages || [])[0] || null;
             const fr = task.factory_requirements || {};
-            const driveUrl = stage5?.concept_statuses?.drive_url || task.jobs?.google_drive_url || '';
+            // Use stage5 saved URL first; if not yet set, fall back to club then job drive URL
+            // stage5.concept_statuses.drive_url === null means user explicitly chose "no link"
+            const stage5Url = stage5?.concept_statuses?.drive_url; // undefined = not set, null = explicitly cleared
+            const driveUrl = (stage5Url !== undefined)
+                ? (stage5Url || '') // null → '' (no link)
+                : (task.clubs?.google_drive_url || task.jobs?.google_drive_url || '');
             const items = typeof _DTR_FR_ITEMS !== 'undefined' ? _DTR_FR_ITEMS : [];
             const itemsHtml = items.map(item => {
                 const done = !!fr[item.key];
