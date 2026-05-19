@@ -2537,7 +2537,7 @@
                     <span id="dt-club-dot"></span>
                     <span id="dt-designer-display"></span>
                     <div id="dt-countdown" class="dt-countdown hide"></div>
-                    <button id="dt-edit-btn" class="dt-edit-btn" onclick="toggleDTREditMode()">Edit</button>
+                    <button id="dt-edit-btn" class="dt-edit-btn" onclick="openDTREditMenu(event)">Edit ▾</button>
                     <button id="dt-delete-btn" class="hide" onclick="deleteDesignTask()">Delete</button>
                     <button id="dt-back-btn" class="hide" onclick="goBack()"><span id="dt-back-label">Back</span></button>
                     <span id="dt-meta-created" class="hide"></span>
@@ -20767,6 +20767,8 @@
                 actionBadge = `<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid #b4530920;color:#b45309;background:#fffbeb;white-space:nowrap;flex-shrink:0">Revisions</span>`;
             } else if (task.status === 'factory_handover') {
                 actionBadge = `<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid #0891b220;color:#0e7490;background:#ecfeff;white-space:nowrap;flex-shrink:0">Factory</span>`;
+            } else if (task.status === 'in_progress') {
+                actionBadge = `<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid #bfdbfe;color:#1d4ed8;background:#eff6ff;white-space:nowrap;flex-shrink:0">In Design</span>`;
             }
 
             const ownerNames = (() => {
@@ -20926,7 +20928,14 @@
             const statusLabels = { new:'New', in_progress:'In Progress', revisions:'Revisions', in_review:'In Review', factory_handover:'Factory Handover', awaiting_approval:'Awaiting Approval', delivered:'Delivered', completed:'Completed' };
             const priLabels    = { urgent:'Urgent', high:'High', standard:'Standard' };
             const priColors    = { urgent:'#dc2626', high:'#ea580c', standard:'#64748b' };
-            const designerName = task.designers?.full_name || task._designerName || 'Unassigned';
+            const designerName = (() => {
+                const ownerIds = task.owner_ids || [];
+                if (ownerIds.length && typeof brandUsers !== 'undefined' && brandUsers?.length) {
+                    const names = ownerIds.map(id => { const u = brandUsers.find(u => u.id === id); return u ? (u.full_name || u.email || '') : null; }).filter(Boolean);
+                    if (names.length) return names.join(', ');
+                }
+                return task.designers?.full_name || task._designerName || 'Unassigned';
+            })();
             const brief  = task.design_brief || task.design_summary || '';
             const notes  = task.key_notes || '';
 
@@ -21382,6 +21391,7 @@
 
             const hasRevisions = task.status === 'revisions'
                 || stages.some(s => s.status === 'revisions_required');
+            const inDesign = task.status === 'in_progress' && !hasRevisions;
 
             const priorityBadge = task.priority && task.priority !== 'standard'
                 ? `<span class="ds-priority ds-priority-${task.priority}" style="font-size:10px;padding:2px 7px">${task.priority === 'urgent' ? '🔴' : '🟠'} ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}</span>`
@@ -21393,6 +21403,7 @@
                 <div class="tc-title" style="font-size:12px;padding-right:${unreadCount > 0 ? '26px' : '0'}">${escHtml(task.task_name || 'Untitled Task')}</div>
                 ${task.clubs?.name ? `<div class="tc-sub" style="font-size:10px;margin-bottom:6px">🏟 ${escHtml(task.clubs.name)}</div>` : '<div style="margin-bottom:6px"></div>'}
                 ${hasRevisions ? `<div class="ds-revisions-pill" style="font-size:10px;padding:2px 7px;margin-bottom:5px">🔄 Revisions</div>` : ''}
+                ${inDesign ? `<div style="display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;margin-bottom:5px;border-radius:5px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe">In Design</div>` : ''}
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:5px;flex-wrap:wrap">
                     <span class="ds-stage-badge ${stageBadgeStatus}" style="font-size:9px;padding:2px 6px">${escHtml(stageLabel)}</span>
                     ${priorityBadge ? `<span class="ds-priority ds-priority-${task.priority}" style="font-size:9px;padding:2px 5px">${task.priority === 'urgent' ? '🔴' : '🟠'}</span>` : ''}
@@ -22484,7 +22495,8 @@
         async function toggleDTREditMode() {
             _dtrEditMode = !_dtrEditMode;
             const btn = document.getElementById('dt-edit-btn');
-            if (btn) { btn.textContent = _dtrEditMode ? 'Done' : 'Edit'; btn.classList.toggle('active', _dtrEditMode); }
+            if (btn) { btn.textContent = _dtrEditMode ? 'Done' : 'Edit ▾'; btn.classList.toggle('active', _dtrEditMode); }
+            closeDTREditMenu();
             const content = document.getElementById('dtr-left-tab-content');
             if (content && currentDesignTaskRecord) {
                 const task = currentDesignTaskRecord;
@@ -22792,7 +22804,7 @@
                         <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                     </div>
                     <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
-                        <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px">Edit</button>
+                        <button onclick="openDTREditMenu(event)" class="dt-edit-btn" style="font-size:10px;padding:3px 9px">Edit ▾</button>
                     </div>
                 </div>
 
@@ -25806,6 +25818,33 @@
             if (startAnnotating) {
                 setTimeout(() => toggleAnnMode(), 300);
             }
+        }
+
+        function openDTREditMenu(event) {
+            event.stopPropagation();
+            if (_dtrEditMode) { toggleDTREditMode(); return; }
+            let menu = document.getElementById('_dtr_edit_floating_menu');
+            if (!menu) {
+                menu = document.createElement('div');
+                menu.id = '_dtr_edit_floating_menu';
+                menu.style.cssText = 'position:fixed;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 4px 20px rgba(0,0,0,0.13);min-width:160px;z-index:9999;overflow:hidden';
+                menu.innerHTML = `
+                    <button onclick="closeDTREditMenu();toggleDTREditMode()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:12px;font-weight:600;color:#334155;border:none;background:none;cursor:pointer" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">Edit Record</button>
+                    <div style="border-top:1px solid #f1f5f9"></div>
+                    <button onclick="closeDTREditMenu();deleteDesignTask()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:12px;font-weight:700;color:#dc2626;border:none;background:none;cursor:pointer" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">Delete</button>`;
+                document.body.appendChild(menu);
+            }
+            const rect = event.currentTarget.getBoundingClientRect();
+            menu.style.top = (rect.bottom + 4) + 'px';
+            menu.style.right = (window.innerWidth - rect.right) + 'px';
+            menu.style.left = 'auto';
+            menu.style.display = 'block';
+            setTimeout(() => document.addEventListener('click', closeDTREditMenu, { once: true }), 0);
+        }
+
+        function closeDTREditMenu() {
+            const menu = document.getElementById('_dtr_edit_floating_menu');
+            if (menu) menu.style.display = 'none';
         }
 
         async function deleteDesignTask() {
