@@ -4062,7 +4062,6 @@
                             <span class="text-xs text-gray-600 block mb-1.5">Design Pipeline</span>
                             <div id="jr-design-stage-pills"><!-- rendered by renderDesignStagePills() --></div>
                         </div>
-                        <p id="jr-job-desc" class="text-gray-300 text-xs leading-relaxed mb-3"></p>
                         <div class="grid grid-cols-2 gap-y-2 pt-3 border-t border-gray-800" id="jr-meta-row">
                             <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-xs font-semibold mt-0.5">—</p></div>
                             <div><span class="text-xs text-gray-600">Club Type</span><p id="jr-club-type" class="text-xs font-semibold mt-0.5">—</p></div>
@@ -16946,7 +16945,7 @@
             if (!currentJob) return;
             document.getElementById('jr-job-number').textContent = currentJob.job_number || '';
             document.getElementById('jr-job-name').textContent = currentJob.job_name || '';
-            document.getElementById('jr-job-desc').textContent = currentJob.job_description || '';
+            // jr-job-desc removed from left col — description is in the centre Overview tab
             document.getElementById('jr-stage-select').value = currentJob.stage || 'discovery';
             document.getElementById('jr-type').textContent = JOB_TYPE_LABELS[currentJob.job_type] || currentJob.job_type;
             document.getElementById('jr-club-type').textContent = CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type;
@@ -17078,11 +17077,9 @@
                 statusBg = `${statusColor}18`; statusBdr = `${statusColor}44`;
             }
 
-            const taskLink = `<button onclick="showDesignTask('${_jobLinkedDesignTask.id}')" style="font-size:10px;color:#be185d;background:transparent;border:none;cursor:pointer;padding:0;font-weight:700;text-decoration:underline;flex-shrink:0;white-space:nowrap">Open →</button>`;
-
-            container.innerHTML = `<div style="display:flex;align-items:center;gap:6px;width:100%;flex-wrap:wrap">
-                <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid ${statusBdr};color:${statusColor};background:${statusBg};white-space:nowrap">${escHtml(statusText)}</span>
-                ${taskLink}
+            container.innerHTML = `<div style="display:flex;flex-direction:column;align-items:flex-start;gap:5px;width:100%">
+                <span style="display:block;width:100%;box-sizing:border-box;padding:6px 10px;border-radius:20px;border:2px solid ${statusBdr};color:${statusColor};background:${statusBg};font-size:12px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(statusText)}</span>
+                <button onclick="showDesignTask('${_jobLinkedDesignTask.id}')" style="font-size:10px;color:#be185d;background:transparent;border:none;cursor:pointer;padding:0 2px;font-weight:700;text-decoration:underline;white-space:nowrap">Open →</button>
             </div>`;
         }
 
@@ -17188,7 +17185,7 @@
                 descEl.innerHTML = `<div class="mb-4">
                     <span class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Description</span>
                     ${currentJob.job_description
-                        ? `<p class="text-sm leading-relaxed" style="color:#f1f5f9">${escHtml(currentJob.job_description)}</p>`
+                        ? `<p class="text-sm leading-relaxed" style="color:#374151">${escHtml(currentJob.job_description)}</p>`
                         : `<p class="text-xs italic" style="color:#475569">No description added. Click Edit to add one.</p>`}
                 </div>`;
             }
@@ -21780,8 +21777,17 @@
         // Helper: resolve which Drive URL the user picked
         function _cdtResolveDriveUrl(taskJob, taskClub) {
             const src = document.querySelector('input[name="cdt-drive-src"]:checked')?.value || 'custom';
-            if (src === 'job')  return (taskJob?.google_drive_url)  || '';
-            if (src === 'club') return (taskClub?.google_drive_url) || '';
+            if (src === 'job') {
+                // taskJob may be undefined if insert/update response lacks joins; fall back to global jobs list
+                if (taskJob?.google_drive_url) return taskJob.google_drive_url;
+                const jobId = document.getElementById('cdt-job-id')?.value || document.getElementById('cdt-linked-job-id')?.value;
+                return (jobs || []).find(j => j.id === jobId)?.google_drive_url || '';
+            }
+            if (src === 'club') {
+                if (taskClub?.google_drive_url) return taskClub.google_drive_url;
+                const clubId = document.getElementById('cdt-club-id')?.value;
+                return (clubs || []).find(c => c.id === clubId)?.google_drive_url || '';
+            }
             return document.getElementById('cdt-drive-custom')?.value.trim() || '';
         }
 
@@ -23451,32 +23457,6 @@
                     Google Drive
                 </a>` : `<span style="font-size:10px;color:#94a3b8;display:block;margin-bottom:8px;font-style:italic">No Drive folder linked</span>`}
                 ${itemsHtml || '<span style="font-size:10px;color:#94a3b8">No requirements set.</span>'}`;
-        }
-
-        async function _loadPreviewPanelAttachments(taskId) {
-            const el = document.getElementById(`dsp-attachments-${taskId}`);
-            if (!el) return;
-            const { data, error } = await supabase
-                .from('design_task_assets')
-                .select('id, file_name, file_url, file_type, file_size')
-                .eq('design_task_id', taskId)
-                .order('created_at', { ascending: false });
-            if (!document.getElementById(`dsp-attachments-${taskId}`)) return;
-            if (error || !data?.length) { el.innerHTML = ''; return; }
-            const rows = data.map(f => {
-                const sizeStr = f.file_size ? (f.file_size > 1048576 ? (f.file_size/1048576).toFixed(1)+'MB' : Math.round(f.file_size/1024)+'KB') : '';
-                return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f1f5f9">
-                    <span style="font-size:11px;font-weight:600;color:#1e293b;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(f.file_name||'')}">${escHtml(f.file_name||'—')}</span>
-                    ${sizeStr ? `<span style="font-size:9px;color:#94a3b8;flex-shrink:0">${escHtml(sizeStr)}</span>` : ''}
-                    <a href="${escHtml(f.file_url)}" target="_blank" title="Download" style="flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#f1f5f9;color:#475569;text-decoration:none">
-                        <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3"/></svg>
-                    </a>
-                </div>`;
-            }).join('');
-            el.innerHTML = `<div style="border:1px solid #e8ecf0;border-radius:10px;padding:10px 12px;background:#fff">
-                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Task Attachments</div>
-                ${rows}
-            </div>`;
         }
 
         async function _loadPreviewPanelProducts(taskId, productIds) {
