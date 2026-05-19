@@ -1598,13 +1598,14 @@
         /* ── Job Record: unified 3-column layout ── */
         .jr-three-col {
             display: grid;
-            grid-template-columns: var(--jr-left-width, 280px) 1fr 280px;
+            grid-template-columns: var(--jr-left-width, 300px) 1fr 340px;
             gap: 20px;
             align-items: start;
             transition: grid-template-columns 0.22s ease;
         }
         .jr-three-col.left-collapsed { --jr-left-width: 48px; }
-        @media (max-width: 1200px) { .jr-three-col { grid-template-columns: var(--jr-left-width, 260px) 1fr; } .jr-activity-sidebar { display: none !important; } }
+        @media (max-width: 1400px) { .jr-three-col { grid-template-columns: var(--jr-left-width, 280px) 1fr 300px; } }
+        @media (max-width: 1200px) { .jr-three-col { grid-template-columns: var(--jr-left-width, 280px) 1fr; } .jr-activity-sidebar { display: none !important; } }
         @media (max-width: 767px) { .jr-three-col { grid-template-columns: 1fr; } }
 
         /* Left col collapse toggle */
@@ -3265,6 +3266,14 @@
             <div id="factory-view-development" class="hide"></div>
         </div>
 
+        <!-- Design Task: Edit/Delete dropdown menu (fixed-position, shared) -->
+        <div id="dt-edit-dropdown" class="hide" style="position:fixed;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,0.12);min-width:160px;overflow:hidden">
+            <button onclick="toggleDTREditMode();_closeDTEditMenu()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:13px;font-weight:600;color:#0f172a;background:none;border:none;cursor:pointer;transition:background 0.1s" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='none'">Edit Record</button>
+            <div id="dt-edit-dropdown-delete" class="hide" style="border-top:1px solid #f1f5f9">
+                <button onclick="deleteDesignTask(currentDesignTaskRecord?.id);_closeDTEditMenu()" style="display:block;width:100%;text-align:left;padding:10px 14px;font-size:13px;font-weight:600;color:#dc2626;background:none;border:none;cursor:pointer;transition:background 0.1s" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">Delete Task</button>
+            </div>
+        </div>
+
         <!-- MODAL: Factory Share Link -->
         <div id="factory-share-modal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center hide" onclick="if(event.target===this)closeFactoryShareModal()">
             <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px 28px 24px;width:100%;max-width:520px;margin:16px">
@@ -4059,29 +4068,29 @@
                             <span class="text-xs text-gray-600 block mb-1.5">Owner</span>
                             <div class="owner-dp dark" id="owner-dp-job"></div>
                         </div>
+                        <!-- Job Stage -->
+                        <div class="mt-3 pt-3 border-t border-gray-800">
+                            <span class="text-xs text-gray-600 block mb-1.5">Job Stage</span>
+                            <div class="flex flex-wrap gap-1" id="jr-stage-pills">
+                                <!-- Populated by renderJobStagePills() -->
+                            </div>
+                            <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
+                                <option value="discovery">Discovery</option>
+                                <option value="concepts">Concepts</option>
+                                <option value="final_mockups">Final Mock-ups</option>
+                                <option value="order_details">Order Details</option>
+                                <option value="quoted">Quoted</option>
+                                <option value="completed">Completed</option>
+                                <option value="lost">Lost</option>
+                            </select>
+                        </div>
+                        <!-- Design Pipeline -->
+                        <div class="mt-3 pt-3 border-t border-gray-800">
+                            <span class="text-xs text-gray-600 block mb-2">Design Pipeline</span>
+                            <div class="design-stage-row" id="jr-design-stage-pills" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px"></div>
+                        </div>
                         <!-- Legacy Next Action slot (kept hidden for JS compatibility; primary card now above activity sidebar) -->
                         <div id="jr-next-action" class="hide"></div>
-                    </div>
-                    <!-- Job Stage Pipeline (moved from middle column) -->
-                    <div class="glass rounded-2xl p-4 mt-3">
-                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Job Stage</span>
-                        <div class="flex flex-wrap gap-1" id="jr-stage-pills">
-                            <!-- Populated by renderJobStagePills() -->
-                        </div>
-                        <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
-                            <option value="discovery">Discovery</option>
-                            <option value="concepts">Concepts</option>
-                            <option value="final_mockups">Final Mock-ups</option>
-                            <option value="order_details">Order Details</option>
-                            <option value="quoted">Quoted</option>
-                            <option value="completed">Completed</option>
-                            <option value="lost">Lost</option>
-                        </select>
-                    </div>
-                    <!-- Design Pipeline (moved from middle column — shows current design status) -->
-                    <div class="glass rounded-2xl p-4 mt-3">
-                        <span class="text-xs text-gray-500 font-bold uppercase tracking-wider block mb-3">Design Pipeline</span>
-                        <div class="design-stage-row" id="jr-design-stage-pills" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px"></div>
                     </div>
                 </div>
 
@@ -21132,6 +21141,9 @@
             const legacy = (legacyTasks || []).filter(t => t.jobs?.brand_id === currentBrand.id);
             allDesignTasks = [...(brandTasks || []), ...legacy];
 
+            // Ensure brand users are loaded so owner names show in task cards/preview
+            if (!brandUsers?.length) loadBrandUsers().catch(() => {});
+
             // Load pending activity counts per task (comments, sub-tasks, revisions)
             const taskIds = allDesignTasks.map(t => t.id).filter(Boolean);
             if (taskIds.length > 0) {
@@ -23029,6 +23041,8 @@
             } else if (task.sub_stage && DS_SUBSTAGE_LABELS[task.sub_stage]) {
                 const col = DS_SUBSTAGE_COLORS[task.sub_stage] || '#64748b';
                 actionBadge = `<span class="ds-substage-badge ds-substage-${task.sub_stage}" style="flex-shrink:0">${DS_SUBSTAGE_LABELS[task.sub_stage]}</span>`;
+            } else if (task.status === 'in_progress') {
+                actionBadge = `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:rgba(217,119,6,0.12);color:#d97706;border:1px solid rgba(217,119,6,0.25);flex-shrink:0;white-space:nowrap">In Design</span>`;
             }
 
             const ownerNames = (() => {
@@ -23074,7 +23088,7 @@
             else if (statusLabel === 'in_review')      badgeHtml = `<span class="ds-row-badge review">In Review</span>`;
             else if (statusLabel === 'factory_handover') badgeHtml = `<span class="ds-row-badge" style="border-color:#0891b2;color:#0e7490;background:#ecfeff">Factory Handover</span>`;
             else if (statusLabel === 'new')            badgeHtml = `<span class="ds-row-badge new" onclick="event.stopPropagation();startDesignTask('${task.id}')" style="cursor:pointer;border-color:#6366f1;color:#6366f1;background:#eef2ff">▶ Start</span>`;
-            else if (statusLabel === 'in_progress')    badgeHtml = `<span class="ds-row-badge in_progress">In Progress</span>`;
+            else if (statusLabel === 'in_progress')    badgeHtml = `<span class="ds-row-badge in_progress">In Design</span>`;
 
             const dName = task.designers?.full_name || task._designerName || '';
             const initials = dName ? dName.split(' ').map(w => w[0]||'').join('').substring(0,2).toUpperCase() : '';
@@ -23192,7 +23206,13 @@
             const priColors    = { urgent:'#dc2626', high:'#ea580c', standard:'#64748b' };
             const priBgs       = { urgent:'#fef2f2', high:'#fff7ed', standard:'#f8fafc' };
             const priBdrs      = { urgent:'#fecaca', high:'#fed7aa', standard:'#e2e8f0' };
-            const designerName = task.designers?.full_name || task._designerName || 'Unassigned';
+            const designerName = (() => {
+                if (task.owner_ids?.length && Array.isArray(brandUsers) && brandUsers.length) {
+                    const names = task.owner_ids.map(id => brandUsers.find(u => u.id === id)?.full_name?.split(' ')[0]).filter(Boolean);
+                    if (names.length) return names.join(', ');
+                }
+                return task.designers?.full_name?.split(' ')[0] || task._designerName || 'Unassigned';
+            })();
             const brief  = task.design_brief || task.design_summary || '';
             const notes  = task.key_notes || '';
             const pri    = task.priority || 'standard';
@@ -25052,6 +25072,31 @@
             showToast('Status updated');
         }
 
+        function _toggleDTEditMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('dt-edit-dropdown');
+            if (!menu) return;
+            const isOpen = !menu.classList.contains('hide');
+            _closeDTEditMenu();
+            if (!isOpen) {
+                // Show/hide delete option based on role
+                const canDelete = !!(isSuperAdmin || currentUserProfile?.role === 'admin');
+                document.getElementById('dt-edit-dropdown-delete')?.classList.toggle('hide', !canDelete);
+                const btn = event.currentTarget;
+                const rect = btn.getBoundingClientRect();
+                menu.style.top = (rect.bottom + 4) + 'px';
+                const left = Math.max(8, rect.right - 164);
+                menu.style.left = left + 'px';
+                menu.classList.remove('hide');
+            }
+        }
+        function _closeDTEditMenu() {
+            document.getElementById('dt-edit-dropdown')?.classList.add('hide');
+        }
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#dt-edit-dropdown')) _closeDTEditMenu();
+        });
+
         async function toggleDTREditMode() {
             _dtrEditMode = !_dtrEditMode;
             const btn = document.getElementById('dt-edit-btn');
@@ -25388,8 +25433,9 @@
                         <div style="font-size:12px;font-weight:700;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(task.task_name||'Untitled Task')}</div>
                         <div style="font-size:10px;color:#64748b;margin-top:1px">${escHtml(club.name||'No club')}${task.task_ref ? ` <span style="font-family:monospace;color:#94a3b8;font-size:9px">· ${escHtml(task.task_ref)}</span>` : ''}</div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
-                        <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px">Edit</button>
+                    <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;position:relative">
+                        <button onclick="toggleDTREditMode()" class="dt-edit-btn" style="font-size:10px;padding:3px 9px;border-radius:6px 0 0 6px">Edit</button>
+                        <button onclick="_toggleDTEditMenu(event)" class="dt-edit-btn" style="font-size:10px;padding:3px 6px;border-radius:0 6px 6px 0;margin-left:-1px;border-left-color:transparent" title="More options">▾</button>
                     </div>
                 </div>
 
