@@ -21787,37 +21787,41 @@
 
         // Persist Drive URL on stage 5 (factory handover); create the stage row if missing
         async function _cdtSaveDriveUrl(taskId, driveUrl) {
-            if (_cdtEditStage5Id) {
-                const cs = { ...(_cdtEditStage5CS || {}), drive_url: driveUrl || null };
-                const { error } = await supabase.from('design_stages')
-                    .update({ concept_statuses: cs })
-                    .eq('id', _cdtEditStage5Id);
-                if (error) { console.error('_cdtSaveDriveUrl update error:', error); showToast('Drive URL save failed: ' + error.message, 'error'); }
-                return;
-            }
-            // No stage 5 yet — try to look one up (it may exist but wasn't loaded), otherwise insert
+            // Always look up stage 5 fresh so we update the correct row,
+            // even if _cdtEditStage5Id was stale or set on a different row.
             const { data: existing } = await supabase.from('design_stages')
-                .select('id, concept_statuses').eq('task_id', taskId).eq('stage_number', 5).limit(1);
+                .select('id, concept_statuses, brand_id')
+                .eq('task_id', taskId).eq('stage_number', 5).limit(1);
             if (existing && existing.length) {
                 const row = existing[0];
                 const cs = { ...(row.concept_statuses || {}), drive_url: driveUrl || null };
+                const updatePayload = { concept_statuses: cs };
+                // Repair missing brand_id if needed (legacy rows may have null)
+                if (!row.brand_id && currentBrand?.id) updatePayload.brand_id = currentBrand.id;
                 const { error } = await supabase.from('design_stages')
-                    .update({ concept_statuses: cs }).eq('id', row.id);
+                    .update(updatePayload).eq('id', row.id);
                 if (error) { console.error('_cdtSaveDriveUrl update error:', error); showToast('Drive URL save failed: ' + error.message, 'error'); }
                 _cdtEditStage5Id = row.id;
                 _cdtEditStage5CS = cs;
                 return;
             }
-            if (!driveUrl) return;  // nothing to save
-            const { error } = await supabase.from('design_stages').insert({
+            if (!driveUrl) return;  // nothing to save, no row to create
+            // No stage 5 yet — insert one
+            const { data: ins, error } = await supabase.from('design_stages').insert({
                 task_id: taskId,
                 brand_id: currentBrand?.id,
                 stage_number: 5,
                 stage_name: 'Upload To Drive',
                 status: 'not_started',
                 concept_statuses: { drive_url: driveUrl }
-            });
-            if (error) { console.error('_cdtSaveDriveUrl insert error:', error); showToast('Drive URL save failed: ' + error.message, 'error'); }
+            }).select('id, concept_statuses').single();
+            if (error) {
+                console.error('_cdtSaveDriveUrl insert error:', error);
+                showToast('Drive URL save failed: ' + error.message, 'error');
+            } else if (ins) {
+                _cdtEditStage5Id = ins.id;
+                _cdtEditStage5CS = ins.concept_statuses || {};
+            }
         }
 
         async function saveNewDesignTask() {
@@ -21925,6 +21929,11 @@
                     if (idx >= 0) allDesignTasks[idx] = data;
                     renderDSDashboard();
                     if (typeof renderDSPreviewPanel === 'function') renderDSPreviewPanel(taskId);
+                    // If the full task record is open for this task, reload it so the Drive URL appears
+                    const isDTR = !document.getElementById('tool-design-task')?.classList.contains('hide');
+                    if (isDTR && currentDesignTaskRecord?.id === taskId && typeof loadDesignTaskRecordV2 === 'function') {
+                        loadDesignTaskRecordV2(taskId).catch(() => {});
+                    }
                     return; // skip attachment upload + navigation
                 }
                 showToast(`Design task created: ${ref}`);
@@ -23416,11 +23425,13 @@
         }
 
         async function _loadPreviewPanelFactoryHandover(task) {
-            const el = document.getElementById(`dsp-factory-${task.id}`);
-            if (!el) return;
+            const elId = `dsp-factory-${task.id}`;
+            if (!document.getElementById(elId)) return;
             const { data: stages } = await supabase.from('design_stages')
                 .select('*').eq('task_id', task.id).eq('stage_number', 5).limit(1);
-            if (!document.getElementById(`dsp-factory-${task.id}`)) return;
+            // Re-fetch element after await in case the panel was re-rendered
+            const el = document.getElementById(elId);
+            if (!el) return;
             const stage5 = (stages || [])[0] || null;
             const fr = task.factory_requirements || {};
             const driveUrl = stage5?.concept_statuses?.drive_url || task.jobs?.google_drive_url || '';
