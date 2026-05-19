@@ -4051,6 +4051,17 @@
                 <div class="jr-left-col">
                     <!-- Compact job info card -->
                     <div class="glass rounded-2xl p-4">
+                        <!-- Job Stage (top of card) -->
+                        <div class="mb-3">
+                            <span class="text-xs text-gray-600 block mb-1.5">Job Stage</span>
+                            <div id="jr-stage-pills"><!-- rendered by renderJobStagePills() --></div>
+                            <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide"></select>
+                        </div>
+                        <!-- Design Pipeline (below stage) -->
+                        <div class="mb-3 pb-3 border-b border-gray-800">
+                            <span class="text-xs text-gray-600 block mb-1.5">Design Pipeline</span>
+                            <div id="jr-design-stage-pills"><!-- rendered by renderDesignStagePills() --></div>
+                        </div>
                         <p id="jr-job-desc" class="text-gray-300 text-xs leading-relaxed mb-3"></p>
                         <div class="grid grid-cols-2 gap-y-2 pt-3 border-t border-gray-800" id="jr-meta-row">
                             <div><span class="text-xs text-gray-600">Type</span><p id="jr-type" class="text-xs font-semibold mt-0.5">—</p></div>
@@ -4067,27 +4078,6 @@
                         <div class="mt-3 pt-3 border-t border-gray-800">
                             <span class="text-xs text-gray-600 block mb-1.5">Owner</span>
                             <div class="owner-dp dark" id="owner-dp-job"></div>
-                        </div>
-                        <!-- Job Stage -->
-                        <div class="mt-3 pt-3 border-t border-gray-800">
-                            <span class="text-xs text-gray-600 block mb-1.5">Job Stage</span>
-                            <div class="flex flex-wrap gap-1" id="jr-stage-pills">
-                                <!-- Populated by renderJobStagePills() -->
-                            </div>
-                            <select id="jr-stage-select" onchange="updateJobStage(this.value)" class="hide">
-                                <option value="discovery">Discovery</option>
-                                <option value="concepts">Concepts</option>
-                                <option value="final_mockups">Final Mock-ups</option>
-                                <option value="order_details">Order Details</option>
-                                <option value="quoted">Quoted</option>
-                                <option value="completed">Completed</option>
-                                <option value="lost">Lost</option>
-                            </select>
-                        </div>
-                        <!-- Design Pipeline -->
-                        <div class="mt-3 pt-3 border-t border-gray-800">
-                            <span class="text-xs text-gray-600 block mb-2">Design Pipeline</span>
-                            <div class="design-stage-row" id="jr-design-stage-pills" style="display:flex;align-items:center;flex-wrap:wrap;gap:4px"></div>
                         </div>
                         <!-- Legacy Next Action slot (kept hidden for JS compatibility; primary card now above activity sidebar) -->
                         <div id="jr-next-action" class="hide"></div>
@@ -17005,18 +16995,15 @@
         function renderJobStagePills() {
             const container = document.getElementById('jr-stage-pills');
             if (!container) return;
-            // Use configurable job kanban stages; fall back to hardcoded if not yet loaded
             const stages = jobKanbanStages.length > 0 ? jobKanbanStages : JOB_STAGES.map(s => ({ id: s.key, name: s.label, color: s.color }));
             const activeStageId = currentJob?.job_kanban_stage_id ||
-                // Legacy fallback: match by name
                 stages.find(s => s.name.toLowerCase() === (_JOB_LEGACY_MAP[currentJob?.stage] || currentJob?.stage || '').toLowerCase())?.id;
-            container.innerHTML = stages.map(s => {
-                const active = activeStageId === s.id;
-                const c = s.color || '#64748b';
-                let style = active ? `color:${c};border-color:${c};background:${c}18;` : '';
-                return `<button onclick="updateJobStage('${s.id}')" class="stage-pill-btn${active ? ' active' : ''}"
-                    style="${style}">${escHtml(s.name)}</button>`;
-            }).join('');
+            const activeStage = stages.find(s => s.id === activeStageId);
+            const c = activeStage?.color || '#64748b';
+            container.innerHTML = `<select onchange="updateJobStage(this.value)"
+                style="width:100%;padding:6px 10px;border-radius:20px;border:2px solid ${c};color:${c};background:${c}18;font-size:12px;font-weight:700;cursor:pointer;outline:none;font-family:inherit;appearance:auto">
+                ${stages.map(s => `<option value="${s.id}"${s.id === activeStageId ? ' selected' : ''}>${escHtml(s.name)}</option>`).join('')}
+            </select>`;
         }
 
         const DESIGN_STAGE_LABELS = {
@@ -17058,54 +17045,44 @@
             if (!container) return;
 
             if (!_jobLinkedDesignTask) {
-                // No design task linked — show greyed pipeline
-                const DS_PIPELINE_LABELS = ['Brief', 'Concepts', 'Full Range', 'Final Artwork', 'Completed'];
-                container.innerHTML = DS_PIPELINE_LABELS.map(label =>
-                    `<span class="stage-pill-btn" style="opacity:0.35;cursor:default;pointer-events:none">${escHtml(label)}</span>`
-                ).join('') +
-                `<span style="font-size:11px;color:#94a3b8;margin-left:8px;align-self:center">No design task linked</span>`;
+                container.innerHTML = `<span style="font-size:11px;color:#94a3b8;font-style:italic">No design task linked</span>`;
                 return;
             }
 
-            // Map the 4 design stages to pipeline labels
+            // Find the current active stage
             const DS_STAGE_NAMES = { 1: 'Brief', 2: 'Concepts', 3: 'Full Range', 4: 'Final Artwork' };
             const DS_STAGE_COLORS_PIPELINE = {
-                not_started:        '#94a3b8',
-                in_progress:        '#d97706',
-                in_review:          '#7c3aed',
-                approved:           '#16a34a',
-                declined:           '#dc2626',
-                revisions_required: '#c2410c',
-                skipped:            '#22c55e',
+                not_started:'#94a3b8', in_progress:'#d97706', in_review:'#7c3aed',
+                approved:'#16a34a', declined:'#dc2626', revisions_required:'#c2410c', skipped:'#22c55e',
             };
-
-            const stagesHtml = [1,2,3,4].map(num => {
-                const stage = _jobLinkedDesignStages.find(s => s.stage_number === num);
-                const label = DS_STAGE_NAMES[num];
-                if (!stage || stage.status === 'not_started') {
-                    return `<span class="stage-pill-btn" style="opacity:0.4;cursor:default;pointer-events:none">${escHtml(label)}</span>`;
-                }
-                const c = DS_STAGE_COLORS_PIPELINE[stage.status] || '#64748b';
-                const isActive = ['in_progress','in_review','revisions_required'].includes(stage.status);
-                const isDone   = ['approved','skipped'].includes(stage.status);
-                let style = `color:${c};border-color:${c};background:${c}18`;
-                if (isDone) style = `color:#16a34a;border-color:#86efac;background:rgba(34,197,94,0.08)`;
-                const statusDot = isDone ? '✓ ' : isActive ? '● ' : '';
-                return `<span class="stage-pill-btn active" style="${style}">${statusDot}${escHtml(label)}</span>`;
-            }).join('');
-
-            // "Completed" pill
             const isCompleted = _jobLinkedDesignTask.status === 'completed';
-            const completedStyle = isCompleted
-                ? 'color:#16a34a;border-color:#16a34a;background:rgba(22,163,74,0.1);font-weight:800'
-                : 'opacity:0.4;cursor:default;pointer-events:none';
-            const completedPill = `<span class="stage-pill-btn active" style="${completedStyle}">${isCompleted ? '✓ ' : ''}Completed</span>`;
 
-            // Link to open the design task
-            const taskLink = `<button onclick="showDesignTask('${_jobLinkedDesignTask.id}')" style="margin-left:auto;font-size:11px;color:#be185d;background:transparent;border:none;cursor:pointer;padding:2px 6px;font-weight:700;text-decoration:underline;flex-shrink:0">Open Task →</button>`;
+            // Find the furthest active/last-completed stage
+            const activeStage = _jobLinkedDesignStages.find(s => ['in_progress','in_review','revisions_required'].includes(s.status))
+                || (isCompleted ? null : _jobLinkedDesignStages.filter(s => ['approved','skipped'].includes(s.status)).slice(-1)[0]);
 
-            container.innerHTML = `<div style="display:flex;align-items:center;flex-wrap:wrap;gap:4px;width:100%">
-                ${stagesHtml}${completedPill}${taskLink}
+            let statusText, statusColor, statusBg, statusBdr;
+            if (isCompleted) {
+                statusText = '✓ Completed'; statusColor = '#16a34a'; statusBg = 'rgba(22,163,74,0.1)'; statusBdr = '#86efac';
+            } else if (activeStage) {
+                const stageLabel = DS_STAGE_NAMES[activeStage.stage_number] || `Stage ${activeStage.stage_number}`;
+                const stageStatusLabels = { in_progress:'In Progress', in_review:'In Review', revisions_required:'Revisions' };
+                const stLabel = stageStatusLabels[activeStage.status] || activeStage.status;
+                statusText = `${stageLabel} — ${stLabel}`;
+                statusColor = DS_STAGE_COLORS_PIPELINE[activeStage.status] || '#64748b';
+                statusBg = `${statusColor}18`; statusBdr = `${statusColor}44`;
+            } else {
+                const doneStages = _jobLinkedDesignStages.filter(s => ['approved','skipped'].includes(s.status));
+                statusText = doneStages.length > 0 ? `${DS_STAGE_NAMES[doneStages.length]} ✓` : 'Not started';
+                statusColor = doneStages.length > 0 ? '#16a34a' : '#94a3b8';
+                statusBg = `${statusColor}18`; statusBdr = `${statusColor}44`;
+            }
+
+            const taskLink = `<button onclick="showDesignTask('${_jobLinkedDesignTask.id}')" style="font-size:10px;color:#be185d;background:transparent;border:none;cursor:pointer;padding:0;font-weight:700;text-decoration:underline;flex-shrink:0;white-space:nowrap">Open →</button>`;
+
+            container.innerHTML = `<div style="display:flex;align-items:center;gap:6px;width:100%;flex-wrap:wrap">
+                <span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;border:1.5px solid ${statusBdr};color:${statusColor};background:${statusBg};white-space:nowrap">${escHtml(statusText)}</span>
+                ${taskLink}
             </div>`;
         }
 
@@ -23042,7 +23019,11 @@
                 const col = DS_SUBSTAGE_COLORS[task.sub_stage] || '#64748b';
                 actionBadge = `<span class="ds-substage-badge ds-substage-${task.sub_stage}" style="flex-shrink:0">${DS_SUBSTAGE_LABELS[task.sub_stage]}</span>`;
             } else if (task.status === 'in_progress') {
-                actionBadge = `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:rgba(217,119,6,0.12);color:#d97706;border:1px solid rgba(217,119,6,0.25);flex-shrink:0;white-space:nowrap">In Design</span>`;
+                actionBadge = `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;flex-shrink:0;white-space:nowrap">In Design</span>`;
+            } else if (task.status === 'in_review') {
+                actionBadge = `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:#fffbeb;color:#b45309;border:1px solid #fde68a;flex-shrink:0;white-space:nowrap">In Review</span>`;
+            } else if (task.status === 'revisions') {
+                actionBadge = `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;flex-shrink:0;white-space:nowrap">Revisions</span>`;
             }
 
             const ownerNames = (() => {
@@ -23253,10 +23234,13 @@
                                 Design Uploads
                                 <span class="count-badge" id="dsp-uploads-count-${task.id}">0</span>
                             </button>
-                            <button onclick="openDesignTaskEditModal('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#475569;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;gap:4px">
-                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                Edit
-                            </button>
+                            <div style="display:inline-flex;align-items:center">
+                                <button onclick="openDesignTaskEditModal('${task.id}')" style="padding:5px 9px;border-radius:7px 0 0 7px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#475569;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;gap:4px">
+                                    <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    Edit
+                                </button>
+                                <button onclick="_toggleDSPEditMenu(event,'${task.id}')" style="padding:5px 6px;border-radius:0 7px 7px 0;font-size:10px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;border-left-color:transparent;background:#fff;color:#64748b;line-height:1;margin-left:-1px" title="More options">▾</button>
+                            </div>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
@@ -25070,6 +25054,30 @@
             }
             renderDSDashboard();
             showToast('Status updated');
+        }
+
+        // DS preview panel Edit ▾ menu (reuses the same dropdown element)
+        function _toggleDSPEditMenu(event, taskId) {
+            event.stopPropagation();
+            const menu = document.getElementById('dt-edit-dropdown');
+            if (!menu) return;
+            const isOpen = !menu.classList.contains('hide');
+            _closeDTEditMenu();
+            if (!isOpen) {
+                const canDelete = !!(isSuperAdmin || currentUserProfile?.role === 'admin');
+                document.getElementById('dt-edit-dropdown-delete')?.classList.toggle('hide', !canDelete);
+                // Wire delete button to the preview task id
+                const delBtn = menu.querySelector('#dt-edit-dropdown-delete button');
+                if (delBtn) delBtn.onclick = () => { deleteDesignTask(taskId); _closeDTEditMenu(); };
+                // Wire edit button to open the edit modal for preview context
+                const editBtn = menu.querySelector('button:first-child');
+                if (editBtn) editBtn.onclick = () => { openDesignTaskEditModal(taskId); _closeDTEditMenu(); };
+                const btn = event.currentTarget;
+                const rect = btn.getBoundingClientRect();
+                menu.style.top = (rect.bottom + 4) + 'px';
+                menu.style.left = Math.max(8, rect.right - 164) + 'px';
+                menu.classList.remove('hide');
+            }
         }
 
         function _toggleDTEditMenu(event) {
