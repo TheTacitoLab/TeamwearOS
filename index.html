@@ -1633,15 +1633,34 @@
         /* ── Job Record: unified 3-column layout ── */
         .jr-three-col {
             display: grid;
-            grid-template-columns: var(--jr-left-width, 300px) 1fr 340px;
+            grid-template-columns: var(--jr-left-width, 300px) 1fr 380px;
             gap: 20px;
             align-items: start;
             transition: grid-template-columns 0.22s ease;
         }
         .jr-three-col.left-collapsed { --jr-left-width: 48px; }
-        @media (max-width: 1400px) { .jr-three-col { grid-template-columns: var(--jr-left-width, 280px) 1fr 300px; } }
+        @media (max-width: 1400px) { .jr-three-col { grid-template-columns: var(--jr-left-width, 280px) 1fr 340px; } }
         @media (max-width: 1200px) { .jr-three-col { grid-template-columns: var(--jr-left-width, 280px) 1fr; } .jr-activity-sidebar { display: none !important; } }
         @media (max-width: 767px) { .jr-three-col { grid-template-columns: 1fr; } }
+        /* Club record: hide brand identity col on non-overview tabs */
+        .jr-three-col.no-left { grid-template-columns: 1fr 380px; }
+        .jr-three-col.no-left .jr-left-col { display: none; }
+        @media (max-width: 1400px) { .jr-three-col.no-left { grid-template-columns: 1fr 340px; } }
+        @media (max-width: 1200px) { .jr-three-col.no-left { grid-template-columns: 1fr; } }
+        /* WON / LOST header buttons */
+        .jr-won-btn { background:#dcfce7;color:#16a34a;border:1.5px solid #86efac; }
+        .jr-won-btn:hover, .jr-won-btn.active { background:#16a34a;color:#fff;border-color:#16a34a; }
+        .jr-lost-btn { background:#fee2e2;color:#dc2626;border:1.5px solid #fca5a5; }
+        .jr-lost-btn:hover, .jr-lost-btn.active { background:#dc2626;color:#fff;border-color:#dc2626; }
+        /* Order type pill in job left col */
+        .ot-pill { display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:700; }
+        .ot-new_order    { background:#dcfce7;color:#16a34a; }
+        .ot-repeat_order { background:#dbeafe;color:#1d4ed8; }
+        .ot-store_build  { background:#f1f5f9;color:#64748b; }
+        /* Kanban card order type left border */
+        .sh-record-card.ot-new_order    { border-left:3px solid #16a34a; }
+        .sh-record-card.ot-repeat_order { border-left:3px solid #2563eb; }
+        .sh-record-card.ot-store_build  { border-left:3px solid #94a3b8; }
 
         /* Left col collapse toggle */
         .jr-left-collapse-btn {
@@ -4036,6 +4055,8 @@
                     <button class="record-nav-item" onclick="showJobTab('orderhub')" id="jt-orderhub" style="width:auto;padding:7px 12px;font-size:12px">Order Hub</button>
                 </div>
                 <button onclick="openEditJobModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit Job</button>
+                <button id="jr-won-btn" onclick="markJobWon()" class="jr-won-btn btn-secondary text-xs flex-shrink-0 px-3 py-1.5 font-bold">✓ WON</button>
+                <button id="jr-lost-btn" onclick="markJobLost()" class="jr-lost-btn btn-secondary text-xs flex-shrink-0 px-3 py-1.5 font-bold">✗ LOST</button>
                 <button onclick="deleteJob(currentJobId)" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5" style="color:#dc2626;border-color:#fca5a5" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">Delete</button>
             </div>
             <!-- 3-COLUMN LAYOUT: left (info) | middle (pipelines+content) | right (activity) -->
@@ -4045,6 +4066,16 @@
                 <div class="jr-left-col">
                     <!-- Compact job info card -->
                     <div class="glass rounded-2xl p-4">
+                        <!-- Order Type (above Stage) -->
+                        <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,0.06)">
+                            <span class="text-xs text-gray-600 block mb-1.5">Order Type</span>
+                            <select id="jr-order-type-select" onchange="updateJobOrderType(this.value)" style="width:100%;padding:5px 8px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:12px;font-weight:600;color:#0f172a;background:#fff;cursor:pointer;outline:none;font-family:inherit">
+                                <option value="">— Select —</option>
+                                <option value="new_order">New Order</option>
+                                <option value="repeat_order">Repeat Order</option>
+                                <option value="store_build">Store Build</option>
+                            </select>
+                        </div>
                         <!-- Job Stage (top of card) -->
                         <div class="mb-3">
                             <span class="text-xs text-gray-600 block mb-1.5">Job Stage</span>
@@ -4259,6 +4290,15 @@
                         <div class="mb-3">
                             <label class="text-xs text-gray-500 mb-1 block">Description</label>
                             <textarea id="job-description" rows="2" placeholder="Brief overview of this job..." class="w-full px-3 py-2 rounded-lg text-sm resize-none"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Order Type</label>
+                            <select id="job-order-type" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">— Select —</option>
+                                <option value="new_order">New Order</option>
+                                <option value="repeat_order">Repeat Order</option>
+                                <option value="store_build">Store Build</option>
+                            </select>
                         </div>
                         <div class="grid grid-cols-2 gap-3 mb-3">
                             <div>
@@ -4549,7 +4589,7 @@
             </div>
 
             <!-- 3-column layout: brand identity | content | activity -->
-            <div class="jr-three-col">
+            <div class="jr-three-col" id="club-jr-three-col">
 
                 <!-- ── Column 1: Brand Identity (sticky) ── -->
                 <div class="jr-left-col" id="jr-left-col">
@@ -13408,6 +13448,9 @@
             document.getElementById(`icon-tab-${tab}`)?.classList.add('active');
             document.getElementById(`club-tab-${tab}`)?.classList.remove('hide');
             document.getElementById(`tab-btn-${tab}`)?.classList.add('active');
+            // Brand identity column only visible on overview tab
+            const threeCol = document.getElementById('club-jr-three-col');
+            if (threeCol) threeCol.classList.toggle('no-left', tab !== 'overview');
             if (tab === 'overview') renderClubOverviewInfo();
             if (tab === 'teams') { loadClubTeams().then(() => renderClubTeams()); }
             if (tab === 'products') renderClubProducts();
@@ -15907,6 +15950,8 @@
             new_club: 'New Club', repeat_order: 'Repeat Order',
             new_concept: 'New Concept', new_team: 'New Team'
         };
+        const ORDER_TYPE_LABELS = { new_order: 'New Order', repeat_order: 'Repeat Order', store_build: 'Store Build' };
+        const ORDER_TYPE_COLORS = { new_order: '#16a34a', repeat_order: '#2563eb', store_build: '#94a3b8' };
         const CLUB_TYPE_LABELS = { retail: 'Retail', partner: 'Partner', partner_plus: 'Partner+' };
         const CHANNEL_LABELS   = { direct: 'Direct', store: 'Store' };
 
@@ -16530,8 +16575,8 @@
             else _renderSHJobsKanban(board, search);
         }
 
-        function _shKanbanCard(type, id, name, club, tagsHtml, selected) {
-            return `<div class="sh-record-card${selected ? ' sh-selected' : ''}"
+        function _shKanbanCard(type, id, name, club, tagsHtml, selected, otClass) {
+            return `<div class="sh-record-card${selected ? ' sh-selected' : ''}${otClass ? ' ' + otClass : ''}"
                 draggable="true"
                 ondragstart="onSHDragStart(event,'${type}','${id}')"
                 ondragend="onSHDragEnd(event)"
@@ -16648,7 +16693,8 @@
                     const shopify = job.shopify_draft_order_url ? `<span class="sh-card-tag" style="background:rgba(5,150,105,0.1);color:#059669">Shopify</span>` : '';
                     const ot = calcOrderTargetDate(job.deadline_date);
                     const orderTargetTag = ot ? `<span class="sh-card-tag" style="background:rgba(217,119,6,0.1);color:#d97706" title="Order target date (7 weeks before deadline)">Order by ${ot.toLocaleDateString('en-GB', { day:'numeric', month:'short' })}</span>` : '';
-                    return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + rev + orderTargetTag + shopify, sel);
+                    const otClass = job.order_type ? `ot-${job.order_type}` : '';
+                    return _shKanbanCard('job', job.id, escHtml(job.job_name), club, num + rev + orderTargetTag + shopify, sel, otClass);
                 }).join('');
                 return _shKanbanCol(stage.id, stage.color, escHtml(stage.name), stageJobs.length, cards, stageSubtitle);
             });
@@ -16664,7 +16710,6 @@
                 j.clubs?.name?.toLowerCase().includes(search) ||
                 j.job_number?.toLowerCase().includes(search)
             );
-            // Use the full-width kanban wrapper as a flat list container
             const wrapper = document.getElementById('sh-kanban-wrapper');
             if (!wrapper) return;
             wrapper.classList.remove('hide');
@@ -16672,42 +16717,44 @@
             document.getElementById('sh-right')?.classList.add('hide');
             const board = document.getElementById('sh-list');
             if (!board) return;
-            if (closed.length === 0) {
-                board.innerHTML = `<div style="padding:40px;text-align:center;color:#94a3b8;font-size:13px">No closed jobs yet.</div>`;
-                return;
-            }
-            const completedList = closed.filter(j => j.stage === 'completed');
-            const lostList      = closed.filter(j => j.stage === 'lost');
-            const renderSection = (title, color, list) => {
-                if (list.length === 0) return '';
-                return `<div style="margin-bottom:24px;width:100%">
-                    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:${color};margin-bottom:10px;padding:0 4px">${title} (${list.length})</div>
-                    <div style="display:flex;flex-direction:column;gap:8px">
-                        ${list.map(j => {
-                            const stage = JOB_STAGES.find(s => s.key === j.stage) || JOB_STAGES[0];
-                            const clubName = j.clubs?.name || '—';
-                            const days = Math.floor((new Date() - new Date(j.created_at)) / 86400000);
-                            return `<div class="job-card" onclick="openJobRecord('${j.id}')" style="cursor:pointer">
-                                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-                                    <div style="flex:1;min-width:0">
-                                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
-                                            <span class="job-number">${j.job_number || ''}</span>
-                                            <span class="stage-pill ${stage.colorClass}" style="font-size:10px">${stage.label}</span>
-                                        </div>
-                                        <div class="job-name truncate">${escHtml(j.job_name)}</div>
-                                        <div class="job-meta">${escHtml(clubName)} · ${JOB_TYPE_LABELS[j.job_type] || j.job_type || ''}</div>
-                                    </div>
-                                    <div style="font-size:11px;color:#94a3b8;flex-shrink:0">${days}d ago</div>
-                                </div>
-                            </div>`;
-                        }).join('')}
+
+            const wonList  = closed.filter(j => j.stage === 'completed');
+            const lostList = closed.filter(j => j.stage === 'lost');
+
+            const renderCard = (j) => {
+                const clubName = j.clubs?.name || '—';
+                const days = Math.floor((new Date() - new Date(j.created_at)) / 86400000);
+                const otLabel = ORDER_TYPE_LABELS[j.order_type] || '';
+                return `<div class="job-card" onclick="openJobRecord('${j.id}')" style="cursor:pointer;margin-bottom:8px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+                        <div style="flex:1;min-width:0">
+                            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+                                <span class="job-number">${j.job_number || ''}</span>
+                                ${otLabel ? `<span class="sh-card-tag" style="background:#f1f5f9;color:#64748b">${escHtml(otLabel)}</span>` : ''}
+                            </div>
+                            <div class="job-name truncate">${escHtml(j.job_name)}</div>
+                            <div class="job-meta">${escHtml(clubName)}</div>
+                        </div>
+                        <div style="font-size:11px;color:#94a3b8;flex-shrink:0">${days}d ago</div>
                     </div>
                 </div>`;
             };
-            board.style.flexDirection = 'column';
-            board.style.overflowX = 'hidden';
-            board.style.padding = '16px';
-            board.innerHTML = renderSection('Completed', '#16a34a', completedList) + renderSection('Lost', '#dc2626', lostList);
+
+            const renderCol = (title, color, bg, list) =>
+                `<div>
+                    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:${color};margin-bottom:12px;padding:8px 12px;background:${bg};border-radius:8px">${title} (${list.length})</div>
+                    ${list.length === 0
+                        ? `<div style="padding:24px;text-align:center;color:#94a3b8;font-size:12px;border:1px dashed #e2e8f0;border-radius:10px">No ${title.toLowerCase()} jobs</div>`
+                        : list.map(renderCard).join('')}
+                </div>`;
+
+            board.style.flexDirection = '';
+            board.style.overflowX = '';
+            board.style.padding = '';
+            board.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;padding:16px">
+                ${renderCol('WON', '#16a34a', 'rgba(22,163,74,0.08)', wonList)}
+                ${renderCol('LOST', '#dc2626', 'rgba(239,68,68,0.07)', lostList)}
+            </div>`;
         }
 
         function selectSalesRecord(type, id) {
@@ -17186,6 +17233,7 @@
             document.getElementById('job-name').value = '';
             document.getElementById('job-description').value = '';
             document.getElementById('job-type').value = 'new_club';
+            document.getElementById('job-order-type').value = '';
             document.getElementById('job-club-type').value = 'retail';
             document.getElementById('job-channel').value = 'direct';
             document.getElementById('job-stage').value = 'discovery';
@@ -17219,6 +17267,7 @@
             document.getElementById('job-name').value = currentJob.job_name || '';
             document.getElementById('job-description').value = currentJob.job_description || '';
             document.getElementById('job-type').value = currentJob.job_type || 'new_club';
+            document.getElementById('job-order-type').value = currentJob.order_type || '';
             document.getElementById('job-club-type').value = currentJob.club_type || 'retail';
             document.getElementById('job-channel').value = currentJob.channel || 'direct';
             document.getElementById('job-stage').value = currentJob.stage || 'discovery';
@@ -17257,6 +17306,7 @@
                 job_name: jobName,
                 job_description: document.getElementById('job-description').value.trim() || null,
                 job_type: document.getElementById('job-type').value,
+                order_type: document.getElementById('job-order-type')?.value || null,
                 club_type: document.getElementById('job-club-type').value,
                 channel: document.getElementById('job-channel').value,
                 stage: document.getElementById('job-stage').value,
@@ -17429,6 +17479,14 @@
             document.getElementById('jr-job-name').textContent = currentJob.job_name || '';
             // jr-job-desc removed from left col — description is in the centre Overview tab
             document.getElementById('jr-stage-select').value = currentJob.stage || 'discovery';
+            // Order type select
+            const otSel = document.getElementById('jr-order-type-select');
+            if (otSel) otSel.value = currentJob.order_type || '';
+            // WON / LOST button active state
+            const wonBtn = document.getElementById('jr-won-btn');
+            const lostBtn = document.getElementById('jr-lost-btn');
+            if (wonBtn) wonBtn.classList.toggle('active', currentJob.stage === 'completed');
+            if (lostBtn) lostBtn.classList.toggle('active', currentJob.stage === 'lost');
             document.getElementById('jr-type').textContent = JOB_TYPE_LABELS[currentJob.job_type] || currentJob.job_type;
             document.getElementById('jr-club-type').textContent = CLUB_TYPE_LABELS[currentJob.club_type] || currentJob.club_type;
             document.getElementById('jr-channel').textContent = CHANNEL_LABELS[currentJob.channel] || currentJob.channel;
@@ -17594,6 +17652,58 @@
             if (isPaid) {
                 supabase.from('job_activity').insert({ job_id: currentJobId, brand_id: currentBrand?.id, user_id: currentUser?.id, user_name: userDisplayName(currentUserProfile), message: `Job moved to Paid — revenue recognised: £${(currentJob.estimated_revenue||0).toLocaleString('en-GB')}`, activity_type: 'stage_change', task_completed: false }).then(() => {});
             }
+        }
+
+        async function updateJobOrderType(value) {
+            if (!currentJobId) return;
+            const { error } = await supabase.from('jobs').update({ order_type: value || null }).eq('id', currentJobId);
+            if (error) { showToast('Error updating order type', 'error'); return; }
+            currentJob = { ...currentJob, order_type: value || null };
+            renderJobHeader();
+            await loadJobs();
+            updateSalesBadges();
+            if (value) showToast('Order type set to ' + (ORDER_TYPE_LABELS[value] || value));
+        }
+
+        async function markJobWon() {
+            if (!currentJobId) return;
+            const isAlreadyWon = currentJob?.stage === 'completed';
+            if (isAlreadyWon) {
+                // Revert back to active — clear closed stage, let user reassign kanban stage
+                const { error } = await supabase.from('jobs').update({ stage: 'discovery', job_kanban_stage_id: null }).eq('id', currentJobId);
+                if (error) { showToast('Error reverting job', 'error'); return; }
+                currentJob = { ...currentJob, stage: 'discovery', job_kanban_stage_id: null };
+                showToast('Job moved back to active pipeline');
+            } else {
+                const { error } = await supabase.from('jobs').update({ stage: 'completed', job_kanban_stage_id: null }).eq('id', currentJobId);
+                if (error) { showToast('Error marking job as won', 'error'); return; }
+                currentJob = { ...currentJob, stage: 'completed', job_kanban_stage_id: null };
+                showToast('Job marked as WON', 'success');
+            }
+            renderJobHeader();
+            renderJobStagePills();
+            await loadJobs();
+            updateSalesBadges();
+        }
+
+        async function markJobLost() {
+            if (!currentJobId) return;
+            const isAlreadyLost = currentJob?.stage === 'lost';
+            if (isAlreadyLost) {
+                const { error } = await supabase.from('jobs').update({ stage: 'discovery', job_kanban_stage_id: null }).eq('id', currentJobId);
+                if (error) { showToast('Error reverting job', 'error'); return; }
+                currentJob = { ...currentJob, stage: 'discovery', job_kanban_stage_id: null };
+                showToast('Job moved back to active pipeline');
+            } else {
+                const { error } = await supabase.from('jobs').update({ stage: 'lost', job_kanban_stage_id: null }).eq('id', currentJobId);
+                if (error) { showToast('Error marking job as lost', 'error'); return; }
+                currentJob = { ...currentJob, stage: 'lost', job_kanban_stage_id: null };
+                showToast('Job marked as LOST');
+            }
+            renderJobHeader();
+            renderJobStagePills();
+            await loadJobs();
+            updateSalesBadges();
         }
 
         // =============================================
