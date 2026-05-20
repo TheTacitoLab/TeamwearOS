@@ -16576,11 +16576,15 @@
         }
 
         function _shKanbanCard(type, id, name, club, tagsHtml, selected, otClass) {
+            const dblclick = type === 'job'
+                ? `ondblclick="openJobRecord('${id}')"`
+                : `ondblclick="selectSalesRecord('${type}','${id}')"`;
             return `<div class="sh-record-card${selected ? ' sh-selected' : ''}${otClass ? ' ' + otClass : ''}"
                 draggable="true"
                 ondragstart="onSHDragStart(event,'${type}','${id}')"
                 ondragend="onSHDragEnd(event)"
-                onclick="selectSalesRecord('${type}','${id}')">
+                onclick="selectSalesRecord('${type}','${id}')"
+                ${dblclick}>
                 <div class="sh-card-name">${name}</div>
                 <div class="sh-card-club">${club}</div>
                 ${tagsHtml ? `<div class="sh-card-tags">${tagsHtml}</div>` : ''}
