@@ -2327,28 +2327,8 @@
                             <input type="number" id="prod-weight" placeholder="450" class="w-full px-3 py-2 rounded-lg">
                         </div>
                         <div>
-                            <div class="flex items-center justify-between mb-1">
-                                <label class="text-gray-400 text-sm">COGS (£)</label>
-                                <div class="flex rounded-lg overflow-hidden" style="border:1px solid #374151;font-size:10px">
-                                    <button id="cogs-mode-manual-btn" onclick="toggleCOGSFormulaMode(false)" class="px-2.5 py-1 font-semibold transition-colors" style="background:#374151;color:#d1d5db">Manual</button>
-                                    <button id="cogs-mode-formula-btn" onclick="toggleCOGSFormulaMode(true)" class="px-2.5 py-1 font-semibold transition-colors" style="background:transparent;color:#6b7280">Formula</button>
-                                </div>
-                            </div>
-                            <!-- Formula inputs (unit cost + breakdown) — only shown in formula mode -->
-                            <div id="cogs-formula-wrap" class="hide" style="margin-bottom:6px">
-                                <div class="mb-1">
-                                    <label class="text-gray-500 text-xs mb-1 block">Unit Cost (£)</label>
-                                    <input type="number" step="0.01" min="0" id="prod-unit-cost" placeholder="e.g. 10.00" oninput="updateCOGSPreview()" class="w-full px-3 py-2 rounded-lg text-sm">
-                                </div>
-                                <div id="cogs-formula-preview" class="rounded-lg px-3 py-2 text-xs space-y-1 mb-1" style="background:#111827;border:1px solid #1f2937">
-                                    <div class="flex justify-between" style="color:#9ca3af"><span>Unit Cost</span><span id="cogs-prev-unit">—</span></div>
-                                    <div class="flex justify-between" style="color:#9ca3af"><span>VAT (20%)</span><span id="cogs-prev-vat">—</span></div>
-                                    <div class="flex justify-between" style="color:#9ca3af"><span>Payment Fee</span><span id="cogs-prev-fee">—</span></div>
-                                </div>
-                            </div>
-                            <!-- COGS field — always visible; read-only + highlighted when formula is active -->
+                            <label class="text-gray-400 text-sm mb-1 block">COGS (£)</label>
                             <input type="number" step="0.01" id="prod-cogs" placeholder="18.00" class="w-full px-3 py-2 rounded-lg">
-                            <p id="cogs-formula-hint" class="hide text-xs mt-1" style="color:#6b7280">Auto-calculated — edit Unit Cost above to change</p>
                         </div>
                     </div>
                     <!-- Hidden legacy fit_type for backward compat -->
@@ -3431,30 +3411,6 @@
                 <button onclick="saveDesignSettings()" class="mt-4 btn-primary text-sm">Save Design Settings</button>
             </div>
 
-            <!-- COGS Formula Settings -->
-            <div class="glass rounded-2xl p-6 mb-6">
-                <h3 class="font-semibold mb-1">COGS Formula Settings</h3>
-                <p class="text-gray-500 text-sm mb-4">Set the master formula for calculating Cost of Goods Sold on products. Each product can use this formula or have COGS entered manually.</p>
-                <div class="bg-gray-800/50 rounded-lg px-4 py-3 mb-4 text-sm">
-                    <span class="text-gray-400">Formula: </span>
-                    <span class="font-mono text-brand-300">Unit Cost + 20% VAT + Payment Fee = COGS</span>
-                </div>
-                <div class="grid md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Payment Fee (£ per item)</label>
-                        <input type="number" step="0.01" min="0" id="cogs-payment-fee" placeholder="0.30" class="w-full px-3 py-2 rounded-lg text-sm">
-                        <p class="text-gray-500 text-xs mt-1">Fixed fee added per item (e.g. payment processing)</p>
-                    </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-2 block">New Products Default</label>
-                        <label class="flex items-center gap-3 cursor-pointer select-none">
-                            <input type="checkbox" id="cogs-formula-default-on" class="w-4 h-4 accent-brand-500">
-                            <span class="text-sm text-gray-300">Enable formula on new products by default</span>
-                        </label>
-                    </div>
-                </div>
-                <button onclick="saveCOGSSettings()" class="btn-primary text-sm">Save COGS Settings</button>
-            </div>
             <div class="glass rounded-2xl p-6 mb-6">
                 <h3 class="font-semibold mb-1">SKU Format</h3>
                 <p class="text-gray-500 text-sm mb-4">Define how product SKUs are structured for this brand. The club suffix and size are always appended automatically — configure the tokens and separators to match your brand's convention.</p>
@@ -7028,78 +6984,8 @@
             loadShopifyConfigUI();
             renderFeatureToggles();
             if (typeof loadDesignSettings === 'function') loadDesignSettings();
-            loadCOGSSettings();
         }
 
-        function loadCOGSSettings() {
-            if (!currentBrand) return;
-            const feeEl = document.getElementById('cogs-payment-fee');
-            const defEl = document.getElementById('cogs-formula-default-on');
-            if (feeEl) feeEl.value = currentBrand.cogs_payment_fee ?? 0;
-            if (defEl) defEl.checked = !!currentBrand.cogs_formula_default_on;
-        }
-
-        async function saveCOGSSettings() {
-            if (!currentBrand?.id) return;
-            const fee = parseFloat(document.getElementById('cogs-payment-fee')?.value) || 0;
-            const defOn = document.getElementById('cogs-formula-default-on')?.checked || false;
-            const { error } = await supabase.from('brands')
-                .update({ cogs_payment_fee: fee, cogs_formula_default_on: defOn })
-                .eq('id', currentBrand.id);
-            if (error) { showToast('Error saving COGS settings', 'error'); return; }
-            currentBrand.cogs_payment_fee = fee;
-            currentBrand.cogs_formula_default_on = defOn;
-            showToast('COGS settings saved ✓');
-        }
-
-        function toggleCOGSFormulaMode(useFormula) {
-            const formulaWrap = document.getElementById('cogs-formula-wrap');
-            const manualBtn   = document.getElementById('cogs-mode-manual-btn');
-            const formulaBtn  = document.getElementById('cogs-mode-formula-btn');
-            const cogsInput   = document.getElementById('prod-cogs');
-            const hint        = document.getElementById('cogs-formula-hint');
-            if (!formulaWrap || !cogsInput) return;
-            if (useFormula) {
-                formulaWrap.classList.remove('hide');
-                if (hint) hint.classList.remove('hide');
-                cogsInput.readOnly = true;
-                cogsInput.style.background = '#1f2937';
-                cogsInput.style.color = '#9ca3af';
-                cogsInput.style.cursor = 'default';
-                if (manualBtn)  { manualBtn.style.background = 'transparent'; manualBtn.style.color = '#6b7280'; }
-                if (formulaBtn) { formulaBtn.style.background = '#374151';    formulaBtn.style.color = '#d1d5db'; }
-                updateCOGSPreview();
-            } else {
-                formulaWrap.classList.add('hide');
-                if (hint) hint.classList.add('hide');
-                cogsInput.readOnly = false;
-                cogsInput.style.background = '';
-                cogsInput.style.color = '';
-                cogsInput.style.cursor = '';
-                if (manualBtn)  { manualBtn.style.background = '#374151'; manualBtn.style.color = '#d1d5db'; }
-                if (formulaBtn) { formulaBtn.style.background = 'transparent'; formulaBtn.style.color = '#6b7280'; }
-            }
-        }
-
-        function updateCOGSPreview() {
-            const unitCost  = parseFloat(document.getElementById('prod-unit-cost')?.value) || 0;
-            const fee       = parseFloat(currentBrand?.cogs_payment_fee ?? 0);
-            const vat       = unitCost * 0.20;
-            const total     = unitCost + vat + fee;
-            const fmt = v => v > 0 ? `£${v.toFixed(2)}` : '—';
-            const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-            setEl('cogs-prev-unit', fmt(unitCost));
-            setEl('cogs-prev-vat',  unitCost > 0 ? `£${vat.toFixed(2)}` : '—');
-            setEl('cogs-prev-fee',  fmt(fee));
-            // Write the calculated total directly into the visible COGS field
-            const cogsInput = document.getElementById('prod-cogs');
-            if (cogsInput) cogsInput.value = unitCost > 0 ? total.toFixed(2) : '';
-        }
-
-        function _isCOGSFormulaMode() {
-            const formulaWrap = document.getElementById('cogs-formula-wrap');
-            return formulaWrap && !formulaWrap.classList.contains('hide');
-        }
 
         // =============================================
         // FACTORY MODULE
@@ -8287,6 +8173,7 @@
                     <th class="pb-3 pr-3">Category</th>
                     <th class="pb-3 pr-3">Range</th>
                     ${priceCols}
+                    <th class="pb-3 pr-3 text-right whitespace-nowrap">COGS</th>
                     <th class="pb-3 pr-3">Tags</th>
                     <th class="pb-3 text-center">Actions</th>`;
             }
@@ -8325,6 +8212,10 @@
                     <td class="py-2 pr-3 text-gray-400 text-xs">${escHtml(p.category || '-')}</td>
                     <td class="py-2 pr-3 text-gray-400 text-xs">${escHtml(p.range_name || '-')}</td>
                     ${priceCells}
+                    <td class="py-2 pr-3 text-right text-sm cursor-pointer group/inline" onclick="startInlineProdEdit('${p.id}','cogs',this,'number')" title="Click to edit COGS">
+                        <span class="group-hover/inline:underline group-hover/inline:decoration-dotted">${p.cogs ? '£' + Number(p.cogs).toFixed(2) : '—'}</span>
+                        <svg class="w-3 h-3 inline-block ml-1 text-gray-700 opacity-0 group-hover/inline:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </td>
                     <td id="product-tags-${p.id}" class="py-2 pr-3 cursor-pointer group" onclick="openTagEditor(event, '${p.id}')">
                         ${renderProductTagChips(p.shopify_tags)}
                         <svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
@@ -8380,7 +8271,7 @@
         // ── Inline Product Field Editor ───────────────────────────────────────
         let _inlineProdEdit = null;
 
-        function startInlineProdEdit(pid, field, td) {
+        function startInlineProdEdit(pid, field, td, type = 'text') {
             if (_cataloguePricingEditMode) return; // don't interfere with price edit mode
             if (_inlineProdEdit) {
                 _inlineProdEdit.saved = true;
@@ -8388,14 +8279,16 @@
             }
             const p = products.find(x => x.id === pid);
             if (!p) return;
-            const current = p[field] || '';
+            const isNumber = type === 'number';
+            const current = isNumber ? (p[field] != null ? Number(p[field]).toFixed(2) : '') : (p[field] || '');
             const isCode = (field === 'product_code');
             const isMono = isCode || field === 'pattern_code';
 
             const inp = document.createElement('input');
-            inp.type = 'text';
+            inp.type = type;
+            if (isNumber) { inp.step = '0.01'; inp.min = '0'; }
             inp.value = current;
-            inp.style.cssText = `width:100%;min-width:80px;background:#1e293b;border:1px solid #3b82f6;border-radius:4px;color:#e2e8f0;padding:2px 6px;font-size:12px;outline:none;${isMono ? 'font-family:monospace;' : ''}`;
+            inp.style.cssText = `width:100%;min-width:80px;background:#1e293b;border:1px solid #3b82f6;border-radius:4px;color:#e2e8f0;padding:2px 6px;font-size:12px;outline:none;text-align:${isNumber ? 'right' : 'left'};${isMono ? 'font-family:monospace;' : ''}`;
 
             _inlineProdEdit = { saved: false };
             const ctx = _inlineProdEdit;
@@ -8403,10 +8296,11 @@
             ctx.save = async () => {
                 if (ctx.saved) return;
                 ctx.saved = true;
-                const newVal = inp.value.trim();
-                const finalVal = isCode ? (newVal.toUpperCase() || null) : (newVal || null);
+                const finalVal = isNumber
+                    ? (parseFloat(inp.value) || null)
+                    : (isCode ? (inp.value.trim().toUpperCase() || null) : (inp.value.trim() || null));
                 const p2 = products.find(x => x.id === pid);
-                if (p2 && p2[field] !== finalVal) {
+                if (p2) {
                     const { error } = await supabase.from('products').update({ [field]: finalVal }).eq('id', pid);
                     if (error) { showToast(error.message, 'error'); }
                     else { p2[field] = finalVal; }
@@ -9146,9 +9040,6 @@
             });
             document.getElementById('prod-weight').value = '450';
             document.getElementById('prod-cogs').value = '';
-            const unitCostEl = document.getElementById('prod-unit-cost');
-            if (unitCostEl) unitCostEl.value = '';
-            toggleCOGSFormulaMode(!!currentBrand?.cogs_formula_default_on);
             const mto = document.getElementById('prod-made-to-order');
             if (mto) mto.checked = true;
 
@@ -9207,16 +9098,7 @@
             if (patternCodeEl) patternCodeEl.value = product.pattern_code || '';
             document.getElementById('prod-weight').value      = product.weight_grams || 450;
             document.getElementById('prod-description').value = product.description || '';
-            // COGS formula toggle
-            const formulaOn = product.cogs_formula_enabled ?? !!currentBrand?.cogs_formula_default_on;
-            toggleCOGSFormulaMode(formulaOn);
-            if (formulaOn) {
-                const ucEl = document.getElementById('prod-unit-cost');
-                if (ucEl) ucEl.value = product.unit_cost || '';
-                updateCOGSPreview();
-            } else {
-                document.getElementById('prod-cogs').value = product.cogs || '';
-            }
+            document.getElementById('prod-cogs').value = product.cogs || '';
 
             // Shopify fields
             populateTemplateSuffixSelect(product.shopify_template_suffix || '');
@@ -10212,8 +10094,6 @@
                 fit_type:      document.getElementById('prod-fit-type').value,
                 available_fits: availFits,
                 weight_grams:  parseInt(document.getElementById('prod-weight').value) || 450,
-                cogs_formula_enabled: _isCOGSFormulaMode(),
-                unit_cost: _isCOGSFormulaMode() ? (parseFloat(document.getElementById('prod-unit-cost')?.value) || null) : null,
                 cogs: parseFloat(document.getElementById('prod-cogs')?.value) || null,
                 sizes:         document.getElementById('prod-sizes').value.trim(),
                 youth_sizes:   document.getElementById('prod-youth-sizes')?.value.trim() || null,
