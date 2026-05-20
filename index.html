@@ -4069,7 +4069,7 @@
                         <!-- Order Type (above Stage) -->
                         <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,0.06)">
                             <span class="text-xs text-gray-600 block mb-1.5">Order Type</span>
-                            <select id="jr-order-type-select" onchange="updateJobOrderType(this.value)" style="width:100%;padding:5px 8px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:12px;font-weight:600;color:#0f172a;background:#fff;cursor:pointer;outline:none;font-family:inherit">
+                            <select id="jr-order-type-select" onchange="_styleOrderTypeSelect(this,this.value);updateJobOrderType(this.value)" style="width:100%;padding:5px 8px;border-radius:20px;border:1.5px solid #e2e8f0;font-size:12px;font-weight:500;color:#94a3b8;background:#f8fafc;cursor:pointer;outline:none;font-family:inherit;transition:all 0.15s">
                                 <option value="">— Select —</option>
                                 <option value="new_order">New Order</option>
                                 <option value="repeat_order">Repeat Order</option>
@@ -17477,15 +17477,29 @@
             }
         }
 
+        function _styleOrderTypeSelect(el, value) {
+            const OT_COLORS = { new_order: '#16a34a', repeat_order: '#2563eb', store_build: '#ea580c' };
+            const c = OT_COLORS[value] || '#64748b';
+            const bg = value ? `${c}18` : '#f8fafc';
+            const border = value ? `2px solid ${c}` : '1.5px solid #e2e8f0';
+            el.style.color = value ? c : '#94a3b8';
+            el.style.background = bg;
+            el.style.border = border;
+            el.style.fontWeight = value ? '700' : '500';
+        }
+
         function renderJobHeader() {
             if (!currentJob) return;
             document.getElementById('jr-job-number').textContent = currentJob.job_number || '';
             document.getElementById('jr-job-name').textContent = currentJob.job_name || '';
             // jr-job-desc removed from left col — description is in the centre Overview tab
             document.getElementById('jr-stage-select').value = currentJob.stage || 'discovery';
-            // Order type select
+            // Order type select — colour-coded to match type
             const otSel = document.getElementById('jr-order-type-select');
-            if (otSel) otSel.value = currentJob.order_type || '';
+            if (otSel) {
+                otSel.value = currentJob.order_type || '';
+                _styleOrderTypeSelect(otSel, currentJob.order_type);
+            }
             // WON / LOST button active state
             const wonBtn = document.getElementById('jr-won-btn');
             const lostBtn = document.getElementById('jr-lost-btn');
