@@ -154,10 +154,45 @@
         .club-list-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 16px 20px; transition: all 0.2s ease; cursor: pointer; }
         .club-list-card:hover { background: rgba(59,130,246,0.04); border-color: rgba(59,130,246,0.3); }
 
-        /* Partner badges */
+        /* Club pool cards (3-column list) */
+        .club-pool-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:11px 13px; display:flex; align-items:center; gap:11px; cursor:pointer; transition:all 0.15s; }
+        .club-pool-card:hover { border-color:rgba(59,130,246,0.35); background:rgba(59,130,246,0.03); box-shadow:0 2px 8px rgba(59,130,246,0.08); }
+        .pool-col-wrap { display:flex; flex-direction:column; }
+        .pool-header-label { display:flex; align-items:center; justify-content:space-between; padding:9px 13px; border-radius:10px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; margin-bottom:10px; }
+        .pool-count-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; opacity:0.75; }
+
+        /* Partner badges — 3-tier colour system */
+        .badge-tier-retail       { background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; }
+        .badge-tier-partner      { background:#dbeafe; color:#1d4ed8; border:1px solid #bfdbfe; }
+        .badge-tier-partner-plus { background:#fef3c7; color:#b45309; border:1px solid #fde68a; }
+        /* Legacy badge aliases (kept for backward compat) */
         .badge-partner    { background: rgba(59,130,246,0.1);  color: #2563eb; }
         .badge-nonpartner { background: rgba(100,100,100,0.08); color: #64748b; }
         .badge-danger     { background: rgba(239,68,68,0.1);   color: #dc2626; }
+
+        /* Journal entry type colours */
+        .jentry-update  { background:#dbeafe; color:#1d4ed8; }
+        .jentry-event   { background:#dcfce7; color:#15803d; }
+        .jentry-warning { background:#fef3c7; color:#b45309; }
+        .jentry-meeting { background:#f3e8ff; color:#7c3aed; }
+
+        /* Plan tab journal card */
+        .journal-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:13px 15px; position:relative; transition:border-color 0.15s; }
+        .journal-card.is-pinned { border-color:#f59e0b; background:#fffbeb; }
+        .journal-card:hover { border-color:#cbd5e1; }
+        .journal-icon-btn { background:none; border:none; cursor:pointer; padding:3px 5px; border-radius:6px; color:#94a3b8; transition:all 0.12s; display:inline-flex; align-items:center; }
+        .journal-icon-btn:hover { background:#f1f5f9; color:#374151; }
+        .journal-icon-btn.active { color:#f59e0b; }
+
+        /* Customer journey map */
+        .journey-stage-card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:18px 12px; text-align:center; position:relative; box-shadow:0 2px 8px rgba(0,0,0,0.05); transition:transform 0.15s,box-shadow 0.15s; }
+        .journey-stage-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(59,130,246,0.12); border-color:rgba(59,130,246,0.35); }
+        .journey-stage-num { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; color:#fff; background:linear-gradient(135deg,#3b82f6,#6366f1); margin:0 auto 10px; box-shadow:0 3px 10px rgba(99,102,241,0.3); }
+        .journey-stage-name { font-weight:700; font-size:13px; color:#0f172a; margin-bottom:6px; }
+        .journey-stage-desc { font-size:11px; color:#94a3b8; line-height:1.4; }
+        .journey-connector { display:flex; align-items:center; justify-content:center; }
+        .journey-connector::after { content:''; display:block; width:100%; height:2px; background:linear-gradient(to right,#3b82f6,#6366f1); border-radius:1px; position:relative; }
+        .journey-connector::before { content:'▶'; font-size:10px; color:#6366f1; position:absolute; z-index:1; }
 
         /* Price tier card */
         .price-tier-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; }
@@ -4437,23 +4472,44 @@
                         <option value="Netball">Netball</option><option value="Hockey">Hockey</option>
                         <option value="Athletics">Athletics</option><option value="Other">Other</option>
                     </select>
-                    <select id="clubs-filter-partner" class="px-3 py-2 rounded-lg text-sm" onchange="renderClubsEnhanced()">
-                        <option value="">All Status</option>
-                        <option value="retail">Retail</option>
-                        <option value="partner">Partner</option>
-                        <option value="partner_plus">Partner+</option>
-                    </select>
                     <button onclick="showCreateClubModal()" class="btn-primary text-xs px-4 py-2" style="display:flex;align-items:center;gap:6px;flex-shrink:0">
                         <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                         New Club
                     </button>
                 </div>
-                <div id="clubs-enhanced-list" class="space-y-3"></div>
-                <div id="clubs-enhanced-empty" class="hide text-center py-16">
-                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800 flex items-center justify-center text-3xl">🏟️</div>
-                    <p class="text-gray-400 font-medium mb-2">No clubs found</p>
-                    <p class="text-gray-600 text-sm">Try adjusting your search or filters, or <button onclick="showCreateClubModal()" class="text-brand-400 hover:underline">create a new club</button>.</p>
+                <!-- 3-pool layout: PARTNER+ | PARTNER | RETAIL -->
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:start">
+                    <!-- PARTNER+ pool -->
+                    <div class="pool-col-wrap">
+                        <div class="pool-header-label badge-tier-partner-plus">
+                            <span>Partner+</span>
+                            <span id="clubs-pool-plus-count" class="pool-count-badge" style="background:rgba(180,83,9,0.12)">0</span>
+                        </div>
+                        <div id="clubs-pool-plus" class="space-y-2"></div>
+                        <div id="clubs-pool-plus-empty" class="hide text-center py-6 text-gray-500 text-sm">No Partner+ clubs</div>
+                    </div>
+                    <!-- PARTNER pool -->
+                    <div class="pool-col-wrap">
+                        <div class="pool-header-label badge-tier-partner">
+                            <span>Partner</span>
+                            <span id="clubs-pool-partner-count" class="pool-count-badge" style="background:rgba(29,78,216,0.12)">0</span>
+                        </div>
+                        <div id="clubs-pool-partner" class="space-y-2"></div>
+                        <div id="clubs-pool-partner-empty" class="hide text-center py-6 text-gray-500 text-sm">No Partner clubs</div>
+                    </div>
+                    <!-- RETAIL pool -->
+                    <div class="pool-col-wrap">
+                        <div class="pool-header-label badge-tier-retail">
+                            <span>Retail</span>
+                            <span id="clubs-pool-retail-count" class="pool-count-badge" style="background:rgba(71,85,105,0.12)">0</span>
+                        </div>
+                        <div id="clubs-pool-retail" class="space-y-2"></div>
+                        <div id="clubs-pool-retail-empty" class="hide text-center py-6 text-gray-500 text-sm">No Retail clubs</div>
+                    </div>
                 </div>
+                <!-- legacy empty state (hidden) -->
+                <div id="clubs-enhanced-list" class="hide"></div>
+                <div id="clubs-enhanced-empty" class="hide"></div>
             </div>
 
         </div>
@@ -4463,131 +4519,111 @@
              ============================================================ -->
         <div id="tool-club-detail" class="hide w-full" style="padding:20px 32px 32px">
 
-            <!-- Club header bar + nav (white card with identity pill + nav pill) -->
+            <!-- Club header bar -->
             <div style="background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 1px 3px rgba(0,0,0,0.06)">
-                <!-- Club identity pill -->
-                <div style="display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;flex-shrink:0;min-width:100px">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden" id="club-detail-avatar" style="background:#fff;border:1px solid #e2e8f0">
-                        <span id="club-detail-initials" class="text-brand-400 font-bold text-xs"></span>
-                    </div>
-                    <div class="min-w-0">
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <h2 id="club-detail-name" class="text-sm font-bold leading-tight truncate" style="color:#0f172a"></h2>
-                            <span id="club-detail-partner-badge" class="badge text-xs"></span>
-                        </div>
-                        <div class="flex gap-2 mt-0.5">
-                            <p id="club-detail-sport" class="text-xs text-gray-500"></p>
-                            <p id="club-detail-suffix" class="text-xs font-mono" style="color:#94a3b8"></p>
-                        </div>
+                <div style="min-width:0;flex-shrink:0">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                        <h2 id="club-detail-name" class="font-bold text-base leading-tight" style="color:#0f172a"></h2>
+                        <span id="club-detail-sport" class="text-xs text-gray-400"></span>
+                        <span id="club-detail-suffix" class="text-xs font-mono" style="color:#94a3b8"></span>
                     </div>
                 </div>
-                <!-- Nav pill -->
+                <!-- hidden avatar el kept for JS compat -->
+                <div id="club-detail-avatar" class="hide"><span id="club-detail-initials"></span></div>
+                <!-- Nav pills -->
                 <div id="club-record-nav" style="flex:1;display:flex;gap:2px;overflow-x:auto;min-width:0">
                     <button class="record-nav-item active" id="tab-btn-overview" onclick="showClubTab('overview')" style="width:auto;padding:7px 12px;font-size:12px">Overview</button>
                     <button class="record-nav-item" id="tab-btn-teams" onclick="showClubTab('teams')" style="width:auto;padding:7px 12px;font-size:12px">Teams</button>
                     <button class="record-nav-item" id="tab-btn-products" onclick="showClubTab('products')" style="width:auto;padding:7px 12px;font-size:12px">Club Products</button>
                     <button class="record-nav-item" id="tab-btn-orderforms" onclick="showClubTab('orderforms')" style="width:auto;padding:7px 12px;font-size:12px">Order Forms</button>
                     <button class="record-nav-item" id="tab-btn-jobs" onclick="showClubTab('jobs')" style="width:auto;padding:7px 12px;font-size:12px">Jobs</button>
+                    <button class="record-nav-item" id="tab-btn-plan" onclick="showClubTab('plan')" style="width:auto;padding:7px 12px;font-size:12px">Plan</button>
+                    <button class="record-nav-item" id="tab-btn-contacts" onclick="showClubTab('contacts')" style="width:auto;padding:7px 12px;font-size:12px">Contacts</button>
+                    <button class="record-nav-item" id="tab-btn-map" onclick="showClubTab('map')" style="width:auto;padding:7px 12px;font-size:12px">Map</button>
                     <button class="record-nav-item" id="tab-btn-onboarding" onclick="showClubTab('onboarding')" style="width:auto;padding:7px 12px;font-size:12px">Onboarding</button>
                 </div>
-                <button onclick="showEditClubModal()" class="btn-secondary text-xs flex-shrink-0 px-3 py-1.5">Edit Club</button>
+                <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+                    <span id="club-detail-partner-badge" class="badge text-xs"></span>
+                    <button onclick="showEditClubModal()" class="btn-secondary text-xs px-3 py-1.5">Edit Club</button>
+                </div>
             </div>
 
-            <!-- 2-column layout: content | activity -->
-            <div style="display:grid;grid-template-columns:1fr 280px;gap:20px;align-items:start">
+            <!-- 3-column layout: brand identity | content | activity -->
+            <div class="jr-three-col">
 
-                <!-- ── Column 1: Timeline at top + tab content ── -->
-                <div class="jr-middle-col">
-                    <!-- Onboarding timeline (slim at top, same width as content) -->
-                    <div class="record-timeline" style="margin-bottom:16px" id="club-record-timeline">
-                        <div class="tl-step" id="club-tl-profile">
-                            <div class="tl-dot"></div>
-                            <span class="tl-label">Profile</span>
-                        </div>
-                        <div class="tl-step" id="club-tl-products">
-                            <div class="tl-dot"></div>
-                            <span class="tl-label">Products</span>
-                        </div>
-                        <div class="tl-step" id="club-tl-mockups">
-                            <div class="tl-dot"></div>
-                            <span class="tl-label">Mock-Ups</span>
-                        </div>
-                        <div class="tl-step" id="club-tl-store">
-                            <div class="tl-dot"></div>
-                            <span class="tl-label">Store</span>
-                        </div>
-                        <div class="tl-step" id="club-tl-active">
-                            <div class="tl-dot"></div>
-                            <span class="tl-label">Active</span>
-                        </div>
-                    </div>
-                    <!-- Tab content area -->
-                    <div class="record-content">
-
-            <!-- TAB: Overview -->
-            <div id="club-tab-overview" class="club-tab-content">
-                <div class="grid md:grid-cols-3 gap-5">
-                    <!-- Club identity card -->
-                    <div class="card md:col-span-2">
-                        <div class="flex items-start justify-between mb-4">
-                            <h3 class="font-semibold text-brand-400">Club Details</h3>
-                            <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:#f1f5f9">Edit</button>
-                        </div>
-                        <div id="club-overview-info"><!-- Populated by JS --></div>
-                        <!-- Owner assignment (multi-user dropdown) -->
-                        <div class="mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.06)">
-                            <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
-                            <div class="owner-dp dark" id="owner-dp-club"></div>
-                        </div>
-                    </div>
-                    <!-- Branding card -->
-                    <div class="card">
-                        <h3 class="font-semibold text-brand-400 mb-4">Brand Identity</h3>
-                        <!-- Club Logo / Crest -->
-                        <div class="mb-4">
-                            <p class="text-xs text-gray-500 mb-2">Club Logo / Crest</p>
-                            <div class="flex items-start gap-3">
-                                <div id="club-crest-display" class="w-20 h-20 rounded-xl flex items-center justify-center text-3xl flex-shrink-0" style="background:#f8fafc;border:1px dashed #e2e8f0">🏟️</div>
-                                <div class="flex flex-col gap-2 justify-center">
-                                    <button onclick="document.getElementById('club-logo-upload-inline').click()" class="text-xs btn-secondary px-3 py-1.5">Upload Logo</button>
+                <!-- ── Column 1: Brand Identity (sticky) ── -->
+                <div class="jr-left-col" id="jr-left-col">
+                    <div class="jr-left-col-inner">
+                        <div class="glass rounded-2xl p-5">
+                            <h3 class="font-semibold text-brand-400 mb-4 text-sm">Brand Identity</h3>
+                            <!-- Club Logo / Crest -->
+                            <div class="mb-5">
+                                <p class="text-xs text-gray-500 mb-2">Club Logo / Crest</p>
+                                <div id="club-crest-display" class="w-28 h-28 mx-auto rounded-2xl flex items-center justify-center text-4xl mb-3" style="background:#f8fafc;border:1px dashed #e2e8f0">🏟️</div>
+                                <div class="flex gap-2 justify-center">
+                                    <button onclick="document.getElementById('club-logo-upload-inline').click()" class="text-xs btn-secondary px-3 py-1.5">Upload</button>
                                     <input type="file" id="club-logo-upload-inline" accept="image/*" class="hide" onchange="uploadClubLogoInline(event)">
                                     <button id="club-logo-download-btn" onclick="downloadClubLogo()" class="text-xs btn-secondary px-3 py-1.5 hide">Download</button>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Pantone colours — inline editable -->
-                        <div class="mb-4">
-                            <p class="text-xs text-gray-500 mb-2">Club Colours</p>
-                            <div style="display:flex;flex-direction:column;gap:8px">
-                                <div style="display:flex;align-items:center;gap:6px">
-                                    <input type="color" id="pantone-main-swatch" value="#3b82f6" title="Primary colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-main').value=this.value">
-                                    <input type="text" id="inline-hex-main" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-main-swatch')">
-                                    <input type="text" id="inline-pantone-main" placeholder="Pantone e.g. 355 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
+                            <!-- Pantone colours — inline editable -->
+                            <div class="mb-5">
+                                <p class="text-xs text-gray-500 mb-2">Club Colours</p>
+                                <div style="display:flex;flex-direction:column;gap:8px">
+                                    <div style="display:flex;align-items:center;gap:6px">
+                                        <input type="color" id="pantone-main-swatch" value="#3b82f6" title="Primary colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-main').value=this.value">
+                                        <input type="text" id="inline-hex-main" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-main-swatch')">
+                                        <input type="text" id="inline-pantone-main" placeholder="Pantone e.g. 355 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:6px">
+                                        <input type="color" id="pantone-sec-swatch" value="#64748b" title="Secondary colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-sec').value=this.value">
+                                        <input type="text" id="inline-hex-sec" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-sec-swatch')">
+                                        <input type="text" id="inline-pantone-sec" placeholder="Pantone e.g. Cool Grey 5 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:6px">
+                                        <input type="color" id="pantone-acc-swatch" value="#f59e0b" title="Accent colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-acc').value=this.value">
+                                        <input type="text" id="inline-hex-acc" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-acc-swatch')">
+                                        <input type="text" id="inline-pantone-acc" placeholder="Pantone e.g. 123 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
+                                    </div>
+                                    <button onclick="saveClubColoursInline()" style="width:100%;padding:7px;border-radius:7px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer;margin-top:2px">Save Colours</button>
                                 </div>
-                                <div style="display:flex;align-items:center;gap:6px">
-                                    <input type="color" id="pantone-sec-swatch" value="#64748b" title="Secondary colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-sec').value=this.value">
-                                    <input type="text" id="inline-hex-sec" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-sec-swatch')">
-                                    <input type="text" id="inline-pantone-sec" placeholder="Pantone e.g. Cool Grey 5 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
-                                </div>
-                                <div style="display:flex;align-items:center;gap:6px">
-                                    <input type="color" id="pantone-acc-swatch" value="#f59e0b" title="Accent colour" style="width:30px;height:30px;border-radius:7px;cursor:pointer;padding:2px;border:1.5px solid #e2e8f0;background:transparent;flex-shrink:0" oninput="document.getElementById('inline-hex-acc').value=this.value">
-                                    <input type="text" id="inline-hex-acc" placeholder="#hex" maxlength="7" style="width:62px;font-size:10px;font-family:monospace;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#0f172a;background:#fff;outline:none" oninput="syncInlineColor(this,'pantone-acc-swatch')">
-                                    <input type="text" id="inline-pantone-acc" placeholder="Pantone e.g. 123 C" style="flex:1;font-size:10px;padding:4px 6px;border:1.5px solid #e2e8f0;border-radius:6px;color:#64748b;background:#fff;outline:none">
-                                </div>
-                                <button onclick="saveClubColoursInline()" style="width:100%;padding:7px;border-radius:7px;background:#0f172a;color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer;margin-top:2px">Save Colours</button>
+                                <span id="pantone-labels" class="hide">—</span>
                             </div>
-                            <!-- hidden span kept for legacy code that reads pantone-labels -->
-                            <span id="pantone-labels" class="hide">—</span>
-                        </div>
-                        <!-- Sponsor logos -->
-                        <div>
-                            <p class="text-xs text-gray-500 mb-2">Sponsor Logos</p>
-                            <div id="sponsor-logos-display" class="text-xs text-gray-600">—</div>
+                            <!-- Sponsor logos -->
+                            <div>
+                                <p class="text-xs text-gray-500 mb-2">Sponsor Logos</p>
+                                <div id="sponsor-logos-display" class="text-xs text-gray-600">—</div>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- ── Column 2: Tab content ── -->
+                <div class="jr-middle-col">
+                    <div class="record-content">
+
+            <!-- TAB: Overview -->
+            <div id="club-tab-overview" class="club-tab-content">
+                <!-- Club Details card — full width, 2-col grid inside -->
+                <div class="glass rounded-2xl p-6 mb-5">
+                    <div class="flex items-start justify-between mb-5">
+                        <h3 class="font-semibold text-brand-400">Club Details</h3>
+                        <button onclick="showEditClubModal()" class="text-xs text-gray-500 hover:text-white px-3 py-1.5 rounded-lg" style="background:#f1f5f9">Edit</button>
+                    </div>
+                    <div id="club-overview-info" class="grid grid-cols-2 gap-x-8 gap-y-0 mb-5"><!-- Populated by JS --></div>
+                    <!-- Owner assignment -->
+                    <div class="pt-4 mb-5" style="border-top:1px solid rgba(255,255,255,0.06)">
+                        <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">Owner</label>
+                        <div class="owner-dp dark" id="owner-dp-club"></div>
+                    </div>
+                    <!-- About field -->
+                    <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:16px">
+                        <label class="text-xs text-gray-500 font-semibold uppercase tracking-wide block mb-2">About</label>
+                        <textarea id="club-about-field" rows="4" placeholder="Add notes about this club — history, key contacts, preferences..." class="w-full px-3 py-2 rounded-xl text-sm resize-y" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;min-height:90px" onblur="saveClubAbout()"></textarea>
+                    </div>
+                </div>
                 <!-- Stats row -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-5">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-0">
                     <div class="stat-card">
                         <p class="text-xs text-gray-500 mb-1">Club Products</p>
                         <p id="overview-stat-products" class="text-2xl font-bold text-brand-400">0</p>
@@ -4916,10 +4952,220 @@
                 </div>
             </div>
 
+
+            <!-- TAB: Plan -->
+            <div id="club-tab-plan" class="club-tab-content hide">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+                    <!-- Left: Club Plan -->
+                    <div class="glass rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-brand-400">Club Plan</h3>
+                            <button onclick="saveClubPlan()" class="btn-primary text-xs px-3 py-1.5">Save Plan</button>
+                        </div>
+                        <textarea id="club-plan-content" rows="20" placeholder="Annual goals, season objectives, key milestones, growth targets..." class="w-full px-3 py-2.5 rounded-xl text-sm resize-y" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#e2e8f0;min-height:400px;line-height:1.6"></textarea>
+                    </div>
+                    <!-- Right: Journal -->
+                    <div class="glass rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-semibold text-brand-400">Journal</h3>
+                            <button onclick="toggleJournalForm()" id="journal-add-btn" class="btn-primary text-xs px-3 py-1.5 flex items-center gap-1.5">
+                                <svg width="11" height="11" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                                New Entry
+                            </button>
+                        </div>
+                        <!-- Add entry form -->
+                        <div id="journal-form" class="hide mb-4 rounded-xl p-4" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)">
+                            <div class="flex gap-2 mb-3 flex-wrap">
+                                <button onclick="setJournalType('update')" id="jtype-update" class="jtype-btn px-3 py-1 rounded-full text-xs font-semibold border transition-all" style="border-color:#3b82f6;color:#3b82f6">Update</button>
+                                <button onclick="setJournalType('event')" id="jtype-event" class="jtype-btn px-3 py-1 rounded-full text-xs font-semibold border transition-all" style="border-color:#16a34a;color:#16a34a">Event</button>
+                                <button onclick="setJournalType('warning')" id="jtype-warning" class="jtype-btn px-3 py-1 rounded-full text-xs font-semibold border transition-all" style="border-color:#b45309;color:#b45309">Warning</button>
+                                <button onclick="setJournalType('meeting')" id="jtype-meeting" class="jtype-btn px-3 py-1 rounded-full text-xs font-semibold border transition-all" style="border-color:#7c3aed;color:#7c3aed">Meeting</button>
+                            </div>
+                            <input type="date" id="journal-event-date" class="hide w-full px-3 py-2 rounded-lg text-sm mb-2" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#e2e8f0">
+                            <textarea id="journal-entry-content" rows="3" placeholder="Notes..." class="w-full px-3 py-2 rounded-lg text-sm resize-none mb-3" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#e2e8f0"></textarea>
+                            <div class="flex gap-2 justify-end">
+                                <button onclick="toggleJournalForm()" class="btn-secondary text-xs px-3 py-1.5">Cancel</button>
+                                <button onclick="addClubJournalEntry()" class="btn-primary text-xs px-3 py-1.5">Add Entry</button>
+                            </div>
+                        </div>
+                        <!-- Entry list -->
+                        <div id="club-journal-list" class="space-y-3"><!-- Populated by JS --></div>
+                        <div id="club-journal-empty" class="hide text-center py-8 text-gray-500 text-sm">No journal entries yet. Add your first entry above.</div>
+                        <!-- Archived toggle -->
+                        <div class="mt-4">
+                            <button onclick="toggleShowArchived()" id="journal-archived-toggle" class="hide text-xs text-gray-500 hover:text-gray-300 transition-colors">Show archived entries</button>
+                        </div>
+                        <div id="club-journal-archived" class="hide space-y-2 mt-3"><!-- Populated by JS --></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Contacts -->
+            <div id="club-tab-contacts" class="club-tab-content hide">
+                <div class="section-header mb-5">
+                    <div>
+                        <h3 class="font-semibold text-lg">Club Contacts</h3>
+                        <p class="text-gray-500 text-sm mt-1">Key people at this club — managers, coaches, commercial contacts and more.</p>
+                    </div>
+                    <button onclick="openContactForm()" class="btn-primary text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        Add Contact
+                    </button>
+                </div>
+                <!-- Inline add/edit form -->
+                <div id="contact-form-wrap" class="hide glass rounded-2xl p-5 mb-5">
+                    <h4 class="font-semibold mb-4 text-sm" id="contact-form-title">Add Contact</h4>
+                    <input type="hidden" id="contact-form-id">
+                    <div class="grid md:grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Name <span class="text-red-400">*</span></label>
+                            <input type="text" id="contact-form-name" placeholder="Full name" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Role</label>
+                            <input type="text" id="contact-form-role" placeholder="e.g. Kit Manager" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Email</label>
+                            <input type="email" id="contact-form-email" placeholder="email@club.com" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Phone</label>
+                            <input type="tel" id="contact-form-phone" placeholder="+44 7700 000000" class="w-full px-3 py-2 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="text-gray-400 text-xs mb-1 block">Type</label>
+                            <select id="contact-form-type" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">Select type...</option>
+                                <option value="manager">Manager</option>
+                                <option value="coach">Coach</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="social">Social</option>
+                                <option value="partnerships">Partnerships</option>
+                                <option value="chairman">Chairman</option>
+                            </select>
+                        </div>
+                        <div class="flex flex-col gap-2 justify-end">
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="contact-form-primary" class="w-4 h-4 accent-brand-500">
+                                <span class="text-sm text-gray-300">Primary Contact</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer select-none">
+                                <input type="checkbox" id="contact-form-billing" class="w-4 h-4 accent-brand-500">
+                                <span class="text-sm text-gray-300">Billing Contact</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 justify-end">
+                        <button onclick="closeContactForm()" class="btn-secondary text-sm">Cancel</button>
+                        <button onclick="saveClubContact()" class="btn-primary text-sm">Save Contact</button>
+                    </div>
+                </div>
+                <div id="club-contacts-list" class="grid md:grid-cols-2 gap-4"><!-- Populated by JS --></div>
+                <div id="club-contacts-empty" class="hide text-center py-12">
+                    <div class="empty-icon">👤</div>
+                    <p class="text-gray-500">No contacts yet. Add your first club contact.</p>
+                </div>
+            </div>
+
+            <!-- TAB: Map — Customer Growth Journey -->
+            <div id="club-tab-map" class="club-tab-content hide">
+                <div class="glass rounded-2xl p-8">
+                    <div class="text-center mb-10">
+                        <h3 class="font-bold text-2xl text-brand-400 mb-2">Customer Growth Journey</h3>
+                        <p class="text-gray-500 text-sm">11 key stages from first contact to long-term partnership</p>
+                    </div>
+                    <!-- Journey map: 2-row zigzag layout -->
+                    <div style="position:relative;padding:20px 0">
+                        <!-- Row 1: stages 1, 3, 5, 7, 9, 11 -->
+                        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-bottom:0">
+                            <div class="journey-stage-card" style="--stage-hue:210">
+                                <div class="journey-stage-num">1</div>
+                                <div class="journey-stage-name">Stage 1</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector"></div>
+                            <div class="journey-stage-card" style="--stage-hue:200">
+                                <div class="journey-stage-num">3</div>
+                                <div class="journey-stage-name">Stage 3</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector"></div>
+                            <div class="journey-stage-card" style="--stage-hue:190">
+                                <div class="journey-stage-num">5</div>
+                                <div class="journey-stage-name">Stage 5</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector"></div>
+                        </div>
+                        <!-- Connector down + across -->
+                        <div style="display:grid;grid-template-columns:repeat(6,1fr);height:48px;margin:0">
+                            <div></div><div></div><div></div><div></div><div></div>
+                            <div style="display:flex;align-items:center;justify-content:center">
+                                <div style="width:2px;height:100%;background:linear-gradient(to bottom,#3b82f6,#6366f1);margin:auto"></div>
+                            </div>
+                        </div>
+                        <!-- Row 2: stages 2, 4, 6, 8, 10 (right-to-left visually, so 11, 10, 8, 6, 4, 2) -->
+                        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0">
+                            <div class="journey-connector" style="transform:scaleX(-1)"></div>
+                            <div class="journey-stage-card" style="--stage-hue:230">
+                                <div class="journey-stage-num">11</div>
+                                <div class="journey-stage-name">Stage 11</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector" style="transform:scaleX(-1)"></div>
+                            <div class="journey-stage-card" style="--stage-hue:220">
+                                <div class="journey-stage-num">9</div>
+                                <div class="journey-stage-name">Stage 9</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector" style="transform:scaleX(-1)"></div>
+                            <div class="journey-stage-card" style="--stage-hue:210">
+                                <div class="journey-stage-num">7</div>
+                                <div class="journey-stage-name">Stage 7</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                        </div>
+                        <!-- second down connector -->
+                        <div style="display:grid;grid-template-columns:repeat(6,1fr);height:48px;margin:0">
+                            <div style="display:flex;align-items:center;justify-content:center">
+                                <div style="width:2px;height:100%;background:linear-gradient(to bottom,#6366f1,#8b5cf6);margin:auto"></div>
+                            </div>
+                        </div>
+                        <!-- Row 3: stages 2, 4, 6 -->
+                        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0">
+                            <div class="journey-stage-card" style="--stage-hue:250">
+                                <div class="journey-stage-num">2</div>
+                                <div class="journey-stage-name">Stage 2</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector"></div>
+                            <div class="journey-stage-card" style="--stage-hue:240">
+                                <div class="journey-stage-num">4</div>
+                                <div class="journey-stage-name">Stage 4</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector"></div>
+                            <div class="journey-stage-card" style="--stage-hue:235">
+                                <div class="journey-stage-num">6</div>
+                                <div class="journey-stage-name">Stage 6</div>
+                                <div class="journey-stage-desc">Placeholder — phase 2</div>
+                            </div>
+                            <div class="journey-connector"></div>
+                        </div>
+                        <!-- Row 4: stages 8, 10 -->
+                        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;margin-top:0">
+                            <div></div><div></div><div></div><div></div><div></div><div></div>
+                        </div>
+                    </div>
+                    <p class="text-center text-gray-600 text-xs mt-8">Stage names and descriptions will be added in phase 2 of this build.</p>
+                </div>
+            </div>
+
                 </div><!-- /record-content -->
                 </div><!-- /jr-middle-col -->
 
-                <!-- ── Column 3: Next Action card + Activity & Comments sidebar ── -->
+                <!-- ── Column 3: Activity sidebar ── -->
                 <div class="jr-right-col">
                 <div class="next-action-card" id="club-next-action-card"></div>
                 <div class="jr-activity-sidebar">
@@ -4939,7 +5185,7 @@
                 </div><!-- /jr-activity-sidebar -->
                 </div><!-- /jr-right-col -->
 
-            </div><!-- /2-col grid -->
+            </div><!-- /jr-three-col -->
         </div>
 
         <!-- ============================================================
@@ -12311,63 +12557,60 @@
         function renderClubsEnhanced(targetContainer) {
             const search = (document.getElementById('clubs-search')?.value || '').toLowerCase();
             const sportFilter = document.getElementById('clubs-filter-sport')?.value || '';
-            const partnerFilter = document.getElementById('clubs-filter-partner')?.value || '';
 
             let filtered = clubs.filter(c => {
                 if (viewScope === 'mine' && currentUser && c.created_by !== currentUser.id) return false;
                 if (search && !c.name.toLowerCase().includes(search) && !(c.suffix || '').toLowerCase().includes(search) && !(c.address_county || '').toLowerCase().includes(search)) return false;
                 if (sportFilter && c.sport !== sportFilter) return false;
-                if (partnerFilter && (c.club_status || (c.is_partner ? 'partner' : 'retail')) !== partnerFilter) return false;
                 return true;
             });
 
-            const makeClubHtml = (club) => {
+            // Minimal pool card
+            const makePoolCard = (club) => {
                 const { tierName, badgeClass } = getClubTierDisplay(club);
-                const sp = salespeople.find(s => s.id === club.assigned_salesperson_id);
                 const ownerName = getUserDisplayName(club.created_by);
-                return `<div class="club-list-card" onclick="openClubDashboard('${club.id}')">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" style="background:#dbeafe">
-                                ${(club.club_crest_url || club.logo_url)
-                                    ? `<img src="${escHtml(club.club_crest_url || club.logo_url)}" alt="" style="width:100%;height:100%;object-fit:cover" loading="lazy">`
-                                    : `<span class="text-brand-400 font-bold text-sm">${((club.suffix || club.name.substring(0,2))).substring(0,2)}</span>`}
-                            </div>
-                            <div>
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <span class="font-semibold text-white">${escHtml(club.name)}</span>
-                                    <span class="badge ${badgeClass} text-xs">${escHtml(tierName)}</span>
-                                    ${club.sport ? `<span class="badge badge-info text-xs">${escHtml(club.sport)}</span>` : ''}
-                                </div>
-                                <div class="flex items-center gap-3 mt-0.5">
-                                    <span class="text-gray-600 font-mono text-xs">${escHtml(club.suffix || '')}</span>
-                                    ${club.address_county ? `<span class="text-gray-500 text-xs">${escHtml(club.address_county)}</span>` : ''}
-                                    ${sp ? `<span class="text-gray-500 text-xs">${escHtml(sp.first_name + ' ' + sp.last_name)}</span>` : (club.contact_name ? `<span class="text-gray-500 text-xs">${escHtml(club.contact_name)}</span>` : '')}
-                                    ${ownerName !== '—' ? `<span class="text-gray-600 text-xs">Owner: ${escHtml(ownerName)}</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 flex-shrink-0">
-                            ${club.has_images ? '<span class="badge badge-success text-xs">Images</span>' : ''}
-                            ${club.shopify_collection_id ? '<span class="badge badge-info text-xs">Shopify ✓</span>' : ''}
-                            ${(isSuperAdmin || currentUserProfile?.role === 'admin') ? `<button onclick="event.stopPropagation();deleteClub('${club.id}')" title="Delete club" style="padding:4px 6px;border-radius:6px;border:1.5px solid rgba(239,68,68,0.3);background:rgba(239,68,68,0.06);color:#dc2626;cursor:pointer;display:flex;align-items:center;transition:all 0.15s" onmouseover="this.style.background='rgba(239,68,68,0.14)'" onmouseout="this.style.background='rgba(239,68,68,0.06)'"><svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>` : ''}
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                        </div>
+                const logoSrc = club.club_crest_url || club.logo_url;
+                const initials = (club.suffix || club.name.substring(0, 2)).substring(0, 2).toUpperCase();
+                return `<div class="club-pool-card" onclick="openClubDashboard('${club.id}')">
+                    <div class="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden" style="background:#dbeafe">
+                        ${logoSrc
+                            ? `<img src="${escHtml(logoSrc)}" alt="" style="width:100%;height:100%;object-fit:cover" loading="lazy">`
+                            : `<span class="text-brand-400 font-bold text-sm">${escHtml(initials)}</span>`}
                     </div>
+                    <div style="min-width:0;flex:1">
+                        <div class="font-semibold text-sm truncate" style="color:#0f172a">${escHtml(club.name)}</div>
+                        <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                            ${club.sport ? `<span class="badge badge-info" style="font-size:10px;padding:1px 6px">${escHtml(club.sport)}</span>` : ''}
+                        </div>
+                        ${ownerName !== '—' ? `<div class="text-xs mt-0.5" style="color:#94a3b8">${escHtml(ownerName)}</div>` : ''}
+                    </div>
+                    <svg class="w-4 h-4 flex-shrink-0" style="color:#cbd5e1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </div>`;
             };
 
-            // Render clubs list
-            const container = document.getElementById('clubs-enhanced-list');
-            const emptyEl = document.getElementById('clubs-enhanced-empty');
-            if (!container) return;
-            if (!filtered.length) {
-                container.innerHTML = '';
-                emptyEl?.classList.remove('hide');
-                return;
-            }
-            emptyEl?.classList.add('hide');
-            container.innerHTML = filtered.map(c => makeClubHtml(c)).join('');
+            // Bucket into 3 pools
+            const poolPlus    = filtered.filter(c => { const cs = c.club_status || (c.is_partner ? 'partner' : 'retail'); return cs !== 'retail' && cs !== 'partner'; });
+            const poolPartner = filtered.filter(c => { const cs = c.club_status || (c.is_partner ? 'partner' : 'retail'); return cs === 'partner'; });
+            const poolRetail  = filtered.filter(c => { const cs = c.club_status || (c.is_partner ? 'partner' : 'retail'); return cs === 'retail'; });
+
+            const renderPool = (poolId, emptyId, countId, items) => {
+                const el = document.getElementById(poolId);
+                const emEl = document.getElementById(emptyId);
+                const cntEl = document.getElementById(countId);
+                if (!el) return;
+                if (cntEl) cntEl.textContent = items.length;
+                if (items.length) {
+                    el.innerHTML = items.map(makePoolCard).join('');
+                    emEl?.classList.add('hide');
+                } else {
+                    el.innerHTML = '';
+                    emEl?.classList.remove('hide');
+                }
+            };
+
+            renderPool('clubs-pool-plus',    'clubs-pool-plus-empty',    'clubs-pool-plus-count',    poolPlus);
+            renderPool('clubs-pool-partner',  'clubs-pool-partner-empty',  'clubs-pool-partner-count',  poolPartner);
+            renderPool('clubs-pool-retail',   'clubs-pool-retail-empty',   'clubs-pool-retail-count',   poolRetail);
         }
 
         function showClubSearch() {
@@ -13092,13 +13335,20 @@
                 else backLbl.textContent = 'Clubs';
             }
             renderBreadcrumb();
+            _showArchived = false;
+            currentClubPlanEntries = [];
+            currentClubContacts = [];
             updateClubDetailHeader();
             showClubTab('overview');
-            renderClubTimeline();
-            await Promise.all([loadCurrentClubProducts(), loadCurrentClubOrderForms(), loadClubActivity()]);
+            await Promise.all([
+                loadCurrentClubProducts(),
+                loadCurrentClubOrderForms(),
+                loadClubActivity(),
+                loadClubPlanEntries(clubId),
+                loadClubContacts(clubId),
+            ]);
             renderClubOverviewInfo();
             updateOverviewStats();
-            renderClubTimeline(); // re-render with product data loaded
             // Populate the dedicated Next Action card above the activity sidebar
             if (currentClub?.id) loadNextActionCard('club', currentClub.id, 'club-next-action-card');
         }
@@ -13108,7 +13358,9 @@
             const cs = club?.club_status || (club?.is_partner ? 'partner' : 'retail');
             const tier = brandPricingTiers.find(t => t.tier_key === cs);
             const tierName = tier?.tier_name || cs.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-            const badgeClass = cs === 'retail' ? 'badge-nonpartner' : 'badge-partner';
+            let badgeClass = 'badge-tier-retail';
+            if (cs === 'partner') badgeClass = 'badge-tier-partner';
+            else if (cs !== 'retail') badgeClass = 'badge-tier-partner-plus';
             return { cs, tierName, badgeClass };
         }
 
@@ -13152,7 +13404,6 @@
             currentClubTab = tab;
             document.querySelectorAll('.club-tab-content').forEach(el => el.classList.add('hide'));
             document.querySelectorAll('#club-record-nav .record-nav-item').forEach(btn => btn.classList.remove('active'));
-            // Also update icon nav active state
             document.querySelectorAll('.jr-left-icon-nav button').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`icon-tab-${tab}`)?.classList.add('active');
             document.getElementById(`club-tab-${tab}`)?.classList.remove('hide');
@@ -13162,8 +13413,10 @@
             if (tab === 'products') renderClubProducts();
             if (tab === 'orderforms') renderClubOrderForms();
             if (tab === 'jobs') loadClubJobs();
+            if (tab === 'plan') { renderClubPlan(); renderClubJournal(); }
+            if (tab === 'contacts') renderClubContacts();
             if (tab === 'onboarding') { renderShopifySyncStatus(); renderOnboardingTab(); }
-            if (tab === 'shopify') renderShopifySyncStatus(); // legacy compatibility
+            if (tab === 'shopify') renderShopifySyncStatus();
             if (tab === 'images') loadClubDetailImages();
         }
 
@@ -13421,6 +13674,16 @@
             showToast(`CSV downloaded for: ${title}`);
         }
 
+        async function saveClubAbout() {
+            if (!currentClub?.id) return;
+            const val = document.getElementById('club-about-field')?.value.trim() || null;
+            if (val === (currentClub.about || null)) return;
+            const { error } = await supabase.from('clubs').update({ about: val }).eq('id', currentClub.id);
+            if (error) { showToast('Error saving About', 'error'); return; }
+            currentClub.about = val;
+            showToast('About saved ✓');
+        }
+
         function renderClubOverviewInfo() {
             const el = document.getElementById('club-overview-info');
             if (!el || !currentClub) return;
@@ -13431,25 +13694,32 @@
                 currentClub.address_town, currentClub.address_county,
                 currentClub.address_postcode
             ].filter(Boolean).join(', ');
-            const rows = [
-                ['Name', currentClub.name],
-                ['Suffix', currentClub.suffix || '—'],
-                ['Sport', currentClub.sport || '—'],
-                ['Partnership Level', tierName],
-                ['Salesperson', salesperson ? `${salesperson.first_name} ${salesperson.last_name}` : '—'],
-                ['Owner', getUserDisplayName(currentClub.created_by)],
-                ['League', currentClub.league || '—'],
-                ['Address', fullAddress || '—'],
-                ['Contact', currentClub.contact_name || '—'],
-                ['Email', currentClub.contact_email || '—'],
-                ['Phone', currentClub.contact_phone || '—'],
-            ];
             const driveUrl = currentClub.google_drive_url || '';
-            el.innerHTML = rows.map(([label, value]) =>
-                `<div class="info-row"><span class="info-label">${escHtml(label)}</span><span class="info-value">${escHtml(value)}</span></div>`
-            ).join('') + (driveUrl
-                ? `<div class="info-row"><span class="info-label">Google Drive</span><span class="info-value"><a href="${escHtml(driveUrl)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;color:#2563eb;font-weight:600;text-decoration:none;font-size:12px" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>Open Drive Folder ↗</a></span></div>`
-                : `<div class="info-row"><span class="info-label">Google Drive</span><span class="info-value" style="color:#94a3b8;font-style:italic">Not set</span></div>`);
+            // 2-column grid: left col (col 1) and right col (col 2)
+            const col1 = [
+                ['Name', escHtml(currentClub.name)],
+                ['Sport', escHtml(currentClub.sport || '—')],
+                ['League', escHtml(currentClub.league || '—')],
+                ['Partnership', escHtml(tierName)],
+                ['Salesperson', escHtml(salesperson ? `${salesperson.first_name} ${salesperson.last_name}` : '—')],
+                ['Suffix', escHtml(currentClub.suffix || '—')],
+            ];
+            const col2 = [
+                ['Address', escHtml(fullAddress || '—')],
+                ['Contact', escHtml(currentClub.contact_name || '—')],
+                ['Email', escHtml(currentClub.contact_email || '—')],
+                ['Phone', escHtml(currentClub.contact_phone || '—')],
+                ['Drive', driveUrl
+                    ? `<a href="${escHtml(driveUrl)}" target="_blank" rel="noopener" style="color:#2563eb;font-weight:600;text-decoration:none;font-size:12px">Open Folder ↗</a>`
+                    : '<span style="color:#94a3b8;font-style:italic">Not set</span>'],
+                ['Owner', escHtml(getUserDisplayName(currentClub.created_by))],
+            ];
+            const makeRow = ([label, value]) =>
+                `<div class="info-row"><span class="info-label">${escHtml(label)}</span><span class="info-value">${value}</span></div>`;
+            el.innerHTML = `<div>${col1.map(makeRow).join('')}</div><div>${col2.map(makeRow).join('')}</div>`;
+            // Populate About field
+            const aboutEl = document.getElementById('club-about-field');
+            if (aboutEl) aboutEl.value = currentClub.about || '';
 
             // Update branding panel — prefer logo_url, fall back to club_crest_url
             const crestEl = document.getElementById('club-crest-display');
@@ -13486,6 +13756,327 @@
             if (inlinePMain) inlinePMain.value = currentClub.pantone_main_code || '';
             if (inlinePSec)  inlinePSec.value  = currentClub.pantone_sec_code  || '';
             if (inlinePAcc)  inlinePAcc.value  = currentClub.pantone_acc_code  || '';
+        }
+
+        // ─── PLAN TAB ────────────────────────────────────────────────────────────
+
+        let currentClubPlanEntries = [];
+        let _journalType = 'update';
+        let _showArchived = false;
+
+        function renderClubPlan() {
+            const el = document.getElementById('club-plan-content');
+            if (el && currentClub) el.value = currentClub.plan_content || '';
+        }
+
+        async function saveClubPlan() {
+            if (!currentClub?.id) return;
+            const val = document.getElementById('club-plan-content')?.value || null;
+            const { error } = await supabase.from('clubs').update({ plan_content: val }).eq('id', currentClub.id);
+            if (error) { showToast('Error saving plan', 'error'); return; }
+            currentClub.plan_content = val;
+            showToast('Plan saved ✓');
+        }
+
+        async function loadClubPlanEntries(clubId) {
+            const { data, error } = await supabase.from('club_plan_entries')
+                .select('*').eq('club_id', clubId).order('created_at', { ascending: false });
+            if (error) { console.error('loadClubPlanEntries:', error); return; }
+            currentClubPlanEntries = data || [];
+        }
+
+        function setJournalType(type) {
+            _journalType = type;
+            ['update','event','warning','meeting'].forEach(t => {
+                const btn = document.getElementById(`jtype-${t}`);
+                if (!btn) return;
+                btn.style.fontWeight = t === type ? '800' : '600';
+                btn.style.opacity = t === type ? '1' : '0.5';
+            });
+            const dateEl = document.getElementById('journal-event-date');
+            if (dateEl) { type === 'event' ? dateEl.classList.remove('hide') : dateEl.classList.add('hide'); }
+        }
+
+        function toggleJournalForm() {
+            const form = document.getElementById('journal-form');
+            if (!form) return;
+            const isHidden = form.classList.contains('hide');
+            form.classList.toggle('hide', !isHidden);
+            if (isHidden) {
+                setJournalType('update');
+                const ta = document.getElementById('journal-entry-content');
+                if (ta) ta.value = '';
+                const de = document.getElementById('journal-event-date');
+                if (de) { de.value = ''; de.classList.add('hide'); }
+                setTimeout(() => document.getElementById('journal-entry-content')?.focus(), 50);
+            }
+        }
+
+        async function addClubJournalEntry() {
+            if (!currentClub?.id) return;
+            const content = document.getElementById('journal-entry-content')?.value.trim();
+            if (!content) { showToast('Please add some notes', 'error'); return; }
+            const eventDate = _journalType === 'event'
+                ? (document.getElementById('journal-event-date')?.value || null)
+                : null;
+            const { data, error } = await supabase.from('club_plan_entries').insert({
+                club_id: currentClub.id,
+                brand_id: currentBrand.id,
+                entry_type: _journalType,
+                content,
+                event_date: eventDate,
+                created_by: currentUser?.id || null,
+            }).select().single();
+            if (error) { showToast('Error adding entry', 'error'); return; }
+            currentClubPlanEntries.unshift(data);
+            toggleJournalForm();
+            renderClubJournal();
+            showToast('Entry added ✓');
+        }
+
+        async function togglePinEntry(id) {
+            const entry = currentClubPlanEntries.find(e => e.id === id);
+            if (!entry) return;
+            const pinnedCount = currentClubPlanEntries.filter(e => e.is_pinned && !e.is_archived).length;
+            if (!entry.is_pinned && pinnedCount >= 3) {
+                showToast('Max 3 pinned entries. Unpin one first.', 'error'); return;
+            }
+            const { error } = await supabase.from('club_plan_entries')
+                .update({ is_pinned: !entry.is_pinned }).eq('id', id);
+            if (error) { showToast('Error updating pin', 'error'); return; }
+            entry.is_pinned = !entry.is_pinned;
+            renderClubJournal();
+        }
+
+        async function archiveEntry(id) {
+            const entry = currentClubPlanEntries.find(e => e.id === id);
+            if (!entry) return;
+            const { error } = await supabase.from('club_plan_entries')
+                .update({ is_archived: !entry.is_archived, is_pinned: false }).eq('id', id);
+            if (error) { showToast('Error archiving entry', 'error'); return; }
+            entry.is_archived = !entry.is_archived;
+            entry.is_pinned = false;
+            renderClubJournal();
+        }
+
+        function toggleShowArchived() {
+            _showArchived = !_showArchived;
+            const btn = document.getElementById('journal-archived-toggle');
+            const archived = document.getElementById('club-journal-archived');
+            if (archived) archived.classList.toggle('hide', !_showArchived);
+            if (btn) {
+                const count = currentClubPlanEntries.filter(e => e.is_archived).length;
+                btn.textContent = _showArchived ? 'Hide archived' : `Show ${count} archived entr${count === 1 ? 'y' : 'ies'}`;
+            }
+        }
+
+        function renderClubJournal() {
+            const listEl = document.getElementById('club-journal-list');
+            const emptyEl = document.getElementById('club-journal-empty');
+            const archivedEl = document.getElementById('club-journal-archived');
+            const toggleBtn = document.getElementById('journal-archived-toggle');
+            if (!listEl) return;
+
+            const typeLabels = { update: 'Update', event: 'Event', warning: 'Warning', meeting: 'Meeting' };
+            const typeCls    = { update: 'jentry-update', event: 'jentry-event', warning: 'jentry-warning', meeting: 'jentry-meeting' };
+
+            const makeCard = (entry) => {
+                const label = typeLabels[entry.entry_type] || entry.entry_type;
+                const cls = typeCls[entry.entry_type] || 'jentry-update';
+                const dateStr = entry.event_date
+                    ? `<span class="text-xs" style="color:#64748b">${entry.event_date}</span>`
+                    : `<span class="text-xs" style="color:#94a3b8">${new Date(entry.created_at).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</span>`;
+                const pinIcon = entry.is_pinned
+                    ? `<svg width="13" height="13" fill="#f59e0b" stroke="#f59e0b" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+                    : `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+                const archIcon = entry.is_archived
+                    ? `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 6h18M5 14l2 6h10l2-6"/></svg>`
+                    : `<svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>`;
+                return `<div class="journal-card${entry.is_pinned ? ' is-pinned' : ''}">
+                    <div class="flex items-start justify-between gap-3">
+                        <div style="flex:1;min-width:0">
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="badge ${cls}" style="font-size:10px;padding:2px 8px">${label}</span>
+                                ${dateStr}
+                                ${entry.is_pinned ? '<span class="text-xs font-semibold" style="color:#f59e0b">Pinned</span>' : ''}
+                            </div>
+                            <p class="text-sm" style="color:#374151;line-height:1.55;white-space:pre-wrap">${escHtml(entry.content)}</p>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <button class="journal-icon-btn${entry.is_pinned ? ' active' : ''}" onclick="togglePinEntry('${entry.id}')" title="${entry.is_pinned ? 'Unpin' : 'Pin'}">${pinIcon}</button>
+                            <button class="journal-icon-btn" onclick="archiveEntry('${entry.id}')" title="${entry.is_archived ? 'Unarchive' : 'Archive'}">${archIcon}</button>
+                        </div>
+                    </div>
+                </div>`;
+            };
+
+            const active = currentClubPlanEntries.filter(e => !e.is_archived);
+            const archived = currentClubPlanEntries.filter(e => e.is_archived);
+            const pinned = active.filter(e => e.is_pinned);
+            const unpinned = active.filter(e => !e.is_pinned);
+
+            if (!active.length && !archived.length) {
+                listEl.innerHTML = '';
+                emptyEl?.classList.remove('hide');
+            } else {
+                emptyEl?.classList.add('hide');
+                listEl.innerHTML = [
+                    ...(pinned.length ? ['<div class="text-xs font-semibold uppercase tracking-wide mb-2" style="color:#94a3b8">📌 Pinned</div>'] : []),
+                    ...pinned.map(makeCard),
+                    ...(unpinned.length && pinned.length ? ['<div style="height:1px;background:rgba(0,0,0,0.06);margin:8px 0"></div>'] : []),
+                    ...unpinned.map(makeCard),
+                ].join('');
+            }
+
+            if (archived.length) {
+                toggleBtn?.classList.remove('hide');
+                const count = archived.length;
+                if (toggleBtn && !_showArchived) toggleBtn.textContent = `Show ${count} archived entr${count === 1 ? 'y' : 'ies'}`;
+                if (archivedEl) archivedEl.innerHTML = archived.map(makeCard).join('');
+                if (archivedEl) archivedEl.classList.toggle('hide', !_showArchived);
+            } else {
+                toggleBtn?.classList.add('hide');
+            }
+        }
+
+        // ─── CONTACTS TAB ────────────────────────────────────────────────────────
+
+        let currentClubContacts = [];
+
+        async function loadClubContacts(clubId) {
+            const { data, error } = await supabase.from('club_contacts')
+                .select('*').eq('club_id', clubId).order('created_at', { ascending: true });
+            if (error) { console.error('loadClubContacts:', error); return; }
+            currentClubContacts = data || [];
+        }
+
+        function openContactForm(contactId = null) {
+            const wrap = document.getElementById('contact-form-wrap');
+            const title = document.getElementById('contact-form-title');
+            if (!wrap) return;
+            wrap.classList.remove('hide');
+            if (contactId) {
+                const c = currentClubContacts.find(x => x.id === contactId);
+                if (!c) return;
+                document.getElementById('contact-form-id').value = c.id;
+                document.getElementById('contact-form-name').value = c.name || '';
+                document.getElementById('contact-form-role').value = c.role || '';
+                document.getElementById('contact-form-email').value = c.email || '';
+                document.getElementById('contact-form-phone').value = c.phone || '';
+                document.getElementById('contact-form-type').value = c.contact_type || '';
+                document.getElementById('contact-form-primary').checked = !!c.is_primary_contact;
+                document.getElementById('contact-form-billing').checked = !!c.is_billing_contact;
+                if (title) title.textContent = 'Edit Contact';
+            } else {
+                document.getElementById('contact-form-id').value = '';
+                ['contact-form-name','contact-form-role','contact-form-email','contact-form-phone'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.value = '';
+                });
+                document.getElementById('contact-form-type').value = '';
+                document.getElementById('contact-form-primary').checked = false;
+                document.getElementById('contact-form-billing').checked = false;
+                if (title) title.textContent = 'Add Contact';
+            }
+            document.getElementById('contact-form-name')?.focus();
+        }
+
+        function closeContactForm() {
+            document.getElementById('contact-form-wrap')?.classList.add('hide');
+        }
+
+        async function saveClubContact() {
+            if (!currentClub?.id) return;
+            const name = document.getElementById('contact-form-name')?.value.trim();
+            if (!name) { showToast('Name is required', 'error'); return; }
+            const id = document.getElementById('contact-form-id')?.value || null;
+            const isPrimary = document.getElementById('contact-form-primary')?.checked;
+            const isBilling = document.getElementById('contact-form-billing')?.checked;
+            const payload = {
+                club_id: currentClub.id,
+                brand_id: currentBrand.id,
+                name,
+                role: document.getElementById('contact-form-role')?.value.trim() || null,
+                email: document.getElementById('contact-form-email')?.value.trim() || null,
+                phone: document.getElementById('contact-form-phone')?.value.trim() || null,
+                contact_type: document.getElementById('contact-form-type')?.value || null,
+                is_primary_contact: isPrimary,
+                is_billing_contact: isBilling,
+            };
+            // Enforce single primary / billing
+            if (isPrimary) {
+                await supabase.from('club_contacts')
+                    .update({ is_primary_contact: false })
+                    .eq('club_id', currentClub.id)
+                    .neq('id', id || '00000000-0000-0000-0000-000000000000');
+                currentClubContacts.forEach(c => { if (c.id !== id) c.is_primary_contact = false; });
+            }
+            if (isBilling) {
+                await supabase.from('club_contacts')
+                    .update({ is_billing_contact: false })
+                    .eq('club_id', currentClub.id)
+                    .neq('id', id || '00000000-0000-0000-0000-000000000000');
+                currentClubContacts.forEach(c => { if (c.id !== id) c.is_billing_contact = false; });
+            }
+            let saved;
+            if (id) {
+                const { data, error } = await supabase.from('club_contacts').update(payload).eq('id', id).select().single();
+                if (error) { showToast('Error saving contact', 'error'); return; }
+                saved = data;
+                const idx = currentClubContacts.findIndex(c => c.id === id);
+                if (idx >= 0) currentClubContacts[idx] = saved;
+            } else {
+                const { data, error } = await supabase.from('club_contacts').insert(payload).select().single();
+                if (error) { showToast('Error saving contact', 'error'); return; }
+                saved = data;
+                currentClubContacts.push(saved);
+            }
+            closeContactForm();
+            renderClubContacts();
+            showToast('Contact saved ✓');
+        }
+
+        async function deleteClubContact(id) {
+            if (!confirm('Delete this contact?')) return;
+            const { error } = await supabase.from('club_contacts').delete().eq('id', id);
+            if (error) { showToast('Error deleting contact', 'error'); return; }
+            currentClubContacts = currentClubContacts.filter(c => c.id !== id);
+            renderClubContacts();
+            showToast('Contact deleted');
+        }
+
+        function renderClubContacts() {
+            const listEl = document.getElementById('club-contacts-list');
+            const emptyEl = document.getElementById('club-contacts-empty');
+            if (!listEl) return;
+            if (!currentClubContacts.length) {
+                listEl.innerHTML = '';
+                emptyEl?.classList.remove('hide');
+                return;
+            }
+            emptyEl?.classList.add('hide');
+            const typeLabels = { manager: 'Manager', coach: 'Coach', commercial: 'Commercial', social: 'Social', partnerships: 'Partnerships', chairman: 'Chairman' };
+            listEl.innerHTML = currentClubContacts.map(c => `
+                <div class="glass rounded-2xl p-5">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <span class="font-semibold text-sm">${escHtml(c.name)}</span>
+                                ${c.contact_type ? `<span class="badge badge-info" style="font-size:10px;padding:2px 7px">${escHtml(typeLabels[c.contact_type] || c.contact_type)}</span>` : ''}
+                                ${c.is_primary_contact ? '<span class="badge" style="font-size:10px;padding:2px 7px;background:#dcfce7;color:#15803d;border:1px solid #bbf7d0">Primary</span>' : ''}
+                                ${c.is_billing_contact ? '<span class="badge" style="font-size:10px;padding:2px 7px;background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe">Billing</span>' : ''}
+                            </div>
+                            ${c.role ? `<div class="text-xs text-gray-500">${escHtml(c.role)}</div>` : ''}
+                        </div>
+                        <div class="flex gap-1.5 flex-shrink-0">
+                            <button onclick="openContactForm('${c.id}')" class="text-xs text-brand-400 hover:text-brand-300 px-2 py-1 rounded-lg" style="background:rgba(59,130,246,0.08)">Edit</button>
+                            <button onclick="deleteClubContact('${c.id}')" class="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded-lg" style="background:rgba(239,68,68,0.07)">Delete</button>
+                        </div>
+                    </div>
+                    <div class="space-y-1.5">
+                        ${c.email ? `<div class="flex items-center gap-2 text-xs text-gray-400"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><a href="mailto:${escHtml(c.email)}" style="color:#3b82f6;text-decoration:none">${escHtml(c.email)}</a></div>` : ''}
+                        ${c.phone ? `<div class="flex items-center gap-2 text-xs text-gray-400"><svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>${escHtml(c.phone)}</div>` : ''}
+                    </div>
+                </div>`).join('');
         }
 
         function updateOverviewStats() {
