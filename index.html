@@ -1878,6 +1878,29 @@
         button.bg-gray-700:hover, button.bg-gray-600:hover { background-color: #e2e8f0 !important; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-color: #cbd5e1; }
         /* Back navigation buttons */
         button.text-gray-400:hover { color: #1d4ed8 !important; }
+
+        /* ── Design Studio: Up Next section ── */
+        .ds-up-next-wrap { border:2px dashed #e2e8f0; border-radius:12px; padding:8px 8px 6px; margin-bottom:4px; transition:border-color 0.15s,background 0.15s; }
+        .ds-up-next-wrap.drag-over { border-color:#6366f1; background:rgba(99,102,241,0.04); }
+        .ds-up-next-hdr { display:flex; align-items:center; gap:6px; padding:2px 4px 7px; }
+        .ds-up-next-lbl { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.07em; color:#6366f1; }
+        .ds-up-next-ct { font-size:10px; font-weight:700; background:#ede9fe; color:#6d28d9; padding:1px 7px; border-radius:8px; }
+        .ds-up-next-empty { padding:11px 8px; text-align:center; font-size:11px; color:#b0b8c4; font-style:italic; pointer-events:none; }
+        .ds-up-next-divider { display:flex; align-items:center; gap:8px; padding:7px 4px 6px; }
+        .ds-up-next-divider::before,.ds-up-next-divider::after { content:''; flex:1; height:1px; background:#e8ecf0; }
+        .ds-up-next-divider span { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:#94a3b8; white-space:nowrap; }
+        .ds-kanban-card.ds-dragging { opacity:0.4; }
+        .ds-up-next-wrap .ds-kanban-card { cursor:grab; }
+        .ds-rest-wrap .ds-kanban-card { cursor:grab; }
+
+        /* ── Settings: Tab Order section ── */
+        .tab-order-list { display:flex; flex-direction:column; gap:5px; }
+        .tab-order-chip { display:flex; align-items:center; gap:7px; padding:7px 11px; background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:8px; font-size:12px; font-weight:600; color:#374151; cursor:grab; user-select:none; transition:all 0.12s; }
+        .tab-order-chip:hover { border-color:#94a3b8; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,0.06); }
+        .tab-order-chip.drag-active { opacity:0.4; }
+        .tab-order-chip.drop-above { border-top:2px solid #6366f1; padding-top:6px; }
+        .tab-order-chip.drop-below { border-bottom:2px solid #6366f1; padding-bottom:6px; }
+        .tab-order-handle { color:#cbd5e1; font-size:13px; flex-shrink:0; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -3542,6 +3565,23 @@
                 <div id="feature-toggles-list" class="space-y-3">
                     <!-- Populated by JS -->
                 </div>
+            </div>
+
+            <!-- Tab Order -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-1">Tab Order</h3>
+                <p class="text-gray-500 text-sm mb-5">Drag to reorder the tabs shown in the Sales Job Record and Club Record. Changes are saved locally to your device.</p>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Sales Job Record</p>
+                        <div class="tab-order-list" id="tab-order-list-job"></div>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Club Record</p>
+                        <div class="tab-order-list" id="tab-order-list-club"></div>
+                    </div>
+                </div>
+                <button onclick="resetTabOrders()" class="mt-5 text-xs text-gray-400 hover:text-gray-300 underline">Reset to default order</button>
             </div>
 
             <!-- Danger Zone -->
@@ -6871,6 +6911,9 @@
 
             // Load data
             await loadAllData();
+            // Load user preferences from localStorage
+            loadTabOrders();
+            loadDSUpNext();
             // Apply any feature access restrictions for this user
             await applyUserFeaturePermissions();
             showLaunchpad();
@@ -7270,6 +7313,7 @@
             loadShopifyConfigUI();
             renderFeatureToggles();
             if (typeof loadDesignSettings === 'function') loadDesignSettings();
+            renderTabOrderSettings();
         }
 
 
@@ -13379,6 +13423,7 @@
             currentClubPlanEntries = [];
             currentClubContacts = [];
             updateClubDetailHeader();
+            renderClubTabNav();
             showClubTab('overview');
             await Promise.all([
                 loadCurrentClubProducts(),
@@ -15952,6 +15997,22 @@
         };
         const ORDER_TYPE_LABELS = { new_order: 'New Order', repeat_order: 'Repeat Order', store_build: 'Store Build' };
         const ORDER_TYPE_COLORS = { new_order: '#16a34a', repeat_order: '#2563eb', store_build: '#ea580c' };
+
+        const DEFAULT_JOB_TABS = [
+            { key:'overview', label:'Overview' }, { key:'products', label:'Products' },
+            { key:'club', label:'Club Record' }, { key:'team', label:'Team' },
+            { key:'design', label:'Design Studio' }, { key:'orderform', label:'Order Form' },
+            { key:'production', label:'Production' }, { key:'orderhub', label:'Order Hub' },
+        ];
+        const DEFAULT_CLUB_TABS = [
+            { key:'overview', label:'Overview' }, { key:'teams', label:'Teams' },
+            { key:'products', label:'Club Products' }, { key:'orderforms', label:'Order Forms' },
+            { key:'jobs', label:'Jobs' }, { key:'plan', label:'Plan' },
+            { key:'contacts', label:'Contacts' }, { key:'map', label:'Map' },
+            { key:'onboarding', label:'Onboarding' },
+        ];
+        let _jobTabOrder  = null; // null = use default
+        let _clubTabOrder = null;
         const CLUB_TYPE_LABELS = { retail: 'Retail', partner: 'Partner', partner_plus: 'Partner+' };
         const CHANNEL_LABELS   = { direct: 'Direct', store: 'Store' };
 
@@ -17432,6 +17493,7 @@
 
             _jobLinkedDesignTask   = null;
             _jobLinkedDesignStages = [];
+            renderJobTabNav();
             renderJobHeader();
             showJobTab('overview');
             // Load activity log, user assignment, and design pipeline in parallel
@@ -18862,6 +18924,8 @@
         let _dsSubstageFilter = 'all';
         let _dsListTab = 'new'; // 'new' | 'inprogress' | 'inreview'
         let allDesignTasks = [];
+        let _dsUpNextIds = [];   // ordered task IDs in the "Up Next" section
+        let _dsDragTaskId = null;
         let designBriefLog = [];
 
         async function loadDesignStudio() {
@@ -23607,9 +23671,13 @@
             const list = filtered.filter(t => _dtBucket(t) === _dsListTab);
             const listBody = document.getElementById('ds-list-body');
             if (listBody) {
-                listBody.innerHTML = list.length === 0
-                    ? `<div style="padding:24px 14px;text-align:center"><p style="font-size:11px;color:#b0b8c4;font-style:italic">${emptyMsg}</p></div>`
-                    : list.map(t => _renderDSKanbanCard(t, _dsUnreadByTask[t.id] || 0)).join('');
+                if (list.length === 0) {
+                    listBody.innerHTML = `<div style="padding:24px 14px;text-align:center"><p style="font-size:11px;color:#b0b8c4;font-style:italic">${emptyMsg}</p></div>`;
+                } else if (_dsListTab === 'new') {
+                    listBody.innerHTML = _renderDSNewTabSplit(list, _dsUnreadByTask);
+                } else {
+                    listBody.innerHTML = list.map(t => _renderDSKanbanCard(t, _dsUnreadByTask[t.id] || 0)).join('');
+                }
             }
 
             // Auto-select first active task on first render
@@ -23626,7 +23694,7 @@
             renderDSKanbanBoard();
         }
 
-        function _renderDSKanbanCard(task, unreadCount) {
+        function _renderDSKanbanCard(task, unreadCount, draggable = false) {
             const isSelected = task.id === _dsSelectedTaskId;
             const due = task.due_date ? new Date(task.due_date) : null;
             const dueInfo = due ? getDueInfo(due) : null;
@@ -23660,7 +23728,10 @@
                 return task.designers?.full_name?.split(' ')[0] || null;
             })();
 
-            return `<div class="ds-kanban-card${isSelected ? ' ds-selected' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')">
+            const dragAttrs = draggable
+                ? `draggable="true" ondragstart="onDSCardDragStart(event,'${task.id}')" ondragend="onDSCardDragEnd(event)"`
+                : '';
+            return `<div class="ds-kanban-card${isSelected ? ' ds-selected' : ''}" data-task-id="${task.id}" onclick="selectDSTask('${task.id}')" ${dragAttrs}>
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px">
                     <div style="font-size:12px;font-weight:700;color:#0f172a;line-height:1.35;flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(task.task_name || 'Untitled Task')}${unreadDot}</div>
                     ${actionBadge}
@@ -23672,6 +23743,237 @@
                     ${dueLabel ? `<span style="font-size:10px;font-weight:600;color:${dueCls};margin-left:auto">${dueInfo?.urgency === 'overdue' ? dueInfo.text : dueLabel}</span>` : ''}
                 </div>
             </div>`;
+        }
+
+        // ── Design Studio: Up Next ──────────────────────────────────────
+        function _dsUpNextKey() { return `ds_up_next_${currentBrand?.id || 'default'}`; }
+
+        function loadDSUpNext() {
+            try { _dsUpNextIds = JSON.parse(localStorage.getItem(_dsUpNextKey())) || []; } catch { _dsUpNextIds = []; }
+        }
+
+        function saveDSUpNext() {
+            localStorage.setItem(_dsUpNextKey(), JSON.stringify(_dsUpNextIds));
+        }
+
+        function _renderDSNewTabSplit(list, unreadMap) {
+            // Clean up stale IDs (tasks no longer in "new" list)
+            const validIds = new Set(list.map(t => t.id));
+            _dsUpNextIds = _dsUpNextIds.filter(id => validIds.has(id));
+
+            const upNext = _dsUpNextIds.map(id => list.find(t => t.id === id)).filter(Boolean);
+            const rest   = list.filter(t => !_dsUpNextIds.includes(t.id));
+
+            const upNextCards = upNext.length === 0
+                ? `<div class="ds-up-next-empty">Drag tasks here to queue them</div>`
+                : upNext.map(t => _renderDSKanbanCard(t, unreadMap[t.id] || 0, true)).join('');
+
+            const restCards = rest.map(t => _renderDSKanbanCard(t, unreadMap[t.id] || 0, true)).join('');
+
+            return `
+                <div class="ds-up-next-wrap" id="ds-up-next-wrap"
+                    ondragover="onDSUpNextWrapDragOver(event)"
+                    ondragleave="onDSUpNextWrapDragLeave(event)"
+                    ondrop="onDSUpNextDrop(event,null)">
+                    <div class="ds-up-next-hdr">
+                        <span class="ds-up-next-lbl">↑ Up Next</span>
+                        <span class="ds-up-next-ct">${upNext.length}</span>
+                    </div>
+                    <div id="ds-up-next-list"
+                        ondragover="onDSUpNextListDragOver(event)"
+                        ondrop="onDSUpNextListDrop(event)">
+                        ${upNextCards}
+                    </div>
+                </div>
+                <div class="ds-up-next-divider"><span>All New Tasks</span></div>
+                <div class="ds-rest-wrap" id="ds-rest-wrap"
+                    ondragover="event.preventDefault()"
+                    ondrop="onDSRestDrop(event)">
+                    ${restCards}
+                </div>`;
+        }
+
+        function onDSCardDragStart(event, taskId) {
+            _dsDragTaskId = taskId;
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', taskId);
+            setTimeout(() => event.target.classList.add('ds-dragging'), 0);
+        }
+
+        function onDSCardDragEnd(event) {
+            event.target.classList.remove('ds-dragging');
+        }
+
+        function onDSUpNextWrapDragOver(event) {
+            event.preventDefault();
+            document.getElementById('ds-up-next-wrap')?.classList.add('drag-over');
+        }
+
+        function onDSUpNextWrapDragLeave(event) {
+            const wrap = document.getElementById('ds-up-next-wrap');
+            if (wrap && !wrap.contains(event.relatedTarget)) wrap.classList.remove('drag-over');
+        }
+
+        function onDSUpNextDrop(event, beforeId) {
+            event.preventDefault();
+            event.stopPropagation();
+            document.getElementById('ds-up-next-wrap')?.classList.remove('drag-over');
+            if (!_dsDragTaskId) return;
+            _dsUpNextIds = _dsUpNextIds.filter(id => id !== _dsDragTaskId);
+            if (beforeId) {
+                const idx = _dsUpNextIds.indexOf(beforeId);
+                if (idx !== -1) _dsUpNextIds.splice(idx, 0, _dsDragTaskId);
+                else _dsUpNextIds.push(_dsDragTaskId);
+            } else {
+                _dsUpNextIds.push(_dsDragTaskId);
+            }
+            saveDSUpNext();
+            renderDSDashboard();
+        }
+
+        function onDSUpNextListDragOver(event) { event.preventDefault(); }
+
+        function onDSUpNextListDrop(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            // Dropped on the list itself (not a card) — find position from y coord
+            const list = document.getElementById('ds-up-next-list');
+            if (!list || !_dsDragTaskId) return;
+            const cards = [...list.querySelectorAll('.ds-kanban-card[data-task-id]')];
+            let beforeId = null;
+            for (const card of cards) {
+                const rect = card.getBoundingClientRect();
+                if (event.clientY < rect.top + rect.height / 2) {
+                    beforeId = card.dataset.taskId;
+                    break;
+                }
+            }
+            onDSUpNextDrop(event, beforeId);
+        }
+
+        function onDSRestDrop(event) {
+            event.preventDefault();
+            if (!_dsDragTaskId) return;
+            const wasInUpNext = _dsUpNextIds.includes(_dsDragTaskId);
+            _dsUpNextIds = _dsUpNextIds.filter(id => id !== _dsDragTaskId);
+            if (wasInUpNext) { saveDSUpNext(); renderDSDashboard(); }
+        }
+
+        // ── Tab Order ──────────────────────────────────────────────────
+        function loadTabOrders() {
+            try { _jobTabOrder  = JSON.parse(localStorage.getItem('tab_order_job')); } catch { _jobTabOrder = null; }
+            try { _clubTabOrder = JSON.parse(localStorage.getItem('tab_order_club')); } catch { _clubTabOrder = null; }
+        }
+
+        function saveTabOrders() {
+            localStorage.setItem('tab_order_job',  JSON.stringify(_jobTabOrder));
+            localStorage.setItem('tab_order_club', JSON.stringify(_clubTabOrder));
+        }
+
+        function resetTabOrders() {
+            _jobTabOrder  = DEFAULT_JOB_TABS.map(t => t.key);
+            _clubTabOrder = DEFAULT_CLUB_TABS.map(t => t.key);
+            saveTabOrders();
+            renderTabOrderSettings();
+            renderJobTabNav();
+            renderClubTabNav();
+            showToast('Tab order reset to default');
+        }
+
+        function _resolvedTabOrder(type) {
+            const defs = type === 'job' ? DEFAULT_JOB_TABS : DEFAULT_CLUB_TABS;
+            const stored = type === 'job' ? _jobTabOrder : _clubTabOrder;
+            if (!stored) return defs;
+            // Merge: keep stored order, add any new tabs not yet in stored list
+            const ordered = stored.map(k => defs.find(d => d.key === k)).filter(Boolean);
+            defs.forEach(d => { if (!ordered.find(o => o.key === d.key)) ordered.push(d); });
+            return ordered;
+        }
+
+        function renderJobTabNav() {
+            const nav = document.getElementById('job-record-nav');
+            if (!nav) return;
+            const tabs = _resolvedTabOrder('job');
+            nav.innerHTML = tabs.map(t =>
+                `<button class="record-nav-item${currentJobTab === t.key ? ' active' : ''}" onclick="showJobTab('${t.key}')" id="jt-${t.key}" style="width:auto;padding:7px 12px;font-size:12px">${escHtml(t.label)}</button>`
+            ).join('');
+        }
+
+        function renderClubTabNav() {
+            const nav = document.getElementById('club-record-nav');
+            if (!nav) return;
+            const tabs = _resolvedTabOrder('club');
+            nav.innerHTML = tabs.map(t =>
+                `<button class="record-nav-item${currentClubTab === t.key ? ' active' : ''}" onclick="showClubTab('${t.key}')" id="tab-btn-${t.key}" style="width:auto;padding:7px 12px;font-size:12px">${escHtml(t.label)}</button>`
+            ).join('');
+        }
+
+        let _tabOrderDragKey   = null;
+        let _tabOrderDragType  = null;
+
+        function onTabChipDragStart(event, type, key) {
+            _tabOrderDragKey  = key;
+            _tabOrderDragType = type;
+            event.dataTransfer.effectAllowed = 'move';
+            event.target.classList.add('drag-active');
+        }
+
+        function onTabChipDragEnd(event) {
+            event.target.classList.remove('drag-active');
+            document.querySelectorAll('.tab-order-chip').forEach(c => c.classList.remove('drop-above','drop-below'));
+        }
+
+        function onTabChipDragOver(event, type, key) {
+            if (_tabOrderDragType !== type) return;
+            event.preventDefault();
+            // Show indicator above or below based on cursor position
+            document.querySelectorAll(`.tab-order-list[data-type="${type}"] .tab-order-chip`).forEach(c => c.classList.remove('drop-above','drop-below'));
+            const chip = event.currentTarget;
+            const rect = chip.getBoundingClientRect();
+            chip.classList.toggle('drop-above', event.clientY < rect.top + rect.height / 2);
+            chip.classList.toggle('drop-below', event.clientY >= rect.top + rect.height / 2);
+        }
+
+        function onTabChipDrop(event, type, targetKey) {
+            event.preventDefault();
+            if (_tabOrderDragType !== type || _tabOrderDragKey === targetKey) return;
+            const defs = type === 'job' ? DEFAULT_JOB_TABS : DEFAULT_CLUB_TABS;
+            let order = _resolvedTabOrder(type).map(t => t.key);
+            const fromIdx = order.indexOf(_tabOrderDragKey);
+            let toIdx = order.indexOf(targetKey);
+            const chip = event.currentTarget;
+            const rect = chip.getBoundingClientRect();
+            if (event.clientY >= rect.top + rect.height / 2) toIdx += 1;
+            if (fromIdx === -1 || toIdx === -1) return;
+            order.splice(fromIdx, 1);
+            if (toIdx > fromIdx) toIdx--;
+            order.splice(toIdx, 0, _tabOrderDragKey);
+            if (type === 'job')  _jobTabOrder  = order;
+            else                  _clubTabOrder = order;
+            saveTabOrders();
+            renderTabOrderSettings();
+            if (type === 'job')  renderJobTabNav();
+            else                  renderClubTabNav();
+        }
+
+        function renderTabOrderSettings() {
+            ['job','club'].forEach(type => {
+                const list = document.querySelector(`.tab-order-list[data-type="${type}"]`) ||
+                             document.getElementById(`tab-order-list-${type}`);
+                if (!list) return;
+                list.setAttribute('data-type', type);
+                const tabs = _resolvedTabOrder(type);
+                list.innerHTML = tabs.map(t => `
+                    <div class="tab-order-chip"
+                        draggable="true"
+                        ondragstart="onTabChipDragStart(event,'${type}','${t.key}')"
+                        ondragend="onTabChipDragEnd(event)"
+                        ondragover="onTabChipDragOver(event,'${type}','${t.key}')"
+                        ondrop="onTabChipDrop(event,'${type}','${t.key}')">
+                        <span class="tab-order-handle">⠿</span>
+                        <span>${escHtml(t.label)}</span>
+                    </div>`).join('');
+            });
         }
 
         function _renderDSTaskRow(task, unreadCount, statusLabel) {
@@ -24865,6 +25167,7 @@
         const _origLoadDesignStudio = loadDesignStudio;
         async function loadDesignStudioV2() {
             if (!currentBrand) return;
+            loadDSUpNext(); // refresh per-brand Up Next list
             // Load tasks
             const { data: brandTasks } = await supabase
                 .from('design_tasks')
