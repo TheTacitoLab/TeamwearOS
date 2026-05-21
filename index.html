@@ -25909,10 +25909,12 @@
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
                         <div id="dtr-stages-inner" class="dtr-stages-inner" style="height:100%;overflow-y:auto">
-                            ${buildDTRStagesColumn(stage2, stage3, stage4, stage5, conceptUploads, rangeUploads, finaliseUploads)}
+                            ${buildDTRDesignUploadsSection(stage2, conceptUploads)}
                         </div>
                     </div>
                     <div class="dtr-activity-col" id="dtr-activity-col" style="display:flex;flex-direction:column;gap:12px;overflow-y:auto">
+                        <!-- Task Progress panel -->
+                        <div id="dtr-task-progress-wrap">${buildDTRTaskProgressPanel(task, stage2, stage3, stage5)}</div>
                         <!-- Feedback Portal header -->
                         <div style="background:#fff;border-radius:12px;border:1px solid #dde3ea;padding:10px 14px;box-shadow:0 1px 2px rgba(15,23,42,0.04)">
                             <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#6d28d9;margin-bottom:2px">Feedback Portal</div>
@@ -26930,6 +26932,142 @@
             </div>`;
         }
 
+        // ── Task Progress Panel (right column) ────────────────────────────────
+        function buildDTRTaskProgressPanel(task, stage2, stage3, stage5) {
+            if (!task) return '';
+            const isCompleted = task.status === 'completed';
+
+            // Drive URL: prefer job record, then manually saved on stage5
+            const linkedJob = (typeof jobs !== 'undefined' ? jobs : []).find(j => j.id === task?.job_id);
+            const jobDriveUrl = linkedJob?.google_drive_url || task?.jobs?.google_drive_url || '';
+            const savedDriveUrl = stage5?.concept_statuses?.drive_url || '';
+            const driveUrl = jobDriveUrl || savedDriveUrl || '';
+
+            // Helper: stage status badge
+            const stageBadge = (status) => {
+                if (status === 'approved') return `<span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(34,197,94,0.1);color:#16a34a">Approved</span>`;
+                if (status === 'in_review') return `<span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309">In Review</span>`;
+                if (status === 'revisions_required') return `<span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;background:rgba(239,68,68,0.1);color:#dc2626">Revisions</span>`;
+                return '';
+            };
+            const stageCircle = (num, approved) =>
+                `<div style="width:22px;height:22px;border-radius:50%;background:${approved?'#dcfce7':'#eff6ff'};border:2px solid ${approved?'#86efac':'#93c5fd'};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:${approved?'#15803d':'#1d4ed8'};flex-shrink:0">${approved?'✓':num}</div>`;
+
+            // --- 1. Concept Uploads ---
+            const conceptsHtml = (() => {
+                if (!stage2) return '';
+                const s = stage2.status;
+                const isApproved = s === 'approved';
+                const isInReview = s === 'in_review';
+                const isRevisions = s === 'revisions_required';
+                let actionHtml;
+                if (isApproved) {
+                    actionHtml = `<span style="font-size:11px;color:#16a34a;font-weight:600">✓ Concepts approved</span>`;
+                } else if (isInReview) {
+                    actionHtml = `<span style="padding:4px 9px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
+                        <button onclick="dtrCompleteConceptsStage('${stage2.id}')" style="padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">Accept</button>
+                        <button onclick="dtrConceptRevisions('${stage2.id}')" style="padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions</button>`;
+                } else if (isRevisions) {
+                    actionHtml = `<span style="padding:4px 8px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(239,68,68,0.07);color:#dc2626">🔄 Revisions</span>
+                        <button onclick="dtrDeliverConcepts('${stage2.id}')" style="padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer">Re-Deliver</button>`;
+                } else {
+                    actionHtml = `<button onclick="dtrDeliverConcepts('${stage2.id}')" style="padding:5px 12px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer">Deliver Concepts</button>`;
+                }
+                return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                    ${stageCircle(1, isApproved)}
+                    <span style="font-size:12px;font-weight:700;color:#0f172a">Concept Uploads</span>
+                    ${stageBadge(s)}
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                    <button onclick="document.getElementById('dtr-stages-col')?.scrollIntoView({behavior:'smooth',block:'nearest'})" style="padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;cursor:pointer">Design Uploads ↗</button>
+                    ${actionHtml}
+                </div>`;
+            })();
+
+            // --- Drive link ---
+            const driveHtml = driveUrl
+                ? `<a href="${escHtml(driveUrl)}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:#f0fdf4;border:1.5px solid #86efac;text-decoration:none">
+                    <svg width="15" height="15" fill="none" stroke="#16a34a" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    <div><div style="font-size:11px;font-weight:700;color:#16a34a">Google Drive Folder</div><div style="font-size:9px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${escHtml(driveUrl)}</div></div>
+                    <button onclick="event.preventDefault();document.getElementById('tp-drive-edit').classList.toggle('hide')" style="margin-left:auto;font-size:10px;color:#64748b;background:#fff;border:1px solid #e2e8f0;border-radius:5px;cursor:pointer;padding:2px 6px">Edit</button>
+                </a>
+                <div id="tp-drive-edit" class="hide" style="margin-top:6px;display:flex;gap:6px">
+                    <input id="tp-drive-url-input" type="url" value="${escHtml(driveUrl)}" placeholder="https://drive.google.com/…" style="flex:1;padding:6px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:11px;color:#374151;outline:none">
+                    <button onclick="dtrSaveDriveUrlFromTP(${stage5?`'${stage5.id}'`:'null'})" style="padding:6px 12px;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer">Save</button>
+                </div>`
+                : `<div>
+                    <div style="font-size:11px;font-weight:600;color:#64748b;margin-bottom:5px">Google Drive Folder</div>
+                    <div style="display:flex;gap:6px">
+                        <input id="tp-drive-url-input" type="url" placeholder="Paste Drive folder URL…" style="flex:1;padding:6px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:11px;color:#374151;outline:none">
+                        <button onclick="dtrSaveDriveUrlFromTP(${stage5?`'${stage5.id}'`:'null'})" style="padding:6px 12px;border-radius:8px;background:#2563eb;color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer;white-space:nowrap">Save</button>
+                    </div>
+                </div>`;
+
+            // --- 2. Full Range ---
+            const fullRangeHtml = (() => {
+                if (!stage3) return '';
+                const s = stage3.status;
+                const isApproved = s === 'approved';
+                const isInReview = s === 'in_review';
+                const isRevisions = s === 'revisions_required';
+                let actionHtml;
+                if (isApproved) {
+                    actionHtml = `<span style="font-size:11px;color:#16a34a;font-weight:600">✓ Full Range approved</span>`;
+                } else if (isInReview) {
+                    actionHtml = `<span style="padding:4px 9px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
+                        <button onclick="approveStage('${stage3.id}',3)" style="padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">Accept</button>
+                        <button onclick="requestRevisions('${stage3.id}',3)" style="padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions</button>`;
+                } else if (isRevisions) {
+                    actionHtml = `<span style="padding:4px 8px;border-radius:8px;font-size:11px;font-weight:700;background:rgba(239,68,68,0.07);color:#dc2626">🔄 Revisions</span>
+                        <button onclick="dtrDeliverFullRange('${stage3.id}')" style="padding:4px 10px;border-radius:8px;font-size:11px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer">Re-Deliver</button>`;
+                } else {
+                    actionHtml = `<button onclick="dtrDeliverFullRange('${stage3.id}')" style="padding:5px 14px;border-radius:8px;font-size:12px;font-weight:800;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer;letter-spacing:0.02em">DELIVER RANGE</button>`;
+                }
+                return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+                    ${stageCircle(2, isApproved)}
+                    <span style="font-size:12px;font-weight:700;color:#0f172a">Full Range</span>
+                    ${stageBadge(s)}
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${actionHtml}</div>`;
+            })();
+
+            // --- 3. Factory Handover ---
+            const factoryHtml = isCompleted
+                ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#dcfce7;border:2px solid #86efac;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#15803d;flex-shrink:0">✓</div>
+                    <span style="font-size:12px;font-weight:700;color:#0f172a">Factory Handover</span>
+                </div>
+                <span style="font-size:11px;color:#16a34a;font-weight:600">✓ Task completed</span>`
+                : `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+                    <div style="width:22px;height:22px;border-radius:50%;background:#f8fafc;border:2px solid #e2e8f0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#94a3b8;flex-shrink:0">3</div>
+                    <span style="font-size:12px;font-weight:700;color:#0f172a">Factory Handover</span>
+                </div>
+                <button onclick="completeDesignTask()" style="width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:800;border:2px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;transition:all 0.2s" onmouseover="this.style.borderColor='#16a34a';this.style.color='#16a34a';this.style.background='#f0fdf4'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#374151';this.style.background='#fff'">Complete Task</button>`;
+
+            return `<div style="background:#fff;border-radius:12px;border:1px solid #dde3ea;box-shadow:0 1px 2px rgba(15,23,42,0.04),0 2px 8px rgba(15,23,42,0.04);overflow:hidden">
+                <div style="padding:10px 14px;border-bottom:1px solid #f1f5f9;background:linear-gradient(135deg,#eef2ff,#ede9fe)">
+                    <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#312e81">Task Progress</div>
+                    <div style="font-size:10px;color:#6366f1;margin-top:1px">Concepts → Full Range → Factory Handover</div>
+                </div>
+                <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+                    <div style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fafafa">${conceptsHtml}</div>
+                    <div style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fafafa">${driveHtml}</div>
+                    <div style="padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:10px;background:#fafafa">${fullRangeHtml}</div>
+                    <div style="padding:10px 12px;border:1.5px solid ${isCompleted?'#86efac':'#e2e8f0'};border-radius:10px;background:${isCompleted?'#f0fdf4':'#fafafa'}">${factoryHtml}</div>
+                </div>
+            </div>`;
+        }
+
+        function _refreshDTRTaskProgressPanel() {
+            const wrap = document.getElementById('dtr-task-progress-wrap');
+            if (!wrap || !currentDesignTaskRecord) return;
+            const task = currentDesignTaskRecord;
+            const stage2 = currentStages.find(s => s.stage_number === 2);
+            const stage3 = currentStages.find(s => s.stage_number === 3);
+            const stage5 = currentStages.find(s => s.stage_number === 5);
+            wrap.innerHTML = buildDTRTaskProgressPanel(task, stage2, stage3, stage5);
+        }
+
         // ── Shared upload-stage body builder (Range + Finalise) ──────────────
         function _buildUploadStageBody(stage, uploads, stageNum, sectionLabel, deliverLabel, completeLabel) {
             const stageId = stage.id;
@@ -27255,6 +27393,24 @@
             }
             showToast('Drive URL saved ✓');
             await renderNewDTRLayout();
+        }
+
+        async function dtrSaveDriveUrlFromTP(stageId) {
+            const url = document.getElementById('tp-drive-url-input')?.value.trim();
+            if (!url) { showToast('Please enter a URL', 'warning'); return; }
+            if (stageId) {
+                const stage = currentStages.find(s => s.id === stageId);
+                if (stage) {
+                    const cs = { ...(stage.concept_statuses || {}), drive_url: url };
+                    await supabase.from('design_stages').update({ concept_statuses: cs }).eq('id', stageId);
+                    stage.concept_statuses = cs;
+                }
+            } else if (currentDesignTaskRecord?.job_id) {
+                await supabase.from('jobs').update({ google_drive_url: url }).eq('id', currentDesignTaskRecord.job_id);
+                if (currentDesignTaskRecord.jobs) currentDesignTaskRecord.jobs.google_drive_url = url;
+            }
+            showToast('Drive URL saved ✓');
+            _refreshDTRTaskProgressPanel();
         }
 
         function dtrFRDropdownChange() {
@@ -27696,6 +27852,21 @@
             await _dtrRefreshConceptsStage();
         }
 
+        async function dtrDeliverFullRange(stageId) {
+            const stage = currentStages.find(s => s.id === stageId);
+            if (!stage) return;
+            const ok = await updateStageStatus(stage, 'in_review', 'Full Range delivered for review');
+            if (!ok) return;
+            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'full_range' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = 'full_range'; }
+            const t = (allDesignTasks || []).find(t => t.id === stage.task_id);
+            if (t) { t.status = 'in_review'; t.sub_stage = 'full_range'; }
+            await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Full Range' });
+            showToast('Full Range delivered for review ✓');
+            _refreshDTRStatusSection();
+            _refreshDTRTaskProgressPanel();
+        }
+
         async function dtrConceptRevisions(stageId) {
             showDSCommentModal('Request Revisions', 'Describe the revisions needed…', async (comment) => {
                 if (!comment.trim()) { showToast('Please describe the revisions needed', 'warning'); return; }
@@ -27837,6 +28008,7 @@
             const stagesInner = document.getElementById('dtr-stages-inner');
             if (!stagesInner) return;
             stagesInner.innerHTML = buildDTRDesignUploadsSection(_dtrConceptStage || s2, _dtrConceptUploads);
+            _refreshDTRTaskProgressPanel();
         }
 
         // ── Stage 3 / 4 upload actions ────────────────────────────────────────
@@ -28807,11 +28979,13 @@
                 await dsLogActivity(stage.task_id, null, 'task_completed', {});
                 renderStageTabs();
                 renderStagePanel(stageNum);
+                _refreshDTRTaskProgressPanel();
                 showToast('All stages complete — task marked Completed 🎉');
             } else {
                 await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
                 if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
                 renderStageTabs();
+                _refreshDTRTaskProgressPanel();
                 showToast(`Stage ${stageNum} approved ✓`);
                 if (nextStage) setTimeout(() => switchDSStage(nextStage.stage_number), 300);
                 else renderStagePanel(stageNum);
@@ -28847,6 +29021,7 @@
                 } catch (e) { console.error('activity insert failed', e); }
                 renderStageTabs();
                 renderStagePanel(stageNum);
+                _refreshDTRTaskProgressPanel();
                 showToast(`${stageLabel} revisions requested`);
             });
         }
