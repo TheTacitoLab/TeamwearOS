@@ -2639,9 +2639,6 @@
 
                 <!-- RIGHT COLUMN (75%) — Preview Window -->
                 <div class="ds-preview-panel" id="ds-preview-panel" style="display:flex;flex-direction:column;overflow:hidden">
-                    <div style="flex-shrink:0;padding:10px 14px 8px;border-bottom:1px solid #f1f5f9;background:#fff">
-                        <span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8">Task Details</span>
-                    </div>
                     <div id="dsp-empty" class="ds-preview-empty">
                         <svg width="40" height="40" fill="none" stroke="#e2e8f0" viewBox="0 0 24 24" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M9 9h6M9 12h6M9 15h4"/></svg>
                         <p style="font-size:13px;font-weight:600;color:#94a3b8">Select a task to view details</p>
@@ -24217,18 +24214,25 @@
             panel.innerHTML = `<div style="height:100%;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden">
 
                 <!-- Header: title + chips + action buttons -->
-                <div style="border-bottom:1px solid #f1f5f9;padding:12px 14px 10px;flex-shrink:0">
-                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:7px">
-                        <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                            <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35">${escHtml(task.task_name || 'Untitled Task')}</div>
-                            ${task.task_ref ? `<span style="font-family:monospace;font-size:11px;color:#6d28d9;font-weight:700;background:#f5f3ff;padding:2px 8px;border-radius:6px;border:1px solid #ddd6fe">${escHtml(task.task_ref)}</span>` : ''}
+                <div style="border-bottom:1px solid #f1f5f9;padding:10px 14px 8px;flex-shrink:0">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+                        <div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                            <div style="font-size:13px;font-weight:800;color:#0f172a;line-height:1.35;white-space:nowrap">${escHtml(task.task_name || 'Untitled Task')}</div>
+                            ${task.task_ref ? `<span style="font-family:monospace;font-size:11px;color:#6d28d9;font-weight:700;background:#f5f3ff;padding:2px 8px;border-radius:6px;border:1px solid #ddd6fe;white-space:nowrap">${escHtml(task.task_ref)}</span>` : ''}
+                            ${task.clubs?.name ? `<span style="font-size:10px;color:#475569;font-weight:500;background:#f8fafc;padding:2px 7px;border-radius:5px;border:1px solid #e2e8f0;white-space:nowrap">${escHtml(task.clubs.name)}</span>` : ''}
+                            <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${priBgs[pri]};color:${priColors[pri]};border:1px solid ${priBdrs[pri]};white-space:nowrap">${priLabels[pri]}</span>
+                            ${dueLabel ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${dueBg};color:${dueCls};border:1px solid ${dueBdr};white-space:nowrap" title="${dueInfo?.text||''}">${dueLabel}</span>` : ''}
                         </div>
-                        <div style="display:flex;gap:4px;flex-shrink:0;margin-top:1px">
+                        <div style="display:flex;gap:4px;flex-shrink:0">
                             ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;white-space:nowrap;line-height:1">▶ Start</button>` : ''}
-                            <button id="dsp-uploads-btn-${task.id}" class="dsp-uploads-btn no-uploads" onclick="showDesignTask('${task.id}')">
+                            <button id="dsp-concepts-btn-${task.id}" class="dsp-uploads-btn no-uploads" onclick="showDesignTask('${task.id}')" title="Concept Uploads">
                                 <span class="status-dot"></span>
-                                Design Uploads
-                                <span class="count-badge" id="dsp-uploads-count-${task.id}">0</span>
+                                Concept Uploads
+                                <span class="count-badge" id="dsp-concepts-count-${task.id}">0</span>
+                            </button>
+                            <button id="dsp-drive-btn-${task.id}" onclick="_dspOpenDrive('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;gap:4px" title="Google Drive Folder">
+                                <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                Drive
                             </button>
                             <div style="display:inline-flex;align-items:center">
                                 <button onclick="openDesignTaskEditModal('${task.id}')" style="padding:5px 9px;border-radius:7px 0 0 7px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#fff;color:#475569;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;gap:4px">
@@ -24239,23 +24243,17 @@
                             </div>
                         </div>
                     </div>
-                    <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-                        <select onchange="_dspChangeStatus('${task.id}', this.value)" style="font-size:10px;font-weight:700;padding:2px 22px 2px 7px;border-radius:6px;background:${colorBg[nextAct.color]};color:${colorText[nextAct.color]};border:1px solid ${colorBdr[nextAct.color]};cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%2210%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22${encodeURIComponent(colorText[nextAct.color])}%22 stroke-width=%222.5%22><path d=%22M6 9l6 6 6-6%22/></svg>');background-repeat:no-repeat;background-position:right 5px center">${_statusOpts}</select>
-                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;white-space:nowrap;display:inline-flex;align-items:center;gap:4px" title="Owner">
-                            <svg width="9" height="9" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                            ${escHtml(designerName)}
-                        </span>
-                        ${task.clubs?.name ? `<span style="font-size:10px;color:#475569;font-weight:500;background:#f8fafc;padding:1px 6px;border-radius:5px;border:1px solid #e2e8f0">${escHtml(task.clubs.name)}</span>` : ''}
-                        <span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${priBgs[pri]};color:${priColors[pri]};border:1px solid ${priBdrs[pri]};white-space:nowrap">${priLabels[pri]}</span>
-                        ${dueLabel ? `<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:${dueBg};color:${dueCls};border:1px solid ${dueBdr};white-space:nowrap" title="${dueInfo?.text||''}">${dueLabel}</span>` : ''}
-                    </div>
                 </div>
 
-                <!-- 3-column body: Details+Brief | Products+Factory | NextAction+Activity -->
+                <!-- 3-column body: Products+Brief+Colours+Attachments | Task Progress | Activity -->
                 <div style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:12px 14px;overflow:hidden;box-sizing:border-box;min-height:0">
 
-                    <!-- LEFT: Brief + Colours + Attachments -->
+                    <!-- LEFT: Products + Brief + Colours + Attachments -->
                     <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;padding-right:2px">
+                        <div id="dsp-products-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
+                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div>
+                            <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
+                        </div>
                         <div style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
                             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:6px">Brief</div>
                             ${brief ? `<p style="font-size:11px;color:#374151;line-height:1.6;margin:0;white-space:pre-wrap">${escHtml(brief)}</p>` : `<p style="font-size:11px;color:#94a3b8;font-style:italic;margin:0">No brief set.</p>`}
@@ -24270,12 +24268,8 @@
                         </div>
                     </div>
 
-                    <!-- MIDDLE: Products + Factory Handover -->
+                    <!-- MIDDLE: Task Progress -->
                     <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;padding-right:2px">
-                        <div id="dsp-products-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
-                            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Products Required</div>
-                            <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
-                        </div>
                         <div id="dsp-task-progress-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
                             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Task Progress</div>
                             <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
@@ -24403,12 +24397,45 @@
 
         async function _loadPreviewPanelUploadsCount(taskId) {
             const n = await _dsCountTaskUploads(taskId);
-            const btn = document.getElementById(`dsp-uploads-btn-${taskId}`);
-            const cnt = document.getElementById(`dsp-uploads-count-${taskId}`);
+            const btn = document.getElementById(`dsp-concepts-btn-${taskId}`);
+            const cnt = document.getElementById(`dsp-concepts-count-${taskId}`);
             if (!btn || !cnt) return;
             cnt.textContent = n;
             btn.classList.toggle('has-uploads', n > 0);
             btn.classList.toggle('no-uploads', n === 0);
+        }
+
+        function _updateDSPDriveBtn(taskId, driveUrl, stage5Id) {
+            const btn = document.getElementById(`dsp-drive-btn-${taskId}`);
+            if (!btn) return;
+            if (driveUrl) {
+                btn.style.borderColor = '#86efac';
+                btn.style.background = '#f0fdf4';
+                btn.style.color = '#16a34a';
+                btn.onclick = () => window.open(driveUrl, '_blank');
+                btn.title = 'Open Google Drive Folder';
+            } else {
+                btn.style.borderColor = '#e2e8f0';
+                btn.style.background = '#f8fafc';
+                btn.style.color = '#64748b';
+                btn.onclick = () => _dspPromptDriveUrl(taskId, stage5Id);
+                btn.title = 'Add Google Drive Folder URL';
+            }
+        }
+
+        function _dspOpenDrive(taskId) {
+            // Fallback for when stage5 hasn't loaded yet; clicking before progress loads
+            const task = (allDesignTasks || []).find(t => t.id === taskId);
+            const url = task?.clubs?.google_drive_url || task?.jobs?.google_drive_url || '';
+            if (url) { window.open(url, '_blank'); }
+            else { _dspPromptDriveUrl(taskId, null); }
+        }
+
+        function _dspPromptDriveUrl(taskId, stage5Id) {
+            showDSCommentModal('Add Google Drive Folder URL', 'https://drive.google.com/drive/folders/…', async (url) => {
+                if (!url?.trim()) return;
+                await dspSaveDriveUrl(taskId, stage5Id, url.trim());
+            });
         }
 
         async function _loadPreviewPanelTaskProgress(task) {
@@ -24416,7 +24443,6 @@
             if (!document.getElementById(elId)) return;
             const { data: stages } = await supabase.from('design_stages')
                 .select('*').eq('task_id', task.id).in('stage_number', [2, 3, 5]);
-            // Re-fetch element after await in case the panel was re-rendered
             const el = document.getElementById(elId);
             if (!el) return;
             const stage2 = (stages || []).find(s => s.stage_number === 2) || null;
@@ -24424,13 +24450,13 @@
             const stage5 = (stages || []).find(s => s.stage_number === 5) || null;
             const isCompleted = task.status === 'completed';
 
-            // Drive URL resolution
+            // Update Drive button in header now that we have stage5
             const stage5Url = stage5?.concept_statuses?.drive_url;
             const driveUrl = (stage5Url !== undefined)
                 ? (stage5Url || '')
                 : (task.clubs?.google_drive_url || task.jobs?.google_drive_url || '');
+            _updateDSPDriveBtn(task.id, driveUrl, stage5?.id || null);
 
-            // Status badge helper
             const stageBadge = (status) => {
                 if (status === 'approved') return `<span style="padding:1px 6px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(34,197,94,0.1);color:#16a34a">Approved</span>`;
                 if (status === 'in_review') return `<span style="padding:1px 6px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309">In Review</span>`;
@@ -24438,62 +24464,45 @@
                 return '';
             };
             const stageCircle = (num, approved) =>
-                `<div style="width:18px;height:18px;border-radius:50%;background:${approved?'#dcfce7':'#eff6ff'};border:1.5px solid ${approved?'#86efac':'#93c5fd'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:${approved?'#15803d':'#1d4ed8'};flex-shrink:0">${approved?'✓':num}</div>`;
+                `<div style="width:20px;height:20px;border-radius:50%;background:${approved?'#dcfce7':'#eff6ff'};border:1.5px solid ${approved?'#86efac':'#93c5fd'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:${approved?'#15803d':'#1d4ed8'};flex-shrink:0">${approved?'✓':num}</div>`;
 
-            // --- 1. Concept Uploads ---
+            const deliverBtnStyle = `padding:4px 12px;border-radius:6px;font-size:10px;font-weight:800;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer;letter-spacing:0.03em`;
+            const redeliverBtnStyle = `padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer`;
+            const acceptBtnStyle = `padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer`;
+            const revBtnStyle = `padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer`;
+
+            // --- 1. Concepts ---
             const conceptsActions = (() => {
                 if (!stage2) return '';
                 const s = stage2.status;
-                if (s === 'approved')           return `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Approved</span>`;
-                if (s === 'in_review')          return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
-                    <button onclick="dspAcceptConcepts('${task.id}','${stage2.id}')" style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">Accept</button>
-                    <button onclick="dspRequestStageRevisions('${task.id}','${stage2.id}',2)" style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions</button>`;
+                if (s === 'approved') return `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Approved</span>`;
+                if (s === 'in_review') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
+                    <button onclick="dspAcceptConcepts('${task.id}','${stage2.id}')" style="${acceptBtnStyle}">Accept</button>
+                    <button onclick="dspRequestStageRevisions('${task.id}','${stage2.id}',2)" style="${revBtnStyle}">Revisions</button>`;
                 if (s === 'revisions_required') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(239,68,68,0.07);color:#dc2626">🔄 Revisions</span>
-                    <button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer">Re-Deliver</button>`;
-                return `<button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer">Deliver Concepts</button>`;
+                    <button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="${redeliverBtnStyle}">Re-Deliver</button>`;
+                return `<button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="${deliverBtnStyle}">DELIVER CONCEPTS</button>`;
             })();
 
             const conceptsHtml = `
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
                     ${stageCircle(1, stage2?.status === 'approved')}
-                    <span style="font-size:11px;font-weight:700;color:#0f172a">Concept Uploads</span>
+                    <span style="font-size:11px;font-weight:700;color:#0f172a">Concepts</span>
                     ${stage2 ? stageBadge(stage2.status) : ''}
                 </div>
-                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
-                    <button onclick="showDesignTask('${task.id}')" style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600;border:1.5px solid #e2e8f0;background:#f8fafc;color:#374151;cursor:pointer">Design Uploads ↗</button>
-                    ${conceptsActions}
-                </div>`;
-
-            // --- Drive link ---
-            const driveHtml = driveUrl
-                ? `<a href="${escHtml(driveUrl)}" target="_blank" style="display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:8px;background:#f0fdf4;border:1.5px solid #86efac;text-decoration:none;margin-top:8px">
-                    <svg width="13" height="13" fill="none" stroke="#16a34a" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                    <span style="font-size:10px;font-weight:700;color:#16a34a">Google Drive Folder ↗</span>
-                    <button onclick="event.preventDefault();event.stopPropagation();document.getElementById('dsp-drive-edit-${task.id}').classList.toggle('hide')" style="margin-left:auto;font-size:9px;color:#64748b;background:#fff;border:1px solid #cbd5e1;border-radius:4px;cursor:pointer;padding:1px 5px">Edit</button>
-                </a>
-                <div id="dsp-drive-edit-${task.id}" class="hide" style="margin-top:6px;display:flex;gap:5px">
-                    <input id="dsp-drive-url-input-${task.id}" type="url" value="${escHtml(driveUrl)}" placeholder="https://drive.google.com/…" style="flex:1;padding:5px 8px;border-radius:6px;border:1.5px solid #e2e8f0;font-size:10px;color:#374151;outline:none">
-                    <button onclick="dspSaveDriveUrl('${task.id}',${stage5?`'${stage5.id}'`:'null'})" style="padding:5px 10px;border-radius:6px;background:#2563eb;color:#fff;font-size:10px;font-weight:700;border:none;cursor:pointer">Save</button>
-                </div>`
-                : `<div style="margin-top:8px">
-                    <div style="font-size:10px;font-weight:600;color:#64748b;margin-bottom:4px">Google Drive Folder</div>
-                    <div style="display:flex;gap:5px">
-                        <input id="dsp-drive-url-input-${task.id}" type="url" placeholder="Paste Drive folder URL…" style="flex:1;padding:5px 8px;border-radius:6px;border:1.5px solid #e2e8f0;font-size:10px;color:#374151;outline:none">
-                        <button onclick="dspSaveDriveUrl('${task.id}',${stage5?`'${stage5.id}'`:'null'})" style="padding:5px 10px;border-radius:6px;background:#2563eb;color:#fff;font-size:10px;font-weight:700;border:none;cursor:pointer;white-space:nowrap">Save</button>
-                    </div>
-                </div>`;
+                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${conceptsActions}</div>`;
 
             // --- 2. Full Range ---
             const fullRangeActions = (() => {
                 if (!stage3) return '';
                 const s = stage3.status;
-                if (s === 'approved')           return `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Approved</span>`;
-                if (s === 'in_review')          return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
-                    <button onclick="dspAcceptRange('${task.id}','${stage3.id}')" style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">Accept</button>
-                    <button onclick="dspRequestStageRevisions('${task.id}','${stage3.id}',3)" style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Revisions</button>`;
+                if (s === 'approved') return `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Approved</span>`;
+                if (s === 'in_review') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
+                    <button onclick="dspAcceptRange('${task.id}','${stage3.id}')" style="${acceptBtnStyle}">Accept</button>
+                    <button onclick="dspRequestStageRevisions('${task.id}','${stage3.id}',3)" style="${revBtnStyle}">Revisions</button>`;
                 if (s === 'revisions_required') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(239,68,68,0.07);color:#dc2626">🔄 Revisions</span>
-                    <button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer">Re-Deliver</button>`;
-                return `<button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="padding:4px 12px;border-radius:6px;font-size:10px;font-weight:800;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer;letter-spacing:0.03em">DELIVER RANGE</button>`;
+                    <button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="${redeliverBtnStyle}">Re-Deliver</button>`;
+                return `<button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="${deliverBtnStyle}">DELIVER RANGE</button>`;
             })();
 
             const fullRangeHtml = `
@@ -24504,7 +24513,7 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${fullRangeActions}</div>`;
 
-            // --- 3. Factory Handover (with requirements checklist + Complete Task) ---
+            // --- 3. Factory Handover ---
             const fr = task.factory_requirements || {};
             const items = typeof _DTR_FR_ITEMS !== 'undefined' ? _DTR_FR_ITEMS : [];
             const itemsHtml = items.map(item => {
@@ -24521,7 +24530,7 @@
                     <span style="font-size:11px;font-weight:700;color:#0f172a">Factory Handover</span>
                     ${isCompleted ? `<span style="padding:1px 6px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(34,197,94,0.1);color:#16a34a">Completed</span>` : ''}
                 </div>
-                ${items.length ? `<div style="padding:4px 0 6px">${itemsHtml || ''}</div>` : ''}
+                ${items.length ? `<div style="padding:4px 0 6px">${itemsHtml}</div>` : ''}
                 ${isCompleted
                     ? `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Task completed</span>`
                     : `<button onclick="dspCompleteTask('${task.id}')" style="width:100%;padding:7px;border-radius:8px;font-size:11px;font-weight:800;border:2px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;transition:all 0.2s;margin-top:4px" onmouseover="this.style.borderColor='#16a34a';this.style.color='#16a34a';this.style.background='#f0fdf4'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#374151';this.style.background='#fff'">Complete Task</button>`}`;
@@ -24530,7 +24539,6 @@
                 <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:8px">Task Progress</div>
                 <div style="display:flex;flex-direction:column;gap:8px">
                     <div style="padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fafafa">${conceptsHtml}</div>
-                    <div style="padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fafafa">${driveHtml}</div>
                     <div style="padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fafafa">${fullRangeHtml}</div>
                     <div style="padding:8px 10px;border:1px solid ${isCompleted?'#86efac':'#e2e8f0'};border-radius:8px;background:${isCompleted?'#f0fdf4':'#fafafa'}">${factoryHtml}</div>
                 </div>`;
@@ -24650,8 +24658,8 @@
             renderDSPreviewPanel(taskId);
         }
 
-        async function dspSaveDriveUrl(taskId, stage5Id) {
-            const url = document.getElementById(`dsp-drive-url-input-${taskId}`)?.value.trim();
+        async function dspSaveDriveUrl(taskId, stage5Id, urlArg) {
+            const url = urlArg || document.getElementById(`dsp-drive-url-input-${taskId}`)?.value.trim();
             if (!url) { showToast('Please enter a URL', 'warning'); return; }
             if (stage5Id) {
                 // Read existing concept_statuses to preserve other fields
