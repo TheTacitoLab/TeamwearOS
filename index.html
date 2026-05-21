@@ -6921,6 +6921,7 @@
             // Load user preferences from localStorage
             loadTabOrders();
             loadDSUpNext();
+            loadDSRestOrder();
             // Apply any feature access restrictions for this user
             await applyUserFeaturePermissions();
             showLaunchpad();
@@ -18932,6 +18933,7 @@
         let _dsListTab = 'new'; // 'new' | 'inprogress' | 'inreview'
         let allDesignTasks = [];
         let _dsUpNextIds = [];   // ordered task IDs in the "Up Next" section
+        let _dsRestOrder = [];   // ordered task IDs in the "All New Tasks" rest section
         let _dsDragTaskId = null;
         let designBriefLog = [];
 
@@ -23791,7 +23793,8 @@
         }
 
         // ── Design Studio: Up Next ──────────────────────────────────────
-        function _dsUpNextKey() { return `ds_up_next_${currentBrand?.id || 'default'}`; }
+        function _dsUpNextKey()  { return `ds_up_next_${currentBrand?.id || 'default'}`; }
+        function _dsRestOrderKey() { return `ds_rest_order_${currentBrand?.id || 'default'}`; }
 
         function loadDSUpNext() {
             try { _dsUpNextIds = JSON.parse(localStorage.getItem(_dsUpNextKey())) || []; } catch { _dsUpNextIds = []; }
@@ -23801,13 +23804,27 @@
             localStorage.setItem(_dsUpNextKey(), JSON.stringify(_dsUpNextIds));
         }
 
+        function loadDSRestOrder() {
+            try { _dsRestOrder = JSON.parse(localStorage.getItem(_dsRestOrderKey())) || []; } catch { _dsRestOrder = []; }
+        }
+
+        function saveDSRestOrder() {
+            localStorage.setItem(_dsRestOrderKey(), JSON.stringify(_dsRestOrder));
+        }
+
         function _renderDSNewTabSplit(list, unreadMap) {
-            // Clean up stale IDs (tasks no longer in "new" list)
+            // Clean up stale IDs
             const validIds = new Set(list.map(t => t.id));
             _dsUpNextIds = _dsUpNextIds.filter(id => validIds.has(id));
+            _dsRestOrder = _dsRestOrder.filter(id => validIds.has(id));
 
             const upNext = _dsUpNextIds.map(id => list.find(t => t.id === id)).filter(Boolean);
-            const rest   = list.filter(t => !_dsUpNextIds.includes(t.id));
+            const restUnsorted = list.filter(t => !_dsUpNextIds.includes(t.id));
+
+            // Apply saved rest order: ordered tasks first, then any new tasks not yet in the order
+            const orderedInRest = _dsRestOrder.map(id => restUnsorted.find(t => t.id === id)).filter(Boolean);
+            const unorderedRest = restUnsorted.filter(t => !_dsRestOrder.includes(t.id));
+            const rest = [...orderedInRest, ...unorderedRest];
 
             const upNextCards = upNext.length === 0
                 ? `<div class="ds-up-next-empty">Drag tasks here to queue them</div>`
@@ -23832,7 +23849,7 @@
                 </div>
                 <div class="ds-up-next-divider"><span>All New Tasks</span></div>
                 <div class="ds-rest-wrap" id="ds-rest-wrap"
-                    ondragover="event.preventDefault()"
+                    ondragover="onDSRestListDragOver(event)"
                     ondrop="onDSRestDrop(event)">
                     ${restCards}
                 </div>`;
@@ -23916,12 +23933,55 @@
             onDSUpNextDrop(event, beforeId);
         }
 
+        function onDSRestListDragOver(event) {
+            event.preventDefault();
+            const wrap = document.getElementById('ds-rest-wrap');
+            if (!wrap) return;
+            wrap.querySelectorAll('.ds-kanban-card.drop-before,.ds-kanban-card.drop-after').forEach(c => c.classList.remove('drop-before','drop-after'));
+            const cards = [...wrap.querySelectorAll('.ds-kanban-card[data-task-id]')].filter(c => !c.classList.contains('ds-dragging'));
+            if (!cards.length) return;
+            for (let i = 0; i < cards.length; i++) {
+                const rect = cards[i].getBoundingClientRect();
+                if (event.clientY < rect.top + rect.height / 2) {
+                    cards[i].classList.add('drop-before');
+                    return;
+                }
+            }
+            cards[cards.length - 1].classList.add('drop-after');
+        }
+
         function onDSRestDrop(event) {
             event.preventDefault();
+            event.stopPropagation();
+            document.querySelectorAll('.ds-kanban-card.drop-before,.ds-kanban-card.drop-after').forEach(c => c.classList.remove('drop-before','drop-after'));
             if (!_dsDragTaskId) return;
+
+            // Determine drop insertion point within the rest list
+            const wrap = document.getElementById('ds-rest-wrap');
+            const cards = wrap ? [...wrap.querySelectorAll('.ds-kanban-card[data-task-id]')].filter(c => c.dataset.taskId !== _dsDragTaskId) : [];
+            let beforeId = null;
+            for (const card of cards) {
+                const rect = card.getBoundingClientRect();
+                if (event.clientY < rect.top + rect.height / 2) { beforeId = card.dataset.taskId; break; }
+            }
+
+            // Remove from up-next if needed
             const wasInUpNext = _dsUpNextIds.includes(_dsDragTaskId);
             _dsUpNextIds = _dsUpNextIds.filter(id => id !== _dsDragTaskId);
-            if (wasInUpNext) { saveDSUpNext(); renderDSDashboard(); }
+
+            // Reorder within rest
+            _dsRestOrder = _dsRestOrder.filter(id => id !== _dsDragTaskId);
+            if (beforeId) {
+                const idx = _dsRestOrder.indexOf(beforeId);
+                if (idx !== -1) _dsRestOrder.splice(idx, 0, _dsDragTaskId);
+                else _dsRestOrder.push(_dsDragTaskId);
+            } else {
+                _dsRestOrder.push(_dsDragTaskId);
+            }
+
+            if (wasInUpNext) saveDSUpNext();
+            saveDSRestOrder();
+            renderDSDashboard();
         }
 
         // ── Tab Order ──────────────────────────────────────────────────
@@ -24227,7 +24287,7 @@
                             ${task.status === 'new' ? `<button onclick="startDesignTask('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #dc2626;background:#fef2f2;color:#dc2626;white-space:nowrap;line-height:1">▶ Start</button>` : ''}
                             <button id="dsp-concepts-btn-${task.id}" class="dsp-uploads-btn no-uploads" onclick="showDesignTask('${task.id}')" title="Concept Uploads">
                                 <span class="status-dot"></span>
-                                Concept Uploads
+                                Concepts
                                 <span class="count-badge" id="dsp-concepts-count-${task.id}">0</span>
                             </button>
                             <button id="dsp-drive-btn-${task.id}" onclick="_dspOpenDrive('${task.id}')" style="padding:5px 9px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid #e2e8f0;background:#f8fafc;color:#64748b;white-space:nowrap;line-height:1;display:inline-flex;align-items:center;gap:4px" title="Google Drive Folder">
@@ -24268,9 +24328,9 @@
                         </div>
                     </div>
 
-                    <!-- MIDDLE: Task Progress -->
-                    <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;padding-right:2px">
-                        <div id="dsp-task-progress-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff">
+                    <!-- MIDDLE: Task Progress (fills full height like activity col) -->
+                    <div style="display:flex;flex-direction:column;overflow:hidden;min-height:0">
+                        <div id="dsp-task-progress-${task.id}" style="border:1px solid #e2e8f0;border-radius:9px;padding:10px 12px;background:#fff;flex:1;display:flex;flex-direction:column;overflow:hidden">
                             <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:4px">Task Progress</div>
                             <p style="font-size:10px;color:#94a3b8;margin:0">Loading…</p>
                         </div>
@@ -24281,7 +24341,7 @@
                         <div style="display:flex;flex-direction:column;background:#fff;border:1px solid #dde3ea;border-radius:12px;overflow:hidden;flex:1;min-height:0;box-shadow:0 1px 2px rgba(15,23,42,0.04)">
                             <div class="dtr-activity-header" style="flex-shrink:0;padding:10px 12px;border-bottom:1px solid #f1f5f9">
                                 <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
-                                    <h4 style="font-size:12px;font-weight:800;color:#0f172a;margin:0">Activity</h4>
+                                    <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8">Activity</span>
                                     <select class="dsp-act-filter-select" onchange="filterDTRActivity(null,this.value)" style="font-size:11px;font-weight:600;color:#475569;border:1.5px solid #e2e8f0;border-radius:7px;padding:3px 8px;background:#f8fafc;cursor:pointer;outline:none">
                                         <option value="all">All Active</option>
                                         <option value="comment">Comments</option>
@@ -24466,52 +24526,57 @@
             const stageCircle = (num, approved) =>
                 `<div style="width:20px;height:20px;border-radius:50%;background:${approved?'#dcfce7':'#eff6ff'};border:1.5px solid ${approved?'#86efac':'#93c5fd'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:${approved?'#15803d':'#1d4ed8'};flex-shrink:0">${approved?'✓':num}</div>`;
 
-            const deliverBtnStyle = `padding:4px 12px;border-radius:6px;font-size:10px;font-weight:800;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer;letter-spacing:0.03em`;
-            const redeliverBtnStyle = `padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #93c5fd;background:#eff6ff;color:#1d4ed8;cursor:pointer`;
-            const acceptBtnStyle = `padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer`;
-            const revBtnStyle = `padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;border:1.5px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer`;
+            const btnStyle = `padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#374151;cursor:pointer;white-space:nowrap`;
+
+            const cardStyle = (status, isTask) => {
+                if (isTask) return 'border:1px solid #86efac;background:#f0fdf4';
+                if (status === 'approved') return 'border:1px solid #86efac;background:#f0fdf4';
+                if (status === 'in_review') return 'border:1px solid #fde68a;background:#fffbeb';
+                if (status === 'revisions_required') return 'border:1px solid #fca5a5;background:#fff1f2';
+                return 'border:1px solid #e2e8f0;background:#fafafa';
+            };
 
             // --- 1. Concepts ---
             const conceptsActions = (() => {
                 if (!stage2) return '';
                 const s = stage2.status;
-                if (s === 'approved') return `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Approved</span>`;
-                if (s === 'in_review') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
-                    <button onclick="dspAcceptConcepts('${task.id}','${stage2.id}')" style="${acceptBtnStyle}">Accept</button>
-                    <button onclick="dspRequestStageRevisions('${task.id}','${stage2.id}',2)" style="${revBtnStyle}">Revisions</button>`;
-                if (s === 'revisions_required') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(239,68,68,0.07);color:#dc2626">🔄 Revisions</span>
-                    <button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="${redeliverBtnStyle}">Re-Deliver</button>`;
-                return `<button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="${deliverBtnStyle}">DELIVER CONCEPTS</button>`;
+                if (s === 'approved') return `<span style="font-size:10px;color:#16a34a;font-weight:700">✓ Approved</span>`;
+                if (s === 'in_review') return `
+                    <button onclick="dspAcceptConcepts('${task.id}','${stage2.id}')" style="${btnStyle}">Accept</button>
+                    <button onclick="dspRequestStageRevisions('${task.id}','${stage2.id}',2)" style="${btnStyle}">Request Revisions</button>`;
+                if (s === 'revisions_required') return `
+                    <button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="${btnStyle}">Re-Deliver Concepts</button>`;
+                return `<button onclick="dspDeliverConcepts('${task.id}','${stage2.id}')" style="${btnStyle}">DELIVER CONCEPTS</button>`;
             })();
 
             const conceptsHtml = `
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
                     ${stageCircle(1, stage2?.status === 'approved')}
                     <span style="font-size:11px;font-weight:700;color:#0f172a">Concepts</span>
                     ${stage2 ? stageBadge(stage2.status) : ''}
                 </div>
-                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${conceptsActions}</div>`;
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${conceptsActions}</div>`;
 
             // --- 2. Full Range ---
             const fullRangeActions = (() => {
                 if (!stage3) return '';
                 const s = stage3.status;
-                if (s === 'approved') return `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Approved</span>`;
-                if (s === 'in_review') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(245,158,11,0.12);color:#b45309;border:1px solid #fde68a">IN REVIEW</span>
-                    <button onclick="dspAcceptRange('${task.id}','${stage3.id}')" style="${acceptBtnStyle}">Accept</button>
-                    <button onclick="dspRequestStageRevisions('${task.id}','${stage3.id}',3)" style="${revBtnStyle}">Revisions</button>`;
-                if (s === 'revisions_required') return `<span style="padding:3px 7px;border-radius:6px;font-size:10px;font-weight:700;background:rgba(239,68,68,0.07);color:#dc2626">🔄 Revisions</span>
-                    <button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="${redeliverBtnStyle}">Re-Deliver</button>`;
-                return `<button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="${deliverBtnStyle}">DELIVER RANGE</button>`;
+                if (s === 'approved') return `<span style="font-size:10px;color:#16a34a;font-weight:700">✓ Approved</span>`;
+                if (s === 'in_review') return `
+                    <button onclick="dspAcceptRange('${task.id}','${stage3.id}')" style="${btnStyle}">Accept</button>
+                    <button onclick="dspRequestStageRevisions('${task.id}','${stage3.id}',3)" style="${btnStyle}">Request Revisions</button>`;
+                if (s === 'revisions_required') return `
+                    <button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="${btnStyle}">Re-Deliver Range</button>`;
+                return `<button onclick="dspDeliverRange('${task.id}','${stage3.id}')" style="${btnStyle}">DELIVER RANGE</button>`;
             })();
 
             const fullRangeHtml = `
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
                     ${stageCircle(2, stage3?.status === 'approved')}
                     <span style="font-size:11px;font-weight:700;color:#0f172a">Full Range</span>
                     ${stage3 ? stageBadge(stage3.status) : ''}
                 </div>
-                <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">${fullRangeActions}</div>`;
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${fullRangeActions}</div>`;
 
             // --- 3. Factory Handover ---
             const fr = task.factory_requirements || {};
@@ -24519,29 +24584,77 @@
             const itemsHtml = items.map(item => {
                 const done = !!fr[item.key];
                 const subs = (item.subs || []).filter(s => fr[s.key]);
-                return `<div style="display:flex;align-items:flex-start;gap:5px;padding:2px 0">
-                    <span style="font-size:10px;color:${done?'#16a34a':'#cbd5e1'};flex-shrink:0;line-height:1.4">${done?'✓':'○'}</span>
-                    <span style="font-size:9px;color:${done?'#374151':'#94a3b8'};line-height:1.4;font-weight:${done?'600':'400'}">${escHtml(item.label)}${subs.length?` <span style="color:#64748b;font-size:8px">(${subs.map(s=>s.label).join(', ')})</span>`:''}</span>
+                return `<div style="display:flex;align-items:flex-start;gap:5px;padding:3px 0">
+                    <span style="font-size:11px;color:${done?'#16a34a':'#cbd5e1'};flex-shrink:0;line-height:1.3">${done?'✓':'○'}</span>
+                    <span style="font-size:10px;color:${done?'#374151':'#94a3b8'};line-height:1.3;font-weight:${done?'600':'400'}">${escHtml(item.label)}${subs.length?` <span style="color:#64748b;font-size:9px">(${subs.map(s=>s.label).join(', ')})</span>`:''}</span>
                 </div>`;
             }).join('');
             const factoryHtml = `
-                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:6px">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:10px">
                     ${stageCircle(3, isCompleted)}
                     <span style="font-size:11px;font-weight:700;color:#0f172a">Factory Handover</span>
                     ${isCompleted ? `<span style="padding:1px 6px;border-radius:5px;font-size:9px;font-weight:700;background:rgba(34,197,94,0.1);color:#16a34a">Completed</span>` : ''}
                 </div>
-                ${items.length ? `<div style="padding:4px 0 6px">${itemsHtml}</div>` : ''}
+                ${items.length ? `<div style="padding:0 0 10px">${itemsHtml}</div>` : ''}
                 ${isCompleted
-                    ? `<span style="font-size:10px;color:#16a34a;font-weight:600">✓ Task completed</span>`
-                    : `<button onclick="dspCompleteTask('${task.id}')" style="width:100%;padding:7px;border-radius:8px;font-size:11px;font-weight:800;border:2px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer;transition:all 0.2s;margin-top:4px" onmouseover="this.style.borderColor='#16a34a';this.style.color='#16a34a';this.style.background='#f0fdf4'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#374151';this.style.background='#fff'">Complete Task</button>`}`;
+                    ? `<span style="font-size:10px;color:#16a34a;font-weight:700">✓ Task completed</span>`
+                    : `<button onclick="dspCompleteTask('${task.id}')" style="${btnStyle};width:100%;padding:8px;font-size:11px;font-weight:800">Complete Task</button>`}`;
+
+            // --- Settings cog panel ---
+            const stageStatusOpts = (stageId, currentStatus) => ['not_started','in_progress','in_review','revisions_required','approved']
+                .map(v => `<option value="${v}"${v===currentStatus?' selected':''}>${{not_started:'Not Started',in_progress:'In Progress',in_review:'In Review',revisions_required:'Revisions',approved:'Approved'}[v]}</option>`).join('');
+            const settingsHtml = `
+                <div id="dsp-progress-settings-${task.id}" class="hide" style="margin-bottom:10px;padding:10px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc">
+                    <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;color:#94a3b8;margin-bottom:8px">Manual Override</div>
+                    ${stage2 ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                        <span style="font-size:11px;font-weight:600;color:#374151">Concepts</span>
+                        <select onchange="_dspSetStageStatus('${task.id}','${stage2.id}',this.value)" style="font-size:10px;padding:3px 7px;border-radius:5px;border:1px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer">${stageStatusOpts(stage2.id, stage2.status)}</select>
+                    </div>` : ''}
+                    ${stage3 ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                        <span style="font-size:11px;font-weight:600;color:#374151">Full Range</span>
+                        <select onchange="_dspSetStageStatus('${task.id}','${stage3.id}',this.value)" style="font-size:10px;padding:3px 7px;border-radius:5px;border:1px solid #e2e8f0;background:#fff;color:#374151;cursor:pointer">${stageStatusOpts(stage3.id, stage3.status)}</select>
+                    </div>` : ''}
+                    <button onclick="dspResetTaskToNew('${task.id}')" style="width:100%;margin-top:4px;padding:6px;border-radius:6px;font-size:10px;font-weight:700;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">↺ Reset Task to New</button>
+                </div>`;
 
             el.innerHTML = `
-                <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8;margin-bottom:8px">Task Progress</div>
-                <div style="display:flex;flex-direction:column;gap:8px">
-                    <div style="padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fafafa">${conceptsHtml}</div>
-                    <div style="padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;background:#fafafa">${fullRangeHtml}</div>
-                    <div style="padding:8px 10px;border:1px solid ${isCompleted?'#86efac':'#e2e8f0'};border-radius:8px;background:${isCompleted?'#f0fdf4':'#fafafa'}">${factoryHtml}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-shrink:0">
+                    <span style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:#94a3b8">Task Progress</span>
+                    <button onclick="_dspToggleProgressSettings('${task.id}')" title="Settings" style="width:22px;height:22px;border-radius:6px;border:1px solid #e2e8f0;background:#f8fafc;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">⚙</button>
+                </div>
+                ${settingsHtml}
+                <div style="display:flex;flex-direction:column;gap:6px;overflow-y:auto;flex:1;min-height:0">
+                    <div style="padding:12px 14px;border-radius:8px;${cardStyle(stage2?.status, false)}">${conceptsHtml}</div>
+                    <div style="padding:12px 14px;border-radius:8px;${cardStyle(stage3?.status, false)}">${fullRangeHtml}</div>
+                    <div style="padding:12px 14px;border-radius:8px;${cardStyle(null, isCompleted)}">${factoryHtml}</div>
                 </div>`;
+        }
+
+        function _dspToggleProgressSettings(taskId) {
+            const panel = document.getElementById(`dsp-progress-settings-${taskId}`);
+            if (panel) panel.classList.toggle('hide');
+        }
+
+        async function _dspSetStageStatus(taskId, stageId, newStatus) {
+            const { error } = await supabase.from('design_stages').update({ status: newStatus }).eq('id', stageId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            showToast('Stage updated', 'success');
+            const task = (allDesignTasks || []).find(t => t.id === taskId);
+            if (task) renderDSPreviewPanel(taskId);
+        }
+
+        async function dspResetTaskToNew(taskId) {
+            if (!confirm('Reset this task to New? All stage progress will be cleared.')) return;
+            const { data: allStages } = await supabase.from('design_stages').select('id').eq('task_id', taskId);
+            if (allStages?.length) {
+                await supabase.from('design_stages').update({ status: 'not_started' }).in('id', allStages.map(s => s.id));
+            }
+            await supabase.from('design_tasks').update({ status: 'new', sub_stage: null }).eq('id', taskId);
+            const t = (allDesignTasks || []).find(t => t.id === taskId);
+            if (t) { t.status = 'new'; t.sub_stage = null; }
+            showToast('Task reset to New ✓');
+            renderDSDashboard();
+            renderDSPreviewPanel(taskId);
         }
 
         // ── DSP Task Progress action handlers ────────────────────────────────
@@ -25474,7 +25587,8 @@
         const _origLoadDesignStudio = loadDesignStudio;
         async function loadDesignStudioV2() {
             if (!currentBrand) return;
-            loadDSUpNext(); // refresh per-brand Up Next list
+            loadDSUpNext();    // refresh per-brand Up Next list
+            loadDSRestOrder(); // refresh per-brand rest order
             // Load tasks
             const { data: brandTasks } = await supabase
                 .from('design_tasks')
