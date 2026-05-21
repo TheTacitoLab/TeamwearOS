@@ -24739,10 +24739,10 @@
         async function startDesignTask(taskId) {
             const task = (allDesignTasks || []).find(t => t.id === taskId);
             if (!task) return;
-            const { error } = await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'in_design' }).eq('id', taskId);
+            const { error } = await supabase.from('design_tasks').update({ status: 'in_progress', sub_stage: 'concepts' }).eq('id', taskId);
             if (error) { showToast('Error starting task', 'error'); return; }
             task.status = 'in_progress';
-            task.sub_stage = 'in_design';
+            task.sub_stage = 'concepts';
             const stages = task._stages || [];
             const conceptsStage = stages.find(s => s.stage_number === 2);
             if (conceptsStage && conceptsStage.status === 'not_started') {
@@ -24757,14 +24757,21 @@
 
         async function completeDesignTask() {
             if (!currentDesignTaskRecord?.id) return;
-            if (!confirm('Mark this design task as complete? It will be moved to the Completed list.')) return;
-            const { error } = await supabase.from('design_tasks').update({ status: 'completed', sub_stage: null }).eq('id', currentDesignTaskRecord.id);
+            if (!confirm('Mark this design task as complete? Any unfinished sub-stages will be skipped.')) return;
+            const taskId = currentDesignTaskRecord.id;
+            const { error } = await supabase.from('design_tasks').update({ status: 'completed', sub_stage: null, completed_at: new Date().toISOString() }).eq('id', taskId);
             if (error) { showToast('Error completing task: ' + error.message, 'error'); return; }
+            // Mark any non-approved stages as skipped so per-stage state stays consistent
+            const stagesToSkip = (currentStages || []).filter(s => !['approved','skipped'].includes(s.status));
+            if (stagesToSkip.length) {
+                await supabase.from('design_stages').update({ status: 'skipped' }).in('id', stagesToSkip.map(s => s.id));
+                stagesToSkip.forEach(s => { s.status = 'skipped'; });
+            }
             currentDesignTaskRecord.status = 'completed';
             currentDesignTaskRecord.sub_stage = null;
-            const task = (allDesignTasks || []).find(t => t.id === currentDesignTaskRecord.id);
+            const task = (allDesignTasks || []).find(t => t.id === taskId);
             if (task) { task.status = 'completed'; task.sub_stage = null; }
-            if (currentDesignTaskRecord?.id) dsLogActivity(currentDesignTaskRecord.id, null, 'task_completed', {});
+            dsLogActivity(taskId, null, 'task_completed', {});
             showToast('Task completed! ✓');
             _dsSelectedTaskId = null;
             renderDSDashboard();
@@ -25902,7 +25909,7 @@
                     </div>
                     <div class="dtr-stages-col" id="dtr-stages-col">
                         <div id="dtr-stages-inner" class="dtr-stages-inner" style="height:100%;overflow-y:auto">
-                            ${buildDTRDesignUploadsSection(stage2, conceptUploads)}
+                            ${buildDTRStagesColumn(stage2, stage3, stage4, stage5, conceptUploads, rangeUploads, finaliseUploads)}
                         </div>
                     </div>
                     <div class="dtr-activity-col" id="dtr-activity-col" style="display:flex;flex-direction:column;gap:12px;overflow-y:auto">
@@ -26684,21 +26691,27 @@
             }
         }
 
-        // ── Stages column ──────────────────────────────────────────────────────
+        // ── Task Progress column (Concepts → Full Range → Factory Handover) ──
         function buildDTRStagesColumn(stage2, stage3, stage4, stage5, conceptUploads, rangeUploads, finaliseUploads) {
-            const allApproved = stage2?.status === 'approved' && stage3?.status === 'approved' && stage4?.status === 'approved' && (!stage5 || stage5.status === 'approved');
             const taskAlreadyDone = currentDesignTaskRecord?.status === 'completed';
-            const completeTaskBtn = (allApproved && !taskAlreadyDone) ? `
-                <div style="margin-top:16px;padding:16px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1.5px solid #86efac;border-radius:14px;text-align:center">
-                    <div style="font-size:12px;font-weight:700;color:#15803d;margin-bottom:10px">🎉 All stages complete!</div>
-                    <button onclick="completeDesignTask()" style="width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:700;border:none;background:#16a34a;color:#fff;cursor:pointer;transition:opacity 0.15s" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Complete Task</button>
-                </div>` : (taskAlreadyDone ? `<div style="margin-top:16px;padding:12px 16px;background:#f0fdf4;border:1.5px solid #86efac;border-radius:12px;text-align:center;font-size:12px;font-weight:700;color:#16a34a">✓ Task Completed</div>` : '');
-            return [
+
+            // Header for the Task Progress container with Complete Task button always available
+            const header = `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;margin-bottom:12px;background:linear-gradient(135deg,#eef2ff,#ede9fe);border:1.5px solid #c7d2fe;border-radius:12px">
+                    <div style="display:flex;flex-direction:column">
+                        <span style="font-size:13px;font-weight:800;color:#312e81;letter-spacing:0.02em">Task Progress</span>
+                        <span style="font-size:10px;color:#6b7280">Concepts → Full Range → Factory Handover</span>
+                    </div>
+                    ${taskAlreadyDone
+                        ? `<span style="padding:7px 14px;border-radius:8px;font-size:11px;font-weight:800;background:#dcfce7;color:#16a34a;border:1.5px solid #86efac">✓ Task Completed</span>`
+                        : `<button onclick="completeDesignTask()" style="padding:7px 14px;border-radius:8px;font-size:11px;font-weight:800;border:1.5px solid #16a34a;background:#16a34a;color:#fff;cursor:pointer;transition:opacity 0.15s;white-space:nowrap" onmouseover="this.style.opacity='0.88'" onmouseout="this.style.opacity='1'">Complete Task</button>`}
+                </div>`;
+
+            // Stage 4 (Finalise) is no longer rendered — auto-skipped on stage 3 approval
+            return header + [
                 stage2 ? buildDTRConceptsStage(stage2, conceptUploads) : '',
                 stage3 ? buildDTRFullRangeStage(stage3, rangeUploads || []) : '',
-                stage4 ? buildDTRFinalArtworkStage(stage4, finaliseUploads || []) : '',
                 stage5 ? buildDTRUploadToDriveStage(stage5) : '',
-                completeTaskBtn,
             ].join('');
         }
 
@@ -27089,12 +27102,12 @@
             return `<div class="dtr-stage-section${stageClass3}" id="dtr-stage-3">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(3)">
                     <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '2'}</div>
-                    <span class="dtr-stage-title">Range</span>
+                    <span class="dtr-stage-title">Full Range</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     <svg class="dtr-stage-chevron${isOpen3 ? '' : ' closed'}" id="dtr-stage-chev-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-3"${isOpen3 ? '' : ' style="display:none"'}>
-                    ${_buildUploadStageBody(stage, uploads, 3, 'range', 'Deliver Range', 'Complete Range')}
+                    ${_buildUploadStageBody(stage, uploads, 3, 'range', 'Deliver Full Range', 'Complete Full Range')}
                 </div>
             </div>`;
         }
@@ -27183,15 +27196,46 @@
                 </div>`;
             }
 
+            // Factory Handover requirements checklist
+            const task = currentDesignTaskRecord || {};
+            const fr = task.factory_requirements || {};
+            const _frAllOpts = [];
+            (typeof _DTR_FR_ITEMS !== 'undefined' ? _DTR_FR_ITEMS : []).forEach(item => {
+                _frAllOpts.push({ key: item.key, label: item.label, indent: false });
+                if (item.subs) item.subs.forEach(sub => _frAllOpts.push({ key: sub.key, label: sub.label, indent: true }));
+            });
+            const frDropdownOpts = _frAllOpts.map(opt =>
+                `<label style="display:flex;align-items:center;gap:8px;padding:5px ${opt.indent?'22px':'10px'} 5px 10px;cursor:pointer;font-size:12px;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                    <input type="checkbox" id="fhcol-fr-${opt.key}" ${fr[opt.key]?'checked':''} onchange="dtrFRDropdownChange()" style="accent-color:#00e5cc;width:13px;height:13px;flex-shrink:0">
+                    <span style="overflow:hidden;text-overflow:ellipsis">${opt.indent ? '↳ ' : ''}${escHtml(opt.label)}</span>
+                </label>`
+            ).join('');
+            const frBulletList = _frAllOpts.filter(opt => fr[opt.key]).map(opt =>
+                `<li style="font-size:11px;color:#374151;padding:1px 0">${opt.indent ? '↳ ' : ''}${escHtml(opt.label)}</li>`
+            ).join('');
+            const frChecklist = _frAllOpts.length ? `
+                <div style="margin-top:14px;padding-top:12px;border-top:1px solid #f1f5f9">
+                    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#94a3b8;margin-bottom:6px">Handover Requirements</div>
+                    <details id="fhcol-fr-details" style="border:1.5px solid #e2e8f0;border-radius:8px;background:#fff;overflow:hidden">
+                        <summary style="padding:7px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#374151;list-style:none;display:flex;align-items:center;justify-content:space-between;outline:none">
+                            <span>Select requirements</span>
+                            <svg width="12" height="12" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                        </summary>
+                        <div style="border-top:1px solid #f1f5f9;display:flex;flex-direction:column;gap:0;max-height:240px;overflow-y:auto">${frDropdownOpts}</div>
+                    </details>
+                    <ul id="fhcol-fr-list" style="margin:8px 0 0;padding:0 0 0 14px;list-style:disc;${frBulletList?'':'display:none'}">${frBulletList}</ul>
+                </div>` : '';
+
             return `<div class="dtr-stage-section${stageClass5}" id="dtr-stage-5">
                 <button class="dtr-stage-hdr" onclick="dtrToggleStage(5)">
-                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '4'}</div>
-                    <span class="dtr-stage-title">Upload To Drive</span>
+                    <div class="dtr-stage-icon-circle">${isApproved ? '✓' : '3'}</div>
+                    <span class="dtr-stage-title">Factory Handover</span>
                     <span style="padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;${statusStyle};margin-left:4px">${statusLabel}</span>
                     <svg class="dtr-stage-chevron${isOpen5 ? '' : ' closed'}" id="dtr-stage-chev-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                 </button>
                 <div class="dtr-stage-body" id="dtr-stage-body-5"${isOpen5 ? '' : ' style="display:none"'}>
                     ${bodyHtml}
+                    ${frChecklist}
                 </div>
             </div>`;
         }
@@ -27642,10 +27686,10 @@
             if (!stage) return;
             const ok = await updateStageStatus(stage, 'in_review', 'Concepts delivered for review');
             if (!ok) return;
-            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'internal_review' }).eq('id', stage.task_id);
-            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = 'internal_review'; }
+            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'concepts' }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = 'concepts'; }
             const t = (allDesignTasks || []).find(t => t.id === stage.task_id);
-            if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
+            if (t) { t.status = 'in_review'; t.sub_stage = 'concepts'; }
             await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: 'Concepts' });
             showToast('Concepts delivered for review ✓');
             _refreshDTRStatusSection();
@@ -27840,12 +27884,13 @@
         }
         async function dtrDeliverStage(stageId, stageNum, label) {
             await supabase.from('design_stages').update({ status: 'in_review' }).eq('id', stageId);
+            const newSub = stageNum === 2 ? 'concepts' : stageNum === 3 ? 'full_range' : 'factory_handover';
             if (currentDesignTaskRecord?.id) {
-                await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'internal_review' }).eq('id', currentDesignTaskRecord.id);
+                await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: newSub }).eq('id', currentDesignTaskRecord.id);
                 currentDesignTaskRecord.status = 'in_review';
-                currentDesignTaskRecord.sub_stage = 'internal_review';
+                currentDesignTaskRecord.sub_stage = newSub;
                 const t = (allDesignTasks||[]).find(t=>t.id===currentDesignTaskRecord.id);
-                if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
+                if (t) { t.status = 'in_review'; t.sub_stage = newSub; }
                 dsLogActivity(currentDesignTaskRecord.id, stageId, 'stage_delivered', { label });
             }
             _refreshDTRStatusSection();
@@ -28709,11 +28754,11 @@
             if (!stage) return;
             const ok = await updateStageStatus(stage, 'in_review', 'Submitted for review');
             if (!ok) return;
-            // Update the parent task to In Review / Internal Review substage
-            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: 'internal_review' }).eq('id', stage.task_id);
-            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = 'internal_review'; }
+            const newSub = stageNum === 2 ? 'concepts' : stageNum === 3 ? 'full_range' : 'factory_handover';
+            await supabase.from('design_tasks').update({ status: 'in_review', sub_stage: newSub }).eq('id', stage.task_id);
+            if (currentDesignTaskRecord) { currentDesignTaskRecord.status = 'in_review'; currentDesignTaskRecord.sub_stage = newSub; }
             const t = (allDesignTasks||[]).find(t=>t.id===stage.task_id);
-            if (t) { t.status = 'in_review'; t.sub_stage = 'internal_review'; }
+            if (t) { t.status = 'in_review'; t.sub_stage = newSub; }
             await dsLogActivity(stage.task_id, stageId, 'stage_submitted_for_review', { stage_name: stage.stage_name });
             _refreshDTRStatusSection();
             renderStageTabs();
@@ -28728,14 +28773,33 @@
             if (!ok) return;
             await dsLogActivity(stage.task_id, stageId, 'stage_approved', { stage_name: stage.stage_name });
 
-            // Auto-advance next stage to in_progress (turns tab orange)
-            const nextStage = currentStages.find(s => s.stage_number === stageNum + 1);
+            // New workflow: stage 4 (Finalise) is no longer used — auto-approve it silently
+            // so stage 3 (Full Range) approval advances directly to stage 5 (Factory Handover).
+            if (stageNum === 3) {
+                const stage4 = currentStages.find(s => s.stage_number === 4);
+                if (stage4 && stage4.status !== 'approved' && stage4.status !== 'skipped') {
+                    await supabase.from('design_stages').update({ status: 'skipped' }).eq('id', stage4.id);
+                    stage4.status = 'skipped';
+                }
+            }
+
+            // Auto-advance: stage 2 → stage 3, stage 3 → stage 5 (skipping 4)
+            const nextNumber = stageNum === 3 ? 5 : stageNum + 1;
+            const nextStage = currentStages.find(s => s.stage_number === nextNumber);
             if (nextStage && nextStage.status === 'not_started') {
                 await supabase.from('design_stages').update({ status: 'in_progress' }).eq('id', nextStage.id);
                 nextStage.status = 'in_progress';
             }
 
-            // Auto-complete task if all 4 stages done
+            // Update task.sub_stage to reflect new workflow buckets
+            const newSubStage = stageNum === 2 ? 'full_range'
+                              : stageNum === 3 ? 'factory_handover'
+                              : null;
+            if (newSubStage) {
+                await supabase.from('design_tasks').update({ sub_stage: newSubStage }).eq('id', stage.task_id);
+                if (currentDesignTaskRecord) currentDesignTaskRecord.sub_stage = newSubStage;
+            }
+
             const allApproved = currentStages.every(s => s.id === stageId ? true : ['approved','skipped'].includes(s.status));
             if (allApproved) {
                 await supabase.from('design_tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', stage.task_id);
@@ -28745,19 +28809,18 @@
                 renderStagePanel(stageNum);
                 showToast('All stages complete — task marked Completed 🎉');
             } else {
-                // Move task back to in_progress for next stage
                 await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
                 if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
                 renderStageTabs();
                 showToast(`Stage ${stageNum} approved ✓`);
-                // Auto-jump to next stage
                 if (nextStage) setTimeout(() => switchDSStage(nextStage.stage_number), 300);
                 else renderStagePanel(stageNum);
             }
         }
 
         async function requestRevisions(stageId, stageNum) {
-            showDSCommentModal('Request Revisions', 'Describe what needs to be revised...', async (comment) => {
+            const stageLabel = stageNum === 2 ? 'Concepts' : stageNum === 3 ? 'Full Range' : 'Factory Handover';
+            showDSCommentModal('Request Revisions — ' + stageLabel, 'Describe what needs to be revised...', async (comment) => {
                 if (!comment.trim()) { showToast('Please describe the revisions needed', 'warning'); return; }
                 const stage = currentStages.find(s => s.id === stageId);
                 if (!stage) return;
@@ -28766,9 +28829,25 @@
                 await supabase.from('design_tasks').update({ status: 'in_progress' }).eq('id', stage.task_id);
                 if (currentDesignTaskRecord) currentDesignTaskRecord.status = 'in_progress';
                 await dsLogActivity(stage.task_id, stageId, 'stage_revisions_requested', { stage_name: stage.stage_name, comment });
+                // Also post to the task's activity container so designer sees the request
+                try {
+                    const actor = await supabase.auth.getUser();
+                    const actorId = actor?.data?.user?.id || null;
+                    const actorName = currentUserProfile ? `${currentUserProfile.first_name||''} ${currentUserProfile.last_name||''}`.trim() : null;
+                    await supabase.from('design_task_activity').insert({
+                        design_task_id: stage.task_id,
+                        brand_id: currentBrand?.id,
+                        user_id: actorId,
+                        user_name: actorName,
+                        message: `${stageLabel} revisions: ${comment}`,
+                        activity_type: 'revision_request',
+                        task_completed: false
+                    });
+                    if (typeof loadDesignTaskActivity === 'function') await loadDesignTaskActivity(stage.task_id);
+                } catch (e) { console.error('activity insert failed', e); }
                 renderStageTabs();
                 renderStagePanel(stageNum);
-                showToast('Revisions requested');
+                showToast(`${stageLabel} revisions requested`);
             });
         }
 
