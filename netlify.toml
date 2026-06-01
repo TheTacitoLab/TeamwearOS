@@ -8,6 +8,12 @@
   to   = "/orders/hub.html"
   status = 200
 
+# Serve factory view with clean URL
+[[redirects]]
+  from = "/factory/view"
+  to   = "/factory/view.html"
+  status = 200
+
 # Pass query params through (token=xxx must survive the redirect)
 [[headers]]
   for = "/orders/hub.html"

@@ -470,25 +470,43 @@
             value = value !== '' ? parseFloat(value) : null;
         }
 
-        const payload = {
-            brand_id: brand.id,
-            fabric_id: fabricId,
-            colour_hex: colourHex || null,
-            colour_pantone: colourPantone || null,
-            [field]: value,
-            updated_at: new Date().toISOString()
-        };
-        const { error } = await db.from('fabric_stock').upsert(payload, { onConflict: 'fabric_id,colour_hex' });
+        const key = `${fabricId}::${colourHex||''}`;
+        const existing = stockData.find(s => `${s.fabric_id}::${s.colour_hex||''}` === key);
+
+        let error, inserted;
+        if (existing?.id) {
+            // Update by primary key so NULL colour_hex rows are handled correctly.
+            // ON CONFLICT with a nullable column treats two NULLs as distinct, so
+            // upsert would INSERT duplicates instead of updating the existing row.
+            const { error: e } = await db.from('fabric_stock')
+                .update({ [field]: value, updated_at: new Date().toISOString() })
+                .eq('id', existing.id);
+            error = e;
+        } else {
+            const payload = {
+                brand_id: brand.id,
+                fabric_id: fabricId,
+                colour_hex: colourHex,
+                colour_pantone: colourPantone,
+                [field]: value,
+                updated_at: new Date().toISOString()
+            };
+            const { data: d, error: e } = await db.from('fabric_stock').insert(payload).select().single();
+            error = e;
+            inserted = d;
+        }
 
         if (error) {
             showToast('Save failed: ' + error.message);
         } else {
             const row = document.getElementById(`row-${input.dataset.row}`);
             if (row) { row.classList.add('saved-flash'); setTimeout(() => row.classList.remove('saved-flash'), 700); }
-            const key = `${fabricId}::${colourHex||''}`;
-            const idx = stockData.findIndex(s => `${s.fabric_id}::${s.colour_hex||''}` === key);
-            if (idx !== -1) stockData[idx][field] = value;
-            else stockData.push({ brand_id: brand.id, fabric_id: fabricId, colour_hex: colourHex, colour_pantone: colourPantone, [field]: value });
+            if (inserted) {
+                stockData.push(inserted);
+            } else {
+                const idx = stockData.findIndex(s => `${s.fabric_id}::${s.colour_hex||''}` === key);
+                if (idx !== -1) stockData[idx][field] = value;
+            }
         }
     }
 
