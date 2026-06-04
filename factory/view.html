@@ -572,7 +572,8 @@
                     <thead>
                         <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
                             <th class="text-left px-4 py-3">Status</th>
-                            <th class="text-left px-4 py-3">Fabric · Colour</th>
+                            <th class="text-left px-4 py-3">Fabric</th>
+                            <th class="text-left px-4 py-3">Colour</th>
                             <th class="text-right px-4 py-3">Forecast Min kg</th>
                             <th class="text-right px-4 py-3">Forecast Max kg</th>
                             <th class="text-right px-4 py-3">Live Stock (kg)</th>
@@ -583,14 +584,17 @@
                     <tbody id="stock-tbody">
                         ${rows.map((r, i) => {
                             const s = stockMap[`${r.fabric_id}::${r.colour_hex||''}`] || {};
-                            const pill = r.colour_hex ? ' ' + colourPill(r.colour_hex, r.pantone_code) : '';
+                            const colCell = r.colour_hex
+                                ? `<div style="display:inline-flex;align-items:center;gap:8px"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:${r.colour_hex};border:1px solid rgba(255,255,255,0.25);flex-shrink:0"></span><span style="color:#d1d5db;font-size:12px">${esc(r.pantone_code||r.colour_hex)}</span></div>`
+                                : '<span style="color:#6b7280;font-size:12px">—</span>';
                             const rag = _ragStatus(s.live_stock_kg, r.max_kg);
                             const statusCell = rag.label
                                 ? `<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:${rag.colour}">${rag.dot}${rag.label}</span>`
                                 : '<span class="text-xs text-gray-600">—</span>';
                             return `<tr id="row-${i}" class="border-b border-white/5 hover:bg-white/5">
                                 <td class="px-4 py-3">${statusCell}</td>
-                                <td class="px-4 py-3 font-medium text-orange-300">${esc(r.fabric_label)}${pill}</td>
+                                <td class="px-4 py-3 font-medium">${esc(r.fabric_label)}</td>
+                                <td class="px-4 py-3">${colCell}</td>
                                 <td class="px-4 py-3 text-right text-gray-400">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
                                 <td class="px-4 py-3 text-right text-gray-400">${r.max_kg > 0 ? r.max_kg.toFixed(2) : '—'}</td>
                                 <td class="px-4 py-3 text-right">

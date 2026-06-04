@@ -8354,7 +8354,8 @@
                         <thead>
                             <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
                                 <th class="text-left px-4 py-3">Status</th>
-                                <th class="text-left px-4 py-3">Fabric · Colour</th>
+                                <th class="text-left px-4 py-3">Fabric</th>
+                                <th class="text-left px-4 py-3">Colour</th>
                                 <th class="text-right px-4 py-3">Forecast Min kg</th>
                                 <th class="text-right px-4 py-3">Forecast Max kg</th>
                                 <th class="text-right px-4 py-3">Live Stock (kg)</th>
@@ -8364,14 +8365,17 @@
                         </thead>
                         <tbody>
                             ${rows.map(r => {
-                                const colourPill = r.colour_hex ? `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded ml-1" style="background:${r.colour_hex};color:${hexLuminance(r.colour_hex)>0.4?'#1e293b':'#f1f5f9'}">${escHtml(r.pantone_code||r.colour_hex)}</span>` : '';
+                                const colourCell = r.colour_hex
+                                    ? `<div class="inline-flex items-center gap-2"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:${r.colour_hex};border:1px solid rgba(255,255,255,0.25);flex-shrink:0"></span><span class="text-gray-300 text-xs">${escHtml(r.pantone_code||r.colour_hex)}</span></div>`
+                                    : '<span class="text-gray-500 text-xs">—</span>';
                                 const rag = _stockRagStatus(r.live_stock_kg, r.max_kg);
                                 const statusCell = rag.label
                                     ? `<span class="inline-flex items-center gap-1.5 text-xs font-medium" style="color:${rag.colour}">${rag.dot}${rag.label}</span>`
                                     : '<span class="text-xs text-gray-600">—</span>';
                                 return `<tr class="border-b border-white/5 hover:bg-white/5">
                                     <td class="px-4 py-3">${statusCell}</td>
-                                    <td class="px-4 py-3 font-medium text-orange-300">${escHtml(r.fabric_label||r.fabric_name||'')}${colourPill}</td>
+                                    <td class="px-4 py-3 font-medium">${escHtml(r.fabric_label||r.fabric_name||'')}</td>
+                                    <td class="px-4 py-3">${colourCell}</td>
                                     <td class="px-4 py-3 text-right text-gray-400">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
                                     <td class="px-4 py-3 text-right text-gray-400">${r.max_kg > 0 ? r.max_kg.toFixed(2) : '—'}</td>
                                     <td class="px-4 py-3 text-right">
