@@ -7409,9 +7409,13 @@
             el.innerHTML = _fabricEditTags.map(t =>
                 `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-orange-500/15 text-orange-300 border border-orange-500/25">
                     ${escHtml(t)}
-                    <button type="button" onclick="removeFabricTag(${JSON.stringify(t)})" class="hover:text-red-400 ml-0.5 leading-none">&times;</button>
+                    <button type="button" class="fabric-modal-tag-remove hover:text-red-400 ml-0.5 leading-none" data-tag="${escHtml(t)}">&times;</button>
                 </span>`
             ).join('');
+            // Attach listeners — avoids JSON.stringify inside quoted HTML attributes.
+            el.querySelectorAll('button.fabric-modal-tag-remove').forEach(btn => {
+                btn.addEventListener('click', () => removeFabricTag(btn.dataset.tag));
+            });
         }
 
         function toggleFabricTagFilter(tag) {
@@ -7532,12 +7536,11 @@
             });
 
             const tagFilterBar = allTags.length ? `
-                <div class="flex flex-wrap items-center gap-2 mb-3">
+                <div class="flex flex-wrap items-center gap-2 mb-3" id="fabric-tag-filter-bar">
                     <span class="text-xs text-gray-500">Filter:</span>
                     ${allTags.map(t => {
                         const active = _fabricTagFilter.includes(t);
-                        return `<button onclick="toggleFabricTagFilter(${JSON.stringify(t)})"
-                            class="text-xs px-2.5 py-0.5 rounded-full border transition-colors ${active ? 'bg-orange-500/20 border-orange-500/40 text-orange-300' : 'border-white/10 text-gray-400 hover:text-white'}">${escHtml(t)}</button>`;
+                        return `<button class="fabric-tag-chip text-xs px-2.5 py-0.5 rounded-full border transition-colors ${active ? 'bg-orange-500/20 border-orange-500/40 text-orange-300' : 'border-white/10 text-gray-400 hover:text-white'}" data-tag="${escHtml(t)}">${escHtml(t)}</button>`;
                     }).join('')}
                     ${_fabricTagFilter.length ? `<button onclick="_fabricTagFilter=[];renderFabricsTable()" class="text-xs text-gray-600 hover:text-gray-400 underline">Clear</button>` : ''}
                 </div>` : '';
@@ -7579,7 +7582,7 @@
                                     return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded mr-1 mb-0.5" style="background:${hex};color:${textCol}"><span style="width:8px;height:8px;border-radius:2px;display:inline-block;background:${hex};border:1px solid rgba(0,0,0,0.15)"></span>${label}</span>`;
                                 }).join('');
                                 const fTags = Array.isArray(f.tags) ? f.tags : [];
-                                const tagPills = fTags.map(t => `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 mr-1 mb-0.5">${escHtml(t)}<button type="button" title="Remove tag" onclick="event.stopPropagation();removeFabricTagFromRow('${f.id}',${JSON.stringify(t)})" class="hover:text-red-400 leading-none">&times;</button></span>`).join('');
+                                const tagPills = fTags.map(t => `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 mr-1 mb-0.5">${escHtml(t)}<button type="button" title="Remove tag" class="fabric-row-tag-remove hover:text-red-400 leading-none" data-fabric="${escHtml(f.id)}" data-tag="${escHtml(t)}">&times;</button></span>`).join('');
                                 return `
                             <tr class="border-b border-white/5 hover:bg-white/5 cursor-pointer"
                                 draggable="true"
@@ -7609,6 +7612,17 @@
                         </tbody>
                     </table>
                 </div>`}`;
+            // Attach tag filter chip listeners after innerHTML is set.
+            el.querySelectorAll('button.fabric-tag-chip').forEach(btn => {
+                btn.addEventListener('click', () => toggleFabricTagFilter(btn.dataset.tag));
+            });
+            // Attach inline × remove listeners for row tag pills.
+            el.querySelectorAll('button.fabric-row-tag-remove').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    e.stopPropagation();
+                    removeFabricTagFromRow(btn.dataset.fabric, btn.dataset.tag);
+                });
+            });
         }
 
         let _fabricShowArchived = false;
@@ -15153,8 +15167,7 @@
             const container = document.getElementById('cp-colour-rows');
             if (!section || !container) return;
             // Show a row for every recipe component, even if the master product has no
-            // fabric assigned — this lets existing club products pick fabrics/colours
-            // so the fabric forecast works for established customers.
+            // fabric assigned — this lets existing club products pick fabrics/colours.
             const rowsToShow = (recipes || []);
             if (!rowsToShow.length) { section.classList.add('hide'); return; }
             section.classList.remove('hide');
@@ -15179,8 +15192,10 @@
                                 const border = isOn ? '3px solid #f97316' : '2px solid rgba(0,0,0,0.15)';
                                 const label = escHtml(c.pantone_code || c.hex);
                                 return `<button type="button"
-                                    onclick="selectCpColour(${JSON.stringify(recipe.id)},${JSON.stringify(c.hex)},${JSON.stringify(c.pantone_code||'')})"
-                                    class="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg transition-all"
+                                    class="cp-colour-btn flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg transition-all"
+                                    data-recipe="${escHtml(recipe.id)}"
+                                    data-hex="${escHtml(c.hex || '')}"
+                                    data-pantone="${escHtml(c.pantone_code || '')}"
                                     style="background:${c.hex||'#cccccc'};border:${border};color:${textCol};opacity:${isOn?1:0.55}">
                                     ${isOn ? '✓ ' : ''}${label}
                                 </button>`;
@@ -15193,14 +15208,31 @@
                 return `<div class="mb-3 pb-3 border-b border-white/5 last:border-0 last:mb-0 last:pb-0">
                     <p class="text-xs font-medium text-gray-300 mb-2">${escHtml(RECIPE_COMPONENT_LABELS[recipe.component_type] || recipe.component_type)}</p>
                     <label class="text-xs text-gray-500 mb-1 block">Fabric <span class="text-gray-600">(pre-set from master — override if needed)</span></label>
-                    <select class="w-full px-2 py-1.5 rounded-lg text-sm"
-                        onchange="selectCpFabric(${JSON.stringify(recipe.id)}, this.value)">
+                    <select class="cp-fabric-sel w-full px-2 py-1.5 rounded-lg text-sm"
+                        data-recipe="${escHtml(recipe.id)}">
                         <option value="" ${!selectedFabricId ? 'selected' : ''}>— Select fabric —</option>
-                        ${activeFabrics.map(f => `<option value="${f.id}" ${f.id === selectedFabricId ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
+                        ${activeFabrics.map(f => `<option value="${escHtml(f.id)}" ${f.id === selectedFabricId ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
                     </select>
                     ${colourPicker}
                 </div>`;
             }).join('');
+            // Attach event listeners — avoids inline onclick/onchange attribute escaping issues.
+            _attachCpColourListeners();
+        }
+
+        function _attachCpColourListeners() {
+            const container = document.getElementById('cp-colour-rows');
+            if (!container) return;
+            container.querySelectorAll('select.cp-fabric-sel').forEach(sel => {
+                sel.addEventListener('change', function() {
+                    selectCpFabric(this.dataset.recipe, this.value);
+                });
+            });
+            container.querySelectorAll('button.cp-colour-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    selectCpColour(this.dataset.recipe, this.dataset.hex, this.dataset.pantone || '');
+                });
+            });
         }
 
         async function saveClubProduct() {
