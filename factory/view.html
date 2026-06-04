@@ -171,7 +171,7 @@
         let selMap = {};
         if (cpIds.length) {
             const { data: colourSels } = await db.from('club_product_colour_selections')
-                .select('club_product_id, recipe_id, colour_hex, colour_pantone')
+                .select('club_product_id, recipe_id, colour_hex, colour_pantone, fabric_id')
                 .in('club_product_id', cpIds);
             (colourSels||[]).forEach(s => { selMap[`${s.club_product_id}::${s.recipe_id}`] = s; });
         }
@@ -182,19 +182,21 @@
             const club = clubMap[cp.club_id]; if (!club) return;
             const p = cp.products; if (!p || !p.total_fabric_kg) return;
             (p.product_fabric_recipes||[]).forEach(rec => {
-                const fab = allFabrics.find(f => f.id === rec.fabric_id); if (!fab) return;
+                // Use club's fabric override if set, otherwise use master recipe fabric
                 const sel = selMap[`${cp.id}::${rec.id}`];
+                const fabricId = sel?.fabric_id || rec.fabric_id;
+                const fab = allFabrics.find(f => f.id === fabricId); if (!fab) return;
                 const availCols = Array.isArray(rec.available_colours) ? rec.available_colours : [];
                 const colourHex = sel ? (sel.colour_hex || '') : (availCols[0]?.hex || '');
                 const colourPantone = sel ? (sel.colour_pantone || '') : (availCols[0]?.pantone_code || '');
-                const key = `${rec.fabric_id}::${colourHex}`;
+                const key = `${fabricId}::${colourHex}`;
                 if (!fmap[key]) {
                     const parts = [fab.fabric_name];
                     if (fab.construction) parts.push(fab.construction);
                     const gsm = gsmLbl(fab);
                     if (gsm !== '—') parts.push(gsm);
                     fmap[key] = {
-                        fabric_id: rec.fabric_id, fabric_name: fab.fabric_name,
+                        fabric_id: fabricId, fabric_name: fab.fabric_name,
                         fabric_label: parts.join(' · '), colour_hex: colourHex,
                         pantone_code: colourPantone,
                         min_kg: 0, max_kg: 0, nearest_date: null,

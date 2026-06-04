@@ -6440,7 +6440,7 @@
 
                 <!-- Fabric colours — one colour picker per recipe component -->
                 <div id="cp-colour-section" class="bg-gray-800/50 rounded-xl p-4 mb-4 hide">
-                    <h4 class="font-semibold text-sm mb-3 text-orange-400">Fabric Colours <span class="text-gray-500 font-normal text-xs ml-1">(select one per component)</span></h4>
+                    <h4 class="font-semibold text-sm mb-3 text-orange-400">Fabrics &amp; Colours <span class="text-gray-500 font-normal text-xs ml-1">(per component)</span></h4>
                     <div id="cp-colour-rows" class="space-y-3"></div>
                 </div>
 
@@ -7431,8 +7431,15 @@
         }
 
         function selectCpColour(recipeId, hex, pantone) {
-            _cpColourSelections[recipeId] = { hex, pantone_code: pantone };
+            if (!_cpColourSelections[recipeId]) _cpColourSelections[recipeId] = {};
+            _cpColourSelections[recipeId].hex = hex;
+            _cpColourSelections[recipeId].pantone_code = pantone;
             renderCpColourRows(_cpRecipeRowsCache || []);
+        }
+
+        function selectCpFabric(recipeId, fabricId) {
+            if (!_cpColourSelections[recipeId]) _cpColourSelections[recipeId] = {};
+            _cpColourSelections[recipeId].fabric_id = fabricId || null;
         }
 
         let _cpRecipeRowsCache = [];
@@ -7786,7 +7793,7 @@
                                 ${RECIPE_COMPONENT_TYPES.map(t => `<option value="${t}" ${row.component_type === t ? 'selected' : ''}
                                     ${(usedTypes.includes(t) && row.component_type !== t) ? 'disabled' : ''}>${RECIPE_COMPONENT_LABELS[t]}</option>`).join('')}
                             </select>
-                            <select onchange="_currentRecipeRows[${i}].fabric_id=this.value;_currentRecipeRows[${i}].available_colours=[];renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm flex-1" style="min-width:160px">
+                            <select onchange="_currentRecipeRows[${i}].fabric_id=this.value;_currentRecipeRows[${i}].available_colours=(allFabrics.find(f=>f.id===this.value)?.colour_options||[]).map(c=>({hex:c.hex,pantone_code:c.pantone_code||''}));renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm flex-1" style="min-width:160px">
                                 <option value="">— Select fabric —</option>
                                 ${availableFabrics.map(f => `<option value="${f.id}" ${row.fabric_id === f.id ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
                             </select>
@@ -7974,12 +7981,12 @@
                 });
             }
 
-            // Load per-club colour selections
+            // Load per-club fabric + colour selections
             let selMap = {};
             if (cpIds.length) {
                 const { data: colourSels } = await supabase
                     .from('club_product_colour_selections')
-                    .select('club_product_id, recipe_id, colour_hex, colour_pantone')
+                    .select('club_product_id, recipe_id, colour_hex, colour_pantone, fabric_id')
                     .in('club_product_id', cpIds);
                 (colourSels || []).forEach(s => { selMap[`${s.club_product_id}::${s.recipe_id}`] = s; });
             }
@@ -7996,21 +8003,22 @@
                 const recipes = product.product_fabric_recipes || [];
 
                 recipes.forEach(recipe => {
-                    const fabric = allFabrics.find(f => f.id === recipe.fabric_id);
-                    if (!fabric) return;
-                    // Use club's explicit colour selection, or fall back to first available colour
+                    // Use club's fabric override if set, otherwise use master recipe fabric
                     const sel = selMap[`${cp.id}::${recipe.id}`];
+                    const fabricId = sel?.fabric_id || recipe.fabric_id;
+                    const fabric = allFabrics.find(f => f.id === fabricId);
+                    if (!fabric) return;
                     const availCols = Array.isArray(recipe.available_colours) ? recipe.available_colours : [];
                     const colourHex = sel ? (sel.colour_hex || '') : (availCols[0]?.hex || '');
                     const colourPantone = sel ? (sel.colour_pantone || '') : (availCols[0]?.pantone_code || '');
-                    const key = `${recipe.fabric_id}::${colourHex}`;
+                    const key = `${fabricId}::${colourHex}`;
                     if (!forecastMap[key]) {
                         const parts = [fabric.fabric_name];
                         if (fabric.construction) parts.push(fabric.construction);
                         const gsm = gsmLabel(fabric);
                         if (gsm !== '—') parts.push(gsm);
                         forecastMap[key] = {
-                            fabric_id: recipe.fabric_id,
+                            fabric_id: fabricId,
                             fabric_name: fabric.fabric_name,
                             fabric_label: parts.join(' · '),
                             colour_hex: colourHex,
@@ -14701,10 +14709,10 @@
             _cpColourSelections = {};
             const { data: existing } = await supabase
                 .from('club_product_colour_selections')
-                .select('recipe_id, colour_hex, colour_pantone')
+                .select('recipe_id, colour_hex, colour_pantone, fabric_id')
                 .eq('club_product_id', cpId);
             (existing || []).forEach(s => {
-                _cpColourSelections[s.recipe_id] = { hex: s.colour_hex, pantone_code: s.colour_pantone };
+                _cpColourSelections[s.recipe_id] = { hex: s.colour_hex, pantone_code: s.colour_pantone, fabric_id: s.fabric_id || null };
             });
             await onMasterProductChange();
             document.getElementById('club-product-modal').classList.remove('hide');
@@ -14962,36 +14970,41 @@
             const section = document.getElementById('cp-colour-section');
             const container = document.getElementById('cp-colour-rows');
             if (!section || !container) return;
-            const withColours = (recipes || []).filter(r => {
-                const cols = Array.isArray(r.available_colours) ? r.available_colours : [];
-                return r.fabric_id && cols.length > 0;
-            });
-            if (!withColours.length) { section.classList.add('hide'); return; }
+            const withFabrics = (recipes || []).filter(r => r.fabric_id);
+            if (!withFabrics.length) { section.classList.add('hide'); return; }
             section.classList.remove('hide');
-            container.innerHTML = withColours.map(recipe => {
-                const fabric = allFabrics.find(f => f.id === recipe.fabric_id);
+            const activeFabrics = allFabrics.filter(f => f.status !== 'archived');
+            container.innerHTML = withFabrics.map(recipe => {
                 const cols = Array.isArray(recipe.available_colours) ? recipe.available_colours : [];
-                const sel = _cpColourSelections[recipe.id];
-                return `<div>
-                    <p class="text-xs text-gray-400 mb-1.5">
-                        <span class="font-medium text-gray-300">${escHtml(RECIPE_COMPONENT_LABELS[recipe.component_type] || recipe.component_type)}</span>
-                        ${fabric ? ` — ${escHtml(fabric.fabric_name)}` : ''}
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        ${cols.map(c => {
-                            const isOn = sel?.hex === c.hex;
-                            const lum = hexLuminance(c.hex || '#cccccc');
-                            const textCol = lum > 0.4 ? '#1e293b' : '#f1f5f9';
-                            const border = isOn ? '3px solid #f97316' : '2px solid rgba(0,0,0,0.15)';
-                            const label = escHtml(c.pantone_code || c.hex);
-                            return `<button type="button"
-                                onclick="selectCpColour(${JSON.stringify(recipe.id)},${JSON.stringify(c.hex)},${JSON.stringify(c.pantone_code||'')})"
-                                class="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg transition-all"
-                                style="background:${c.hex||'#cccccc'};border:${border};color:${textCol};opacity:${isOn?1:0.55}">
-                                ${isOn ? '✓ ' : ''}${label}
-                            </button>`;
-                        }).join('')}
-                    </div>
+                const sel = _cpColourSelections[recipe.id] || {};
+                const selectedFabricId = sel.fabric_id || recipe.fabric_id;
+                const colourPicker = cols.length ? `
+                    <div class="mt-2">
+                        <label class="text-xs text-gray-500 mb-1 block">Colour <span class="text-gray-600">(from master catalogue)</span></label>
+                        <div class="flex flex-wrap gap-2">
+                            ${cols.map(c => {
+                                const isOn = sel?.hex === c.hex;
+                                const lum = hexLuminance(c.hex || '#cccccc');
+                                const textCol = lum > 0.4 ? '#1e293b' : '#f1f5f9';
+                                const border = isOn ? '3px solid #f97316' : '2px solid rgba(0,0,0,0.15)';
+                                const label = escHtml(c.pantone_code || c.hex);
+                                return `<button type="button"
+                                    onclick="selectCpColour(${JSON.stringify(recipe.id)},${JSON.stringify(c.hex)},${JSON.stringify(c.pantone_code||'')})"
+                                    class="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg transition-all"
+                                    style="background:${c.hex||'#cccccc'};border:${border};color:${textCol};opacity:${isOn?1:0.55}">
+                                    ${isOn ? '✓ ' : ''}${label}
+                                </button>`;
+                            }).join('')}
+                        </div>
+                    </div>` : '';
+                return `<div class="mb-3 pb-3 border-b border-white/5 last:border-0 last:mb-0 last:pb-0">
+                    <p class="text-xs font-medium text-gray-300 mb-2">${escHtml(RECIPE_COMPONENT_LABELS[recipe.component_type] || recipe.component_type)}</p>
+                    <label class="text-xs text-gray-500 mb-1 block">Fabric <span class="text-gray-600">(pre-set from master — override if needed)</span></label>
+                    <select class="w-full px-2 py-1.5 rounded-lg text-sm"
+                        onchange="selectCpFabric(${JSON.stringify(recipe.id)}, this.value)">
+                        ${activeFabrics.map(f => `<option value="${f.id}" ${f.id === selectedFabricId ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
+                    </select>
+                    ${colourPicker}
                 </div>`;
             }).join('');
         }
@@ -15070,17 +15083,18 @@
                 await renderJobProducts();
                 return;
             }
-            // Save per-component colour selections
+            // Save per-component fabric + colour selections
             const savedCpId = result.data.id;
-            const colourEntries = Object.entries(_cpColourSelections).filter(([, c]) => c?.hex);
-            if (colourEntries.length) {
-                await supabase.from('club_product_colour_selections').delete().eq('club_product_id', savedCpId);
+            const selectionEntries = Object.entries(_cpColourSelections).filter(([, c]) => c?.hex || c?.fabric_id);
+            await supabase.from('club_product_colour_selections').delete().eq('club_product_id', savedCpId);
+            if (selectionEntries.length) {
                 await supabase.from('club_product_colour_selections').insert(
-                    colourEntries.map(([recipe_id, c]) => ({
+                    selectionEntries.map(([recipe_id, c]) => ({
                         club_product_id: savedCpId,
                         recipe_id,
-                        colour_hex: c.hex,
-                        colour_pantone: c.pantone_code || null
+                        colour_hex: c.hex || null,
+                        colour_pantone: c.pantone_code || null,
+                        fabric_id: c.fabric_id || null
                     }))
                 );
             }
