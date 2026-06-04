@@ -8366,7 +8366,7 @@
                         <tbody>
                             ${rows.map(r => {
                                 const colourCell = r.colour_hex
-                                    ? `<div class="inline-flex items-center gap-2"><span style="display:inline-block;width:20px;height:20px;border-radius:4px;background:${r.colour_hex};border:1px solid rgba(255,255,255,0.25);flex-shrink:0"></span><span class="text-gray-300 text-xs">${escHtml(r.pantone_code||r.colour_hex)}</span></div>`
+                                    ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:84px;padding:6px 12px;border-radius:6px;background:${r.colour_hex};border:1px solid rgba(0,0,0,0.15);box-shadow:0 2px 6px rgba(0,0,0,0.35);font-size:12px;font-weight:600;color:${hexLuminance(r.colour_hex)>0.5?'#1e293b':'#f8fafc'}">${escHtml(r.pantone_code||r.colour_hex)}</span>`
                                     : '<span class="text-gray-500 text-xs">—</span>';
                                 const rag = _stockRagStatus(r.live_stock_kg, r.max_kg);
                                 const statusCell = rag.label
