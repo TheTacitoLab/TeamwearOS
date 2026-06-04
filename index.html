@@ -7420,6 +7420,21 @@
             renderFabricsTable();
         }
 
+        // Remove a single tag directly from a fabric's row in the list (persists to DB).
+        async function removeFabricTagFromRow(fabricId, tag) {
+            const fabric = allFabrics.find(f => f.id === fabricId);
+            if (!fabric) return;
+            const newTags = (Array.isArray(fabric.tags) ? fabric.tags : []).filter(t => t !== tag);
+            const { error } = await supabase.from('fabrics').update({ tags: newTags }).eq('id', fabricId);
+            if (error) { showToast(error.message, 'error'); return; }
+            fabric.tags = newTags;
+            // Drop the tag from the active filter if nothing carries it anymore.
+            if (!allFabrics.some(f => (Array.isArray(f.tags) ? f.tags : []).includes(tag))) {
+                _fabricTagFilter = _fabricTagFilter.filter(t => t !== tag);
+            }
+            renderFabricsTable();
+        }
+
         function toggleRecipeColour(rowIdx, hex, pantone) {
             const row = _currentRecipeRows[rowIdx];
             if (!row) return;
@@ -7439,7 +7454,15 @@
 
         function selectCpFabric(recipeId, fabricId) {
             if (!_cpColourSelections[recipeId]) _cpColourSelections[recipeId] = {};
+            const prevFabric = _cpColourSelections[recipeId].fabric_id || null;
             _cpColourSelections[recipeId].fabric_id = fabricId || null;
+            // Clear the colour when the fabric changes — the old colour may not exist on the new fabric.
+            if (prevFabric !== (fabricId || null)) {
+                delete _cpColourSelections[recipeId].hex;
+                delete _cpColourSelections[recipeId].pantone_code;
+            }
+            // Re-render so the colour chips reflect the newly selected fabric.
+            renderCpColourRows(_cpRecipeRowsCache || []);
         }
 
         let _cpRecipeRowsCache = [];
@@ -7556,7 +7579,7 @@
                                     return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded mr-1 mb-0.5" style="background:${hex};color:${textCol}"><span style="width:8px;height:8px;border-radius:2px;display:inline-block;background:${hex};border:1px solid rgba(0,0,0,0.15)"></span>${label}</span>`;
                                 }).join('');
                                 const fTags = Array.isArray(f.tags) ? f.tags : [];
-                                const tagPills = fTags.map(t => `<span class="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 mr-1">${escHtml(t)}</span>`).join('');
+                                const tagPills = fTags.map(t => `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 mr-1 mb-0.5">${escHtml(t)}<button type="button" title="Remove tag" onclick="event.stopPropagation();removeFabricTagFromRow('${f.id}',${JSON.stringify(t)})" class="hover:text-red-400 leading-none">&times;</button></span>`).join('');
                                 return `
                             <tr class="border-b border-white/5 hover:bg-white/5 cursor-pointer"
                                 draggable="true"
@@ -7799,8 +7822,8 @@
                             </select>
                             <input type="number" min="0" max="100" step="0.01" value="${row.allocation_pct || ''}" placeholder="%" style="width:72px"
                                 class="px-2 py-1.5 rounded-lg text-sm"
-                                oninput="_currentRecipeRows[${i}].allocation_pct=parseFloat(this.value)||0;renderFabricRecipeRows()">
-                            <span class="text-xs text-gray-400" style="min-width:72px">→ ${kg} kg</span>
+                                oninput="updateRecipeAllocation(${i}, this.value)">
+                            <span class="text-xs text-gray-400" id="recipe-kg-${i}" style="min-width:72px">→ ${kg} kg</span>
                             <button type="button" onclick="_currentRecipeRows.splice(${i},1);renderFabricRecipeRows()" class="text-gray-500 hover:text-red-400 text-lg leading-none">&times;</button>
                         </div>
                         ${colourSection}
@@ -7816,6 +7839,20 @@
             // Disable add button when all 4 types are used or all types present
             const addBtn = document.getElementById('prod-add-fabric-btn');
             if (addBtn) addBtn.disabled = _currentRecipeRows.length >= RECIPE_COMPONENT_TYPES.length;
+        }
+
+        // Lightweight allocation update — avoids full re-render so the input keeps focus while typing.
+        function updateRecipeAllocation(i, val) {
+            if (!_currentRecipeRows[i]) return;
+            _currentRecipeRows[i].allocation_pct = parseFloat(val) || 0;
+            const totalKg = parseFloat(document.getElementById('prod-total-fabric-kg')?.value) || 0;
+            const row = _currentRecipeRows[i];
+            const kg = totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—';
+            const kgEl = document.getElementById(`recipe-kg-${i}`);
+            if (kgEl) kgEl.textContent = `→ ${kg} kg`;
+            const total = _currentRecipeRows.reduce((s, r) => s + (parseFloat(r.allocation_pct) || 0), 0);
+            const warnEl = document.getElementById('prod-fabric-recipe-warn');
+            if (warnEl) warnEl.classList.toggle('hide', _currentRecipeRows.length === 0 || Math.abs(total - 100) < 0.01);
         }
 
         function addFabricRecipeRow() {
@@ -15115,18 +15152,25 @@
             const section = document.getElementById('cp-colour-section');
             const container = document.getElementById('cp-colour-rows');
             if (!section || !container) return;
-            const withFabrics = (recipes || []).filter(r => r.fabric_id);
-            if (!withFabrics.length) { section.classList.add('hide'); return; }
+            // Show a row for every recipe component, even if the master product has no
+            // fabric assigned — this lets existing club products pick fabrics/colours
+            // so the fabric forecast works for established customers.
+            const rowsToShow = (recipes || []);
+            if (!rowsToShow.length) { section.classList.add('hide'); return; }
             section.classList.remove('hide');
             const activeFabrics = allFabrics.filter(f => f.status !== 'archived');
-            container.innerHTML = withFabrics.map(recipe => {
+            container.innerHTML = rowsToShow.map(recipe => {
                 const sel = _cpColourSelections[recipe.id] || {};
-                const selectedFabricId = sel.fabric_id || recipe.fabric_id;
+                const selectedFabricId = sel.fabric_id || recipe.fabric_id || '';
                 const selectedFabric = allFabrics.find(f => f.id === selectedFabricId);
                 const cols = Array.isArray(selectedFabric?.colour_options) ? selectedFabric.colour_options : [];
-                const colourPicker = cols.length ? `
+                let colourPicker = '';
+                if (!selectedFabricId) {
+                    colourPicker = `<p class="text-xs text-gray-500 mt-2">Select a fabric above to choose a colour.</p>`;
+                } else if (cols.length) {
+                    colourPicker = `
                     <div class="mt-2">
-                        <label class="text-xs text-gray-500 mb-1 block">Colour <span class="text-gray-600">(from master catalogue)</span></label>
+                        <label class="text-xs text-gray-500 mb-1 block">Colour <span class="text-gray-600">(from selected fabric)</span></label>
                         <div class="flex flex-wrap gap-2">
                             ${cols.map(c => {
                                 const isOn = sel?.hex === c.hex;
@@ -15142,12 +15186,16 @@
                                 </button>`;
                             }).join('')}
                         </div>
-                    </div>` : '';
+                    </div>`;
+                } else {
+                    colourPicker = `<p class="text-xs text-gray-600 mt-2">This fabric has no colours configured yet.</p>`;
+                }
                 return `<div class="mb-3 pb-3 border-b border-white/5 last:border-0 last:mb-0 last:pb-0">
                     <p class="text-xs font-medium text-gray-300 mb-2">${escHtml(RECIPE_COMPONENT_LABELS[recipe.component_type] || recipe.component_type)}</p>
                     <label class="text-xs text-gray-500 mb-1 block">Fabric <span class="text-gray-600">(pre-set from master — override if needed)</span></label>
                     <select class="w-full px-2 py-1.5 rounded-lg text-sm"
                         onchange="selectCpFabric(${JSON.stringify(recipe.id)}, this.value)">
+                        <option value="" ${!selectedFabricId ? 'selected' : ''}>— Select fabric —</option>
                         ${activeFabrics.map(f => `<option value="${f.id}" ${f.id === selectedFabricId ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
                     </select>
                     ${colourPicker}
