@@ -3385,7 +3385,12 @@
                     </div>
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">GSM</label>
-                        <input type="number" id="fabric-gsm" placeholder="180" class="w-full px-3 py-2 rounded-lg">
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="fabric-gsm-min" placeholder="130" min="0" class="px-3 py-2 rounded-lg" style="width:88px">
+                            <span class="text-gray-500">–</span>
+                            <input type="number" id="fabric-gsm-max" placeholder="140" min="0" class="px-3 py-2 rounded-lg" style="width:88px">
+                            <span class="text-gray-400 text-sm">gsm</span>
+                        </div>
                     </div>
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">Status</label>
@@ -3400,6 +3405,16 @@
                     <label class="text-gray-400 text-sm mb-2 block">Colours</label>
                     <div id="fabric-colour-rows"></div>
                     <button type="button" onclick="addFabricColourRow()" class="btn-secondary text-xs mt-2">+ Add Colour</button>
+                </div>
+
+                <div class="mb-4">
+                    <label class="text-gray-400 text-sm mb-2 block">Tags</label>
+                    <div id="fabric-tags-display" class="flex flex-wrap gap-1 mb-2"></div>
+                    <div class="flex gap-2">
+                        <input type="text" id="fabric-tag-input" placeholder="Add a tag…" class="px-3 py-1.5 rounded-lg text-sm flex-1"
+                            onkeydown="if(event.key==='Enter'){event.preventDefault();addFabricTag();}">
+                        <button type="button" onclick="addFabricTag()" class="btn-secondary text-xs px-3">Add</button>
+                    </div>
                 </div>
 
                 <div class="mb-4">
@@ -6423,6 +6438,12 @@
                     <div class="space-y-2" id="cp-sizes-display"></div>
                 </div>
 
+                <!-- Fabric colours — one colour picker per recipe component -->
+                <div id="cp-colour-section" class="bg-gray-800/50 rounded-xl p-4 mb-4 hide">
+                    <h4 class="font-semibold text-sm mb-3 text-orange-400">Fabric Colours <span class="text-gray-500 font-normal text-xs ml-1">(select one per component)</span></h4>
+                    <div id="cp-colour-rows" class="space-y-3"></div>
+                </div>
+
                 <div class="flex gap-3">
                     <button onclick="hideClubProductModal()" class="flex-1 btn-secondary py-3">Cancel</button>
                     <button onclick="saveClubProduct()" class="flex-1 btn-primary py-3">Save Product</button>
@@ -7333,18 +7354,102 @@
         let allFabrics = [];
         let _currentRecipeRows = [];
         let _fabricSearchVal = '';
+        let _fabricTagFilter = [];   // active tag filter chips
+        let _fabricEditTags  = [];   // tags being edited in the modal
+        let _fabricDragId    = null; // id of fabric being dragged
+        let _cpColourSelections = {}; // { [recipe_id]: { hex, pantone_code } }
+
+        function gsmLabel(f) {
+            const min = f.gsm_min, max = f.gsm_max, old = f.gsm;
+            if (min && max && min !== max) return `${min}–${max} gsm`;
+            if (max) return `${max} gsm`;
+            if (min) return `${min} gsm`;
+            if (old) return `${old} gsm`;
+            return '—';
+        }
+
+        function _fabDragStart(e, fabricId) {
+            _fabricDragId = fabricId;
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        function _fabDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+        function _fabDrop(e, targetId) {
+            e.preventDefault();
+            if (!_fabricDragId || _fabricDragId === targetId) { _fabricDragId = null; return; }
+            const fromIdx = allFabrics.findIndex(f => f.id === _fabricDragId);
+            const toIdx   = allFabrics.findIndex(f => f.id === targetId);
+            if (fromIdx === -1 || toIdx === -1) { _fabricDragId = null; return; }
+            const [dragged] = allFabrics.splice(fromIdx, 1);
+            allFabrics.splice(toIdx, 0, dragged);
+            _fabricDragId = null;
+            saveFabricOrder();
+            renderFabricsTable();
+        }
+        async function saveFabricOrder() {
+            await Promise.all(allFabrics.map((f, i) =>
+                supabase.from('fabrics').update({ sort_order: i }).eq('id', f.id)
+            ));
+        }
+
+        function addFabricTag() {
+            const input = document.getElementById('fabric-tag-input');
+            const val = (input?.value || '').trim();
+            if (!val || _fabricEditTags.includes(val)) { if (input) input.value = ''; return; }
+            _fabricEditTags.push(val);
+            if (input) input.value = '';
+            renderFabricTagsEdit();
+        }
+        function removeFabricTag(tag) {
+            _fabricEditTags = _fabricEditTags.filter(t => t !== tag);
+            renderFabricTagsEdit();
+        }
+        function renderFabricTagsEdit() {
+            const el = document.getElementById('fabric-tags-display');
+            if (!el) return;
+            el.innerHTML = _fabricEditTags.map(t =>
+                `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs bg-orange-500/15 text-orange-300 border border-orange-500/25">
+                    ${escHtml(t)}
+                    <button type="button" onclick="removeFabricTag(${JSON.stringify(t)})" class="hover:text-red-400 ml-0.5 leading-none">&times;</button>
+                </span>`
+            ).join('');
+        }
+
+        function toggleFabricTagFilter(tag) {
+            if (_fabricTagFilter.includes(tag)) _fabricTagFilter = _fabricTagFilter.filter(t => t !== tag);
+            else _fabricTagFilter.push(tag);
+            renderFabricsTable();
+        }
+
+        function toggleRecipeColour(rowIdx, hex, pantone) {
+            const row = _currentRecipeRows[rowIdx];
+            if (!row) return;
+            if (!row.available_colours) row.available_colours = [];
+            const ei = row.available_colours.findIndex(c => c.hex === hex);
+            if (ei !== -1) row.available_colours.splice(ei, 1);
+            else row.available_colours.push({ hex, pantone_code: pantone });
+            renderFabricRecipeRows();
+        }
+
+        function selectCpColour(recipeId, hex, pantone) {
+            _cpColourSelections[recipeId] = { hex, pantone_code: pantone };
+            renderCpColourRows(_cpRecipeRowsCache || []);
+        }
+
+        let _cpRecipeRowsCache = [];
 
         async function ensureFabricsLoaded() {
             if (!currentBrand || allFabrics.length > 0) return;
             const { data } = await supabase
-                .from('fabrics').select('*').eq('brand_id', currentBrand.id).eq('status','active').order('fabric_name');
+                .from('fabrics').select('*').eq('brand_id', currentBrand.id).eq('status','active')
+                .order('sort_order').order('fabric_name');
             allFabrics = data || [];
         }
 
         async function loadFactory() {
             if (!currentBrand) return;
             const { data, error } = await supabase
-                .from('fabrics').select('*').eq('brand_id', currentBrand.id).order('fabric_name');
+                .from('fabrics').select('*').eq('brand_id', currentBrand.id)
+                .order('sort_order').order('fabric_name');
             if (error) { showToast('Error loading fabrics', 'error'); return; }
             allFabrics = data || [];
             const countEl = document.getElementById('ftab-fabrics-count');
@@ -7380,13 +7485,35 @@
             const el = document.getElementById('factory-view-fabrics');
             if (!el) return;
             const search = (_fabricSearchVal || '').toLowerCase();
+
+            // Collect all unique tags across visible fabrics for the filter bar
+            const allTagsSet = new Set();
+            allFabrics.forEach(f => (Array.isArray(f.tags) ? f.tags : []).forEach(t => allTagsSet.add(t)));
+            const allTags = [...allTagsSet].sort();
+
             const rows = allFabrics.filter(f => {
+                if (!_fabricShowArchived && f.status === 'archived') return false;
                 if (search && !f.fabric_name.toLowerCase().includes(search) && !(f.construction || '').toLowerCase().includes(search)) return false;
+                if (_fabricTagFilter.length) {
+                    const fTags = Array.isArray(f.tags) ? f.tags : [];
+                    if (!_fabricTagFilter.some(t => fTags.includes(t))) return false;
+                }
                 return true;
             });
 
+            const tagFilterBar = allTags.length ? `
+                <div class="flex flex-wrap items-center gap-2 mb-3">
+                    <span class="text-xs text-gray-500">Filter:</span>
+                    ${allTags.map(t => {
+                        const active = _fabricTagFilter.includes(t);
+                        return `<button onclick="toggleFabricTagFilter(${JSON.stringify(t)})"
+                            class="text-xs px-2.5 py-0.5 rounded-full border transition-colors ${active ? 'bg-orange-500/20 border-orange-500/40 text-orange-300' : 'border-white/10 text-gray-400 hover:text-white'}">${escHtml(t)}</button>`;
+                    }).join('')}
+                    ${_fabricTagFilter.length ? `<button onclick="_fabricTagFilter=[];renderFabricsTable()" class="text-xs text-gray-600 hover:text-gray-400 underline">Clear</button>` : ''}
+                </div>` : '';
+
             el.innerHTML = `
-                <div class="flex items-center gap-3 mb-4">
+                <div class="flex items-center gap-3 mb-3 flex-wrap">
                     <input type="text" placeholder="Search fabrics…" value="${escHtml(search)}"
                         oninput="setFabricSearch(this.value)"
                         class="px-3 py-2 rounded-lg text-sm" style="min-width:220px">
@@ -7395,15 +7522,18 @@
                         Show archived
                     </label>
                 </div>
+                ${tagFilterBar}
                 ${rows.length === 0 ? `<div class="glass rounded-2xl p-10 text-center text-gray-500">No fabrics found. Click <strong>+ New Fabric</strong> to add your first.</div>` : `
-                <div class="glass rounded-2xl overflow-hidden">
+                <div class="glass rounded-2xl overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                                <th class="px-3 py-3 w-6"></th>
                                 <th class="text-left px-4 py-3">Fabric Name</th>
                                 <th class="text-left px-4 py-3">Construction</th>
                                 <th class="text-left px-4 py-3">GSM</th>
                                 <th class="text-left px-4 py-3">Colours</th>
+                                <th class="text-left px-4 py-3">Tags</th>
                                 <th class="text-left px-4 py-3">Status</th>
                                 <th class="text-left px-4 py-3">Actions</th>
                             </tr>
@@ -7411,19 +7541,28 @@
                         <tbody>
                             ${rows.map(f => {
                                 const colourOpts = Array.isArray(f.colour_options) ? f.colour_options : [];
-                                const colourPills = colourOpts.slice(0,5).map(c => {
+                                const colourPills = colourOpts.map(c => {
                                     const hex = c.hex || '#cccccc';
                                     const lum = hexLuminance(hex);
                                     const textCol = lum > 0.4 ? '#1e293b' : '#f1f5f9';
                                     const label = c.pantone_code ? escHtml(c.pantone_code) : hex;
                                     return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded mr-1 mb-0.5" style="background:${hex};color:${textCol}"><span style="width:8px;height:8px;border-radius:2px;display:inline-block;background:${hex};border:1px solid rgba(0,0,0,0.15)"></span>${label}</span>`;
                                 }).join('');
+                                const fTags = Array.isArray(f.tags) ? f.tags : [];
+                                const tagPills = fTags.map(t => `<span class="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 mr-1">${escHtml(t)}</span>`).join('');
                                 return `
-                            <tr class="border-b border-white/5 hover:bg-white/5 cursor-pointer" onclick="openFabricModal(${JSON.stringify(f.id)})">
+                            <tr class="border-b border-white/5 hover:bg-white/5 cursor-pointer"
+                                draggable="true"
+                                ondragstart="_fabDragStart(event,'${f.id}')"
+                                ondragover="_fabDragOver(event)"
+                                ondrop="_fabDrop(event,'${f.id}')"
+                                onclick="openFabricModal(${JSON.stringify(f.id)})">
+                                <td class="px-3 py-3 text-gray-600 select-none" title="Drag to reorder">⠿</td>
                                 <td class="px-4 py-3 font-medium">${escHtml(f.fabric_name)}</td>
                                 <td class="px-4 py-3 text-gray-400">${escHtml(f.construction || '—')}</td>
-                                <td class="px-4 py-3 text-gray-400">${f.gsm ? f.gsm + ' gsm' : '—'}</td>
-                                <td class="px-4 py-3">${colourPills || '<span class="text-gray-600 text-xs">—</span>'}</td>
+                                <td class="px-4 py-3 text-gray-400 whitespace-nowrap">${gsmLabel(f)}</td>
+                                <td class="px-4 py-3"><div class="flex flex-wrap">${colourPills || '<span class="text-gray-600 text-xs">—</span>'}</div></td>
+                                <td class="px-4 py-3"><div class="flex flex-wrap">${tagPills || '<span class="text-gray-600 text-xs">—</span>'}</div></td>
                                 <td class="px-4 py-3">
                                     <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${f.status === 'archived' ? 'bg-gray-700 text-gray-400' : 'bg-green-500/10 text-green-400'}">${f.status === 'archived' ? 'Archived' : 'Active'}</span>
                                 </td>
@@ -7453,7 +7592,8 @@
             document.getElementById('edit-fabric-id').value = fabric?.id || '';
             document.getElementById('fabric-name').value = fabric?.fabric_name || '';
             document.getElementById('fabric-construction').value = fabric?.construction || '';
-            document.getElementById('fabric-gsm').value = fabric?.gsm || '';
+            document.getElementById('fabric-gsm-min').value = fabric?.gsm_min ?? (fabric?.gsm || '');
+            document.getElementById('fabric-gsm-max').value = fabric?.gsm_max ?? (fabric?.gsm || '');
             document.getElementById('fabric-status').value = fabric?.status || 'active';
             document.getElementById('fabric-notes').value = fabric?.notes || '';
             document.getElementById('fabric-supplier').value = fabric?.supplier || '';
@@ -7461,6 +7601,9 @@
             document.getElementById('fabric-cost-per-kg').value = fabric?.cost_per_kg || '';
             document.getElementById('fabric-min-order-qty').value = fabric?.min_order_qty || '';
             document.getElementById('fabric-lead-time').value = fabric?.lead_time_days || '';
+            // Tags
+            _fabricEditTags = Array.isArray(fabric?.tags) ? [...fabric.tags] : [];
+            renderFabricTagsEdit();
             // Load colour options
             _fabricColourRows = Array.isArray(fabric?.colour_options) ? fabric.colour_options.map(c => ({hex: c.hex || '#cccccc', pantone_code: c.pantone_code || ''})) : [];
             renderFabricColourRows();
@@ -7519,12 +7662,17 @@
             const name = document.getElementById('fabric-name').value.trim();
             if (!name) { showToast('Fabric name is required', 'error'); return; }
             const validColours = _fabricColourRows.filter(c => /^#[0-9a-fA-F]{6}$/.test(c.hex));
+            const gsmMin = parseInt(document.getElementById('fabric-gsm-min').value) || null;
+            const gsmMax = parseInt(document.getElementById('fabric-gsm-max').value) || null;
+            const newSortOrder = fabricId ? undefined : Math.max(-1, ...allFabrics.map(f => f.sort_order ?? -1)) + 1;
             const fabricData = {
                 brand_id: currentBrand.id,
                 fabric_name: name,
                 construction: document.getElementById('fabric-construction').value.trim() || null,
-                gsm: parseInt(document.getElementById('fabric-gsm').value) || null,
+                gsm_min: gsmMin,
+                gsm_max: gsmMax,
                 colour_options: validColours.length ? validColours : [],
+                tags: _fabricEditTags.length ? _fabricEditTags : [],
                 notes: document.getElementById('fabric-notes').value.trim() || null,
                 status: document.getElementById('fabric-status').value || 'active',
                 supplier: document.getElementById('fabric-supplier').value.trim() || null,
@@ -7534,6 +7682,7 @@
                 lead_time_days: parseInt(document.getElementById('fabric-lead-time').value) || null,
                 updated_at: new Date().toISOString()
             };
+            if (newSortOrder !== undefined) fabricData.sort_order = newSortOrder;
             let result;
             if (fabricId) {
                 result = await supabase.from('fabrics').update(fabricData).eq('id', fabricId).select().single();
@@ -7546,7 +7695,7 @@
                 if (idx !== -1) allFabrics[idx] = result.data; else allFabrics.push(result.data);
             } else {
                 allFabrics.push(result.data);
-                allFabrics.sort((a, b) => a.fabric_name.localeCompare(b.fabric_name));
+                // Keep the array in sort_order sequence for new fabrics appended at the end
             }
             const countEl = document.getElementById('ftab-fabrics-count');
             if (countEl) countEl.textContent = allFabrics.filter(f => f.status !== 'archived').length;
@@ -7612,29 +7761,42 @@
                     const kg = totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—';
                     const fabric = availableFabrics.find(f => f.id === row.fabric_id);
                     const colourOpts = Array.isArray(fabric?.colour_options) ? fabric.colour_options : [];
-                    const colourSelect = colourOpts.length ? `<select onchange="_currentRecipeRows[${i}].colour_hex=this.value.split('||')[0];_currentRecipeRows[${i}].colour_pantone=this.value.split('||')[1]||''" class="px-2 py-1.5 rounded-lg text-sm" style="min-width:130px">
-                            <option value="">— Colour —</option>
-                            ${colourOpts.map(c => {
-                                const val = `${c.hex}||${c.pantone_code||''}`;
-                                const sel = row.colour_hex === c.hex ? 'selected' : '';
-                                return `<option value="${val}" ${sel}>${escHtml(c.pantone_code || c.hex)}</option>`;
-                            }).join('')}
-                        </select>` : `<span class="text-xs text-gray-500 px-2" style="min-width:130px">No colours</span>`;
-                    return `<div class="flex items-center gap-2 mb-2 flex-wrap" id="recipe-row-${i}">
-                        <select onchange="_currentRecipeRows[${i}].component_type=this.value;renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm" style="min-width:110px">
-                            ${RECIPE_COMPONENT_TYPES.map(t => `<option value="${t}" ${row.component_type === t ? 'selected' : ''}
-                                ${(usedTypes.includes(t) && row.component_type !== t) ? 'disabled' : ''}>${RECIPE_COMPONENT_LABELS[t]}</option>`).join('')}
-                        </select>
-                        <select onchange="_currentRecipeRows[${i}].fabric_id=this.value;_currentRecipeRows[${i}].colour_hex='';_currentRecipeRows[${i}].colour_pantone='';renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm flex-1" style="min-width:160px">
-                            <option value="">— Select fabric —</option>
-                            ${availableFabrics.map(f => `<option value="${f.id}" ${row.fabric_id === f.id ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
-                        </select>
-                        ${colourSelect}
-                        <input type="number" min="0" max="100" step="0.01" value="${row.allocation_pct || ''}" placeholder="%" style="width:72px"
-                            class="px-2 py-1.5 rounded-lg text-sm"
-                            oninput="_currentRecipeRows[${i}].allocation_pct=parseFloat(this.value)||0;renderFabricRecipeRows()">
-                        <span class="text-xs text-gray-400" style="min-width:72px">→ ${kg} kg</span>
-                        <button type="button" onclick="_currentRecipeRows.splice(${i},1);renderFabricRecipeRows()" class="text-gray-500 hover:text-red-400 text-lg leading-none">&times;</button>
+                    const selectedColours = Array.isArray(row.available_colours) ? row.available_colours : [];
+                    const colourSection = colourOpts.length ? `
+                        <div class="w-full mt-1 mb-1">
+                            <p class="text-xs text-gray-500 mb-1">Available colours for this component (click to toggle):</p>
+                            <div class="flex flex-wrap gap-1.5">
+                                ${colourOpts.map(c => {
+                                    const isOn = selectedColours.some(ac => ac.hex === c.hex);
+                                    const lum = hexLuminance(c.hex || '#cccccc');
+                                    const border = isOn ? '3px solid #f97316' : '2px solid rgba(0,0,0,0.2)';
+                                    const label = escHtml(c.pantone_code || c.hex);
+                                    return `<button type="button" title="${label}"
+                                        onclick="toggleRecipeColour(${i},${JSON.stringify(c.hex)},${JSON.stringify(c.pantone_code||'')})"
+                                        class="flex items-center gap-1 text-xs px-1.5 py-0.5 rounded transition-all"
+                                        style="background:${c.hex||'#cccccc'};border:${border};color:${lum>0.4?'#1e293b':'#f1f5f9'};opacity:${isOn?1:0.45}">
+                                        ${isOn ? '✓ ' : ''}${label}
+                                    </button>`;
+                                }).join('')}
+                            </div>
+                        </div>` : `<p class="w-full text-xs text-gray-600 mt-1">No colours on this fabric yet.</p>`;
+                    return `<div class="mb-3 p-2 rounded-lg bg-white/3" id="recipe-row-${i}">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <select onchange="_currentRecipeRows[${i}].component_type=this.value;renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm" style="min-width:110px">
+                                ${RECIPE_COMPONENT_TYPES.map(t => `<option value="${t}" ${row.component_type === t ? 'selected' : ''}
+                                    ${(usedTypes.includes(t) && row.component_type !== t) ? 'disabled' : ''}>${RECIPE_COMPONENT_LABELS[t]}</option>`).join('')}
+                            </select>
+                            <select onchange="_currentRecipeRows[${i}].fabric_id=this.value;_currentRecipeRows[${i}].available_colours=[];renderFabricRecipeRows()" class="px-2 py-1.5 rounded-lg text-sm flex-1" style="min-width:160px">
+                                <option value="">— Select fabric —</option>
+                                ${availableFabrics.map(f => `<option value="${f.id}" ${row.fabric_id === f.id ? 'selected' : ''}>${escHtml(f.fabric_name)}</option>`).join('')}
+                            </select>
+                            <input type="number" min="0" max="100" step="0.01" value="${row.allocation_pct || ''}" placeholder="%" style="width:72px"
+                                class="px-2 py-1.5 rounded-lg text-sm"
+                                oninput="_currentRecipeRows[${i}].allocation_pct=parseFloat(this.value)||0;renderFabricRecipeRows()">
+                            <span class="text-xs text-gray-400" style="min-width:72px">→ ${kg} kg</span>
+                            <button type="button" onclick="_currentRecipeRows.splice(${i},1);renderFabricRecipeRows()" class="text-gray-500 hover:text-red-400 text-lg leading-none">&times;</button>
+                        </div>
+                        ${colourSection}
                     </div>`;
                 }).join('');
             }
@@ -7792,10 +7954,10 @@
             const clubIds = (allClubs || []).map(c => c.id);
             if (!clubIds.length) { _forecastRows = []; if (!silent) renderForecastTable(); return; }
 
-            // Load club products with master product + recipe (including colour fields)
+            // Load club products with master product + recipe
             const { data: clubProducts, error: cpErr } = await supabase
                 .from('club_products')
-                .select(`id, club_id, custom_name, products(id, item_name, total_fabric_kg, product_fabric_recipes(fabric_id, component_type, allocation_pct, colour_hex, colour_pantone))`)
+                .select(`id, club_id, custom_name, products(id, item_name, total_fabric_kg, product_fabric_recipes(id, fabric_id, component_type, allocation_pct, available_colours))`)
                 .in('club_id', clubIds);
             if (cpErr) { el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading products.</div>'; return; }
 
@@ -7812,6 +7974,16 @@
                 });
             }
 
+            // Load per-club colour selections
+            let selMap = {};
+            if (cpIds.length) {
+                const { data: colourSels } = await supabase
+                    .from('club_product_colour_selections')
+                    .select('club_product_id, recipe_id, colour_hex, colour_pantone')
+                    .in('club_product_id', cpIds);
+                (colourSels || []).forEach(s => { selMap[`${s.club_product_id}::${s.recipe_id}`] = s; });
+            }
+
             // Build aggregated forecast map keyed by `${fabric_id}::${colour_hex||''}`
             const forecastMap = {};
             const clubMap = Object.fromEntries((allClubs || []).map(c => [c.id, c]));
@@ -7826,18 +7998,23 @@
                 recipes.forEach(recipe => {
                     const fabric = allFabrics.find(f => f.id === recipe.fabric_id);
                     if (!fabric) return;
-                    const colourHex = recipe.colour_hex || '';
+                    // Use club's explicit colour selection, or fall back to first available colour
+                    const sel = selMap[`${cp.id}::${recipe.id}`];
+                    const availCols = Array.isArray(recipe.available_colours) ? recipe.available_colours : [];
+                    const colourHex = sel ? (sel.colour_hex || '') : (availCols[0]?.hex || '');
+                    const colourPantone = sel ? (sel.colour_pantone || '') : (availCols[0]?.pantone_code || '');
                     const key = `${recipe.fabric_id}::${colourHex}`;
                     if (!forecastMap[key]) {
                         const parts = [fabric.fabric_name];
                         if (fabric.construction) parts.push(fabric.construction);
-                        if (fabric.gsm) parts.push(fabric.gsm + ' gsm');
+                        const gsm = gsmLabel(fabric);
+                        if (gsm !== '—') parts.push(gsm);
                         forecastMap[key] = {
                             fabric_id: recipe.fabric_id,
                             fabric_name: fabric.fabric_name,
                             fabric_label: parts.join(' · '),
                             colour_hex: colourHex,
-                            pantone_code: recipe.colour_pantone || '',
+                            pantone_code: colourPantone,
                             min_kg: 0,
                             max_kg: 0,
                             nearest_date: null,
@@ -9501,11 +9678,14 @@
             renderFabricRecipeRows();
             ensureFabricsLoaded().then(() => {
                 supabase.from('product_fabric_recipes')
-                    .select('component_type, fabric_id, allocation_pct, colour_hex, colour_pantone')
+                    .select('id, component_type, fabric_id, allocation_pct, available_colours')
                     .eq('product_id', productId)
                     .order('sort_order')
                     .then(({ data: recipeRows }) => {
-                        _currentRecipeRows = recipeRows || [];
+                        _currentRecipeRows = (recipeRows || []).map(r => ({
+                            ...r,
+                            available_colours: Array.isArray(r.available_colours) ? r.available_colours : []
+                        }));
                         renderFabricRecipeRows();
                     });
             });
@@ -10482,13 +10662,12 @@
             const savedProductId = result.data.id;
             await supabase.from('product_fabric_recipes').delete().eq('product_id', savedProductId);
             if (_currentRecipeRows.length > 0) {
-                const recipeInserts = _currentRecipeRows.map((r, i) => ({
+                const recipeInserts = _currentRecipeRows.filter(r => r.fabric_id).map((r, i) => ({
                     product_id: savedProductId,
                     fabric_id: r.fabric_id,
                     component_type: r.component_type,
                     allocation_pct: parseFloat(r.allocation_pct) || 0,
-                    colour_hex: r.colour_hex || null,
-                    colour_pantone: r.colour_pantone || null,
+                    available_colours: Array.isArray(r.available_colours) ? r.available_colours : [],
                     sort_order: i
                 }));
                 const { error: recipeErr } = await supabase.from('product_fabric_recipes').insert(recipeInserts);
@@ -14474,6 +14653,8 @@
             document.getElementById('cp-custom-name').value = '';
             document.getElementById('cp-sizes-info').classList.add('hide');
             document.getElementById('cp-pricing-info')?.classList.add('hide');
+            document.getElementById('cp-colour-section')?.classList.add('hide');
+            _cpColourSelections = {};
             const tierKey = currentClub.club_status;
             const activeTier = brandPricingTiers.find(t => t.tier_key === tierKey);
             const modalTitle = document.getElementById('club-product-modal-title');
@@ -14505,7 +14686,7 @@
             document.getElementById('club-product-modal').classList.remove('hide');
         }
 
-        function editClubProduct(cpId) {
+        async function editClubProduct(cpId) {
             const cp = currentClubProducts.find(p => p.id === cpId);
             if (!cp) return;
             document.getElementById('club-product-modal-title').textContent = 'Edit Club Product';
@@ -14516,7 +14697,16 @@
                 `<option value="${p.id}" ${p.id === cp.product_id ? 'selected' : ''}>${p.product_code} – ${p.item_name}</option>`
             ).join('');
             select.disabled = true;
-            onMasterProductChange();
+            // Load existing colour selections before rendering colour pickers
+            _cpColourSelections = {};
+            const { data: existing } = await supabase
+                .from('club_product_colour_selections')
+                .select('recipe_id, colour_hex, colour_pantone')
+                .eq('club_product_id', cpId);
+            (existing || []).forEach(s => {
+                _cpColourSelections[s.recipe_id] = { hex: s.colour_hex, pantone_code: s.colour_pantone };
+            });
+            await onMasterProductChange();
             document.getElementById('club-product-modal').classList.remove('hide');
         }
 
@@ -14692,11 +14882,12 @@
             }
         }
 
-        function onMasterProductChange() {
+        async function onMasterProductChange() {
             const productId = document.getElementById('cp-master-product').value;
             if (!productId) {
                 document.getElementById('cp-sizes-info').classList.add('hide');
                 document.getElementById('cp-pricing-info')?.classList.add('hide');
+                document.getElementById('cp-colour-section')?.classList.add('hide');
                 return;
             }
             const product = products.find(p => p.id === productId);
@@ -14704,6 +14895,16 @@
             if (!document.getElementById('cp-custom-name').value && !document.getElementById('edit-club-product-id').value) {
                 document.getElementById('cp-custom-name').value = `${currentClub.name} ${product.item_name}`;
             }
+            // Load fabric recipe for this product and render colour pickers
+            await ensureFabricsLoaded();
+            const { data: recipeRows } = await supabase
+                .from('product_fabric_recipes')
+                .select('id, component_type, fabric_id, available_colours')
+                .eq('product_id', productId)
+                .order('sort_order');
+            _cpRecipeRowsCache = recipeRows || [];
+            // Don't reset _cpColourSelections here — editClubProduct pre-populates it
+            renderCpColourRows(_cpRecipeRowsCache);
             // Show pricing info derived from master product tiers (all fits)
             const tierPrices = (product.tier_prices && typeof product.tier_prices === 'object') ? product.tier_prices : {};
             const pricingRows = document.getElementById('cp-pricing-rows');
@@ -14755,6 +14956,44 @@
                 display.innerHTML = '<p class="text-xs text-gray-500">See master product</p>';
             }
             document.getElementById('cp-sizes-info').classList.remove('hide');
+        }
+
+        function renderCpColourRows(recipes) {
+            const section = document.getElementById('cp-colour-section');
+            const container = document.getElementById('cp-colour-rows');
+            if (!section || !container) return;
+            const withColours = (recipes || []).filter(r => {
+                const cols = Array.isArray(r.available_colours) ? r.available_colours : [];
+                return r.fabric_id && cols.length > 0;
+            });
+            if (!withColours.length) { section.classList.add('hide'); return; }
+            section.classList.remove('hide');
+            container.innerHTML = withColours.map(recipe => {
+                const fabric = allFabrics.find(f => f.id === recipe.fabric_id);
+                const cols = Array.isArray(recipe.available_colours) ? recipe.available_colours : [];
+                const sel = _cpColourSelections[recipe.id];
+                return `<div>
+                    <p class="text-xs text-gray-400 mb-1.5">
+                        <span class="font-medium text-gray-300">${escHtml(RECIPE_COMPONENT_LABELS[recipe.component_type] || recipe.component_type)}</span>
+                        ${fabric ? ` — ${escHtml(fabric.fabric_name)}` : ''}
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        ${cols.map(c => {
+                            const isOn = sel?.hex === c.hex;
+                            const lum = hexLuminance(c.hex || '#cccccc');
+                            const textCol = lum > 0.4 ? '#1e293b' : '#f1f5f9';
+                            const border = isOn ? '3px solid #f97316' : '2px solid rgba(0,0,0,0.15)';
+                            const label = escHtml(c.pantone_code || c.hex);
+                            return `<button type="button"
+                                onclick="selectCpColour(${JSON.stringify(recipe.id)},${JSON.stringify(c.hex)},${JSON.stringify(c.pantone_code||'')})"
+                                class="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg transition-all"
+                                style="background:${c.hex||'#cccccc'};border:${border};color:${textCol};opacity:${isOn?1:0.55}">
+                                ${isOn ? '✓ ' : ''}${label}
+                            </button>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+            }).join('');
         }
 
         async function saveClubProduct() {
@@ -14831,6 +15070,21 @@
                 await renderJobProducts();
                 return;
             }
+            // Save per-component colour selections
+            const savedCpId = result.data.id;
+            const colourEntries = Object.entries(_cpColourSelections).filter(([, c]) => c?.hex);
+            if (colourEntries.length) {
+                await supabase.from('club_product_colour_selections').delete().eq('club_product_id', savedCpId);
+                await supabase.from('club_product_colour_selections').insert(
+                    colourEntries.map(([recipe_id, c]) => ({
+                        club_product_id: savedCpId,
+                        recipe_id,
+                        colour_hex: c.hex,
+                        colour_pantone: c.pantone_code || null
+                    }))
+                );
+            }
+
             if (cpId) {
                 const idx = currentClubProducts.findIndex(p => p.id === cpId);
                 if (idx !== -1) currentClubProducts[idx] = result.data;

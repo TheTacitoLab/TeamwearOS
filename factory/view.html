@@ -103,7 +103,16 @@
     function colourPill(hex, label) {
         if (!hex) return '<span class="text-gray-600 text-xs">—</span>';
         const textCol = hexLuminance(hex) > 0.4 ? '#1e293b' : '#f1f5f9';
-        return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded" style="background:${hex};color:${textCol}">${esc(label || hex)}</span>`;
+        return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded mr-1 mb-0.5" style="background:${hex};color:${textCol}">${esc(label || hex)}</span>`;
+    }
+
+    function gsmLbl(f) {
+        const min = f.gsm_min, max = f.gsm_max, old = f.gsm;
+        if (min && max && min !== max) return `${min}–${max} gsm`;
+        if (max) return `${max} gsm`;
+        if (min) return `${min} gsm`;
+        if (old) return `${old} gsm`;
+        return '—';
     }
 
     async function init() {
@@ -145,7 +154,7 @@
         if (!clubIds.length) { forecastRows = []; return; }
 
         const { data: clubProducts } = await db.from('club_products')
-            .select(`id, club_id, products(id, item_name, total_fabric_kg, product_fabric_recipes(fabric_id, allocation_pct, colour_hex, colour_pantone))`)
+            .select(`id, club_id, products(id, item_name, total_fabric_kg, product_fabric_recipes(id, fabric_id, allocation_pct, available_colours))`)
             .in('club_id', clubIds);
 
         const cpIds = (clubProducts || []).map(cp => cp.id);
@@ -158,6 +167,15 @@
             });
         }
 
+        // Load per-club colour selections
+        let selMap = {};
+        if (cpIds.length) {
+            const { data: colourSels } = await db.from('club_product_colour_selections')
+                .select('club_product_id, recipe_id, colour_hex, colour_pantone')
+                .in('club_product_id', cpIds);
+            (colourSels||[]).forEach(s => { selMap[`${s.club_product_id}::${s.recipe_id}`] = s; });
+        }
+
         const clubMap = Object.fromEntries((clubs||[]).map(c => [c.id, c]));
         const fmap = {};
         (clubProducts||[]).forEach(cp => {
@@ -165,16 +183,20 @@
             const p = cp.products; if (!p || !p.total_fabric_kg) return;
             (p.product_fabric_recipes||[]).forEach(rec => {
                 const fab = allFabrics.find(f => f.id === rec.fabric_id); if (!fab) return;
-                const colourHex = rec.colour_hex || '';
+                const sel = selMap[`${cp.id}::${rec.id}`];
+                const availCols = Array.isArray(rec.available_colours) ? rec.available_colours : [];
+                const colourHex = sel ? (sel.colour_hex || '') : (availCols[0]?.hex || '');
+                const colourPantone = sel ? (sel.colour_pantone || '') : (availCols[0]?.pantone_code || '');
                 const key = `${rec.fabric_id}::${colourHex}`;
                 if (!fmap[key]) {
                     const parts = [fab.fabric_name];
                     if (fab.construction) parts.push(fab.construction);
-                    if (fab.gsm) parts.push(fab.gsm + ' gsm');
+                    const gsm = gsmLbl(fab);
+                    if (gsm !== '—') parts.push(gsm);
                     fmap[key] = {
                         fabric_id: rec.fabric_id, fabric_name: fab.fabric_name,
                         fabric_label: parts.join(' · '), colour_hex: colourHex,
-                        pantone_code: rec.colour_pantone || '',
+                        pantone_code: colourPantone,
                         min_kg: 0, max_kg: 0, nearest_date: null,
                         club_ids: new Set(), month_breakdown: {}
                     };
@@ -272,8 +294,8 @@
                             return `<tr class="border-b border-white/5 hover:bg-white/5">
                                 <td class="px-4 py-3 font-medium">${esc(f.fabric_name)}</td>
                                 <td class="px-4 py-3 text-gray-400">${esc(f.construction||'—')}</td>
-                                <td class="px-4 py-3 text-gray-400">${f.gsm ? f.gsm + ' gsm' : '—'}</td>
-                                <td class="px-4 py-3">${cols.length ? cols.slice(0,6).map(c => colourPill(c.hex, c.pantone_code)).join(' ') : '<span class="text-gray-600 text-xs">—</span>'}</td>
+                                <td class="px-4 py-3 text-gray-400">${gsmLbl(f)}</td>
+                                <td class="px-4 py-3"><div style="display:flex;flex-wrap:wrap;gap:2px">${cols.length ? cols.map(c => colourPill(c.hex, c.pantone_code)).join('') : '<span class="text-gray-600 text-xs">—</span>'}</div></td>
                                 <td class="px-4 py-3 text-gray-400">${esc(f.supplier||'—')}</td>
                             </tr>`;
                         }).join('')}
@@ -386,7 +408,7 @@
             const cols = Array.isArray(f.colour_options) ? f.colour_options : [];
             const parts = [f.fabric_name];
             if (f.construction) parts.push(f.construction);
-            if (f.gsm) parts.push(f.gsm + ' gsm');
+            const gsmStr = gsmLbl(f); if (gsmStr !== '—') parts.push(gsmStr);
             const label = parts.join(' · ');
             if (cols.length === 0) {
                 const k = `${f.id}::`;
