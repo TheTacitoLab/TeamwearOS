@@ -392,77 +392,50 @@
             <p class="text-xs text-gray-600 mt-3">Read-only view — fabric records are managed by the brand.</p>`;
     }
 
-    function _buildClubTable(rows) {
-        if (!rows.length) return '<div class="glass rounded-2xl p-8 text-center text-gray-500 text-sm">No club forecast data yet. Enable fabric forecast on a club with player count set.</div>';
-        const sorted = [...rows];
-        if (forecastSort === 'date') sorted.sort((a,b) => (!a.nearest_date)-(!b.nearest_date) || (a.nearest_date||'').localeCompare(b.nearest_date||''));
-        else if (forecastSort === 'max_kg') sorted.sort((a,b) => b.max_kg - a.max_kg);
-        else if (forecastSort === 'min_kg') sorted.sort((a,b) => b.min_kg - a.min_kg);
-        else if (forecastSort === 'fabric') sorted.sort((a,b) => (a.fabric_name+(a.pantone_code||'')).localeCompare(b.fabric_name+(b.pantone_code||'')));
-        else if (forecastSort === 'count') sorted.sort((a,b) => b.contributor_count - a.contributor_count);
-        return `<div class="glass rounded-2xl overflow-visible">
-            <table class="w-full text-sm">
-                <thead><tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
-                    <th class="text-left px-4 py-3">Fabric · Colour</th>
-                    <th class="text-right px-4 py-3">Min kg</th>
-                    <th class="text-right px-4 py-3">Max kg</th>
-                    <th class="text-left px-4 py-3">Clubs</th>
-                    <th class="text-left px-4 py-3">Needed By</th>
-                </tr></thead>
-                <tbody>${sorted.map((r, i) => {
-                    const pill = r.colour_hex ? ' '+colourPill(r.colour_hex, r.pantone_code) : '';
-                    const months = r.month_breakdown.length ? r.month_breakdown.map(m =>
-                        `<tr class="border-b border-white/5"><td class="px-3 py-1.5 text-gray-400 whitespace-nowrap">${esc(m.month)}</td><td class="px-3 py-1.5 text-gray-400">${esc(m.source)}</td><td class="px-3 py-1.5 text-right text-gray-400">${m.min_kg>0?m.min_kg.toFixed(2):'—'}</td><td class="px-3 py-1.5 text-right font-medium">${m.max_kg.toFixed(2)}</td></tr>`
-                    ).join('') : '<tr><td colspan="4" class="px-3 py-2 text-gray-500 text-xs">No dated entries</td></tr>';
-                    const uid = 'cp-'+i;
-                    return `<tr class="border-b border-white/5 hover:bg-white/5">
-                        <td class="px-4 py-3 font-medium text-orange-300">${esc(r.fabric_label)}${pill}</td>
-                        <td class="px-4 py-3 text-right text-gray-400">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
-                        <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
-                        <td class="px-4 py-3 text-gray-400 text-xs">${r.contributor_count} club${r.contributor_count!==1?'s':''}</td>
-                        <td class="px-4 py-3"><div class="relative inline-block">
-                            <button class="popup-toggle text-xs px-2 py-1 rounded border border-white/10 text-gray-400 hover:text-white hover:border-white/30" data-idx="${uid}">${r.nearest_date?esc(r.nearest_date):'No date'} ▾</button>
-                            <div id="popup-${uid}" class="popup hidden"><p class="text-xs font-semibold text-gray-300 mb-2">Month-by-month breakdown</p>
-                                <table class="w-full text-xs"><thead><tr class="text-gray-500 border-b border-white/10"><th class="text-left px-3 py-1">Month</th><th class="text-left px-3 py-1">Source</th><th class="text-right px-3 py-1">Min kg</th><th class="text-right px-3 py-1">Max kg</th></tr></thead><tbody>${months}</tbody></table>
-                            </div>
-                        </div></td>
-                    </tr>`;
-                }).join('')}</tbody>
-            </table>
-        </div>`;
+    // Merge club + bulk demand into one set of rows. Club demand is a min–max
+    // range; bulk orders are firm so they add equally to min and max.
+    function buildCombinedForecastRows() {
+        const map = {};
+        const ensure = (r) => {
+            const k = `${r.fabric_id}::${r.colour_hex||''}`;
+            if (!map[k]) {
+                map[k] = {
+                    fabric_id: r.fabric_id, fabric_name: r.fabric_name, fabric_label: r.fabric_label,
+                    colour_hex: r.colour_hex, pantone_code: r.pantone_code,
+                    min_kg: 0, max_kg: 0, nearest_date: null,
+                    club_count: 0, job_count: 0, contributor_count: 0, month_breakdown: []
+                };
+            }
+            return map[k];
+        };
+        (forecastRowsClub||[]).forEach(r => {
+            const e = ensure(r);
+            e.min_kg += r.min_kg || 0;
+            e.max_kg += r.max_kg || 0;
+            e.club_count += r.contributor_count || 0;
+            if (r.nearest_date && (!e.nearest_date || r.nearest_date < e.nearest_date)) e.nearest_date = r.nearest_date;
+            (r.month_breakdown||[]).forEach(m => e.month_breakdown.push({ month: m.month, source: m.source, min_kg: m.min_kg||0, max_kg: m.max_kg||0 }));
+        });
+        (forecastRowsBulk||[]).forEach(r => {
+            const e = ensure(r);
+            e.min_kg += r.max_kg || 0;
+            e.max_kg += r.max_kg || 0;
+            e.job_count += r.job_count || 0;
+            if (r.nearest_date && (!e.nearest_date || r.nearest_date < e.nearest_date)) e.nearest_date = r.nearest_date;
+            (r.month_breakdown||[]).forEach(m => e.month_breakdown.push({ month: m.month, source: m.source + ' (order)', min_kg: m.max_kg||0, max_kg: m.max_kg||0 }));
+        });
+        return Object.values(map).map(e => ({ ...e, contributor_count: e.club_count + e.job_count }));
     }
 
-    function _buildBulkTable(rows) {
-        if (!rows.length) return '<div class="glass rounded-2xl p-8 text-center text-gray-500 text-sm">No pipeline orders with quantities. Add a quantity to job products in sales job records.</div>';
-        const sorted = [...rows].sort((a,b) => b.max_kg - a.max_kg);
-        return `<div class="glass rounded-2xl overflow-visible">
-            <table class="w-full text-sm">
-                <thead><tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
-                    <th class="text-left px-4 py-3">Fabric · Colour</th>
-                    <th class="text-right px-4 py-3">KG Required</th>
-                    <th class="text-left px-4 py-3">Jobs</th>
-                    <th class="text-left px-4 py-3">Needed By</th>
-                </tr></thead>
-                <tbody>${sorted.map((r, i) => {
-                    const pill = r.colour_hex ? ' '+colourPill(r.colour_hex, r.pantone_code) : '';
-                    const months = r.month_breakdown.length ? r.month_breakdown.map(m =>
-                        `<tr class="border-b border-white/5"><td class="px-3 py-1.5 text-gray-400 whitespace-nowrap">${esc(m.month)}</td><td class="px-3 py-1.5 text-gray-400">${esc(m.source)}</td><td class="px-3 py-1.5 text-right font-medium" colspan="2">${m.max_kg.toFixed(2)} kg</td></tr>`
-                    ).join('') : '<tr><td colspan="4" class="px-3 py-2 text-gray-500 text-xs">No dated entries</td></tr>';
-                    const uid = 'bp-'+i;
-                    return `<tr class="border-b border-white/5 hover:bg-white/5">
-                        <td class="px-4 py-3 font-medium text-blue-300">${esc(r.fabric_label)}${pill}</td>
-                        <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
-                        <td class="px-4 py-3 text-gray-400 text-xs">${r.job_count} job${r.job_count!==1?'s':''}</td>
-                        <td class="px-4 py-3"><div class="relative inline-block">
-                            <button class="popup-toggle text-xs px-2 py-1 rounded border border-white/10 text-gray-400 hover:text-white hover:border-white/30" data-idx="${uid}">${r.nearest_date?esc(r.nearest_date):'No date'} ▾</button>
-                            <div id="popup-${uid}" class="popup hidden"><p class="text-xs font-semibold text-gray-300 mb-2">Month-by-month breakdown</p>
-                                <table class="w-full text-xs"><thead><tr class="text-gray-500 border-b border-white/10"><th class="text-left px-3 py-1">Month</th><th class="text-left px-3 py-1">Job</th><th class="text-right px-3 py-1" colspan="2">KG</th></tr></thead><tbody>${months}</tbody></table>
-                            </div>
-                        </div></td>
-                    </tr>`;
-                }).join('')}</tbody>
-            </table>
-        </div>`;
+    function forecastFabricSubLine(fabricId) {
+        const f = allFabrics.find(x => x.id === fabricId);
+        if (!f) return '';
+        const parts = [];
+        if (f.description) parts.push(esc(f.description));
+        else if (f.construction) parts.push(esc(f.construction));
+        const gsm = gsmLbl(f);
+        if (gsm !== '—') parts.push(esc(gsm));
+        return parts.join(' · ');
     }
 
     function renderForecast(el) {
@@ -471,28 +444,65 @@
             { key: 'max_kg', label: 'Max KG ↓' },
             { key: 'min_kg', label: 'Min KG ↓' },
             { key: 'fabric', label: 'Fabric A→Z' },
-            { key: 'count',  label: 'Most Contributors ↓' }
+            { key: 'count',  label: 'Most Sources ↓' }
         ];
-        const sortBar = `<div class="flex items-center gap-2 mb-5 flex-wrap">
-            <span class="text-xs text-gray-500 mr-1">Sort clubs by:</span>
+        const sortBar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
+            <span class="text-xs text-gray-500 mr-1">Sort:</span>
             ${sortOptions.map(s => `<button class="sort-chip ${forecastSort===s.key?'active':''}" data-sort="${s.key}">${s.label}</button>`).join('')}
         </div>`;
 
-        el.innerHTML = sortBar + `
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px" class="forecast-grid">
-                <div>
-                    <h3 style="font-weight:600;font-size:15px;margin-bottom:12px;color:#fdba74">Club Forecast
-                        <span style="font-size:11px;font-weight:400;color:#6b7280;margin-left:8px">membership &amp; forecast settings</span>
-                    </h3>
-                    ${_buildClubTable(forecastRowsClub)}
-                </div>
-                <div>
-                    <h3 style="font-weight:600;font-size:15px;margin-bottom:12px;color:#93c5fd">Bulk Orders Pipeline
-                        <span style="font-size:11px;font-weight:400;color:#6b7280;margin-left:8px">active sales jobs with quantities</span>
-                    </h3>
-                    ${_buildBulkTable(forecastRowsBulk)}
-                </div>
+        const rows = buildCombinedForecastRows();
+        const sorted = [...rows];
+        if (forecastSort === 'date') sorted.sort((a,b) => (!a.nearest_date)-(!b.nearest_date) || (a.nearest_date||'').localeCompare(b.nearest_date||''));
+        else if (forecastSort === 'max_kg') sorted.sort((a,b) => b.max_kg - a.max_kg);
+        else if (forecastSort === 'min_kg') sorted.sort((a,b) => b.min_kg - a.min_kg);
+        else if (forecastSort === 'fabric') sorted.sort((a,b) => (a.fabric_name+(a.pantone_code||'')).localeCompare(b.fabric_name+(b.pantone_code||'')));
+        else if (forecastSort === 'count') sorted.sort((a,b) => b.contributor_count - a.contributor_count);
+
+        const intro = '<p class="text-sm text-gray-400 mb-4">Combined fabric forecast based on <span style="color:#fdba74">live bulk orders</span> and <span style="color:#fdba74">club usage estimations</span>.</p>';
+
+        const table = !sorted.length
+            ? '<div class="glass rounded-2xl p-8 text-center text-gray-500 text-sm">No forecast data yet.</div>'
+            : `<div class="glass rounded-2xl overflow-visible">
+                <table class="w-full text-sm">
+                    <thead><tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                        <th class="text-left px-4 py-3">Fabric · Colour</th>
+                        <th class="text-right px-4 py-3">Min kg</th>
+                        <th class="text-right px-4 py-3">Max kg</th>
+                        <th class="text-left px-4 py-3">Sources</th>
+                        <th class="text-left px-4 py-3">Needed By</th>
+                    </tr></thead>
+                    <tbody>${sorted.map((r, i) => {
+                        const pill = r.colour_hex ? ' '+colourPill(r.colour_hex, r.pantone_code) : '';
+                        const sub = forecastFabricSubLine(r.fabric_id);
+                        const sources = [];
+                        if (r.club_count) sources.push(`${r.club_count} club${r.club_count!==1?'s':''}`);
+                        if (r.job_count) sources.push(`${r.job_count} order${r.job_count!==1?'s':''}`);
+                        const sourcesLabel = sources.join(' · ') || '—';
+                        const months = r.month_breakdown.length ? r.month_breakdown.map(m =>
+                            `<tr class="border-b border-white/5"><td class="px-3 py-1.5 text-gray-400 whitespace-nowrap">${esc(m.month)}</td><td class="px-3 py-1.5 text-gray-400">${esc(m.source)}</td><td class="px-3 py-1.5 text-right text-gray-400">${m.min_kg>0?m.min_kg.toFixed(2):'—'}</td><td class="px-3 py-1.5 text-right font-medium">${m.max_kg.toFixed(2)}</td></tr>`
+                        ).join('') : '<tr><td colspan="4" class="px-3 py-2 text-gray-500 text-xs">No dated entries</td></tr>';
+                        const uid = 'fc-'+i;
+                        return `<tr class="border-b border-white/5 hover:bg-white/5">
+                            <td class="px-4 py-3">
+                                <div class="font-medium text-orange-300">${esc(r.fabric_name)}${pill}</div>
+                                ${sub ? `<div class="text-xs text-gray-500" style="margin-top:2px">${sub}</div>` : ''}
+                            </td>
+                            <td class="px-4 py-3 text-right text-gray-400">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
+                            <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
+                            <td class="px-4 py-3 text-gray-400 text-xs">${sourcesLabel}</td>
+                            <td class="px-4 py-3"><div class="relative inline-block">
+                                <button class="popup-toggle text-xs px-2 py-1 rounded border border-white/10 text-gray-400 hover:text-white hover:border-white/30" data-idx="${uid}">${r.nearest_date?esc(r.nearest_date):'No date'} ▾</button>
+                                <div id="popup-${uid}" class="popup hidden"><p class="text-xs font-semibold text-gray-300 mb-2">Month-by-month breakdown</p>
+                                    <table class="w-full text-xs"><thead><tr class="text-gray-500 border-b border-white/10"><th class="text-left px-3 py-1">Month</th><th class="text-left px-3 py-1">Source</th><th class="text-right px-3 py-1">Min kg</th><th class="text-right px-3 py-1">Max kg</th></tr></thead><tbody>${months}</tbody></table>
+                                </div>
+                            </div></td>
+                        </tr>`;
+                    }).join('')}</tbody>
+                </table>
             </div>`;
+
+        el.innerHTML = intro + sortBar + table;
         attachSortHandlers();
         document.querySelectorAll('.popup-toggle').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -512,12 +522,13 @@
         });
     }
 
-    function _ragDot(live, totalMax) {
-        if (!totalMax) return '';
+    function _ragStatus(live, totalMax) {
+        if (!totalMax) return { dot: '', label: '', colour: '' };
         const ratio = (live||0) / totalMax;
-        const title = ratio >= 1 ? 'Healthy' : ratio >= 0.25 ? 'Low' : 'Critical';
+        const label = ratio >= 1 ? 'Healthy' : ratio >= 0.25 ? 'Low' : 'Critical';
         const colour = ratio >= 1 ? '#22c55e' : ratio >= 0.25 ? '#fbbf24' : '#ef4444';
-        return `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${colour};flex-shrink:0" title="${title}"></span>`;
+        const dot = `<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${colour};flex-shrink:0"></span>`;
+        return { dot, label, colour };
     }
 
     function renderStock(el) {
@@ -560,7 +571,7 @@
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
-                            <th class="px-3 py-3 w-8"></th>
+                            <th class="text-left px-4 py-3">Status</th>
                             <th class="text-left px-4 py-3">Fabric · Colour</th>
                             <th class="text-right px-4 py-3">Forecast Min kg</th>
                             <th class="text-right px-4 py-3">Forecast Max kg</th>
@@ -573,9 +584,12 @@
                         ${rows.map((r, i) => {
                             const s = stockMap[`${r.fabric_id}::${r.colour_hex||''}`] || {};
                             const pill = r.colour_hex ? ' ' + colourPill(r.colour_hex, r.pantone_code) : '';
-                            const dot = _ragDot(s.live_stock_kg, r.max_kg);
+                            const rag = _ragStatus(s.live_stock_kg, r.max_kg);
+                            const statusCell = rag.label
+                                ? `<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:${rag.colour}">${rag.dot}${rag.label}</span>`
+                                : '<span class="text-xs text-gray-600">—</span>';
                             return `<tr id="row-${i}" class="border-b border-white/5 hover:bg-white/5">
-                                <td class="px-3 py-3 text-center">${dot}</td>
+                                <td class="px-4 py-3">${statusCell}</td>
                                 <td class="px-4 py-3 font-medium text-orange-300">${esc(r.fabric_label)}${pill}</td>
                                 <td class="px-4 py-3 text-right text-gray-400">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
                                 <td class="px-4 py-3 text-right text-gray-400">${r.max_kg > 0 ? r.max_kg.toFixed(2) : '—'}</td>
