@@ -2509,7 +2509,7 @@
                     <div class="grid grid-cols-2 gap-4 mb-3">
                         <div>
                             <label class="text-gray-400 text-sm mb-1 block">Total Fabric (kg per garment)</label>
-                            <input type="number" step="0.0001" id="prod-total-fabric-kg" placeholder="0.5000" oninput="renderFabricRecipeRows()" class="w-full px-3 py-2 rounded-lg">
+                            <input type="number" step="0.0001" id="prod-total-fabric-kg" placeholder="0.5000" oninput="syncTotalFabricKg()" class="w-full px-3 py-2 rounded-lg">
                         </div>
                     </div>
                     <div id="prod-fabric-recipe-rows"></div>
@@ -7862,12 +7862,32 @@
             if (addBtn) addBtn.disabled = _currentRecipeRows.length >= RECIPE_COMPONENT_TYPES.length;
         }
 
+        // Sync all recipe row weights when total fabric kg changes.
+        function syncTotalFabricKg() {
+            const totalKg = parseFloat(document.getElementById('prod-total-fabric-kg')?.value) || 0;
+            _currentRecipeRows.forEach((row, i) => {
+                if (totalKg > 0 && row.allocation_pct > 0) {
+                    _currentRecipeRows[i].weight_size_l_kg = parseFloat((totalKg * row.allocation_pct / 100).toFixed(4));
+                } else if (!totalKg) {
+                    _currentRecipeRows[i].weight_size_l_kg = null;
+                }
+            });
+            renderFabricRecipeRows();
+        }
+
         // Lightweight allocation update — avoids full re-render so the input keeps focus while typing.
         function updateRecipeAllocation(i, val) {
             if (!_currentRecipeRows[i]) return;
             _currentRecipeRows[i].allocation_pct = parseFloat(val) || 0;
             const totalKg = parseFloat(document.getElementById('prod-total-fabric-kg')?.value) || 0;
             const row = _currentRecipeRows[i];
+            // Auto-populate weight from total × allocation%
+            if (totalKg > 0 && row.allocation_pct > 0) {
+                const calcKg = parseFloat((totalKg * row.allocation_pct / 100).toFixed(4));
+                _currentRecipeRows[i].weight_size_l_kg = calcKg;
+                const weightInput = document.getElementById(`recipe-row-${i}`)?.querySelector('input[placeholder="kg (L)"]');
+                if (weightInput) weightInput.value = calcKg;
+            }
             const effectiveKg = (row.weight_size_l_kg > 0)
                 ? row.weight_size_l_kg.toFixed(4)
                 : (totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—');
