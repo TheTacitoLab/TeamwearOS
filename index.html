@@ -7802,7 +7802,10 @@
                 container.innerHTML = '<p class="text-gray-500 text-xs mb-2">No fabric components added yet.</p>';
             } else {
                 container.innerHTML = _currentRecipeRows.map((row, i) => {
-                    const kg = totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—';
+                    const effectiveKg = (row.weight_size_l_kg > 0)
+                        ? row.weight_size_l_kg.toFixed(4)
+                        : (totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—');
+                    const weightSource = (row.weight_size_l_kg > 0) ? 'direct' : 'legacy';
                     const fabric = availableFabrics.find(f => f.id === row.fabric_id);
                     const colourOpts = Array.isArray(fabric?.colour_options) ? fabric.colour_options : [];
                     const selectedColours = Array.isArray(row.available_colours) ? row.available_colours : [];
@@ -7837,7 +7840,11 @@
                             <input type="number" min="0" max="100" step="0.01" value="${row.allocation_pct || ''}" placeholder="%" style="width:72px"
                                 class="px-2 py-1.5 rounded-lg text-sm"
                                 oninput="updateRecipeAllocation(${i}, this.value)">
-                            <span class="text-xs text-gray-400" id="recipe-kg-${i}" style="min-width:72px">→ ${kg} kg</span>
+                            <input type="number" min="0" step="0.0001" value="${row.weight_size_l_kg || ''}" placeholder="kg (L)"
+                                title="Weight in kg for size Large — tied to this fabric's GSM. Used for forecasting (overrides the % allocation)."
+                                style="width:90px" class="px-2 py-1.5 rounded-lg text-sm"
+                                oninput="updateRecipeWeight(${i}, this.value)">
+                            <span class="text-xs ${weightSource === 'direct' ? 'text-orange-400' : 'text-gray-400'}" id="recipe-kg-${i}" style="min-width:72px">→ ${effectiveKg} kg</span>
                             <button type="button" onclick="_currentRecipeRows.splice(${i},1);renderFabricRecipeRows()" class="text-gray-500 hover:text-red-400 text-lg leading-none">&times;</button>
                         </div>
                         ${colourSection}
@@ -7861,19 +7868,40 @@
             _currentRecipeRows[i].allocation_pct = parseFloat(val) || 0;
             const totalKg = parseFloat(document.getElementById('prod-total-fabric-kg')?.value) || 0;
             const row = _currentRecipeRows[i];
-            const kg = totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—';
+            const effectiveKg = (row.weight_size_l_kg > 0)
+                ? row.weight_size_l_kg.toFixed(4)
+                : (totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—');
             const kgEl = document.getElementById(`recipe-kg-${i}`);
-            if (kgEl) kgEl.textContent = `→ ${kg} kg`;
+            if (kgEl) {
+                kgEl.textContent = `→ ${effectiveKg} kg`;
+                kgEl.className = `text-xs ${row.weight_size_l_kg > 0 ? 'text-orange-400' : 'text-gray-400'}`;
+            }
             const total = _currentRecipeRows.reduce((s, r) => s + (parseFloat(r.allocation_pct) || 0), 0);
             const warnEl = document.getElementById('prod-fabric-recipe-warn');
             if (warnEl) warnEl.classList.toggle('hide', _currentRecipeRows.length === 0 || Math.abs(total - 100) < 0.01);
+        }
+
+        // Lightweight weight update — avoids full re-render so the input keeps focus while typing.
+        function updateRecipeWeight(i, val) {
+            if (!_currentRecipeRows[i]) return;
+            _currentRecipeRows[i].weight_size_l_kg = parseFloat(val) || null;
+            const row = _currentRecipeRows[i];
+            const totalKg = parseFloat(document.getElementById('prod-total-fabric-kg')?.value) || 0;
+            const effectiveKg = (row.weight_size_l_kg > 0)
+                ? row.weight_size_l_kg.toFixed(4)
+                : (totalKg > 0 && row.allocation_pct ? (totalKg * row.allocation_pct / 100).toFixed(4) : '—');
+            const kgEl = document.getElementById(`recipe-kg-${i}`);
+            if (kgEl) {
+                kgEl.textContent = `→ ${effectiveKg} kg`;
+                kgEl.className = `text-xs ${row.weight_size_l_kg > 0 ? 'text-orange-400' : 'text-gray-400'}`;
+            }
         }
 
         function addFabricRecipeRow() {
             const usedTypes = _currentRecipeRows.map(r => r.component_type);
             const nextType = RECIPE_COMPONENT_TYPES.find(t => !usedTypes.includes(t));
             if (!nextType) return;
-            _currentRecipeRows.push({ component_type: nextType, fabric_id: '', allocation_pct: 0 });
+            _currentRecipeRows.push({ component_type: nextType, fabric_id: '', allocation_pct: 0, weight_size_l_kg: null });
             renderFabricRecipeRows();
         }
 
@@ -8067,7 +8095,7 @@
             // Load club products with master product + recipe
             const { data: clubProducts, error: cpErr } = await supabase
                 .from('club_products')
-                .select(`id, club_id, custom_name, products(id, item_name, total_fabric_kg, product_fabric_recipes(id, fabric_id, component_type, allocation_pct, available_colours))`)
+                .select(`id, club_id, custom_name, products(id, item_name, total_fabric_kg, product_fabric_recipes(id, fabric_id, component_type, allocation_pct, weight_size_l_kg, available_colours))`)
                 .in('club_id', clubIds);
             if (cpErr) { el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading products.</div>'; return; }
 
@@ -8102,7 +8130,7 @@
                 const club = clubMap[cp.club_id];
                 if (!club) return;
                 const product = cp.products;
-                if (!product || !product.total_fabric_kg) return;
+                if (!product) return;
                 const recipes = product.product_fabric_recipes || [];
 
                 recipes.forEach(recipe => {
@@ -8135,8 +8163,10 @@
                         };
                     }
                     const entry = forecastMap[key];
-                    const allocPct = recipe.allocation_pct / 100;
-                    const kgPerUnit = product.total_fabric_kg * allocPct;
+                    const kgPerUnit = (recipe.weight_size_l_kg > 0)
+                        ? recipe.weight_size_l_kg
+                        : (product.total_fabric_kg > 0 ? product.total_fabric_kg * (recipe.allocation_pct / 100) : 0);
+                    if (!kgPerUnit) return;
 
                     // Club forecast contribution
                     if (club.fabric_forecast_enabled && club.number_of_players) {
@@ -8192,7 +8222,7 @@
             if (jobIds.length) {
                 const { data: jobProds } = await supabase
                     .from('job_products')
-                    .select('id, job_id, quantity, club_products(id, products(id, total_fabric_kg, product_fabric_recipes(id, fabric_id, allocation_pct)))')
+                    .select('id, job_id, quantity, club_products(id, products(id, total_fabric_kg, product_fabric_recipes(id, fabric_id, allocation_pct, weight_size_l_kg)))')
                     .in('job_id', jobIds)
                     .gt('quantity', 0);
 
@@ -8210,7 +8240,7 @@
                 (jobProds || []).forEach(jp => {
                     const job = jobMap[jp.job_id]; if (!job) return;
                     const cp = jp.club_products; if (!cp) return;
-                    const product = cp.products; if (!product?.total_fabric_kg) return;
+                    const product = cp.products; if (!product) return;
                     (product.product_fabric_recipes || []).forEach(rec => {
                         const sel = bulkSelMap[`${cp.id}::${rec.id}`];
                         const fabricId = sel?.fabric_id || rec.fabric_id;
@@ -8227,7 +8257,10 @@
                             bulkForecastMap[key] = { fabric_id: fabricId, fabric_name: fabric.fabric_name, fabric_label: parts.join(' · '), colour_hex: colourHex, pantone_code: colourPantone, max_kg: 0, nearest_date: null, job_ids: new Set(), month_breakdown: {} };
                         }
                         const e = bulkForecastMap[key];
-                        const kgPerUnit = product.total_fabric_kg * (rec.allocation_pct / 100);
+                        const kgPerUnit = (rec.weight_size_l_kg > 0)
+                            ? rec.weight_size_l_kg
+                            : (product.total_fabric_kg > 0 ? product.total_fabric_kg * (rec.allocation_pct / 100) : 0);
+                        if (!kgPerUnit) return;
                         e.max_kg += jp.quantity * kgPerUnit;
                         e.job_ids.add(jp.job_id);
                         const dueDate = job.deadline_date;
@@ -9905,7 +9938,7 @@
             renderFabricRecipeRows();
             ensureFabricsLoaded().then(() => {
                 supabase.from('product_fabric_recipes')
-                    .select('id, component_type, fabric_id, allocation_pct, available_colours')
+                    .select('id, component_type, fabric_id, allocation_pct, weight_size_l_kg, available_colours')
                     .eq('product_id', productId)
                     .order('sort_order')
                     .then(({ data: recipeRows }) => {
@@ -10894,6 +10927,7 @@
                     fabric_id: r.fabric_id,
                     component_type: r.component_type,
                     allocation_pct: parseFloat(r.allocation_pct) || 0,
+                    weight_size_l_kg: r.weight_size_l_kg > 0 ? parseFloat(r.weight_size_l_kg) : null,
                     available_colours: Array.isArray(r.available_colours) ? r.available_colours : [],
                     sort_order: i
                 }));
