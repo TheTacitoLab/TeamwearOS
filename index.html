@@ -3229,6 +3229,21 @@
             </div>
         </div>
 
+        <!-- MODAL: PO Notes / Chat -->
+        <div id="fpo-notes-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-xl mx-4 my-auto flex flex-col" style="max-height:85vh">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold" id="fpo-notes-title">Notes</h3>
+                    <button onclick="hidePoNotes()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                </div>
+                <div id="fpo-notes-thread" class="flex-1 overflow-y-auto rounded-lg p-3 mb-3" style="background:#f8fafc;border:1px solid #e2e8f0;min-height:200px"></div>
+                <div class="flex gap-2">
+                    <input type="text" id="fpo-note-input" class="flex-1 px-4 py-3 rounded-lg" placeholder="Write a note or reply…" onkeydown="if(event.key==='Enter')sendPoNote()">
+                    <button onclick="sendPoNote()" class="btn-primary">Send</button>
+                </div>
+            </div>
+        </div>
+
         <!-- TOOL: Factory -->
         <div id="tool-factory" class="hide w-full p-6 md:p-8 lg:px-12">
             <div class="sh-topbar">
@@ -16314,6 +16329,7 @@
         let currentFactoryPoId = null;
         let _poCountdownTimer = null;
         let _poFilter = 'all';
+        let poNotesMeta = {};
 
         // ---- Date helpers ----
         function fpoDate(d)      { if (!d) return ''; return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); }
@@ -16337,13 +16353,29 @@
 
         // ---- Stages & countdown ----
         function poStages(po) {
+            const part = po.completion_status === 'part_completed' || po.completion_status === 'completed' || !!po.part_shipped_date;
             return [
                 { label: 'Artwork Approved', done: !!po.artwork_approved, date: po.artwork_approved_date },
                 { label: 'PPS Approved',     done: !!po.pps_approved,     date: po.pps_approved_date },
-                { label: 'Shipped',          done: !!po.shipped,          date: po.shipped_date },
-                { label: po.completion_status === 'part_completed' ? 'Part-Completed' : 'Completed',
-                  done: po.completion_status === 'completed' || po.completion_status === 'part_completed', date: null }
+                { label: 'Part-Shipped',     done: part || !!po.shipped,  date: po.part_shipped_date },
+                { label: 'Shipped',          done: !!po.shipped,          date: po.shipped_date }
             ];
+        }
+        function poStageColor(po, i, done) {
+            if (i === 2) {
+                if (po.shipped) return '#22c55e';
+                if (po.completion_status === 'part_completed' || po.part_shipped_date) return '#f97316';
+                return '#cbd5e1';
+            }
+            if (i === 3) return po.shipped ? '#22c55e' : '#cbd5e1';
+            return done ? '#22c55e' : '#cbd5e1';
+        }
+        function poShipPerf(dateStr, target) {
+            if (!dateStr || !target) return '';
+            const diff = Math.round((new Date(target + 'T00:00:00') - new Date(dateStr + 'T00:00:00')) / 86400000);
+            if (diff === 0) return 'on time';
+            if (diff > 0) return diff + ' day' + (diff !== 1 ? 's' : '') + ' early';
+            return 'late by ' + (-diff) + ' day' + (-diff !== 1 ? 's' : '');
         }
         function poCountdown(po) {
             if (po.shipped) return { cls: 'ok', text: '✓ Shipped' + (po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : '') };
@@ -16356,14 +16388,6 @@
             }
             const late = Math.floor(-ms / 86400000);
             return { cls: 'overdue', text: '⚠ LATE by ' + late + ' day' + (late !== 1 ? 's' : '') };
-        }
-        function poStageColor(po, i, done) {
-            if (i === 3) {
-                if (po.completion_status === 'completed') return '#22c55e';
-                if (po.completion_status === 'part_completed') return '#f97316';
-                return '#cbd5e1';
-            }
-            return done ? '#22c55e' : '#cbd5e1';
         }
         function renderPoTimelineHtml(po) {
             const stages = poStages(po);
@@ -16391,8 +16415,32 @@
                 .order('created_at', { ascending: false });
             if (error) { showToast('Error loading POs: ' + error.message, 'error'); console.error(error); return; }
             factoryPos = data || [];
+            await loadPoNotesMeta();
             renderFactoryPoList();
             if (!_poCountdownTimer) _poCountdownTimer = setInterval(poCountdownTick, 60000);
+        }
+        async function loadPoNotesMeta() {
+            poNotesMeta = {};
+            const ids = factoryPos.map(p => p.id);
+            if (!ids.length) return;
+            const { data } = await supabase.from('factory_po_notes').select('po_id, created_at').in('po_id', ids);
+            (data || []).forEach(n => {
+                const m = poNotesMeta[n.po_id] || (poNotesMeta[n.po_id] = { count: 0, latest: null });
+                m.count++;
+                if (!m.latest || n.created_at > m.latest) m.latest = n.created_at;
+            });
+        }
+        function poHasUnread(po) {
+            const m = poNotesMeta[po.id];
+            if (!m || !m.latest) return false;
+            return !po.brand_last_read_at || m.latest > po.brand_last_read_at;
+        }
+        function poNotesButton(po) {
+            const m = poNotesMeta[po.id];
+            const count = m ? m.count : 0;
+            if (!count) return `<button onclick="event.stopPropagation();openPoNotes('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">+ Add note</button>`;
+            const dot = poHasUnread(po) ? '<span style="position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:#ef4444;border:2px solid #fff"></span>' : '';
+            return `<button onclick="event.stopPropagation();openPoNotes('${po.id}')" class="relative text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe">💬 ${count}${dot}</button>`;
         }
         function poCountdownTick() {
             const tool = document.getElementById('tool-factory');
@@ -16417,13 +16465,34 @@
             return `<button onclick="setPoFilter('${key}')" class="text-xs font-semibold px-3 py-1.5 rounded-full transition" style="${style}">${label}</button>`;
         }
         function setPoFilter(k) { _poFilter = k; renderFactoryPoList(); }
-        async function quickShipPo(poId) {
+        async function markPoPartShipped(poId) {
             const today = fpoToday();
-            const { error } = await supabase.from('factory_purchase_orders').update({ shipped: true, shipped_date: today }).eq('id', poId);
+            const { error } = await supabase.from('factory_purchase_orders').update({ completion_status: 'part_completed', part_shipped_date: today }).eq('id', poId);
             if (error) { showToast('Error: ' + error.message, 'error'); return; }
-            const po = factoryPos.find(p => p.id === poId); if (po) { po.shipped = true; po.shipped_date = today; }
+            const po = factoryPos.find(p => p.id === poId); if (po) { po.completion_status = 'part_completed'; po.part_shipped_date = today; }
+            showToast('Marked part-shipped');
+            renderFactoryPoList();
+            if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
+        }
+        async function markPoFullShipped(poId) {
+            const today = fpoToday();
+            const { error } = await supabase.from('factory_purchase_orders').update({ shipped: true, shipped_date: today, completion_status: 'completed' }).eq('id', poId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === poId); if (po) { po.shipped = true; po.shipped_date = today; po.completion_status = 'completed'; }
             showToast('Marked as shipped');
             renderFactoryPoList();
+            if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
+        }
+        function poActionsHtml(po) {
+            if (po.shipped) {
+                return `<span class="dt-countdown ok" style="justify-content:center">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`;
+            }
+            if (po.completion_status === 'part_completed' || po.part_shipped_date) {
+                return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="background:#ffedd5;color:#ea580c">◑ Part-shipped${po.part_shipped_date ? ' · ' + fpoDateShort(po.part_shipped_date) : ''}</span>
+                    <button onclick="event.stopPropagation();markPoFullShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#16a34a">Mark Shipped</button>`;
+            }
+            return `<button onclick="event.stopPropagation();markPoPartShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#f97316">Part-Shipped</button>
+                <button onclick="event.stopPropagation();markPoFullShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#16a34a">Mark Shipped</button>`;
         }
         function renderFactoryPoList() {
             const el = document.getElementById('factory-view-po-tracker');
@@ -16444,11 +16513,8 @@
                 const cd = poCountdown(po);
                 const clubName = po.clubs?.name || po.club_name || '';
                 const target = poEffectiveTarget(po);
-                const ship = po.shipped
-                    ? `<span class="dt-countdown ok" style="white-space:nowrap">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`
-                    : `<button onclick="event.stopPropagation();quickShipPo('${po.id}')" class="text-sm font-semibold px-4 py-2 rounded-lg text-white transition" style="background:#16a34a">Mark Shipped</button>`;
                 return `<div class="glass rounded-xl cursor-pointer hover:border-brand-500 transition" style="display:flex;align-items:stretch" onclick="openFactoryPoRecord('${po.id}')">
-                    <div style="flex:0 0 30%;min-width:0;padding:14px 16px">
+                    <div style="flex:0 0 26%;min-width:0;padding:14px 16px">
                         <div class="flex items-center gap-2 mb-1 flex-wrap">
                             <span class="font-bold" style="color:#0f172a">${escHtml(po.po_number || 'No PO#')}</span>
                             <span class="dt-countdown ${cd.cls}">${cd.text}</span>
@@ -16457,16 +16523,18 @@
                         <p class="text-xs mt-0.5 truncate" style="color:#94a3b8">${escHtml(clubName)}${po.team_name ? ' · ' + escHtml(po.team_name) : ''}</p>
                         ${po.assets_url ? `<a href="${escHtml(po.assets_url)}" target="_blank" onclick="event.stopPropagation()" class="inline-block mt-2 text-xs font-medium" style="color:#2563eb">📁 Drive assets</a>` : ''}
                     </div>
-                    <div style="flex:1;min-width:0;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;display:flex;align-items:center;padding:10px 18px">
+                    <div style="flex:1;min-width:0;border-left:1px solid #e2e8f0;display:flex;align-items:center;padding:10px 18px">
                         ${renderPoTimelineHtml(po)}
                     </div>
-                    <div style="flex:0 0 22%;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:8px;padding:14px 16px;text-align:right">
-                        <div>
-                            <p class="text-xs" style="color:#94a3b8">Expected delivery</p>
-                            <p class="font-semibold" style="color:#0f172a">${target ? fpoDate(target) : '—'}</p>
-                            ${po.revised_delivery_date ? '<p class="text-xs" style="color:#ea580c">revised</p>' : ''}
-                        </div>
-                        ${ship}
+                    <div style="flex:0 0 16%;min-width:0;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 16px">
+                        <div><p class="text-xs" style="color:#94a3b8">Order date</p><p class="text-sm font-medium" style="color:#334155">${po.order_date ? fpoDate(po.order_date) : '—'}</p></div>
+                        <div><p class="text-xs" style="color:#94a3b8">Expected delivery</p><p class="text-sm font-semibold" style="color:#0f172a">${target ? fpoDate(target) : '—'}${po.revised_delivery_date ? ' <span class="text-xs" style="color:#ea580c">(revised)</span>' : ''}</p></div>
+                        ${po.part_shipped_date && !po.shipped ? `<p class="text-xs" style="color:#ea580c">Part-ship ${poShipPerf(po.part_shipped_date, target)}</p>` : ''}
+                        ${po.shipped ? `<p class="text-xs" style="color:#16a34a">Shipped ${poShipPerf(po.shipped_date, target)}</p>` : ''}
+                    </div>
+                    <div style="flex:0 0 20%;min-width:0;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 16px">
+                        ${poActionsHtml(po)}
+                        ${poNotesButton(po)}
                     </div>
                 </div>`;
             }).join('') + '</div>';
@@ -16646,17 +16714,13 @@
                         </div>
                     </div>
                     <div>
-                        <label class="text-gray-400 block mb-1">Completion Status</label>
-                        <select id="fpo-rec-completion" onchange="savePoField('completion_status', this.value)" class="px-3 py-2 rounded-lg">
-                            <option value="in_progress" ${po.completion_status === 'in_progress' ? 'selected' : ''}>In Progress</option>
-                            <option value="part_completed" ${po.completion_status === 'part_completed' ? 'selected' : ''}>Part-Completed</option>
-                            <option value="completed" ${po.completion_status === 'completed' ? 'selected' : ''}>Completed</option>
-                        </select>
+                        <label class="text-gray-400 block mb-2">Shipping</label>
+                        <div class="flex flex-wrap items-center gap-2">${poActionsHtml(po)}</div>
+                        ${po.part_shipped_date && !po.shipped ? `<p class="text-xs mt-2" style="color:#ea580c">Part-shipped ${fpoDateShort(po.part_shipped_date)} · ${poShipPerf(po.part_shipped_date, target)}</p>` : ''}
+                        ${po.shipped ? `<p class="text-xs mt-2" style="color:#16a34a">Shipped ${fpoDateShort(po.shipped_date)} · ${poShipPerf(po.shipped_date, target)}</p>` : ''}
                     </div>
-                    <div class="pt-2">
-                        ${po.shipped
-                            ? `<span class="dt-countdown ok">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`
-                            : `<button onclick="markPoShipped()" class="px-6 py-3 rounded-lg font-semibold text-white transition" style="background:#16a34a">Mark as Shipped</button>`}
+                    <div>
+                        <button onclick="openPoNotes(currentFactoryPoId)" class="btn-secondary text-sm px-4 py-2 rounded-lg">💬 Notes${poNotesMeta[po.id]?.count ? ' (' + poNotesMeta[po.id].count + ')' : ''}</button>
                     </div>
                 </div>`;
             renderPoFilesList();
@@ -16704,15 +16768,54 @@
             showToast('Revised delivery saved');
             renderFactoryPoList();
         }
-        async function markPoShipped() {
-            if (!currentFactoryPoId) return;
-            const today = fpoToday();
-            const { error } = await supabase.from('factory_purchase_orders').update({ shipped: true, shipped_date: today }).eq('id', currentFactoryPoId);
-            if (error) { showToast('Error: ' + error.message, 'error'); return; }
-            const po = factoryPos.find(p => p.id === currentFactoryPoId); if (po) { po.shipped = true; po.shipped_date = today; }
-            showToast('Marked as shipped');
+        // ---- Notes / chat ----
+        let _notesPoId = null;
+        async function openPoNotes(poId) {
+            _notesPoId = poId;
+            const po = factoryPos.find(p => p.id === poId);
+            document.getElementById('fpo-notes-title').textContent = 'Notes — ' + (po?.po_number || 'PO');
+            await renderPoNotesThread();
+            document.getElementById('fpo-notes-modal').classList.remove('hide');
+            document.getElementById('fpo-note-input').focus();
+            // mark read for the brand side
+            const now = new Date().toISOString();
+            await supabase.from('factory_purchase_orders').update({ brand_last_read_at: now }).eq('id', poId);
+            if (po) po.brand_last_read_at = now;
             renderFactoryPoList();
-            openFactoryPoRecord(currentFactoryPoId);
+        }
+        function hidePoNotes() { document.getElementById('fpo-notes-modal').classList.add('hide'); _notesPoId = null; }
+        async function renderPoNotesThread() {
+            const el = document.getElementById('fpo-notes-thread');
+            const { data } = await supabase.from('factory_po_notes').select('*').eq('po_id', _notesPoId).order('created_at');
+            const notes = data || [];
+            if (!notes.length) { el.innerHTML = '<p class="text-center text-sm py-8" style="color:#94a3b8">No notes yet. Start the conversation below.</p>'; return; }
+            el.innerHTML = notes.map(n => {
+                const brand = n.author_type === 'brand';
+                const align = brand ? 'margin-left:auto;background:#eff6ff;border:1px solid #bfdbfe' : 'margin-right:auto;background:#f8fafc;border:1px solid #e2e8f0';
+                const who = (brand ? '🏷️ ' : '🏭 ') + escHtml(n.author_name || (brand ? 'Brand' : 'Factory'));
+                const when = new Date(n.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+                return `<div style="max-width:80%;${align};border-radius:12px;padding:8px 12px;margin-bottom:8px">
+                    <div class="flex items-center justify-between gap-3 mb-1"><span class="text-xs font-semibold" style="color:#475569">${who}</span><span class="text-xs" style="color:#94a3b8">${when}</span></div>
+                    <p class="text-sm" style="color:#0f172a;white-space:pre-wrap">${escHtml(n.body)}</p>
+                </div>`;
+            }).join('');
+            el.scrollTop = el.scrollHeight;
+        }
+        async function sendPoNote() {
+            const input = document.getElementById('fpo-note-input');
+            const body = input.value.trim();
+            if (!body || !_notesPoId) return;
+            const po = factoryPos.find(p => p.id === _notesPoId);
+            const name = currentUser?.user_metadata?.full_name || currentUser?.email || 'Brand';
+            const { error } = await supabase.from('factory_po_notes').insert({ po_id: _notesPoId, brand_id: po?.brand_id || currentBrand?.id, author_type: 'brand', author_name: name, body });
+            if (error) { showToast('Error sending note: ' + error.message, 'error'); return; }
+            input.value = '';
+            const now = new Date().toISOString();
+            await supabase.from('factory_purchase_orders').update({ brand_last_read_at: now }).eq('id', _notesPoId);
+            if (po) po.brand_last_read_at = now;
+            await renderPoNotesThread();
+            await loadPoNotesMeta();
+            renderFactoryPoList();
         }
         async function deleteFactoryPo() {
             if (!currentFactoryPoId) return;
@@ -16765,6 +16868,7 @@
 
         document.getElementById('factory-po-modal').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoModal(); });
         document.getElementById('factory-po-record').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoRecord(); });
+        document.getElementById('fpo-notes-modal').addEventListener('click', function(e) { if (e.target === this) hidePoNotes(); });
 
         // =============================================
         // SALES MODULE — STATE
