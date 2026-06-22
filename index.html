@@ -16504,7 +16504,7 @@
             function fmtAvg(d) {
                 if (d === null) return '<span style="color:#94a3b8;font-size:1.25rem">—</span>';
                 const w = Math.floor(d / 7), r = d % 7;
-                return `<span style="font-size:1.5rem;font-weight:700;color:#0f172a">${w}<span style="font-size:0.9rem">w</span>${r > 0 ? ` ${r}<span style="font-size:0.9rem">d</span>` : ''}</span>`;
+                return `<span style="font-size:1.5rem;font-weight:700;color:#0f172a">${w}<span style="font-size:0.9rem"> ${w === 1 ? 'Week' : 'Weeks'}</span>${r > 0 ? ` ${r}<span style="font-size:0.9rem"> ${r === 1 ? 'Day' : 'Days'}</span>` : ''}</span>`;
             }
             function tl(d) {
                 if (d === null) return { dot: '#94a3b8', label: 'No data', bg: '#f8fafc', text: '#94a3b8' };
