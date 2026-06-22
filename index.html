@@ -1974,10 +1974,6 @@
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     Design Studio
                 </button>
-                <button class="gnav-btn" id="gnav-po-tracker" onclick="showTool('po-tracker')">
-                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    Production
-                </button>
                 <button class="gnav-btn" id="gnav-factory" onclick="showTool('factory')">
                     <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
                     Factory
@@ -2114,17 +2110,6 @@
                     <p>Manage clubs, custom products, order forms and Shopify collections</p>
                     <div class="mt-4">
                         <span id="stat-clubs-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#ede9fe;color:#6d28d9">0 clubs</span>
-                    </div>
-                </div>
-
-                <!-- Production -->
-                <div id="fc-production" onclick="showTool('po-tracker')" class="feature-card accent-orange">
-                    <span class="card-badge badge-new" id="badge-production" style="display:none">Off</span>
-                    <div class="card-icon" style="background:#ffedd5"><svg class="w-7 h-7" fill="none" stroke="#c2410c" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg></div>
-                    <h3>Production</h3>
-                    <p>Purchase orders, factory tracking and delivery management</p>
-                    <div class="mt-4">
-                        <span id="stat-pos-lp" class="text-xs font-semibold px-2 py-1 rounded-md" style="background:#ffedd5;color:#c2410c">0 active POs</span>
                     </div>
                 </div>
 
@@ -3163,142 +3148,83 @@
             </div>
         </div>
 
-        <!-- TOOL: PO Tracker V2 -->
-        <div id="tool-po-tracker" class="hide w-full p-6 md:p-8 lg:px-12">
-            <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-                <button onclick="openCreatePoModal()" class="btn-primary text-sm flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                    New PO
-                </button>
-            </div>
-
-            <!-- Filters -->
-            <div class="glass rounded-xl p-4 mb-6 flex flex-wrap gap-4 items-center">
-                <input type="text" id="po-search" placeholder="Search by PO number, factory, club..." class="flex-1 min-w-48 px-4 py-2 rounded-lg text-sm" oninput="renderPoList()">
-                <select id="po-status-filter" class="px-4 py-2 rounded-lg text-sm" onchange="renderPoList()">
-                    <option value="">All Statuses</option>
-                    <option value="draft">Draft</option>
-                    <option value="sent">Sent to Factory</option>
-                    <option value="acknowledged">Acknowledged</option>
-                    <option value="in_production">In Production</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="delivered">Delivered</option>
-                    <option value="cancelled">Cancelled</option>
-                </select>
-            </div>
-
-            <!-- PO List -->
-            <div id="po-list" class="space-y-3">
-                <p class="text-gray-400 text-center py-12">No purchase orders yet. Click "+ New PO" to create one.</p>
-            </div>
-        </div>
-
-        <!-- MODAL: Create / Edit PO -->
-        <div id="po-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
-            <div class="glass rounded-2xl p-6 w-full max-w-3xl mx-4 my-auto">
+        <!-- MODAL: Create / Edit Factory PO -->
+        <div id="factory-po-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4 my-auto">
                 <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-bold" id="po-modal-title">New Purchase Order</h3>
-                    <button onclick="hidePoModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    <h3 class="text-xl font-bold" id="fpo-modal-title">New Purchase Order</h3>
+                    <button onclick="hideFactoryPoModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
 
-                <input type="hidden" id="po-edit-id">
+                <input type="hidden" id="fpo-edit-id">
+                <input type="hidden" id="fpo-job-id">
 
-                <!-- PO Header fields -->
                 <div class="grid md:grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="text-gray-400 text-sm mb-1 block">PO Number *</label>
-                        <input type="text" id="po-number" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. PO-2024-001">
+                        <input type="text" id="fpo-number" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. RP01">
                     </div>
                     <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Status</label>
-                        <select id="po-status" class="w-full px-4 py-3 rounded-lg">
-                            <option value="draft">Draft</option>
-                            <option value="sent">Sent to Factory</option>
-                            <option value="acknowledged">Acknowledged</option>
-                            <option value="in_production">In Production</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
+                        <label class="text-gray-400 text-sm mb-1 block">Order Date</label>
+                        <input type="date" id="fpo-order-date" class="w-full px-4 py-3 rounded-lg" onchange="updateFactoryPoDueDate()">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-gray-400 text-sm mb-1 block">PO Title</label>
+                        <input type="text" id="fpo-title" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. 2026/27 Home & Away Kit">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Club</label>
+                        <select id="fpo-club-select" class="w-full px-4 py-3 rounded-lg" onchange="onFactoryPoClubChange()">
+                            <option value="">— Select club —</option>
+                            <option value="__other">Other / free text…</option>
                         </select>
+                        <input type="text" id="fpo-club-text" class="w-full px-4 py-3 rounded-lg mt-2 hide" placeholder="Club name">
                     </div>
                     <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Factory Name</label>
-                        <input type="text" id="po-factory" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. Acme Manufacturing">
-                    </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Club (optional)</label>
-                        <select id="po-club-id" class="w-full px-4 py-3 rounded-lg">
-                            <option value="">— No specific club —</option>
+                        <label class="text-gray-400 text-sm mb-1 block">Team</label>
+                        <select id="fpo-team-select" class="w-full px-4 py-3 rounded-lg" onchange="onFactoryPoTeamChange()">
+                            <option value="">— Select team —</option>
+                            <option value="__other">Other / free text…</option>
                         </select>
+                        <input type="text" id="fpo-team-text" class="w-full px-4 py-3 rounded-lg mt-2 hide" placeholder="Team name">
                     </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Expected Delivery</label>
-                        <input type="date" id="po-expected-delivery" class="w-full px-4 py-3 rounded-lg">
-                    </div>
-                    <div>
-                        <label class="text-gray-400 text-sm mb-1 block">Season / Reference</label>
-                        <input type="text" id="po-season" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. 2024/25">
+                    <div class="md:col-span-2">
+                        <label class="text-gray-400 text-sm mb-1 block">Order Details & Assets (Google Drive link)</label>
+                        <input type="url" id="fpo-assets-url" class="w-full px-4 py-3 rounded-lg" placeholder="https://drive.google.com/...">
                     </div>
                 </div>
 
-                <!-- Shopify Order IDs -->
-                <div class="mb-4">
-                    <label class="text-gray-400 text-sm mb-1 block">Linked Shopify Order IDs <span class="text-gray-500">(comma-separated)</span></label>
-                    <input type="text" id="po-shopify-orders" class="w-full px-4 py-3 rounded-lg" placeholder="e.g. 5001, 5002, 5003">
-                </div>
-
-                <!-- Notes -->
-                <div class="mb-6">
-                    <label class="text-gray-400 text-sm mb-1 block">Notes</label>
-                    <textarea id="po-notes" rows="2" class="w-full px-4 py-3 rounded-lg resize-none" placeholder="Internal notes…"></textarea>
-                </div>
-
-                <!-- Summary Line Items -->
-                <div class="mb-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <h4 class="font-semibold text-gray-300">Summary Line Items</h4>
-                        <button onclick="addPoLineItem()" class="text-brand-400 hover:text-brand-300 text-sm font-medium">+ Add Line</button>
-                    </div>
-                    <div id="po-line-items" class="space-y-2">
-                        <!-- Lines added dynamically -->
-                    </div>
-                    <button onclick="addPoLineItem()" class="w-full border border-dashed border-gray-600 hover:border-brand-500 py-2 rounded-lg text-gray-400 hover:text-brand-400 transition text-sm mt-2">
-                        + Add Line Item
-                    </button>
-                </div>
-
-                <!-- PO Total -->
                 <div class="glass rounded-lg p-4 mb-6 flex justify-between items-center">
-                    <span class="text-gray-400">Estimated Total</span>
-                    <span id="po-total-display" class="text-xl font-bold text-brand-400">£0.00</span>
+                    <span class="text-gray-400 text-sm">Delivery to reach ROKOR HQ (auto · 4 weeks)</span>
+                    <span id="fpo-due-display" class="font-semibold text-brand-400">—</span>
                 </div>
 
                 <div class="flex gap-3 justify-end">
-                    <button onclick="hidePoModal()" class="px-6 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Cancel</button>
-                    <button onclick="savePo()" class="bg-brand-500 hover:bg-brand-600 px-8 py-3 rounded-lg font-semibold transition">Save PO</button>
+                    <button onclick="hideFactoryPoModal()" class="px-6 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Cancel</button>
+                    <button onclick="saveFactoryPo()" class="bg-brand-500 hover:bg-brand-600 px-8 py-3 rounded-lg font-semibold transition">Save PO</button>
                 </div>
             </div>
         </div>
 
-        <!-- MODAL: PO Detail / View -->
-        <div id="po-detail-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
+        <!-- MODAL: Factory PO Record -->
+        <div id="factory-po-record" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
             <div class="glass rounded-2xl p-6 w-full max-w-3xl mx-4 my-auto">
                 <div class="flex justify-between items-center mb-6">
                     <div>
-                        <h3 class="text-xl font-bold" id="po-detail-number">PO Detail</h3>
-                        <p class="text-gray-400 text-sm" id="po-detail-factory"></p>
+                        <h3 class="text-xl font-bold" id="fpo-rec-number">PO</h3>
+                        <p class="text-gray-400 text-sm" id="fpo-rec-title"></p>
                     </div>
-                    <button onclick="hidePoDetailModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    <button onclick="hideFactoryPoRecord()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
                 </div>
 
-                <div id="po-detail-body">
-                    <!-- Populated dynamically -->
-                </div>
+                <div id="fpo-rec-body"><!-- Populated by openFactoryPoRecord() --></div>
 
-                <div class="flex gap-3 justify-end mt-6">
-                    <button onclick="hidePoDetailModal()" class="px-6 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Close</button>
-                    <button onclick="editCurrentPo()" class="bg-yellow-500 hover:bg-yellow-600 px-6 py-3 rounded-lg font-semibold transition">Edit PO</button>
-                    <button onclick="deleteCurrentPo()" class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg font-semibold transition">Delete</button>
+                <div class="flex gap-3 justify-between mt-6">
+                    <button onclick="deleteFactoryPo()" class="bg-red-600/90 hover:bg-red-700 px-5 py-3 rounded-lg font-semibold transition">Delete PO</button>
+                    <div class="flex gap-3">
+                        <button onclick="openFactoryPoModal(currentFactoryPoId)" class="px-5 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Edit Details</button>
+                        <button onclick="hideFactoryPoRecord()" class="bg-brand-500 hover:bg-brand-600 px-6 py-3 rounded-lg font-semibold transition">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3311,6 +3237,7 @@
                     <button id="factory-tab-forecast" class="sh-tab" onclick="switchFactoryTab('forecast')">Fabric Forecast</button>
                     <button id="factory-tab-stock" class="sh-tab" onclick="switchFactoryTab('stock')">Fabric Stock</button>
                     <button id="factory-tab-development" class="sh-tab" onclick="switchFactoryTab('development')">Product Development</button>
+                    <button id="factory-tab-po-tracker" class="sh-tab" onclick="switchFactoryTab('po-tracker')">PO Tracker</button>
                 </div>
                 <div class="sh-topbar-right">
                     <button class="sh-action-btn sh-action-btn-secondary" onclick="showFactoryShareModal()" title="Get the public link to send to your factory">
@@ -3325,12 +3252,16 @@
                     </div>
                     <div id="factory-actions-stock" class="sh-actions hide"></div>
                     <div id="factory-actions-development" class="sh-actions hide"></div>
+                    <div id="factory-actions-po-tracker" class="sh-actions hide">
+                        <button class="btn-primary" onclick="openFactoryPoModal()">+ New PO</button>
+                    </div>
                 </div>
             </div>
             <div id="factory-view-fabrics"></div>
             <div id="factory-view-forecast" class="hide"></div>
             <div id="factory-view-stock" class="hide"></div>
             <div id="factory-view-development" class="hide"></div>
+            <div id="factory-view-po-tracker" class="hide"></div>
         </div>
 
         <!-- Design Task: Edit/Delete dropdown menu (fixed-position, shared) -->
@@ -3508,6 +3439,24 @@
                     </div>
                 </div>
                 <button onclick="saveDesignSettings()" class="mt-4 btn-primary text-sm">Save Design Settings</button>
+            </div>
+
+            <!-- PO Numbering Settings -->
+            <div class="glass rounded-2xl p-6 mb-6">
+                <h3 class="font-semibold mb-1">PO Numbering</h3>
+                <p class="text-gray-500 text-sm mb-4">Auto-generate purchase order numbers in the PO Tracker. The number is editable on each PO, so in-progress POs can be entered manually.</p>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">PO Prefix</label>
+                        <input type="text" id="po-prefix" placeholder="e.g. RP" maxlength="10" class="w-full px-3 py-2 rounded-lg text-sm" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase();updatePoNumberExample()">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Next Number</label>
+                        <input type="number" id="po-next-number" min="1" placeholder="1" class="w-full px-3 py-2 rounded-lg text-sm" oninput="updatePoNumberExample()">
+                    </div>
+                </div>
+                <p class="text-xs text-gray-600 mt-2">Next PO will be: <strong id="po-number-example" class="text-gray-400">RP01</strong></p>
+                <button onclick="savePoSettings()" class="mt-4 btn-primary text-sm">Save PO Settings</button>
             </div>
 
             <div class="glass rounded-2xl p-6 mb-6">
@@ -4285,6 +4234,11 @@
                         <div id="jr-production-status" class="p-4 rounded-xl" style="background:#f8fafc;border:1px solid #e2e8f0">
                             <p class="text-sm text-gray-600">No order form approved yet. Approve an order form to enable worksheet generation.</p>
                         </div>
+                    </div>
+                    <div class="mt-6 pt-6" style="border-top:1px solid #e2e8f0">
+                        <h4 class="font-semibold mb-1">PO Tracker</h4>
+                        <p class="text-xs text-gray-500 mb-3">Create a purchase order in the Factory PO Tracker, pre-filled from this job (title, club, team and assets link).</p>
+                        <button onclick="createPoFromJob()" class="btn-primary text-sm">+ Create PO in Tracker</button>
                     </div>
                 </div>
             </div>
@@ -7166,10 +7120,7 @@
                 .select('*', { count: 'exact', head: true })
                 .eq('brand_id', currentBrand?.id)
                 .then(({ count }) => {
-                    const posCount = count || 0;
-                    document.getElementById('stat-orders').textContent = posCount;
-                    const el_pos = document.getElementById('stat-pos-lp');
-                    if (el_pos) el_pos.textContent = `${posCount} active PO${posCount !== 1 ? 's' : ''}`;
+                    document.getElementById('stat-orders').textContent = count || 0;
                 });
         }
 
@@ -7231,7 +7182,6 @@
             const featureMap = {
                 'sales':          { card: 'fc-sales',       badge: 'badge-sales',       onclick: "showTool('sales')" },
                 'clubs':          { card: 'fc-clubs',       badge: 'badge-clubs',       onclick: "showTool('clubs')" },
-                'production':     { card: 'fc-production',  badge: 'badge-production',  onclick: "showTool('po-tracker')" },
                 'design_studio':  { card: 'fc-design',      badge: 'badge-design',      onclick: "showTool('design-studio')" },
                 'store_generator':{ card: 'fc-store',       badge: 'badge-store',       onclick: "showTool('generator')" },
                 'products':       { card: 'fc-products',    badge: 'badge-products',    onclick: "showTool('products')" },
@@ -7271,7 +7221,7 @@
             if (navTrail.length === 0 || navTrail[navTrail.length - 1]?.type !== 'tool' || navTrail[navTrail.length - 1]?.tool !== tool) {
                 const TOOL_LABELS = { products: 'Product Database', clubs: 'Clubs', 'design-studio': 'Design Studio',
                     mockups: 'Mock-Ups', generator: 'Store Generator', orders: 'Factory Orders',
-                    settings: 'Brand Settings', users: 'User Management', 'po-tracker': 'Production',
+                    settings: 'Brand Settings', users: 'User Management',
                     prospecting: 'Prospecting', sales: 'Sales', 'order-forms': 'Order Forms', factory: 'Factory' };
                 navTrail = [{ label: 'Home', type: 'launchpad' }, { label: TOOL_LABELS[tool] || tool, type: 'tool', tool }];
                 renderBreadcrumb();
@@ -7312,9 +7262,6 @@
                 case 'users':
                     loadAllUsers();
                     break;
-                case 'po-tracker':
-                    loadPoTracker();
-                    break;
                 case 'factory':
                     loadFactory();
                     switchFactoryTab(_factoryActiveTab || 'fabrics');
@@ -7343,6 +7290,32 @@
             renderFeatureToggles();
             if (typeof loadDesignSettings === 'function') loadDesignSettings();
             renderTabOrderSettings();
+            loadPoSettings();
+        }
+
+        function loadPoSettings() {
+            if (!currentBrand) return;
+            const prefixEl = document.getElementById('po-prefix');
+            const nextEl = document.getElementById('po-next-number');
+            if (prefixEl) prefixEl.value = currentBrand.po_prefix || 'RP';
+            if (nextEl) nextEl.value = currentBrand.po_next_number || 1;
+            updatePoNumberExample();
+        }
+        function updatePoNumberExample() {
+            const prefix = (document.getElementById('po-prefix')?.value || 'RP').toUpperCase();
+            const n = parseInt(document.getElementById('po-next-number')?.value, 10) || 1;
+            const ex = document.getElementById('po-number-example');
+            if (ex) ex.textContent = prefix + String(n).padStart(2, '0');
+        }
+        async function savePoSettings() {
+            if (!currentBrand) return;
+            const prefix = (document.getElementById('po-prefix').value || 'RP').trim().toUpperCase();
+            const next = parseInt(document.getElementById('po-next-number').value, 10) || 1;
+            const { error } = await supabase.from('brands').update({ po_prefix: prefix, po_next_number: next }).eq('id', currentBrand.id);
+            if (error) { showToast('Error saving PO settings: ' + error.message, 'error'); return; }
+            currentBrand.po_prefix = prefix;
+            currentBrand.po_next_number = next;
+            showToast('PO settings saved');
         }
 
 
@@ -7495,7 +7468,7 @@
 
         function switchFactoryTab(tab) {
             _factoryActiveTab = tab;
-            ['fabrics','forecast','stock','development'].forEach(t => {
+            ['fabrics','forecast','stock','development','po-tracker'].forEach(t => {
                 const btn = document.getElementById(`factory-tab-${t}`);
                 const view = document.getElementById(`factory-view-${t}`);
                 const actions = document.getElementById(`factory-actions-${t}`);
@@ -7511,6 +7484,7 @@
             if (_factoryActiveTab === 'forecast')    loadForecast();
             if (_factoryActiveTab === 'stock')       loadStockView();
             if (_factoryActiveTab === 'development') renderDevelopmentView();
+            if (_factoryActiveTab === 'po-tracker')  loadFactoryPoTracker();
         }
 
         // ---- Fabric List ----
@@ -16334,219 +16308,409 @@
         }
 
         // =============================================
-        // PO TRACKER V2
+        // FACTORY PO TRACKER
         // =============================================
-        let currentPos = [];
-        let editingPoId = null;
+        let factoryPos = [];
+        let currentFactoryPoId = null;
+        let _poCountdownTimer = null;
 
-        async function loadPoTracker() {
-            const { data, error } = await supabase
-                .from('purchase_orders')
-                .select('*, clubs(name)')
-                .eq('brand_id', currentBrandId)
-                .order('created_at', { ascending: false });
-            if (error) { showToast('Error loading POs: ' + error.message, 'error'); return; }
-            currentPos = data || [];
-            renderPoList();
+        // ---- Date helpers ----
+        function fpoDate(d)      { if (!d) return ''; return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); }
+        function fpoDateShort(d) { if (!d) return ''; return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short' }); }
+        function fpoToday()      { return new Date().toISOString().slice(0, 10); }
+        function fpoAddDays(dateStr, n) { const d = new Date(dateStr + 'T00:00:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+
+        // ---- PO numbering ----
+        function nextPoNumber() {
+            const prefix = currentBrand?.po_prefix || 'RP';
+            const n = currentBrand?.po_next_number || 1;
+            return prefix + String(n).padStart(2, '0');
+        }
+        async function advancePoCounter(poNumber) {
+            const m = String(poNumber).match(/(\d+)\s*$/);
+            if (!m) return;
+            const next = Math.max(currentBrand?.po_next_number || 1, parseInt(m[1], 10) + 1);
+            const { error } = await supabase.from('brands').update({ po_next_number: next }).eq('id', currentBrand.id);
+            if (!error && currentBrand) currentBrand.po_next_number = next;
         }
 
-        function renderPoList() {
-            const search = (document.getElementById('po-search')?.value || '').toLowerCase();
-            const statusFilter = document.getElementById('po-status-filter')?.value || '';
-            const filtered = currentPos.filter(po => {
-                const matchSearch = !search ||
-                    (po.po_number || '').toLowerCase().includes(search) ||
-                    (po.factory_name || '').toLowerCase().includes(search) ||
-                    (po.clubs?.name || '').toLowerCase().includes(search);
-                const matchStatus = !statusFilter || po.status === statusFilter;
-                return matchSearch && matchStatus;
-            });
-            const el = document.getElementById('po-list');
-            if (!filtered.length) {
-                el.innerHTML = '<p class="text-gray-400 text-center py-12">No purchase orders match your filters.</p>';
+        // ---- Stages & countdown ----
+        function poStages(po) {
+            return [
+                { label: 'Artwork Approved', done: !!po.artwork_approved, date: po.artwork_approved_date },
+                { label: 'PPS Approved',     done: !!po.pps_approved,     date: po.pps_approved_date },
+                { label: 'Shipped',          done: !!po.shipped,          date: po.shipped_date },
+                { label: po.completion_status === 'part_completed' ? 'Part-Completed' : 'Completed',
+                  done: po.completion_status === 'completed' || po.completion_status === 'part_completed', date: null }
+            ];
+        }
+        function poCountdown(po) {
+            if (po.shipped) return { cls: 'ok', text: '✓ Shipped' + (po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : '') };
+            const target = po.revised_delivery_date || po.delivery_due_date;
+            if (!target) return { cls: '', text: 'No due date' };
+            const ms = new Date(target + 'T00:00:00') - new Date();
+            if (ms >= 0) {
+                const days = Math.ceil(ms / 86400000);
+                return { cls: days <= 3 ? 'soon' : 'ok', text: days + ' day' + (days !== 1 ? 's' : '') + ' to ship' };
+            }
+            const late = Math.floor(-ms / 86400000);
+            return { cls: 'overdue', text: '⚠ LATE by ' + late + ' day' + (late !== 1 ? 's' : '') };
+        }
+        function renderPoTimelineHtml(po) {
+            const stages = poStages(po);
+            return `<div style="display:flex;align-items:flex-start;margin:8px 0 2px">` +
+                stages.map((s, i) => `
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative">
+                        ${i > 0 ? `<div style="position:absolute;top:9px;left:-50%;width:100%;height:2px;background:${s.done ? '#22c55e' : '#374151'}"></div>` : ''}
+                        <div style="width:20px;height:20px;border-radius:50%;z-index:1;background:${s.done ? '#22c55e' : '#374151'};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">${s.done ? '✓' : ''}</div>
+                        <span style="font-size:11px;margin-top:6px;color:${s.done ? '#d1d5db' : '#6b7280'};text-align:center;line-height:1.2">${s.label}</span>
+                        ${s.date ? `<span style="font-size:10px;color:#6b7280">${fpoDateShort(s.date)}</span>` : ''}
+                    </div>`).join('') + `</div>`;
+        }
+
+        // ---- Load & list ----
+        async function loadFactoryPoTracker() {
+            if (!currentBrand) return;
+            const { data, error } = await supabase
+                .from('factory_purchase_orders')
+                .select('*, clubs(name)')
+                .eq('brand_id', currentBrand.id)
+                .order('created_at', { ascending: false });
+            if (error) { showToast('Error loading POs: ' + error.message, 'error'); console.error(error); return; }
+            factoryPos = data || [];
+            renderFactoryPoList();
+            if (!_poCountdownTimer) _poCountdownTimer = setInterval(poCountdownTick, 60000);
+        }
+        function poCountdownTick() {
+            const tool = document.getElementById('tool-factory');
+            if (_factoryActiveTab === 'po-tracker' && tool && !tool.classList.contains('hide')) renderFactoryPoList();
+        }
+        function renderFactoryPoList() {
+            const el = document.getElementById('factory-view-po-tracker');
+            if (!el) return;
+            if (!factoryPos.length) {
+                el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No purchase orders yet. Click <strong>+ New PO</strong> to create one.</div>';
                 return;
             }
-            const statusColors = { draft: 'bg-gray-500/20 text-gray-300', sent: 'bg-blue-500/20 text-blue-300', acknowledged: 'bg-cyan-500/20 text-cyan-300', in_production: 'bg-yellow-500/20 text-yellow-300', shipped: 'bg-orange-500/20 text-orange-300', delivered: 'bg-green-500/20 text-green-300', cancelled: 'bg-red-500/20 text-red-300' };
-            const statusLabel = { draft: 'Draft', sent: 'Sent', acknowledged: 'Acknowledged', in_production: 'In Production', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' };
-            el.innerHTML = filtered.map(po => {
-                const badge = `<span class="px-2 py-1 rounded-full text-xs font-medium ${statusColors[po.status] || 'bg-gray-500/20 text-gray-300'}">${statusLabel[po.status] || po.status}</span>`;
-                const shopifyIds = po.shopify_order_ids || [];
-                return `<div class="glass rounded-xl p-5 cursor-pointer hover:border-brand-500 transition" onclick="openPoDetail('${po.id}')">
-                    <div class="flex justify-between items-start">
+            el.innerHTML = factoryPos.map(po => {
+                const cd = poCountdown(po);
+                const clubName = po.clubs?.name || po.club_name || '';
+                const assetsBtn = po.assets_url ? `<a href="${escHtml(po.assets_url)}" target="_blank" onclick="event.stopPropagation()" class="btn-secondary text-xs px-3 py-1.5 rounded-lg">📁 Drive</a>` : '';
+                const target = po.revised_delivery_date || po.delivery_due_date;
+                return `<div class="glass rounded-xl p-5 cursor-pointer hover:border-brand-500 transition" onclick="openFactoryPoRecord('${po.id}')">
+                    <div class="flex justify-between items-start gap-4 mb-4 flex-wrap">
                         <div>
-                            <div class="flex items-center gap-3 mb-1"><span class="font-bold text-lg">${po.po_number || 'No PO#'}</span>${badge}</div>
-                            <p class="text-gray-400 text-sm">${po.factory_name || 'No factory assigned'}${po.clubs?.name ? ' · ' + po.clubs.name : ''}</p>
+                            <div class="flex items-center gap-3 mb-1">
+                                <span class="font-bold text-lg">${escHtml(po.po_number || 'No PO#')}</span>
+                                <span class="dt-countdown ${cd.cls}">${cd.text}</span>
+                            </div>
+                            <p class="text-gray-300 text-sm font-medium">${escHtml(po.po_title || 'Untitled PO')}</p>
+                            <p class="text-gray-500 text-xs mt-0.5">${escHtml(clubName)}${po.team_name ? ' · ' + escHtml(po.team_name) : ''}</p>
                         </div>
                         <div class="text-right text-sm text-gray-400">
-                            ${po.expected_delivery_date ? '<p>Delivery: ' + po.expected_delivery_date + '</p>' : ''}
-                            ${shopifyIds.length ? '<p>' + shopifyIds.length + ' Shopify order' + (shopifyIds.length > 1 ? 's' : '') + ' linked</p>' : ''}
+                            <p class="text-xs text-gray-500">Expected delivery</p>
+                            <p class="font-medium">${target ? fpoDate(target) : '—'}${po.revised_delivery_date ? ' <span class="text-xs text-orange-300">(revised)</span>' : ''}</p>
+                            <div class="mt-2">${assetsBtn}</div>
                         </div>
                     </div>
+                    ${renderPoTimelineHtml(po)}
                 </div>`;
             }).join('');
         }
 
-        async function openCreatePoModal() {
-            editingPoId = null;
-            document.getElementById('po-modal-title').textContent = 'New Purchase Order';
-            document.getElementById('po-number').value = '';
-            document.getElementById('po-status').value = 'draft';
-            document.getElementById('po-factory').value = '';
-            document.getElementById('po-expected-delivery').value = '';
-            document.getElementById('po-season').value = '';
-            document.getElementById('po-shopify-orders').value = '';
-            document.getElementById('po-notes').value = '';
-            document.getElementById('po-line-items').innerHTML = '';
-            document.getElementById('po-total-display').textContent = '£0.00';
-            await populatePoClubDropdown('');
-            document.getElementById('po-modal').classList.remove('hide');
+        // ---- Create / edit modal ----
+        function populateFactoryPoClubs(selectedClubId) {
+            const sel = document.getElementById('fpo-club-select');
+            sel.innerHTML = ['<option value="">— Select club —</option>']
+                .concat((clubs || []).map(c => `<option value="${c.id}" ${c.id === selectedClubId ? 'selected' : ''}>${escHtml(c.name)}</option>`))
+                .concat('<option value="__other">Other / free text…</option>').join('');
         }
+        async function populateFactoryPoTeams(clubId, selectedTeamName) {
+            const sel = document.getElementById('fpo-team-select');
+            const txt = document.getElementById('fpo-team-text');
+            let teams = [];
+            if (clubId) {
+                const { data } = await supabase.from('club_teams').select('team_name').eq('club_id', clubId).order('team_name');
+                teams = data || [];
+            }
+            const inList = selectedTeamName && teams.some(t => t.team_name === selectedTeamName);
+            sel.innerHTML = ['<option value="">— Select team —</option>']
+                .concat(teams.map(t => `<option value="${escHtml(t.team_name)}" ${t.team_name === selectedTeamName ? 'selected' : ''}>${escHtml(t.team_name)}</option>`))
+                .concat('<option value="__other">Other / free text…</option>').join('');
+            if (selectedTeamName && !inList) { sel.value = '__other'; txt.classList.remove('hide'); txt.value = selectedTeamName; }
+            else { txt.classList.add('hide'); txt.value = ''; }
+        }
+        function onFactoryPoClubChange() {
+            const sel = document.getElementById('fpo-club-select');
+            const txt = document.getElementById('fpo-club-text');
+            if (sel.value === '__other') txt.classList.remove('hide');
+            else { txt.classList.add('hide'); txt.value = ''; }
+            populateFactoryPoTeams(sel.value && sel.value !== '__other' ? sel.value : null, null);
+        }
+        function onFactoryPoTeamChange() {
+            const sel = document.getElementById('fpo-team-select');
+            const txt = document.getElementById('fpo-team-text');
+            if (sel.value === '__other') txt.classList.remove('hide');
+            else { txt.classList.add('hide'); txt.value = ''; }
+        }
+        function updateFactoryPoDueDate() {
+            const od = document.getElementById('fpo-order-date').value;
+            document.getElementById('fpo-due-display').textContent = od ? fpoDate(fpoAddDays(od, 28)) : '—';
+        }
+        async function openFactoryPoModal(poId, prefill) {
+            const editing = poId && typeof poId === 'string';
+            const po = editing ? factoryPos.find(p => p.id === poId) : null;
+            const p = po || prefill || {};
+            document.getElementById('fpo-edit-id').value = editing ? poId : '';
+            document.getElementById('fpo-job-id').value = p.job_id || '';
+            document.getElementById('fpo-modal-title').textContent = editing ? 'Edit Purchase Order' : 'New Purchase Order';
+            document.getElementById('fpo-number').value = p.po_number || (editing ? '' : nextPoNumber());
+            document.getElementById('fpo-order-date').value = p.order_date || fpoToday();
+            document.getElementById('fpo-title').value = p.po_title || '';
+            document.getElementById('fpo-assets-url').value = p.assets_url || '';
+            populateFactoryPoClubs(p.club_id || '');
+            const clubSel = document.getElementById('fpo-club-select');
+            const clubTxt = document.getElementById('fpo-club-text');
+            if (!p.club_id && p.club_name) { clubSel.value = '__other'; clubTxt.classList.remove('hide'); clubTxt.value = p.club_name; }
+            else { clubTxt.classList.add('hide'); clubTxt.value = ''; }
+            await populateFactoryPoTeams(p.club_id || null, p.team_name || null);
+            updateFactoryPoDueDate();
+            hideFactoryPoRecord();
+            document.getElementById('factory-po-modal').classList.remove('hide');
+        }
+        function hideFactoryPoModal() { document.getElementById('factory-po-modal').classList.add('hide'); }
 
-        async function populatePoClubDropdown(selectedClubId) {
-            const { data } = await supabase.from('clubs').select('id, name').eq('brand_id', currentBrandId).order('name');
-            const sel = document.getElementById('po-club-id');
-            sel.innerHTML = '<option value="">— No specific club —</option>';
-            (data || []).forEach(c => {
-                const opt = document.createElement('option');
-                opt.value = c.id;
-                opt.textContent = c.name;
-                if (c.id === selectedClubId) opt.selected = true;
-                sel.appendChild(opt);
+        async function createPoFromJob() {
+            if (!currentJob) { showToast('No job loaded', 'error'); return; }
+            let teamName = null;
+            const { data: teams } = await supabase.from('job_teams').select('team_name').eq('job_id', currentJob.id).limit(1);
+            if (teams && teams.length) teamName = teams[0].team_name;
+            await openFactoryPoModal(null, {
+                job_id: currentJob.id,
+                po_title: currentJob.job_name || '',
+                club_id: currentJob.club_id || '',
+                club_name: currentJob.clubs?.name || null,
+                team_name: teamName,
+                assets_url: currentJob.google_drive_url || ''
             });
         }
 
-        function hidePoModal() {
-            document.getElementById('po-modal').classList.add('hide');
-            editingPoId = null;
-        }
-
-        function addPoLineItem(desc = '', qty = 1, unitPrice = '') {
-            const lineId = 'pl-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6);
-            const el = document.getElementById('po-line-items');
-            const div = document.createElement('div');
-            div.id = lineId;
-            div.className = 'flex gap-2 items-center';
-            div.innerHTML = `
-                <input type="text" placeholder="Description" value="${desc}" class="flex-1 px-3 py-2 rounded-lg text-sm" oninput="calcPoTotal()">
-                <input type="number" placeholder="Qty" value="${qty}" min="1" class="w-20 px-3 py-2 rounded-lg text-sm" oninput="calcPoTotal()">
-                <input type="number" placeholder="Unit £" value="${unitPrice}" step="0.01" class="w-28 px-3 py-2 rounded-lg text-sm" oninput="calcPoTotal()">
-                <button onclick="document.getElementById('${lineId}').remove(); calcPoTotal();" class="text-red-400 hover:text-red-300 text-xl px-1">&times;</button>`;
-            el.appendChild(div);
-            calcPoTotal();
-        }
-
-        function calcPoTotal() {
-            let total = 0;
-            document.querySelectorAll('#po-line-items > div').forEach(line => {
-                const inputs = line.querySelectorAll('input');
-                total += (parseFloat(inputs[1]?.value) || 0) * (parseFloat(inputs[2]?.value) || 0);
-            });
-            document.getElementById('po-total-display').textContent = '£' + total.toFixed(2);
-        }
-
-        async function savePo() {
-            const poNumber = document.getElementById('po-number').value.trim();
+        async function saveFactoryPo() {
+            const poNumber = document.getElementById('fpo-number').value.trim();
             if (!poNumber) { showToast('PO Number is required', 'error'); return; }
-            const shopifyRaw = document.getElementById('po-shopify-orders').value.trim();
-            const shopifyIds = shopifyRaw ? shopifyRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+            const editing = document.getElementById('fpo-edit-id').value;
+            const clubSelVal = document.getElementById('fpo-club-select').value;
+            const clubId = clubSelVal && clubSelVal !== '__other' ? clubSelVal : null;
+            let clubName = null;
+            if (clubSelVal === '__other') clubName = document.getElementById('fpo-club-text').value.trim() || null;
+            else if (clubId) { const c = (clubs || []).find(x => x.id === clubId); clubName = c ? c.name : null; }
+            const teamSelVal = document.getElementById('fpo-team-select').value;
+            const teamName = teamSelVal === '__other' ? (document.getElementById('fpo-team-text').value.trim() || null) : (teamSelVal || null);
+            const orderDate = document.getElementById('fpo-order-date').value || fpoToday();
+            const seqMatch = poNumber.match(/(\d+)\s*$/);
             const payload = {
-                brand_id: currentBrandId,
+                brand_id: currentBrand.id,
+                job_id: document.getElementById('fpo-job-id').value || null,
                 po_number: poNumber,
-                status: document.getElementById('po-status').value,
-                factory_name: document.getElementById('po-factory').value.trim() || null,
-                club_id: document.getElementById('po-club-id').value || null,
-                expected_delivery_date: document.getElementById('po-expected-delivery').value || null,
-                season: document.getElementById('po-season').value.trim() || null,
-                shopify_order_ids: shopifyIds,
-                notes: document.getElementById('po-notes').value.trim() || null
+                po_seq: seqMatch ? parseInt(seqMatch[1], 10) : null,
+                order_date: orderDate,
+                po_title: document.getElementById('fpo-title').value.trim() || null,
+                club_id: clubId,
+                club_name: clubName,
+                team_name: teamName,
+                assets_url: document.getElementById('fpo-assets-url').value.trim() || null,
+                delivery_due_date: fpoAddDays(orderDate, 28)
             };
-            let poId = editingPoId;
-            if (poId) {
-                const { error } = await supabase.from('purchase_orders').update(payload).eq('id', poId);
+            if (editing) {
+                const { error } = await supabase.from('factory_purchase_orders').update(payload).eq('id', editing);
                 if (error) { showToast('Error updating PO: ' + error.message, 'error'); return; }
             } else {
-                const { data, error } = await supabase.from('purchase_orders').insert(payload).select().single();
+                payload.created_by = currentUser?.id || null;
+                const { error } = await supabase.from('factory_purchase_orders').insert(payload);
                 if (error) { showToast('Error creating PO: ' + error.message, 'error'); return; }
-                poId = data.id;
+                await advancePoCounter(poNumber);
             }
-            await supabase.from('po_line_items').delete().eq('po_id', poId);
-            const lineData = [];
-            document.querySelectorAll('#po-line-items > div').forEach((line, idx) => {
-                const inputs = line.querySelectorAll('input');
-                const desc = inputs[0]?.value.trim();
-                if (desc) lineData.push({ po_id: poId, description: desc, quantity: parseInt(inputs[1]?.value) || 1, unit_price: parseFloat(inputs[2]?.value) || null, line_order: idx });
-            });
-            if (lineData.length) await supabase.from('po_line_items').insert(lineData);
-            showToast(editingPoId ? 'PO updated' : 'PO created', 'success');
-            hidePoModal();
-            await loadPoTracker();
+            showToast(editing ? 'PO updated' : 'PO created');
+            hideFactoryPoModal();
+            await loadFactoryPoTracker();
         }
 
-        async function openPoDetail(poId) {
-            const po = currentPos.find(p => p.id === poId);
+        // ---- Record view ----
+        function openFactoryPoRecord(poId) {
+            const po = factoryPos.find(p => p.id === poId);
             if (!po) return;
-            const { data: lines } = await supabase.from('po_line_items').select('*').eq('po_id', poId).order('line_order');
-            document.getElementById('po-detail-number').textContent = po.po_number || 'PO Detail';
-            document.getElementById('po-detail-factory').textContent = po.factory_name || 'No factory assigned';
-            const statusLabel = { draft: 'Draft', sent: 'Sent to Factory', acknowledged: 'Acknowledged', in_production: 'In Production', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' };
-            const shopifyIds = po.shopify_order_ids || [];
-            const linesHtml = (lines || []).length
-                ? `<table class="w-full text-sm mb-4"><thead><tr class="text-gray-400 text-left"><th class="py-2">Description</th><th class="py-2 text-right">Qty</th><th class="py-2 text-right">Unit £</th><th class="py-2 text-right">Line Total</th></tr></thead><tbody>${(lines || []).map(l => `<tr class="border-t border-gray-800"><td class="py-2">${l.description}</td><td class="py-2 text-right">${l.quantity}</td><td class="py-2 text-right">${l.unit_price != null ? '£' + Number(l.unit_price).toFixed(2) : '—'}</td><td class="py-2 text-right">${l.unit_price != null ? '£' + (l.quantity * l.unit_price).toFixed(2) : '—'}</td></tr>`).join('')}</tbody></table>`
-                : '<p class="text-gray-500 text-sm mb-4">No line items.</p>';
-            document.getElementById('po-detail-body').innerHTML = `
+            currentFactoryPoId = poId;
+            document.getElementById('fpo-rec-number').textContent = po.po_number || 'PO';
+            document.getElementById('fpo-rec-title').textContent = po.po_title || '';
+            const cd = poCountdown(po);
+            const clubName = po.clubs?.name || po.club_name || '—';
+            const target = po.revised_delivery_date || po.delivery_due_date;
+            document.getElementById('fpo-rec-body').innerHTML = `
                 <div class="grid md:grid-cols-2 gap-4 mb-4 text-sm">
-                    <div><span class="text-gray-400">Status</span><p class="font-medium mt-1">${statusLabel[po.status] || po.status}</p></div>
-                    <div><span class="text-gray-400">Club</span><p class="font-medium mt-1">${po.clubs?.name || '—'}</p></div>
-                    <div><span class="text-gray-400">Expected Delivery</span><p class="font-medium mt-1">${po.expected_delivery_date || '—'}</p></div>
-                    <div><span class="text-gray-400">Season</span><p class="font-medium mt-1">${po.season || '—'}</p></div>
+                    <div><span class="text-gray-400">Order Date</span><p class="font-medium mt-1">${po.order_date ? fpoDate(po.order_date) : '—'}</p></div>
+                    <div><span class="text-gray-400">Delivery to reach HQ</span><p class="font-medium mt-1">${target ? fpoDate(target) : '—'}${po.revised_delivery_date ? ' <span class="text-xs text-orange-300">(revised)</span>' : ''}</p></div>
+                    <div><span class="text-gray-400">Club</span><p class="font-medium mt-1">${escHtml(clubName)}</p></div>
+                    <div><span class="text-gray-400">Team</span><p class="font-medium mt-1">${escHtml(po.team_name || '—')}</p></div>
                 </div>
-                ${shopifyIds.length ? `<div class="mb-4"><span class="text-gray-400 text-sm">Linked Shopify Orders</span><p class="font-medium mt-1">${shopifyIds.join(', ')}</p></div>` : ''}
-                ${po.notes ? `<div class="mb-4"><span class="text-gray-400 text-sm">Notes</span><p class="mt-1">${po.notes}</p></div>` : ''}
-                <h4 class="font-semibold text-gray-300 mb-2">Line Items</h4>${linesHtml}`;
-            document.getElementById('po-detail-modal')._currentPoId = poId;
-            document.getElementById('po-detail-modal').classList.remove('hide');
+                ${po.assets_url ? `<a href="${escHtml(po.assets_url)}" target="_blank" class="inline-flex items-center gap-2 btn-secondary text-sm px-4 py-2 rounded-lg mb-4">📁 Order Assets (Drive)</a>` : ''}
+                <div class="mb-4"><span class="dt-countdown ${cd.cls}">${cd.text}</span></div>
+                ${renderPoTimelineHtml(po)}
+                <hr class="border-gray-700 my-5">
+                <h4 class="font-semibold text-gray-300 mb-3">Factory Details</h4>
+                <div class="space-y-4 text-sm">
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" ${po.artwork_approved ? 'checked' : ''} onchange="setPoStageFlag('artwork_approved', this.checked)">
+                        <span>Artwork Approved ${po.artwork_approved_date ? `<span class="text-gray-400">· ${fpoDateShort(po.artwork_approved_date)}</span>` : ''}</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" ${po.pps_approved ? 'checked' : ''} onchange="setPoStageFlag('pps_approved', this.checked)">
+                        <span>PPS Approved ${po.pps_approved_date ? `<span class="text-gray-400">· ${fpoDateShort(po.pps_approved_date)}</span>` : ''}</span>
+                    </label>
+                    <div>
+                        <label class="text-gray-400 block mb-1">PPS Photos (Google Drive folder)</label>
+                        <div class="flex gap-2">
+                            <input type="url" id="fpo-rec-pps-url" value="${escHtml(po.pps_url || '')}" class="flex-1 px-3 py-2 rounded-lg" placeholder="https://drive.google.com/...">
+                            <button onclick="savePoField('pps_url', document.getElementById('fpo-rec-pps-url').value.trim() || null)" class="btn-secondary px-4 rounded-lg">Save</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 block mb-1">Shipping Documents</label>
+                        <div id="fpo-rec-files" class="space-y-2 mb-2"></div>
+                        <input type="file" id="fpo-rec-file-input" multiple class="hide" onchange="uploadPoShippingFiles(event)">
+                        <button onclick="document.getElementById('fpo-rec-file-input').click()" class="btn-secondary text-sm px-4 py-2 rounded-lg">+ Upload files</button>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 block mb-1">Revised Delivery Date Requested?</label>
+                        <select id="fpo-rec-revised-req" onchange="onRevisedReqChange()" class="px-3 py-2 rounded-lg">
+                            <option value="no" ${!po.revised_delivery_requested ? 'selected' : ''}>No</option>
+                            <option value="yes" ${po.revised_delivery_requested ? 'selected' : ''}>Yes</option>
+                        </select>
+                        <div id="fpo-rec-revised-box" class="${po.revised_delivery_requested ? '' : 'hide'} mt-2 space-y-2">
+                            <input type="date" id="fpo-rec-revised-date" value="${po.revised_delivery_date || ''}" class="px-3 py-2 rounded-lg">
+                            <textarea id="fpo-rec-revised-notes" rows="2" class="w-full px-3 py-2 rounded-lg resize-none" placeholder="Notes…">${escHtml(po.revised_delivery_notes || '')}</textarea>
+                            <button onclick="saveRevisedDelivery()" class="btn-secondary text-sm px-4 py-2 rounded-lg">Save revised date</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 block mb-1">Completion Status</label>
+                        <select id="fpo-rec-completion" onchange="savePoField('completion_status', this.value)" class="px-3 py-2 rounded-lg">
+                            <option value="in_progress" ${po.completion_status === 'in_progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="part_completed" ${po.completion_status === 'part_completed' ? 'selected' : ''}>Part-Completed</option>
+                            <option value="completed" ${po.completion_status === 'completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </div>
+                    <div class="pt-2">
+                        ${po.shipped
+                            ? `<span class="dt-countdown ok">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`
+                            : `<button onclick="markPoShipped()" class="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-lg font-semibold transition">Mark as Shipped</button>`}
+                    </div>
+                </div>`;
+            renderPoFilesList();
+            document.getElementById('factory-po-record').classList.remove('hide');
         }
+        function hideFactoryPoRecord() { document.getElementById('factory-po-record').classList.add('hide'); }
 
-        function hidePoDetailModal() {
-            document.getElementById('po-detail-modal').classList.add('hide');
+        async function setPoStageFlag(field, checked) {
+            if (!currentFactoryPoId) return;
+            const dateField = field === 'artwork_approved' ? 'artwork_approved_date' : field === 'pps_approved' ? 'pps_approved_date' : null;
+            const upd = { [field]: checked };
+            if (dateField) upd[dateField] = checked ? fpoToday() : null;
+            const { error } = await supabase.from('factory_purchase_orders').update(upd).eq('id', currentFactoryPoId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === currentFactoryPoId); if (po) Object.assign(po, upd);
+            showToast('Updated');
+            renderFactoryPoList();
+            openFactoryPoRecord(currentFactoryPoId);
         }
-
-        async function editCurrentPo() {
-            const poId = document.getElementById('po-detail-modal')._currentPoId;
-            if (!poId) return;
-            hidePoDetailModal();
-            const po = currentPos.find(p => p.id === poId);
-            if (!po) return;
-            const { data: lines } = await supabase.from('po_line_items').select('*').eq('po_id', poId).order('line_order');
-            editingPoId = poId;
-            document.getElementById('po-modal-title').textContent = 'Edit Purchase Order';
-            document.getElementById('po-number').value = po.po_number || '';
-            document.getElementById('po-status').value = po.status || 'draft';
-            document.getElementById('po-factory').value = po.factory_name || '';
-            document.getElementById('po-expected-delivery').value = po.expected_delivery_date || '';
-            document.getElementById('po-season').value = po.season || '';
-            document.getElementById('po-shopify-orders').value = (po.shopify_order_ids || []).join(', ');
-            document.getElementById('po-notes').value = po.notes || '';
-            document.getElementById('po-line-items').innerHTML = '';
-            (lines || []).forEach(l => addPoLineItem(l.description, l.quantity, l.unit_price ?? ''));
-            await populatePoClubDropdown(po.club_id);
-            calcPoTotal();
-            document.getElementById('po-modal').classList.remove('hide');
+        async function savePoField(field, value) {
+            if (!currentFactoryPoId) return;
+            const { error } = await supabase.from('factory_purchase_orders').update({ [field]: value }).eq('id', currentFactoryPoId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === currentFactoryPoId); if (po) po[field] = value;
+            showToast('Saved');
+            renderFactoryPoList();
+            if (field === 'completion_status') openFactoryPoRecord(currentFactoryPoId);
         }
-
-        async function deleteCurrentPo() {
-            const poId = document.getElementById('po-detail-modal')._currentPoId;
-            if (!poId) return;
+        function onRevisedReqChange() {
+            const v = document.getElementById('fpo-rec-revised-req').value;
+            document.getElementById('fpo-rec-revised-box').classList.toggle('hide', v !== 'yes');
+            if (v !== 'yes') saveRevisedDelivery();
+        }
+        async function saveRevisedDelivery() {
+            if (!currentFactoryPoId) return;
+            const req = document.getElementById('fpo-rec-revised-req').value === 'yes';
+            const upd = {
+                revised_delivery_requested: req,
+                revised_delivery_date: req ? (document.getElementById('fpo-rec-revised-date').value || null) : null,
+                revised_delivery_notes: req ? (document.getElementById('fpo-rec-revised-notes').value.trim() || null) : null
+            };
+            const { error } = await supabase.from('factory_purchase_orders').update(upd).eq('id', currentFactoryPoId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === currentFactoryPoId); if (po) Object.assign(po, upd);
+            showToast('Revised delivery saved');
+            renderFactoryPoList();
+        }
+        async function markPoShipped() {
+            if (!currentFactoryPoId) return;
+            const today = fpoToday();
+            const { error } = await supabase.from('factory_purchase_orders').update({ shipped: true, shipped_date: today }).eq('id', currentFactoryPoId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === currentFactoryPoId); if (po) { po.shipped = true; po.shipped_date = today; }
+            showToast('Marked as shipped');
+            renderFactoryPoList();
+            openFactoryPoRecord(currentFactoryPoId);
+        }
+        async function deleteFactoryPo() {
+            if (!currentFactoryPoId) return;
             if (!confirm('Delete this purchase order? This cannot be undone.')) return;
-            const { error } = await supabase.from('purchase_orders').delete().eq('id', poId);
+            const { error } = await supabase.from('factory_purchase_orders').delete().eq('id', currentFactoryPoId);
             if (error) { showToast('Error deleting PO: ' + error.message, 'error'); return; }
-            showToast('PO deleted', 'success');
-            hidePoDetailModal();
-            await loadPoTracker();
+            showToast('PO deleted');
+            hideFactoryPoRecord();
+            await loadFactoryPoTracker();
         }
 
-        document.getElementById('po-modal').addEventListener('click', function(e) { if (e.target === this) hidePoModal(); });
-        document.getElementById('po-detail-modal').addEventListener('click', function(e) { if (e.target === this) hidePoDetailModal(); });
+        // ---- Shipping documents ----
+        async function renderPoFilesList() {
+            const el = document.getElementById('fpo-rec-files');
+            if (!el) return;
+            const { data } = await supabase.from('factory_po_files').select('*').eq('po_id', currentFactoryPoId).order('created_at', { ascending: false });
+            const files = data || [];
+            if (!files.length) { el.innerHTML = '<p class="text-gray-500 text-xs">No documents uploaded.</p>'; return; }
+            el.innerHTML = files.map(f => `<div class="flex items-center justify-between gap-2 bg-gray-800/50 rounded-lg px-3 py-2">
+                <a href="${escHtml(f.file_url)}" target="_blank" class="text-sm text-brand-400 hover:underline truncate">${escHtml(f.file_name)}</a>
+                <button onclick="deletePoFile('${f.id}')" class="text-red-400 hover:text-red-300 text-sm">✕</button>
+            </div>`).join('');
+        }
+        async function uploadPoShippingFiles(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length || !currentFactoryPoId) return;
+            const bucket = 'club-images';
+            for (const file of files) {
+                showToast(`Uploading ${file.name}…`);
+                const ext = file.name.substring(file.name.lastIndexOf('.'));
+                const path = `${currentBrand?.slug || 'brand'}/purchase-orders/${currentFactoryPoId}/shipping/${Date.now()}${ext}`;
+                const { error: upErr } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+                if (upErr) { showToast(`Failed: ${file.name}`, 'error'); continue; }
+                const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
+                await supabase.from('factory_po_files').insert({
+                    po_id: currentFactoryPoId, brand_id: currentBrand?.id,
+                    file_name: file.name, file_url: urlData.publicUrl, file_type: file.type, file_size: file.size,
+                    uploaded_by: currentUser?.id, uploaded_by_name: currentUser?.user_metadata?.full_name || currentUser?.email || 'Unknown'
+                });
+            }
+            event.target.value = '';
+            showToast(`${files.length} file(s) uploaded`);
+            renderPoFilesList();
+        }
+        async function deletePoFile(id) {
+            const { error } = await supabase.from('factory_po_files').delete().eq('id', id);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            renderPoFilesList();
+        }
+
+        document.getElementById('factory-po-modal').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoModal(); });
+        document.getElementById('factory-po-record').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoRecord(); });
 
         // =============================================
         // SALES MODULE — STATE
@@ -20203,7 +20367,7 @@
                     // Hide the feature card
                     const featureMap = {
                         'prospecting': 'fc-prospecting', 'sales': 'fc-sales', 'clubs': 'fc-clubs',
-                        'production': 'fc-production', 'design_studio': 'fc-design',
+                        'design_studio': 'fc-design',
                         'store_generator': 'fc-store', 'products': 'fc-products'
                     };
                     const cardId = featureMap[feature];
@@ -20726,7 +20890,6 @@
             { key: 'prospecting', label: 'Prospecting', icon: '🎯', desc: 'Lead tracking and early pipeline management' },
             { key: 'sales', label: 'Sales', icon: '💼', desc: 'Job management, design briefs and order pipeline' },
             { key: 'clubs', label: 'Clubs', icon: '🏟️', desc: 'Club management, products and order forms' },
-            { key: 'production', label: 'Production', icon: '🚚', desc: 'PO tracking and factory management' },
             { key: 'design_studio', label: 'Design Studio', icon: '🎨', desc: 'Mockup image uploads' },
             { key: 'store_generator', label: 'Store Generator', icon: '🏪', desc: 'Shopify CSV and store sync' },
             { key: 'products', label: 'Product Database', icon: '📦', desc: 'Master product catalogue and pricing structure' }
