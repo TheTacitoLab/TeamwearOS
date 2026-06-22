@@ -461,13 +461,14 @@
         if (cls === 'ok')      return 'background:#dcfce7;color:#16a34a';
         return 'background:#f1f5f9;color:#64748b';
     }
-    let poFilter = 'all';
+    let poFilter = 'active';
     function poEffectiveTarget(po) { return po.revised_delivery_date || po.delivery_due_date || null; }
     function poFilteredSorted() {
         let list = factoryPos.slice();
         const today = new Date(); today.setHours(0, 0, 0, 0);
         const f = poFilter;
         if (f === 'shipped') list = list.filter(p => p.shipped);
+        else if (f === 'active') list = list.filter(p => !p.shipped);
         else if (f === 'awaiting') list = list.filter(p => !p.shipped);
         else if (f === 'overdue') list = list.filter(p => !p.shipped && poEffectiveTarget(p) && new Date(poEffectiveTarget(p) + 'T00:00:00') < today);
         else if (f === 'due') list = list.filter(p => { if (p.shipped) return false; const t = poEffectiveTarget(p); if (!t) return false; const d = (new Date(t + 'T00:00:00') - today) / 86400000; return d >= 0 && d <= 7; });
@@ -480,22 +481,68 @@
     }
     function setPoFilter(k) { poFilter = k; renderTab(); }
     window.setPoFilter = setPoFilter;
+    function poPerformanceHtml() {
+        const dayDiff = (a, b) => Math.round((new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00')) / 86400000);
+        const avgDays = arr => arr.length ? Math.round(arr.reduce((s, n) => s + n, 0) / arr.length) : null;
+        const partDays = factoryPos.filter(p => p.part_shipped_date && p.order_date).map(p => dayDiff(p.part_shipped_date, p.order_date)).filter(d => d >= 0);
+        const shipDays = factoryPos.filter(p => p.shipped_date && p.order_date).map(p => dayDiff(p.shipped_date, p.order_date)).filter(d => d >= 0);
+        const partAvg = avgDays(partDays), shipAvg = avgDays(shipDays);
+        function fmtAvg(d) {
+            if (d === null) return '<span style="color:#94a3b8;font-size:1.25rem">—</span>';
+            const w = Math.floor(d / 7), r = d % 7;
+            return `<span style="font-size:1.5rem;font-weight:700;color:#0f172a">${w}<span style="font-size:0.9rem">w</span>${r > 0 ? ` ${r}<span style="font-size:0.9rem">d</span>` : ''}</span>`;
+        }
+        function tl(d) {
+            if (d === null) return { dot: '#94a3b8', label: 'No data', bg: '#f8fafc', text: '#94a3b8' };
+            if (d < 35)  return { dot: '#16a34a', label: 'On track', bg: '#f0fdf4', text: '#15803d' };
+            if (d <= 42) return { dot: '#d97706', label: 'Monitor',  bg: '#fffbeb', text: '#b45309' };
+            return             { dot: '#dc2626', label: 'Slow',      bg: '#fef2f2', text: '#b91c1c' };
+        }
+        const ps = tl(partAvg), ss = tl(shipAvg);
+        return `<div class="glass rounded-2xl p-5" style="flex:0 0 215px;align-self:flex-start">
+            <p style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;margin-bottom:16px">Production Performance</p>
+            <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                    <span style="width:9px;height:9px;border-radius:50%;background:${ps.dot};flex-shrink:0;display:inline-block"></span>
+                    <span style="font-size:.75rem;font-weight:600;color:#334155">Part-Shipped avg</span>
+                </div>
+                <div style="margin-bottom:4px">${fmtAvg(partAvg)}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:9999px;background:${ps.bg};color:${ps.text}">${ps.label}</span>
+                    <span style="font-size:.7rem;color:#94a3b8">${partDays.length} PO${partDays.length !== 1 ? 's' : ''}</span>
+                </div>
+            </div>
+            <div style="border-top:1px solid #e2e8f0;margin-top:14px;padding-top:14px">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                    <span style="width:9px;height:9px;border-radius:50%;background:${ss.dot};flex-shrink:0;display:inline-block"></span>
+                    <span style="font-size:.75rem;font-weight:600;color:#334155">Shipped avg</span>
+                </div>
+                <div style="margin-bottom:4px">${fmtAvg(shipAvg)}</div>
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span style="font-size:.7rem;font-weight:600;padding:2px 8px;border-radius:9999px;background:${ss.bg};color:${ss.text}">${ss.label}</span>
+                    <span style="font-size:.7rem;color:#94a3b8">${shipDays.length} PO${shipDays.length !== 1 ? 's' : ''}</span>
+                </div>
+            </div>
+            <p style="font-size:.7rem;color:#94a3b8;border-top:1px solid #e2e8f0;margin-top:14px;padding-top:10px;line-height:1.5">&lt;5 wks = green · 5–6 wks = amber · &gt;6 wks = red</p>
+        </div>`;
+    }
     function renderPoTracker(el) {
         const bar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
-            ${poFilterChip('all', 'All')}${poFilterChip('due', 'Due soon')}${poFilterChip('overdue', 'Overdue')}${poFilterChip('awaiting', 'Awaiting')}${poFilterChip('shipped', 'Shipped')}
+            ${poFilterChip('active', 'Active')}${poFilterChip('due', 'Due soon')}${poFilterChip('overdue', 'Overdue')}${poFilterChip('awaiting', 'Awaiting')}${poFilterChip('shipped', 'Shipped')}
         </div>`;
+        const perf = poPerformanceHtml();
         if (!factoryPos.length) {
-            el.innerHTML = bar + '<div class="glass rounded-2xl p-10 text-center text-slate-500">No purchase orders yet.</div>';
+            el.innerHTML = bar + `<div style="display:flex;align-items:flex-start;gap:16px"><div style="flex:1;min-width:0"><div class="glass rounded-2xl p-10 text-center text-slate-500">No purchase orders yet.</div></div>${perf}</div>`;
             attachPoFilterHandlers();
             return;
         }
         const list = poFilteredSorted();
         if (!list.length) {
-            el.innerHTML = bar + '<div class="glass rounded-2xl p-8 text-center text-slate-500">No POs match this filter.</div>';
+            el.innerHTML = bar + `<div style="display:flex;align-items:flex-start;gap:16px"><div style="flex:1;min-width:0"><div class="glass rounded-2xl p-8 text-center text-slate-500">No POs match this filter.</div></div>${perf}</div>`;
             attachPoFilterHandlers();
             return;
         }
-        el.innerHTML = bar + '<div class="space-y-2.5">' + list.map(po => {
+        el.innerHTML = bar + `<div style="display:flex;align-items:flex-start;gap:16px"><div style="flex:1;min-width:0"><div class="space-y-2.5">` + list.map(po => {
             const cd = poCountdown(po);
             const clubName = po.clubs?.name || po.club_name || '';
             const target = poEffectiveTarget(po);
@@ -523,7 +570,7 @@
                     ${poNotesButton(po)}
                 </div>
             </div>`;
-        }).join('') + '</div>';
+        }).join('') + `</div></div>${perf}</div>`;
         attachPoFilterHandlers();
     }
     function poActionsHtml(po) {
