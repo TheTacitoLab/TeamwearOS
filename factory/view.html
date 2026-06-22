@@ -124,9 +124,9 @@
     }
 
     function colourPill(hex, label) {
-        if (!hex) return '<span class="text-slate-400 text-xs">—</span>';
-        const textCol = hexLuminance(hex) > 0.4 ? '#1e293b' : '#f1f5f9';
-        return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded mr-1 mb-0.5" style="background:${hex};color:${textCol}">${esc(label || hex)}</span>`;
+        if (!hex) return '<span style="color:#94a3b8;font-size:12px">—</span>';
+        const textCol = hexLuminance(hex) > 0.5 ? '#1e293b' : '#f8fafc';
+        return `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:70px;padding:4px 10px;border-radius:6px;background:${hex};border:1px solid rgba(0,0,0,0.15);box-shadow:0 1px 4px rgba(0,0,0,0.25);font-size:12px;font-weight:600;color:${textCol};margin-right:4px;margin-bottom:4px">${esc(label || hex)}</span>`;
     }
 
     function gsmLbl(f) {
@@ -807,7 +807,7 @@
                         const uid = 'fc-'+i;
                         return `<tr class="border-b border-slate-100 hover:bg-slate-50">
                             <td class="px-4 py-3">
-                                <div class="font-medium text-orange-300">${esc(r.fabric_name)}${pill}</div>
+                                <div class="font-medium" style="color:#0f172a">${esc(r.fabric_name)}${pill}</div>
                                 ${sub ? `<div class="text-xs text-slate-500" style="margin-top:2px">${sub}</div>` : ''}
                             </td>
                             <td class="px-4 py-3 text-right text-slate-500">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
