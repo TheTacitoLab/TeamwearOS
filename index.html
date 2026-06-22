@@ -3264,11 +3264,11 @@
         <div id="tool-factory" class="hide w-full p-6 md:p-8 lg:px-12">
             <div class="sh-topbar">
                 <div class="sh-tabs">
-                    <button id="factory-tab-fabrics" class="sh-tab active" onclick="switchFactoryTab('fabrics')">Fabric List <span id="ftab-fabrics-count" class="sh-count">0</span></button>
+                    <button id="factory-tab-po-tracker" class="sh-tab active" onclick="switchFactoryTab('po-tracker')">PO Tracker</button>
                     <button id="factory-tab-forecast" class="sh-tab" onclick="switchFactoryTab('forecast')">Fabric Forecast</button>
                     <button id="factory-tab-stock" class="sh-tab" onclick="switchFactoryTab('stock')">Fabric Stock</button>
+                    <button id="factory-tab-fabrics" class="sh-tab" onclick="switchFactoryTab('fabrics')">Fabric List <span id="ftab-fabrics-count" class="sh-count">0</span></button>
                     <button id="factory-tab-development" class="sh-tab" onclick="switchFactoryTab('development')">Product Development</button>
-                    <button id="factory-tab-po-tracker" class="sh-tab" onclick="switchFactoryTab('po-tracker')">PO Tracker</button>
                 </div>
                 <div class="sh-topbar-right">
                     <button class="sh-action-btn sh-action-btn-secondary" onclick="showFactoryShareModal()" title="Get the public link to send to your factory">
@@ -7300,7 +7300,7 @@
                     break;
                 case 'factory':
                     loadFactory();
-                    switchFactoryTab(_factoryActiveTab || 'fabrics');
+                    switchFactoryTab(_factoryActiveTab || 'po-tracker');
                     break;
                 case 'sales':
                     Promise.all([loadLeads(), loadKanbanStages(), loadJobs(), loadJobKanbanStages()]).then(() => {
@@ -7363,7 +7363,7 @@
         // FACTORY MODULE
         // =============================================
 
-        let _factoryActiveTab = 'fabrics';
+        let _factoryActiveTab = 'po-tracker';
         let allFabrics = [];
         let _currentRecipeRows = [];
         let _fabricSearchVal = '';

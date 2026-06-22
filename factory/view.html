@@ -96,7 +96,7 @@
     let forecastRows = [];     // combined (club + bulk), used by stock view
     let forecastRowsClub = []; // club-based demand only
     let forecastRowsBulk = []; // sales-pipeline bulk orders only
-    let activeTab = 'fabrics';
+    let activeTab = 'po-tracker';
     let forecastSort = 'date';
     let factoryPos = [];
     let _poCountdownTimer = null;
@@ -376,11 +376,11 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-1 border-b border-slate-200 mb-6">
-                    <button class="tab-btn ${activeTab==='fabrics'?'active':''}" data-tab="fabrics">Fabric List</button>
+                    <button class="tab-btn ${activeTab==='po-tracker'?'active':''}" data-tab="po-tracker">PO Tracker</button>
                     <button class="tab-btn ${activeTab==='forecast'?'active':''}" data-tab="forecast">Fabric Forecast</button>
                     <button class="tab-btn ${activeTab==='stock'?'active':''}" data-tab="stock">Fabric Stock</button>
+                    <button class="tab-btn ${activeTab==='fabrics'?'active':''}" data-tab="fabrics">Fabric List</button>
                     <button class="tab-btn ${activeTab==='development'?'active':''}" data-tab="development">Product Development</button>
-                    <button class="tab-btn ${activeTab==='po-tracker'?'active':''}" data-tab="po-tracker">PO Tracker</button>
                 </div>
                 <div id="tab-content"></div>
             </div>`;
