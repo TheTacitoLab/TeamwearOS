@@ -3244,6 +3244,22 @@
             </div>
         </div>
 
+        <!-- MODAL: PO Issue -->
+        <div id="fpo-issue-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-md mx-4 my-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold" id="fpo-issue-title">Raise Issue</h3>
+                    <button onclick="hidePoIssue()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                </div>
+                <p class="text-sm mb-3" style="color:#64748b">Describe the issue with this PO. A red alert beacon will appear on the card.</p>
+                <textarea id="fpo-issue-note" rows="4" class="w-full px-4 py-3 rounded-lg mb-4 resize-none" placeholder="e.g. Wrong colour received, sizing issue, quantity short…" style="border:1px solid #e2e8f0;background:#f8fafc"></textarea>
+                <div class="flex gap-3 justify-end">
+                    <button onclick="hidePoIssue()" class="btn-secondary px-4 py-2 rounded-lg">Cancel</button>
+                    <button onclick="savePoIssue()" class="px-4 py-2 rounded-lg text-white font-semibold text-sm" style="background:#dc2626">Save Issue</button>
+                </div>
+            </div>
+        </div>
+
         <!-- TOOL: Factory -->
         <div id="tool-factory" class="hide w-full p-6 md:p-8 lg:px-12">
             <div class="sh-topbar">
@@ -16353,12 +16369,12 @@
 
         // ---- Stages & countdown ----
         function poStages(po) {
-            const part = po.completion_status === 'part_completed' || po.completion_status === 'completed' || !!po.part_shipped_date;
+            const part = !!po.part_shipped_date || po.completion_status === 'part_completed';
             return [
-                { label: 'Artwork Approved', done: !!po.artwork_approved, date: po.artwork_approved_date },
-                { label: 'PPS Approved',     done: !!po.pps_approved,     date: po.pps_approved_date },
-                { label: 'Part-Shipped',     done: part || !!po.shipped,  date: po.part_shipped_date },
-                { label: 'Shipped',          done: !!po.shipped,          date: po.shipped_date }
+                { label: 'Artwork Approved', done: !!po.artwork_approved,      date: po.artwork_approved_date },
+                { label: 'PPS Approved',     done: !!po.pps_approved,          date: po.pps_approved_date },
+                { label: 'Shipped',          done: !!po.shipped || part,        date: po.shipped ? po.shipped_date : po.part_shipped_date },
+                { label: 'Completed',        done: !!po.received,               date: po.received_date }
             ];
         }
         function poStageColor(po, i, done) {
@@ -16367,7 +16383,7 @@
                 if (po.completion_status === 'part_completed' || po.part_shipped_date) return '#f97316';
                 return '#cbd5e1';
             }
-            if (i === 3) return po.shipped ? '#22c55e' : '#cbd5e1';
+            if (i === 3) return po.received ? '#22c55e' : '#cbd5e1';
             return done ? '#22c55e' : '#cbd5e1';
         }
         function poShipPerf(dateStr, target) {
@@ -16378,6 +16394,7 @@
             return 'late by ' + (-diff) + ' day' + (-diff !== 1 ? 's' : '');
         }
         function poCountdown(po) {
+            if (po.received) return { cls: 'ok', text: '✓ Completed' + (po.received_date ? ' · ' + fpoDateShort(po.received_date) : '') };
             if (po.shipped) return { cls: 'ok', text: '✓ Shipped' + (po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : '') };
             const target = po.revised_delivery_date || po.delivery_due_date;
             if (!target) return { cls: '', text: 'No due date' };
@@ -16485,8 +16502,12 @@
             if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
         }
         function poActionsHtml(po) {
+            if (po.received) {
+                return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="background:#dcfce7;color:#15803d">✓ Completed${po.received_date ? ' · ' + fpoDateShort(po.received_date) : ''}</span>`;
+            }
             if (po.shipped) {
-                return `<span class="dt-countdown ok" style="justify-content:center">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`;
+                return `<span class="dt-countdown ok" style="justify-content:center">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>
+                    <button onclick="event.stopPropagation();markPoCompleted('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#0891b2">✓ Mark Completed</button>`;
             }
             if (po.completion_status === 'part_completed' || po.part_shipped_date) {
                 return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="background:#ffedd5;color:#ea580c">◑ Part-shipped${po.part_shipped_date ? ' · ' + fpoDateShort(po.part_shipped_date) : ''}</span>
@@ -16494,6 +16515,12 @@
             }
             return `<button onclick="event.stopPropagation();markPoPartShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#f97316">Part-Shipped</button>
                 <button onclick="event.stopPropagation();markPoFullShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#16a34a">Mark Shipped</button>`;
+        }
+        function poIssueHtml(po) {
+            if (po.issue_raised) {
+                return `<button onclick="event.stopPropagation();openPoIssue('${po.id}')" class="text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">⚠ Issue raised</button>`;
+            }
+            return `<button onclick="event.stopPropagation();openRaiseIssue('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">⚠ Raise issue</button>`;
         }
         function poPerformanceHtml() {
             const dayDiff = (a, b) => Math.round((new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00')) / 86400000);
@@ -16581,6 +16608,7 @@
                     </div>
                     <div style="flex:0 0 20%;min-width:0;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 16px">
                         ${poActionsHtml(po)}
+                        ${poIssueHtml(po)}
                         ${poNotesButton(po)}
                     </div>
                 </div>`;
@@ -16765,6 +16793,18 @@
                         <div class="flex flex-wrap items-center gap-2">${poActionsHtml(po)}</div>
                         ${po.part_shipped_date && !po.shipped ? `<p class="text-xs mt-2" style="color:#ea580c">Part-shipped ${fpoDateShort(po.part_shipped_date)} · ${poShipPerf(po.part_shipped_date, target)}</p>` : ''}
                         ${po.shipped ? `<p class="text-xs mt-2" style="color:#16a34a">Shipped ${fpoDateShort(po.shipped_date)} · ${poShipPerf(po.shipped_date, target)}</p>` : ''}
+                        ${po.received ? `<p class="text-xs mt-1" style="color:#15803d">✓ Completed · received ${fpoDateShort(po.received_date)}</p>` : po.shipped ? `<p class="text-xs mt-1" style="color:#64748b">Press <strong>Mark Completed</strong> once goods are received at HQ.</p>` : ''}
+                    </div>
+                    <div>
+                        <label class="text-gray-400 block mb-2">Issues</label>
+                        ${po.issue_raised
+                            ? `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px">
+                                <p class="text-sm font-semibold mb-1" style="color:#b91c1c">⚠ Issue raised</p>
+                                ${po.issue_note ? `<p class="text-sm mb-2" style="color:#334155">${escHtml(po.issue_note)}</p>` : ''}
+                                <button onclick="resolvePoIssue(currentFactoryPoId)" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">✓ Mark Resolved</button>
+                                <button onclick="openPoIssue(currentFactoryPoId)" class="text-xs font-medium px-3 py-1.5 rounded-lg ml-2" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">Edit note</button>
+                            </div>`
+                            : `<button onclick="openRaiseIssue(currentFactoryPoId)" class="btn-secondary text-sm px-4 py-2 rounded-lg">⚠ Raise Issue</button>`}
                     </div>
                     <div>
                         <button onclick="openPoNotes(currentFactoryPoId)" class="btn-secondary text-sm px-4 py-2 rounded-lg">💬 Notes${poNotesMeta[po.id]?.count ? ' (' + poNotesMeta[po.id].count + ')' : ''}</button>
@@ -16913,9 +16953,65 @@
             renderPoFilesList();
         }
 
+        // ---- Receipt confirmation ----
+        async function markPoCompleted(poId) {
+            const today = fpoToday();
+            const { error } = await supabase.from('factory_purchase_orders').update({ received: true, received_date: today }).eq('id', poId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === poId);
+            if (po) { po.received = true; po.received_date = today; }
+            showToast('PO marked as completed — goods received at HQ');
+            renderFactoryPoList();
+            if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
+        }
+
+        // ---- Issue raise / resolve ----
+        let _issuePoId = null;
+        function openRaiseIssue(poId) {
+            _issuePoId = poId;
+            const po = factoryPos.find(p => p.id === poId);
+            document.getElementById('fpo-issue-title').textContent = 'Raise Issue — ' + (po?.po_number || 'PO');
+            document.getElementById('fpo-issue-note').value = '';
+            document.getElementById('fpo-issue-modal').classList.remove('hide');
+            document.getElementById('fpo-issue-note').focus();
+        }
+        function openPoIssue(poId) {
+            _issuePoId = poId;
+            const po = factoryPos.find(p => p.id === poId);
+            document.getElementById('fpo-issue-title').textContent = 'Issue — ' + (po?.po_number || 'PO');
+            document.getElementById('fpo-issue-note').value = po?.issue_note || '';
+            document.getElementById('fpo-issue-modal').classList.remove('hide');
+            document.getElementById('fpo-issue-note').focus();
+        }
+        function hidePoIssue() { document.getElementById('fpo-issue-modal').classList.add('hide'); _issuePoId = null; }
+        async function savePoIssue() {
+            if (!_issuePoId) return;
+            const note = document.getElementById('fpo-issue-note').value.trim();
+            if (!note) { showToast('Please describe the issue', 'error'); return; }
+            const { error } = await supabase.from('factory_purchase_orders').update({ issue_raised: true, issue_note: note }).eq('id', _issuePoId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === _issuePoId);
+            if (po) { po.issue_raised = true; po.issue_note = note; }
+            showToast('Issue raised');
+            hidePoIssue();
+            renderFactoryPoList();
+            if (currentFactoryPoId === _issuePoId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(_issuePoId);
+        }
+        async function resolvePoIssue(poId) {
+            if (!confirm('Mark this issue as resolved?')) return;
+            const { error } = await supabase.from('factory_purchase_orders').update({ issue_raised: false, issue_note: null }).eq('id', poId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === poId);
+            if (po) { po.issue_raised = false; po.issue_note = null; }
+            showToast('Issue resolved');
+            renderFactoryPoList();
+            if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
+        }
+
         document.getElementById('factory-po-modal').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoModal(); });
         document.getElementById('factory-po-record').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoRecord(); });
         document.getElementById('fpo-notes-modal').addEventListener('click', function(e) { if (e.target === this) hidePoNotes(); });
+        document.getElementById('fpo-issue-modal').addEventListener('click', function(e) { if (e.target === this) hidePoIssue(); });
 
         // =============================================
         // SALES MODULE — STATE

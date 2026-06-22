@@ -404,12 +404,12 @@
     function fpoDateShort(d) { if (!d) return ''; return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short' }); }
 
     function poStages(po) {
-        const part = po.completion_status === 'part_completed' || po.completion_status === 'completed' || !!po.part_shipped_date;
+        const part = !!po.part_shipped_date || po.completion_status === 'part_completed';
         return [
-            { label: 'Artwork Approved', done: !!po.artwork_approved, date: po.artwork_approved_date },
-            { label: 'PPS Approved',     done: !!po.pps_approved,     date: po.pps_approved_date },
-            { label: 'Part-Shipped',     done: part || !!po.shipped,  date: po.part_shipped_date },
-            { label: 'Shipped',          done: !!po.shipped,          date: po.shipped_date }
+            { label: 'Artwork Approved', done: !!po.artwork_approved,      date: po.artwork_approved_date },
+            { label: 'PPS Approved',     done: !!po.pps_approved,          date: po.pps_approved_date },
+            { label: 'Shipped',          done: !!po.shipped || part,        date: po.shipped ? po.shipped_date : po.part_shipped_date },
+            { label: 'Completed',        done: !!po.received,               date: po.received_date }
         ];
     }
     function poShipPerf(dateStr, target) {
@@ -420,6 +420,7 @@
         return 'late by ' + (-diff) + ' day' + (-diff !== 1 ? 's' : '');
     }
     function poCountdown(po) {
+        if (po.received) return { cls: 'ok', text: '✓ Completed' + (po.received_date ? ' · ' + fpoDateShort(po.received_date) : '') };
         if (po.shipped) return { cls: 'ok', text: '✓ Shipped' + (po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : '') };
         const target = po.revised_delivery_date || po.delivery_due_date;
         if (!target) return { cls: '', text: 'No due date' };
@@ -437,7 +438,7 @@
             if (po.completion_status === 'part_completed' || po.part_shipped_date) return '#f97316';
             return '#cbd5e1';
         }
-        if (i === 3) return po.shipped ? '#22c55e' : '#cbd5e1';
+        if (i === 3) return po.received ? '#22c55e' : '#cbd5e1';
         return done ? '#22c55e' : '#cbd5e1';
     }
     function poTimeline(po) {
@@ -555,6 +556,7 @@
                     <p class="text-sm font-medium truncate" style="color:#334155">${esc(po.po_title || 'Untitled PO')}</p>
                     <p class="text-xs mt-0.5 truncate" style="color:#94a3b8">${esc(clubName)}${po.team_name ? ' · ' + esc(po.team_name) : ''}</p>
                     ${po.assets_url ? `<a href="${esc(po.assets_url)}" target="_blank" class="inline-block mt-2 text-xs font-medium" style="color:#2563eb">📁 Drive assets</a>` : ''}
+                    ${po.issue_raised ? `<span class="inline-block mt-1.5 text-xs font-semibold px-2 py-0.5 rounded-full" style="background:#fef2f2;color:#b91c1c">⚠ Issue raised</span>` : ''}
                 </div>
                 <div style="flex:1;min-width:0;border-left:1px solid #e2e8f0;display:flex;align-items:center;padding:10px 18px">
                     ${poTimeline(po)}
@@ -574,6 +576,9 @@
         attachPoFilterHandlers();
     }
     function poActionsHtml(po) {
+        if (po.received) {
+            return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="background:#dcfce7;color:#15803d">✓ Completed${po.received_date ? ' · ' + fpoDateShort(po.received_date) : ''}</span>`;
+        }
         if (po.shipped) {
             return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="${poCdStyle('ok')}">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`;
         }
