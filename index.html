@@ -3487,6 +3487,11 @@
                     </div>
                 </div>
                 <p class="text-xs text-gray-600 mt-2">Next PO will be: <strong id="po-number-example" class="text-gray-400">RP01</strong></p>
+                <div class="mt-4">
+                    <label class="text-gray-400 text-sm mb-1 block">Factory Email Recipients</label>
+                    <input type="text" id="factory-emails" placeholder="factory1@example.com, factory2@example.com" class="w-full px-3 py-2 rounded-lg text-sm">
+                    <p class="text-xs text-gray-600 mt-1">Comma-separated. Used to pre-fill the "Email factory" draft on each PO.</p>
+                </div>
                 <button onclick="savePoSettings()" class="mt-4 btn-primary text-sm">Save PO Settings</button>
             </div>
 
@@ -7328,8 +7333,10 @@
             if (!currentBrand) return;
             const prefixEl = document.getElementById('po-prefix');
             const nextEl = document.getElementById('po-next-number');
+            const emailsEl = document.getElementById('factory-emails');
             if (prefixEl) prefixEl.value = currentBrand.po_prefix || 'RP';
             if (nextEl) nextEl.value = currentBrand.po_next_number || 1;
+            if (emailsEl) emailsEl.value = currentBrand.factory_emails || '';
             updatePoNumberExample();
         }
         function updatePoNumberExample() {
@@ -7342,10 +7349,12 @@
             if (!currentBrand) return;
             const prefix = (document.getElementById('po-prefix').value || 'RP').trim().toUpperCase();
             const next = parseInt(document.getElementById('po-next-number').value, 10) || 1;
-            const { error } = await supabase.from('brands').update({ po_prefix: prefix, po_next_number: next }).eq('id', currentBrand.id);
+            const factoryEmails = (document.getElementById('factory-emails')?.value || '').trim() || null;
+            const { error } = await supabase.from('brands').update({ po_prefix: prefix, po_next_number: next, factory_emails: factoryEmails }).eq('id', currentBrand.id);
             if (error) { showToast('Error saving PO settings: ' + error.message, 'error'); return; }
             currentBrand.po_prefix = prefix;
             currentBrand.po_next_number = next;
+            currentBrand.factory_emails = factoryEmails;
             showToast('PO settings saved');
         }
 
@@ -8015,14 +8024,15 @@
             return `<div class="glass rounded-2xl overflow-hidden">
                 <table class="w-full text-sm">
                     <thead><tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
-                        <th class="text-left px-4 py-3">Fabric · Colour</th>
+                        <th class="text-left px-4 py-3">Fabric</th>
+                        <th class="text-left px-4 py-3">Colour</th>
                         <th class="text-right px-4 py-3">Min kg</th>
                         <th class="text-right px-4 py-3">Max kg</th>
                         <th class="text-left px-4 py-3">Sources</th>
                         <th class="text-left px-4 py-3">Needed By</th>
                     </tr></thead>
                     <tbody>${sorted.map((r, i) => {
-                        const pill = r.colour_hex ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:70px;padding:4px 10px;border-radius:6px;background:${r.colour_hex};border:1px solid rgba(0,0,0,0.15);box-shadow:0 1px 4px rgba(0,0,0,0.25);font-size:12px;font-weight:600;color:${hexLuminance(r.colour_hex)>0.5?'#1e293b':'#f8fafc'};margin-left:6px;vertical-align:middle">${escHtml(r.pantone_code||r.colour_hex)}</span>` : '';
+                        const pill = r.colour_hex ? `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:70px;padding:4px 10px;border-radius:6px;background:${r.colour_hex};border:1px solid rgba(0,0,0,0.15);box-shadow:0 1px 4px rgba(0,0,0,0.25);font-size:12px;font-weight:600;color:${hexLuminance(r.colour_hex)>0.5?'#1e293b':'#f8fafc'}">${escHtml(r.pantone_code||r.colour_hex)}</span>` : '<span style="color:#94a3b8;font-size:12px">—</span>';
                         const subLine = _forecastFabricSubLine(r.fabric_id);
                         const sources = [];
                         if (r.club_count) sources.push(`${r.club_count} club${r.club_count!==1?'s':''}`);
@@ -8034,9 +8044,10 @@
                         const uid = 'fc-' + i;
                         return `<tr class="border-b border-white/5 hover:bg-white/5">
                             <td class="px-4 py-3">
-                                <div class="font-medium text-orange-300">${escHtml(r.fabric_name)}${pill}</div>
+                                <div class="font-medium" style="color:#0f172a">${escHtml(r.fabric_name)}</div>
                                 ${subLine ? `<div class="text-xs text-gray-500 mt-0.5">${subLine}</div>` : ''}
                             </td>
+                            <td class="px-4 py-3">${pill}</td>
                             <td class="px-4 py-3 text-right text-gray-400">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
                             <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
                             <td class="px-4 py-3 text-gray-400 text-xs">${sourcesLabel}</td>
@@ -8085,10 +8096,10 @@
             if (!isOpen) {
                 const btn = event.currentTarget;
                 const rect = btn.getBoundingClientRect();
-                // Position below button, flip left if too close to right edge
-                let left = rect.left;
+                // Open leftwards: align popup's right edge to the button's right
                 const popupWidth = 380;
-                if (left + popupWidth > window.innerWidth - 12) left = Math.max(8, window.innerWidth - popupWidth - 12);
+                let left = rect.right - popupWidth;
+                if (left < 8) left = 8;   // clamp to viewport
                 popup.style.top = (rect.bottom + 6) + 'px';
                 popup.style.left = left + 'px';
                 popup.classList.remove('hide');
@@ -16526,6 +16537,35 @@
             }
             return `<button onclick="event.stopPropagation();openRaiseIssue('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">⚠ Raise issue</button>`;
         }
+        function poReadyToEmail(po) {
+            return !!(po.po_title && (po.club_name || po.clubs?.name || po.team_name)
+                && po.order_date && (po.revised_delivery_date || po.delivery_due_date)
+                && po.assets_url);
+        }
+        function poEmailHref(po) {
+            const to = (currentBrand?.factory_emails || '').split(',').map(s => s.trim()).filter(Boolean).join(',');
+            const target = po.revised_delivery_date || po.delivery_due_date;
+            const club = po.clubs?.name || po.club_name || '';
+            const subject = `New PO ${po.po_number || ''} — ${po.po_title || ''}`.trim();
+            const lines = [
+                `Hi,`, ``,
+                `Please find the details for our new purchase order below.`, ``,
+                `PO Number: ${po.po_number || '—'}`,
+                `Title: ${po.po_title || '—'}`,
+                `Club / Team: ${[club, po.team_name].filter(Boolean).join(' · ') || '—'}`,
+                `Order Date: ${po.order_date ? fpoDate(po.order_date) : '—'}`,
+                `Required Delivery to HQ: ${target ? fpoDate(target) : '—'}`,
+                ``
+            ];
+            if (po.assets_url) lines.push(`Order Assets (Google Drive): ${po.assets_url}`);
+            if (po.pps_url) lines.push(`PPS Photos (Google Drive): ${po.pps_url}`);
+            lines.push(``, `Many thanks,`, currentBrand?.name || '');
+            return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+        }
+        function poEmailHtml(po) {
+            if (!poReadyToEmail(po)) return '';
+            return `<a href="${poEmailHref(po)}" onclick="event.stopPropagation()" title="Email factory recipients" class="inline-flex items-center justify-center text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>`;
+        }
         function poPerformanceHtml() {
             const dayDiff = (a, b) => Math.round((new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00')) / 86400000);
             const avgDays = arr => arr.length ? Math.round(arr.reduce((s, n) => s + n, 0) / arr.length) : null;
@@ -16612,6 +16652,7 @@
                     </div>
                     <div style="flex:0 0 20%;min-width:0;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 16px">
                         ${poActionsHtml(po)}
+                        ${poEmailHtml(po)}
                         ${poIssueHtml(po)}
                         ${poNotesButton(po)}
                     </div>
@@ -16810,8 +16851,9 @@
                             </div>`
                             : `<button onclick="openRaiseIssue(currentFactoryPoId)" class="btn-secondary text-sm px-4 py-2 rounded-lg">⚠ Raise Issue</button>`}
                     </div>
-                    <div>
+                    <div class="flex flex-wrap items-center gap-2">
                         <button onclick="openPoNotes(currentFactoryPoId)" class="btn-secondary text-sm px-4 py-2 rounded-lg">💬 Notes${poNotesMeta[po.id]?.count ? ' (' + poNotesMeta[po.id].count + ')' : ''}</button>
+                        ${poReadyToEmail(po) ? `<a href="${poEmailHref(po)}" title="Email factory recipients" class="inline-flex items-center text-sm px-4 py-2 rounded-lg font-medium" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>` : `<span class="text-xs" style="color:#94a3b8">Fill in title, club/team, dates &amp; Drive link to email the factory</span>`}
                     </div>
                 </div>`;
             renderPoFilesList();

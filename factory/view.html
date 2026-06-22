@@ -44,7 +44,7 @@
     .popup {
         position: absolute;
         z-index: 30;
-        left: 0; top: 1.75rem;
+        left: auto; right: 0; top: 1.75rem;
         background: #ffffff;
         border: 1px solid #e2e8f0;
         border-radius: 0.75rem;
@@ -788,14 +788,15 @@
             : `<div class="glass rounded-2xl overflow-visible">
                 <table class="w-full text-sm">
                     <thead><tr class="border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wide">
-                        <th class="text-left px-4 py-3">Fabric · Colour</th>
+                        <th class="text-left px-4 py-3">Fabric</th>
+                        <th class="text-left px-4 py-3">Colour</th>
                         <th class="text-right px-4 py-3">Min kg</th>
                         <th class="text-right px-4 py-3">Max kg</th>
                         <th class="text-left px-4 py-3">Sources</th>
                         <th class="text-left px-4 py-3">Needed By</th>
                     </tr></thead>
                     <tbody>${sorted.map((r, i) => {
-                        const pill = r.colour_hex ? ' '+colourPill(r.colour_hex, r.pantone_code) : '';
+                        const pill = r.colour_hex ? colourPill(r.colour_hex, r.pantone_code) : '<span style="color:#94a3b8;font-size:12px">—</span>';
                         const sub = forecastFabricSubLine(r.fabric_id);
                         const sources = [];
                         if (r.club_count) sources.push(`${r.club_count} club${r.club_count!==1?'s':''}`);
@@ -807,9 +808,10 @@
                         const uid = 'fc-'+i;
                         return `<tr class="border-b border-slate-100 hover:bg-slate-50">
                             <td class="px-4 py-3">
-                                <div class="font-medium" style="color:#0f172a">${esc(r.fabric_name)}${pill}</div>
+                                <div class="font-medium" style="color:#0f172a">${esc(r.fabric_name)}</div>
                                 ${sub ? `<div class="text-xs text-slate-500" style="margin-top:2px">${sub}</div>` : ''}
                             </td>
+                            <td class="px-4 py-3">${pill}</td>
                             <td class="px-4 py-3 text-right text-slate-500">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
                             <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
                             <td class="px-4 py-3 text-slate-500 text-xs">${sourcesLabel}</td>
