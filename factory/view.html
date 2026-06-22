@@ -7,18 +7,18 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-    body { background: #0f172a; color: #e2e8f0; font-family: system-ui, sans-serif; }
-    .glass { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); }
-    input[type="number"], input[type="date"] {
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        color: #e2e8f0;
+    body { background: #f1f5f9; color: #0f172a; font-family: 'Inter', system-ui, sans-serif; }
+    .glass { background: #ffffff; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04); }
+    input[type="number"], input[type="date"], input[type="text"], select, textarea {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        color: #0f172a;
         border-radius: 0.5rem;
         padding: 0.25rem 0.5rem;
     }
-    input:focus { outline: 2px solid #f97316; outline-offset: 1px; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
     .saved-flash { animation: flash 0.6s ease; }
-    @keyframes flash { 0%,100% { background: transparent; } 50% { background: rgba(249,115,22,0.15); } }
+    @keyframes flash { 0%,100% { background: transparent; } 50% { background: rgba(59,130,246,0.12); } }
     .tab-btn {
         padding: 0.6rem 1.1rem;
         font-size: 0.875rem;
@@ -29,26 +29,26 @@
         transition: color 0.15s, border-color 0.15s;
         background: transparent;
     }
-    .tab-btn:hover { color: #e2e8f0; }
-    .tab-btn.active { color: #fb923c; border-bottom-color: #fb923c; }
+    .tab-btn:hover { color: #475569; }
+    .tab-btn.active { color: #6d28d9; border-bottom-color: #6d28d9; }
     .sort-chip {
         font-size: 0.75rem;
         padding: 0.25rem 0.75rem;
         border-radius: 9999px;
-        border: 1px solid rgba(255,255,255,0.1);
-        color: #94a3b8;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
         cursor: pointer;
-        background: transparent;
+        background: #ffffff;
     }
-    .sort-chip.active { background: rgba(249,115,22,0.2); border-color: rgba(249,115,22,0.4); color: #fed7aa; }
+    .sort-chip.active { background: #ede9fe; border-color: #ddd6fe; color: #6d28d9; }
     .popup {
         position: absolute;
         z-index: 30;
         left: 0; top: 1.75rem;
-        background: #0f172a;
-        border: 1px solid rgba(255,255,255,0.1);
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
         border-radius: 0.75rem;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.12);
         padding: 0.75rem;
         min-width: 360px;
     }
@@ -56,14 +56,15 @@
         .forecast-grid { grid-template-columns: 1fr !important; }
     }
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="min-h-screen p-6">
 
 <div id="app">
-    <div class="text-gray-400 text-center py-20">Loading…</div>
+    <div class="text-slate-500 text-center py-20">Loading…</div>
 </div>
 
-<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm font-medium hidden" style="background:#1e293b;border:1px solid rgba(255,255,255,0.1)"></div>
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-xl text-sm font-medium hidden" style="background:#ffffff;border:1px solid #e2e8f0;color:#0f172a;box-shadow:0 4px 20px rgba(0,0,0,0.12)"></div>
 
 <script type="module">
     const { createClient } = supabase;
@@ -108,7 +109,7 @@
     }
 
     function colourPill(hex, label) {
-        if (!hex) return '<span class="text-gray-600 text-xs">—</span>';
+        if (!hex) return '<span class="text-slate-400 text-xs">—</span>';
         const textCol = hexLuminance(hex) > 0.4 ? '#1e293b' : '#f1f5f9';
         return `<span class="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded mr-1 mb-0.5" style="background:${hex};color:${textCol}">${esc(label || hex)}</span>`;
     }
@@ -345,10 +346,10 @@
                     ${brand.logo_url ? `<img src="${esc(brand.logo_url)}" class="h-12 w-12 rounded-xl object-contain" alt="">` : ''}
                     <div>
                         <h1 class="text-2xl font-bold">${esc(brand.name)} — Factory</h1>
-                        <p class="text-gray-400 text-sm">Shared factory view</p>
+                        <p class="text-slate-500 text-sm">Shared factory view</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-1 border-b border-white/10 mb-6">
+                <div class="flex items-center gap-1 border-b border-slate-200 mb-6">
                     <button class="tab-btn ${activeTab==='fabrics'?'active':''}" data-tab="fabrics">Fabric List</button>
                     <button class="tab-btn ${activeTab==='forecast'?'active':''}" data-tab="forecast">Fabric Forecast</button>
                     <button class="tab-btn ${activeTab==='stock'?'active':''}" data-tab="stock">Fabric Stock</button>
@@ -397,56 +398,103 @@
         const late = Math.floor(-ms / 86400000);
         return { cls: 'overdue', text: '⚠ LATE by ' + late + ' day' + (late !== 1 ? 's' : '') };
     }
+    function poStageColor(po, i, done) {
+        if (i === 3) {
+            if (po.completion_status === 'completed') return '#22c55e';
+            if (po.completion_status === 'part_completed') return '#f97316';
+            return '#cbd5e1';
+        }
+        return done ? '#22c55e' : '#cbd5e1';
+    }
     function poTimeline(po) {
         const stages = poStages(po);
-        return `<div style="display:flex;align-items:flex-start;margin:8px 0 2px">` +
-            stages.map((s, i) => `
-                <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative">
-                    ${i > 0 ? `<div style="position:absolute;top:9px;left:-50%;width:100%;height:2px;background:${s.done ? '#22c55e' : '#374151'}"></div>` : ''}
-                    <div style="width:20px;height:20px;border-radius:50%;z-index:1;background:${s.done ? '#22c55e' : '#374151'};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">${s.done ? '✓' : ''}</div>
-                    <span style="font-size:11px;margin-top:6px;color:${s.done ? '#d1d5db' : '#6b7280'};text-align:center;line-height:1.2">${s.label}</span>
-                    ${s.date ? `<span style="font-size:10px;color:#6b7280">${fpoDateShort(s.date)}</span>` : ''}
-                </div>`).join('') + `</div>`;
+        return `<div style="display:flex;align-items:flex-start;width:100%">` +
+            stages.map((s, i) => {
+                const col = poStageColor(po, i, s.done);
+                const active = col !== '#cbd5e1';
+                return `
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;min-width:0">
+                    ${i > 0 ? `<div style="position:absolute;top:9px;left:-50%;width:100%;height:2px;background:${active ? col : '#e2e8f0'}"></div>` : ''}
+                    <div style="width:20px;height:20px;border-radius:50%;z-index:1;background:${col};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">${s.done ? '✓' : ''}</div>
+                    <span style="font-size:10px;margin-top:6px;color:${active ? '#334155' : '#94a3b8'};text-align:center;line-height:1.2">${s.label}</span>
+                    ${s.date ? `<span style="font-size:10px;color:#94a3b8">${fpoDateShort(s.date)}</span>` : ''}
+                </div>`;
+            }).join('') + `</div>`;
     }
     function poCdStyle(cls) {
-        if (cls === 'overdue') return 'background:rgba(239,68,68,0.15);color:#f87171';
-        if (cls === 'soon')    return 'background:rgba(249,115,22,0.15);color:#fb923c';
-        if (cls === 'ok')      return 'background:rgba(34,197,94,0.12);color:#4ade80';
-        return 'background:rgba(148,163,184,0.12);color:#94a3b8';
+        if (cls === 'overdue') return 'background:#fee2e2;color:#dc2626';
+        if (cls === 'soon')    return 'background:#ffedd5;color:#ea580c';
+        if (cls === 'ok')      return 'background:#dcfce7;color:#16a34a';
+        return 'background:#f1f5f9;color:#64748b';
     }
+    let poFilter = 'all';
+    function poEffectiveTarget(po) { return po.revised_delivery_date || po.delivery_due_date || null; }
+    function poFilteredSorted() {
+        let list = factoryPos.slice();
+        const today = new Date(); today.setHours(0, 0, 0, 0);
+        const f = poFilter;
+        if (f === 'shipped') list = list.filter(p => p.shipped);
+        else if (f === 'awaiting') list = list.filter(p => !p.shipped);
+        else if (f === 'overdue') list = list.filter(p => !p.shipped && poEffectiveTarget(p) && new Date(poEffectiveTarget(p) + 'T00:00:00') < today);
+        else if (f === 'due') list = list.filter(p => { if (p.shipped) return false; const t = poEffectiveTarget(p); if (!t) return false; const d = (new Date(t + 'T00:00:00') - today) / 86400000; return d >= 0 && d <= 7; });
+        if (f === 'shipped') list.sort((a, b) => (b.shipped_date || '').localeCompare(a.shipped_date || ''));
+        else list.sort((a, b) => (poEffectiveTarget(a) || '9999').localeCompare(poEffectiveTarget(b) || '9999'));
+        return list;
+    }
+    function poFilterChip(key, label) {
+        return `<button class="sort-chip ${poFilter === key ? 'active' : ''}" data-pofilter="${key}">${label}</button>`;
+    }
+    function setPoFilter(k) { poFilter = k; renderTab(); }
+    window.setPoFilter = setPoFilter;
     function renderPoTracker(el) {
+        const bar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
+            ${poFilterChip('all', 'All')}${poFilterChip('due', 'Due soon')}${poFilterChip('overdue', 'Overdue')}${poFilterChip('awaiting', 'Awaiting')}${poFilterChip('shipped', 'Shipped')}
+        </div>`;
         if (!factoryPos.length) {
-            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No purchase orders yet.</div>';
+            el.innerHTML = bar + '<div class="glass rounded-2xl p-10 text-center text-slate-500">No purchase orders yet.</div>';
+            attachPoFilterHandlers();
             return;
         }
-        el.innerHTML = `<div class="space-y-3">` + factoryPos.map(po => {
+        const list = poFilteredSorted();
+        if (!list.length) {
+            el.innerHTML = bar + '<div class="glass rounded-2xl p-8 text-center text-slate-500">No POs match this filter.</div>';
+            attachPoFilterHandlers();
+            return;
+        }
+        el.innerHTML = bar + '<div class="space-y-2.5">' + list.map(po => {
             const cd = poCountdown(po);
             const clubName = po.clubs?.name || po.club_name || '';
-            const target = po.revised_delivery_date || po.delivery_due_date;
-            const assetsBtn = po.assets_url ? `<a href="${esc(po.assets_url)}" target="_blank" class="inline-block text-xs px-3 py-1.5 rounded-lg" style="background:rgba(148,163,184,0.12);color:#cbd5e1">📁 Drive</a>` : '';
-            const shipBtn = po.shipped
-                ? `<span class="text-xs px-3 py-1.5 rounded-lg" style="${poCdStyle('ok')}">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`
-                : `<button onclick="factoryMarkShipped('${po.id}')" class="text-sm font-semibold px-5 py-2 rounded-lg" style="background:#f97316;color:#fff">Mark as Shipped</button>`;
-            return `<div class="glass rounded-xl p-5">
-                <div class="flex justify-between items-start gap-4 mb-4 flex-wrap">
-                    <div>
-                        <div class="flex items-center gap-3 mb-1">
-                            <span class="font-bold text-lg">${esc(po.po_number || 'No PO#')}</span>
-                            <span class="text-xs px-2.5 py-1 rounded-lg font-semibold" style="${poCdStyle(cd.cls)}">${cd.text}</span>
-                        </div>
-                        <p class="text-gray-300 text-sm font-medium">${esc(po.po_title || 'Untitled PO')}</p>
-                        <p class="text-gray-500 text-xs mt-0.5">${esc(clubName)}${po.team_name ? ' · ' + esc(po.team_name) : ''}</p>
+            const target = poEffectiveTarget(po);
+            const ship = po.shipped
+                ? `<span class="text-xs px-3 py-1.5 rounded-lg font-semibold" style="${poCdStyle('ok')};white-space:nowrap">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`
+                : `<button onclick="factoryMarkShipped('${po.id}')" class="text-sm font-semibold px-4 py-2 rounded-lg text-white" style="background:#16a34a">Mark as Shipped</button>`;
+            return `<div class="glass rounded-xl" style="display:flex;align-items:stretch">
+                <div style="flex:0 0 30%;min-width:0;padding:14px 16px">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                        <span class="font-bold" style="color:#0f172a">${esc(po.po_number || 'No PO#')}</span>
+                        <span class="text-xs px-2.5 py-1 rounded-lg font-semibold" style="${poCdStyle(cd.cls)}">${cd.text}</span>
                     </div>
-                    <div class="text-right text-sm text-gray-400">
-                        <p class="text-xs text-gray-500">Expected delivery</p>
-                        <p class="font-medium">${target ? fpoDate(target) : '—'}${po.revised_delivery_date ? ' <span class="text-xs" style="color:#fb923c">(revised)</span>' : ''}</p>
-                        <div class="mt-2">${assetsBtn}</div>
-                    </div>
+                    <p class="text-sm font-medium truncate" style="color:#334155">${esc(po.po_title || 'Untitled PO')}</p>
+                    <p class="text-xs mt-0.5 truncate" style="color:#94a3b8">${esc(clubName)}${po.team_name ? ' · ' + esc(po.team_name) : ''}</p>
+                    ${po.assets_url ? `<a href="${esc(po.assets_url)}" target="_blank" class="inline-block mt-2 text-xs font-medium" style="color:#2563eb">📁 Drive assets</a>` : ''}
                 </div>
-                ${poTimeline(po)}
-                <div class="flex justify-end mt-4">${shipBtn}</div>
+                <div style="flex:1;min-width:0;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;display:flex;align-items:center;padding:10px 18px">
+                    ${poTimeline(po)}
+                </div>
+                <div style="flex:0 0 22%;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:8px;padding:14px 16px;text-align:right">
+                    <div>
+                        <p class="text-xs" style="color:#94a3b8">Expected delivery</p>
+                        <p class="font-semibold" style="color:#0f172a">${target ? fpoDate(target) : '—'}</p>
+                        ${po.revised_delivery_date ? '<p class="text-xs" style="color:#ea580c">revised</p>' : ''}
+                    </div>
+                    ${ship}
+                </div>
             </div>`;
-        }).join('') + `</div>`;
+        }).join('') + '</div>';
+        attachPoFilterHandlers();
+    }
+    function attachPoFilterHandlers() {
+        document.querySelectorAll('[data-pofilter]').forEach(b => b.addEventListener('click', () => setPoFilter(b.dataset.pofilter)));
     }
     async function factoryMarkShipped(poId) {
         const today = new Date().toISOString().slice(0, 10);
@@ -461,14 +509,14 @@
 
     function renderFabrics(el) {
         if (allFabrics.length === 0) {
-            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No fabrics configured.</div>';
+            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-slate-500">No fabrics configured.</div>';
             return;
         }
         el.innerHTML = `
             <div class="glass rounded-2xl overflow-hidden">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                        <tr class="border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wide">
                             <th class="text-left px-4 py-3">Fabric</th>
                             <th class="text-left px-4 py-3">Construction</th>
                             <th class="text-left px-4 py-3">GSM</th>
@@ -479,18 +527,18 @@
                     <tbody>
                         ${allFabrics.map(f => {
                             const cols = Array.isArray(f.colour_options) ? f.colour_options : [];
-                            return `<tr class="border-b border-white/5 hover:bg-white/5">
+                            return `<tr class="border-b border-slate-100 hover:bg-slate-50">
                                 <td class="px-4 py-3 font-medium">${esc(f.fabric_name)}</td>
-                                <td class="px-4 py-3 text-gray-400">${esc(f.construction||'—')}</td>
-                                <td class="px-4 py-3 text-gray-400">${gsmLbl(f)}</td>
-                                <td class="px-4 py-3"><div style="display:flex;flex-wrap:wrap;gap:2px">${cols.length ? cols.map(c => colourPill(c.hex, c.pantone_code)).join('') : '<span class="text-gray-600 text-xs">—</span>'}</div></td>
-                                <td class="px-4 py-3 text-gray-400">${esc(f.supplier||'—')}</td>
+                                <td class="px-4 py-3 text-slate-500">${esc(f.construction||'—')}</td>
+                                <td class="px-4 py-3 text-slate-500">${gsmLbl(f)}</td>
+                                <td class="px-4 py-3"><div style="display:flex;flex-wrap:wrap;gap:2px">${cols.length ? cols.map(c => colourPill(c.hex, c.pantone_code)).join('') : '<span class="text-slate-400 text-xs">—</span>'}</div></td>
+                                <td class="px-4 py-3 text-slate-500">${esc(f.supplier||'—')}</td>
                             </tr>`;
                         }).join('')}
                     </tbody>
                 </table>
             </div>
-            <p class="text-xs text-gray-600 mt-3">Read-only view — fabric records are managed by the brand.</p>`;
+            <p class="text-xs text-slate-400 mt-3">Read-only view — fabric records are managed by the brand.</p>`;
     }
 
     // Merge club + bulk demand into one set of rows. Club demand is a min–max
@@ -548,7 +596,7 @@
             { key: 'count',  label: 'Most Sources ↓' }
         ];
         const sortBar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
-            <span class="text-xs text-gray-500 mr-1">Sort:</span>
+            <span class="text-xs text-slate-500 mr-1">Sort:</span>
             ${sortOptions.map(s => `<button class="sort-chip ${forecastSort===s.key?'active':''}" data-sort="${s.key}">${s.label}</button>`).join('')}
         </div>`;
 
@@ -560,13 +608,13 @@
         else if (forecastSort === 'fabric') sorted.sort((a,b) => (a.fabric_name+(a.pantone_code||'')).localeCompare(b.fabric_name+(b.pantone_code||'')));
         else if (forecastSort === 'count') sorted.sort((a,b) => b.contributor_count - a.contributor_count);
 
-        const intro = '<p class="text-sm text-gray-400 mb-4">Combined fabric forecast based on <span style="color:#fdba74">live bulk orders</span> and <span style="color:#fdba74">club usage estimations</span>.</p>';
+        const intro = '<p class="text-sm text-slate-500 mb-4">Combined fabric forecast based on <span style="color:#fdba74">live bulk orders</span> and <span style="color:#fdba74">club usage estimations</span>.</p>';
 
         const table = !sorted.length
-            ? '<div class="glass rounded-2xl p-8 text-center text-gray-500 text-sm">No forecast data yet.</div>'
+            ? '<div class="glass rounded-2xl p-8 text-center text-slate-500 text-sm">No forecast data yet.</div>'
             : `<div class="glass rounded-2xl overflow-visible">
                 <table class="w-full text-sm">
-                    <thead><tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                    <thead><tr class="border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wide">
                         <th class="text-left px-4 py-3">Fabric · Colour</th>
                         <th class="text-right px-4 py-3">Min kg</th>
                         <th class="text-right px-4 py-3">Max kg</th>
@@ -581,21 +629,21 @@
                         if (r.job_count) sources.push(`${r.job_count} order${r.job_count!==1?'s':''}`);
                         const sourcesLabel = sources.join(' · ') || '—';
                         const months = r.month_breakdown.length ? r.month_breakdown.map(m =>
-                            `<tr class="border-b border-white/5"><td class="px-3 py-1.5 text-gray-400 whitespace-nowrap">${esc(m.month)}</td><td class="px-3 py-1.5 text-gray-400">${esc(m.source)}</td><td class="px-3 py-1.5 text-right text-gray-400">${m.min_kg>0?m.min_kg.toFixed(2):'—'}</td><td class="px-3 py-1.5 text-right font-medium">${m.max_kg.toFixed(2)}</td></tr>`
-                        ).join('') : '<tr><td colspan="4" class="px-3 py-2 text-gray-500 text-xs">No dated entries</td></tr>';
+                            `<tr class="border-b border-slate-100"><td class="px-3 py-1.5 text-slate-500 whitespace-nowrap">${esc(m.month)}</td><td class="px-3 py-1.5 text-slate-500">${esc(m.source)}</td><td class="px-3 py-1.5 text-right text-slate-500">${m.min_kg>0?m.min_kg.toFixed(2):'—'}</td><td class="px-3 py-1.5 text-right font-medium">${m.max_kg.toFixed(2)}</td></tr>`
+                        ).join('') : '<tr><td colspan="4" class="px-3 py-2 text-slate-500 text-xs">No dated entries</td></tr>';
                         const uid = 'fc-'+i;
-                        return `<tr class="border-b border-white/5 hover:bg-white/5">
+                        return `<tr class="border-b border-slate-100 hover:bg-slate-50">
                             <td class="px-4 py-3">
                                 <div class="font-medium text-orange-300">${esc(r.fabric_name)}${pill}</div>
-                                ${sub ? `<div class="text-xs text-gray-500" style="margin-top:2px">${sub}</div>` : ''}
+                                ${sub ? `<div class="text-xs text-slate-500" style="margin-top:2px">${sub}</div>` : ''}
                             </td>
-                            <td class="px-4 py-3 text-right text-gray-400">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
+                            <td class="px-4 py-3 text-right text-slate-500">${r.min_kg>0?r.min_kg.toFixed(2):'—'}</td>
                             <td class="px-4 py-3 text-right font-semibold">${r.max_kg.toFixed(2)}</td>
-                            <td class="px-4 py-3 text-gray-400 text-xs">${sourcesLabel}</td>
+                            <td class="px-4 py-3 text-slate-500 text-xs">${sourcesLabel}</td>
                             <td class="px-4 py-3"><div class="relative inline-block">
-                                <button class="popup-toggle text-xs px-2 py-1 rounded border border-white/10 text-gray-400 hover:text-white hover:border-white/30" data-idx="${uid}">${r.nearest_date?esc(r.nearest_date):'No date'} ▾</button>
-                                <div id="popup-${uid}" class="popup hidden"><p class="text-xs font-semibold text-gray-300 mb-2">Month-by-month breakdown</p>
-                                    <table class="w-full text-xs"><thead><tr class="text-gray-500 border-b border-white/10"><th class="text-left px-3 py-1">Month</th><th class="text-left px-3 py-1">Source</th><th class="text-right px-3 py-1">Min kg</th><th class="text-right px-3 py-1">Max kg</th></tr></thead><tbody>${months}</tbody></table>
+                                <button class="popup-toggle text-xs px-2 py-1 rounded border border-slate-200 text-slate-500 hover:text-slate-900 hover:border-slate-300" data-idx="${uid}">${r.nearest_date?esc(r.nearest_date):'No date'} ▾</button>
+                                <div id="popup-${uid}" class="popup hidden"><p class="text-xs font-semibold text-slate-700 mb-2">Month-by-month breakdown</p>
+                                    <table class="w-full text-xs"><thead><tr class="text-slate-500 border-b border-slate-200"><th class="text-left px-3 py-1">Month</th><th class="text-left px-3 py-1">Source</th><th class="text-right px-3 py-1">Min kg</th><th class="text-right px-3 py-1">Max kg</th></tr></thead><tbody>${months}</tbody></table>
                                 </div>
                             </div></td>
                         </tr>`;
@@ -663,7 +711,7 @@
 
         const rows = Object.values(rowMap);
         if (rows.length === 0) {
-            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No stock rows yet.</div>';
+            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-slate-500">No stock rows yet.</div>';
             return;
         }
 
@@ -671,7 +719,7 @@
             <div class="glass rounded-2xl overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-white/10 text-xs text-gray-400 uppercase tracking-wide">
+                        <tr class="border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wide">
                             <th class="text-left px-4 py-3">Status</th>
                             <th class="text-left px-4 py-3">Fabric</th>
                             <th class="text-left px-4 py-3">Colour</th>
@@ -691,13 +739,13 @@
                             const rag = _ragStatus(s.live_stock_kg, r.max_kg);
                             const statusCell = rag.label
                                 ? `<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:${rag.colour}">${rag.dot}${rag.label}</span>`
-                                : '<span class="text-xs text-gray-600">—</span>';
-                            return `<tr id="row-${i}" class="border-b border-white/5 hover:bg-white/5">
+                                : '<span class="text-xs text-slate-400">—</span>';
+                            return `<tr id="row-${i}" class="border-b border-slate-100 hover:bg-slate-50">
                                 <td class="px-4 py-3">${statusCell}</td>
                                 <td class="px-4 py-3 font-medium">${esc(r.fabric_label)}</td>
                                 <td class="px-4 py-3">${colCell}</td>
-                                <td class="px-4 py-3 text-right text-gray-400">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
-                                <td class="px-4 py-3 text-right text-gray-400">${r.max_kg > 0 ? r.max_kg.toFixed(2) : '—'}</td>
+                                <td class="px-4 py-3 text-right text-slate-500">${r.min_kg > 0 ? r.min_kg.toFixed(2) : '—'}</td>
+                                <td class="px-4 py-3 text-right text-slate-500">${r.max_kg > 0 ? r.max_kg.toFixed(2) : '—'}</td>
                                 <td class="px-4 py-3 text-right">
                                     <input type="number" step="0.01" min="0" value="${s.live_stock_kg != null ? s.live_stock_kg : ''}" placeholder="0"
                                         class="w-24 text-right" data-row="${i}" data-field="live_stock_kg"
@@ -718,14 +766,14 @@
                     </tbody>
                 </table>
             </div>
-            <p class="text-xs text-gray-600 mt-3 text-center">Changes save automatically on leaving each field.</p>`;
+            <p class="text-xs text-slate-400 mt-3 text-center">Changes save automatically on leaving each field.</p>`;
         document.querySelectorAll('#stock-tbody input').forEach(input => {
             input.addEventListener('blur', handleStockEdit);
         });
     }
 
     function renderDevelopment(el) {
-        el.innerHTML = '<div class="glass rounded-2xl p-10 text-center"><h3 class="font-semibold mb-2 text-gray-300">Product Development</h3><p class="text-gray-500">Coming soon.</p></div>';
+        el.innerHTML = '<div class="glass rounded-2xl p-10 text-center"><h3 class="font-semibold mb-2 text-slate-700">Product Development</h3><p class="text-slate-500">Coming soon.</p></div>';
     }
 
     async function handleStockEdit(e) {

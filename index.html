@@ -3153,7 +3153,7 @@
             <div class="glass rounded-2xl p-6 w-full max-w-2xl mx-4 my-auto">
                 <div class="flex justify-between items-center mb-6">
                     <h3 class="text-xl font-bold" id="fpo-modal-title">New Purchase Order</h3>
-                    <button onclick="hideFactoryPoModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    <button onclick="hideFactoryPoModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
 
                 <input type="hidden" id="fpo-edit-id">
@@ -3194,14 +3194,14 @@
                     </div>
                 </div>
 
-                <div class="glass rounded-lg p-4 mb-6 flex justify-between items-center">
-                    <span class="text-gray-400 text-sm">Delivery to reach ROKOR HQ (auto · 4 weeks)</span>
+                <div class="rounded-lg p-4 mb-6 flex justify-between items-center" style="background:#f8fafc;border:1px solid #e2e8f0">
+                    <span class="text-gray-500 text-sm">Delivery to reach ROKOR HQ (auto · 4 weeks)</span>
                     <span id="fpo-due-display" class="font-semibold text-brand-400">—</span>
                 </div>
 
                 <div class="flex gap-3 justify-end">
-                    <button onclick="hideFactoryPoModal()" class="px-6 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Cancel</button>
-                    <button onclick="saveFactoryPo()" class="bg-brand-500 hover:bg-brand-600 px-8 py-3 rounded-lg font-semibold transition">Save PO</button>
+                    <button onclick="hideFactoryPoModal()" class="btn-secondary">Cancel</button>
+                    <button onclick="saveFactoryPo()" class="btn-primary">Save PO</button>
                 </div>
             </div>
         </div>
@@ -3214,16 +3214,16 @@
                         <h3 class="text-xl font-bold" id="fpo-rec-number">PO</h3>
                         <p class="text-gray-400 text-sm" id="fpo-rec-title"></p>
                     </div>
-                    <button onclick="hideFactoryPoRecord()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+                    <button onclick="hideFactoryPoRecord()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
 
                 <div id="fpo-rec-body"><!-- Populated by openFactoryPoRecord() --></div>
 
                 <div class="flex gap-3 justify-between mt-6">
-                    <button onclick="deleteFactoryPo()" class="bg-red-600/90 hover:bg-red-700 px-5 py-3 rounded-lg font-semibold transition">Delete PO</button>
+                    <button onclick="deleteFactoryPo()" class="px-5 py-3 rounded-lg font-semibold text-white transition" style="background:#dc2626">Delete PO</button>
                     <div class="flex gap-3">
-                        <button onclick="openFactoryPoModal(currentFactoryPoId)" class="px-5 py-3 rounded-lg border border-gray-600 hover:border-gray-400 transition">Edit Details</button>
-                        <button onclick="hideFactoryPoRecord()" class="bg-brand-500 hover:bg-brand-600 px-6 py-3 rounded-lg font-semibold transition">Close</button>
+                        <button onclick="openFactoryPoModal(currentFactoryPoId)" class="btn-secondary">Edit Details</button>
+                        <button onclick="hideFactoryPoRecord()" class="btn-primary">Close</button>
                     </div>
                 </div>
             </div>
@@ -16313,6 +16313,7 @@
         let factoryPos = [];
         let currentFactoryPoId = null;
         let _poCountdownTimer = null;
+        let _poFilter = 'all';
 
         // ---- Date helpers ----
         function fpoDate(d)      { if (!d) return ''; return new Date(d + 'T00:00:00').toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); }
@@ -16356,16 +16357,28 @@
             const late = Math.floor(-ms / 86400000);
             return { cls: 'overdue', text: '⚠ LATE by ' + late + ' day' + (late !== 1 ? 's' : '') };
         }
+        function poStageColor(po, i, done) {
+            if (i === 3) {
+                if (po.completion_status === 'completed') return '#22c55e';
+                if (po.completion_status === 'part_completed') return '#f97316';
+                return '#cbd5e1';
+            }
+            return done ? '#22c55e' : '#cbd5e1';
+        }
         function renderPoTimelineHtml(po) {
             const stages = poStages(po);
-            return `<div style="display:flex;align-items:flex-start;margin:8px 0 2px">` +
-                stages.map((s, i) => `
-                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative">
-                        ${i > 0 ? `<div style="position:absolute;top:9px;left:-50%;width:100%;height:2px;background:${s.done ? '#22c55e' : '#374151'}"></div>` : ''}
-                        <div style="width:20px;height:20px;border-radius:50%;z-index:1;background:${s.done ? '#22c55e' : '#374151'};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">${s.done ? '✓' : ''}</div>
-                        <span style="font-size:11px;margin-top:6px;color:${s.done ? '#d1d5db' : '#6b7280'};text-align:center;line-height:1.2">${s.label}</span>
-                        ${s.date ? `<span style="font-size:10px;color:#6b7280">${fpoDateShort(s.date)}</span>` : ''}
-                    </div>`).join('') + `</div>`;
+            return `<div style="display:flex;align-items:flex-start;width:100%">` +
+                stages.map((s, i) => {
+                    const col = poStageColor(po, i, s.done);
+                    const active = col !== '#cbd5e1';
+                    return `
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;position:relative;min-width:0">
+                        ${i > 0 ? `<div style="position:absolute;top:9px;left:-50%;width:100%;height:2px;background:${active ? col : '#e2e8f0'}"></div>` : ''}
+                        <div style="width:20px;height:20px;border-radius:50%;z-index:1;background:${col};display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff">${s.done ? '✓' : ''}</div>
+                        <span style="font-size:10px;margin-top:6px;color:${active ? '#334155' : '#94a3b8'};text-align:center;line-height:1.2">${s.label}</span>
+                        ${s.date ? `<span style="font-size:10px;color:#94a3b8">${fpoDateShort(s.date)}</span>` : ''}
+                    </div>`;
+                }).join('') + `</div>`;
         }
 
         // ---- Load & list ----
@@ -16385,37 +16398,78 @@
             const tool = document.getElementById('tool-factory');
             if (_factoryActiveTab === 'po-tracker' && tool && !tool.classList.contains('hide')) renderFactoryPoList();
         }
+        function poEffectiveTarget(po) { return po.revised_delivery_date || po.delivery_due_date || null; }
+        function poFilteredSorted() {
+            let list = factoryPos.slice();
+            const today = new Date(); today.setHours(0, 0, 0, 0);
+            const f = _poFilter;
+            if (f === 'shipped') list = list.filter(p => p.shipped);
+            else if (f === 'awaiting') list = list.filter(p => !p.shipped);
+            else if (f === 'overdue') list = list.filter(p => !p.shipped && poEffectiveTarget(p) && new Date(poEffectiveTarget(p) + 'T00:00:00') < today);
+            else if (f === 'due') list = list.filter(p => { if (p.shipped) return false; const t = poEffectiveTarget(p); if (!t) return false; const d = (new Date(t + 'T00:00:00') - today) / 86400000; return d >= 0 && d <= 7; });
+            if (f === 'shipped') list.sort((a, b) => (b.shipped_date || '').localeCompare(a.shipped_date || ''));
+            else list.sort((a, b) => (poEffectiveTarget(a) || '9999').localeCompare(poEffectiveTarget(b) || '9999'));
+            return list;
+        }
+        function poFilterChip(key, label) {
+            const active = _poFilter === key;
+            const style = active ? 'background:#ede9fe;color:#6d28d9;border:1px solid #ddd6fe' : 'background:#fff;color:#64748b;border:1px solid #e2e8f0';
+            return `<button onclick="setPoFilter('${key}')" class="text-xs font-semibold px-3 py-1.5 rounded-full transition" style="${style}">${label}</button>`;
+        }
+        function setPoFilter(k) { _poFilter = k; renderFactoryPoList(); }
+        async function quickShipPo(poId) {
+            const today = fpoToday();
+            const { error } = await supabase.from('factory_purchase_orders').update({ shipped: true, shipped_date: today }).eq('id', poId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === poId); if (po) { po.shipped = true; po.shipped_date = today; }
+            showToast('Marked as shipped');
+            renderFactoryPoList();
+        }
         function renderFactoryPoList() {
             const el = document.getElementById('factory-view-po-tracker');
             if (!el) return;
+            const bar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
+                ${poFilterChip('all', 'All')}${poFilterChip('due', 'Due soon')}${poFilterChip('overdue', 'Overdue')}${poFilterChip('awaiting', 'Awaiting')}${poFilterChip('shipped', 'Shipped')}
+            </div>`;
             if (!factoryPos.length) {
-                el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No purchase orders yet. Click <strong>+ New PO</strong> to create one.</div>';
+                el.innerHTML = bar + '<div class="glass rounded-2xl p-10 text-center" style="color:#94a3b8">No purchase orders yet. Click <strong>+ New PO</strong> to create one.</div>';
                 return;
             }
-            el.innerHTML = factoryPos.map(po => {
+            const list = poFilteredSorted();
+            if (!list.length) {
+                el.innerHTML = bar + '<div class="glass rounded-2xl p-8 text-center" style="color:#94a3b8">No POs match this filter.</div>';
+                return;
+            }
+            el.innerHTML = bar + '<div class="space-y-2.5">' + list.map(po => {
                 const cd = poCountdown(po);
                 const clubName = po.clubs?.name || po.club_name || '';
-                const assetsBtn = po.assets_url ? `<a href="${escHtml(po.assets_url)}" target="_blank" onclick="event.stopPropagation()" class="btn-secondary text-xs px-3 py-1.5 rounded-lg">📁 Drive</a>` : '';
-                const target = po.revised_delivery_date || po.delivery_due_date;
-                return `<div class="glass rounded-xl p-5 cursor-pointer hover:border-brand-500 transition" onclick="openFactoryPoRecord('${po.id}')">
-                    <div class="flex justify-between items-start gap-4 mb-4 flex-wrap">
-                        <div>
-                            <div class="flex items-center gap-3 mb-1">
-                                <span class="font-bold text-lg">${escHtml(po.po_number || 'No PO#')}</span>
-                                <span class="dt-countdown ${cd.cls}">${cd.text}</span>
-                            </div>
-                            <p class="text-gray-300 text-sm font-medium">${escHtml(po.po_title || 'Untitled PO')}</p>
-                            <p class="text-gray-500 text-xs mt-0.5">${escHtml(clubName)}${po.team_name ? ' · ' + escHtml(po.team_name) : ''}</p>
+                const target = poEffectiveTarget(po);
+                const ship = po.shipped
+                    ? `<span class="dt-countdown ok" style="white-space:nowrap">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`
+                    : `<button onclick="event.stopPropagation();quickShipPo('${po.id}')" class="text-sm font-semibold px-4 py-2 rounded-lg text-white transition" style="background:#16a34a">Mark Shipped</button>`;
+                return `<div class="glass rounded-xl cursor-pointer hover:border-brand-500 transition" style="display:flex;align-items:stretch" onclick="openFactoryPoRecord('${po.id}')">
+                    <div style="flex:0 0 30%;min-width:0;padding:14px 16px">
+                        <div class="flex items-center gap-2 mb-1 flex-wrap">
+                            <span class="font-bold" style="color:#0f172a">${escHtml(po.po_number || 'No PO#')}</span>
+                            <span class="dt-countdown ${cd.cls}">${cd.text}</span>
                         </div>
-                        <div class="text-right text-sm text-gray-400">
-                            <p class="text-xs text-gray-500">Expected delivery</p>
-                            <p class="font-medium">${target ? fpoDate(target) : '—'}${po.revised_delivery_date ? ' <span class="text-xs text-orange-300">(revised)</span>' : ''}</p>
-                            <div class="mt-2">${assetsBtn}</div>
-                        </div>
+                        <p class="text-sm font-medium truncate" style="color:#334155">${escHtml(po.po_title || 'Untitled PO')}</p>
+                        <p class="text-xs mt-0.5 truncate" style="color:#94a3b8">${escHtml(clubName)}${po.team_name ? ' · ' + escHtml(po.team_name) : ''}</p>
+                        ${po.assets_url ? `<a href="${escHtml(po.assets_url)}" target="_blank" onclick="event.stopPropagation()" class="inline-block mt-2 text-xs font-medium" style="color:#2563eb">📁 Drive assets</a>` : ''}
                     </div>
-                    ${renderPoTimelineHtml(po)}
+                    <div style="flex:1;min-width:0;border-left:1px solid #e2e8f0;border-right:1px solid #e2e8f0;display:flex;align-items:center;padding:10px 18px">
+                        ${renderPoTimelineHtml(po)}
+                    </div>
+                    <div style="flex:0 0 22%;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:8px;padding:14px 16px;text-align:right">
+                        <div>
+                            <p class="text-xs" style="color:#94a3b8">Expected delivery</p>
+                            <p class="font-semibold" style="color:#0f172a">${target ? fpoDate(target) : '—'}</p>
+                            ${po.revised_delivery_date ? '<p class="text-xs" style="color:#ea580c">revised</p>' : ''}
+                        </div>
+                        ${ship}
+                    </div>
                 </div>`;
-            }).join('');
+            }).join('') + '</div>';
         }
 
         // ---- Create / edit modal ----
@@ -16548,15 +16602,15 @@
             document.getElementById('fpo-rec-body').innerHTML = `
                 <div class="grid md:grid-cols-2 gap-4 mb-4 text-sm">
                     <div><span class="text-gray-400">Order Date</span><p class="font-medium mt-1">${po.order_date ? fpoDate(po.order_date) : '—'}</p></div>
-                    <div><span class="text-gray-400">Delivery to reach HQ</span><p class="font-medium mt-1">${target ? fpoDate(target) : '—'}${po.revised_delivery_date ? ' <span class="text-xs text-orange-300">(revised)</span>' : ''}</p></div>
+                    <div><span class="text-gray-400">Delivery to reach HQ</span><p class="font-medium mt-1">${target ? fpoDate(target) : '—'}${po.revised_delivery_date ? ' <span class="text-xs" style="color:#ea580c">(revised)</span>' : ''}</p></div>
                     <div><span class="text-gray-400">Club</span><p class="font-medium mt-1">${escHtml(clubName)}</p></div>
                     <div><span class="text-gray-400">Team</span><p class="font-medium mt-1">${escHtml(po.team_name || '—')}</p></div>
                 </div>
                 ${po.assets_url ? `<a href="${escHtml(po.assets_url)}" target="_blank" class="inline-flex items-center gap-2 btn-secondary text-sm px-4 py-2 rounded-lg mb-4">📁 Order Assets (Drive)</a>` : ''}
                 <div class="mb-4"><span class="dt-countdown ${cd.cls}">${cd.text}</span></div>
                 ${renderPoTimelineHtml(po)}
-                <hr class="border-gray-700 my-5">
-                <h4 class="font-semibold text-gray-300 mb-3">Factory Details</h4>
+                <hr class="my-5" style="border:none;border-top:1px solid #e2e8f0">
+                <h4 class="font-semibold mb-3" style="color:#334155">Factory Details</h4>
                 <div class="space-y-4 text-sm">
                     <label class="flex items-center gap-3 cursor-pointer">
                         <input type="checkbox" ${po.artwork_approved ? 'checked' : ''} onchange="setPoStageFlag('artwork_approved', this.checked)">
@@ -16602,7 +16656,7 @@
                     <div class="pt-2">
                         ${po.shipped
                             ? `<span class="dt-countdown ok">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>`
-                            : `<button onclick="markPoShipped()" class="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-lg font-semibold transition">Mark as Shipped</button>`}
+                            : `<button onclick="markPoShipped()" class="px-6 py-3 rounded-lg font-semibold text-white transition" style="background:#16a34a">Mark as Shipped</button>`}
                     </div>
                 </div>`;
             renderPoFilesList();
@@ -16677,9 +16731,9 @@
             const { data } = await supabase.from('factory_po_files').select('*').eq('po_id', currentFactoryPoId).order('created_at', { ascending: false });
             const files = data || [];
             if (!files.length) { el.innerHTML = '<p class="text-gray-500 text-xs">No documents uploaded.</p>'; return; }
-            el.innerHTML = files.map(f => `<div class="flex items-center justify-between gap-2 bg-gray-800/50 rounded-lg px-3 py-2">
+            el.innerHTML = files.map(f => `<div class="flex items-center justify-between gap-2 rounded-lg px-3 py-2" style="background:#f8fafc;border:1px solid #e2e8f0">
                 <a href="${escHtml(f.file_url)}" target="_blank" class="text-sm text-brand-400 hover:underline truncate">${escHtml(f.file_name)}</a>
-                <button onclick="deletePoFile('${f.id}')" class="text-red-400 hover:text-red-300 text-sm">✕</button>
+                <button onclick="deletePoFile('${f.id}')" class="text-red-500 hover:text-red-600 text-sm">✕</button>
             </div>`).join('');
         }
         async function uploadPoShippingFiles(event) {
