@@ -99,6 +99,7 @@
     let activeTab = 'po-tracker';
     let forecastSort = 'date';
     let factoryPos = [];
+    let factoryDocs = [];
     let _poCountdownTimer = null;
 
     function showToast(msg) {
@@ -166,6 +167,7 @@
 
         await loadFactoryPos();
         await loadForecast();
+        await loadFactoryDocs();
 
         renderShell();
         if (!_poCountdownTimer) _poCountdownTimer = setInterval(() => { if (activeTab === 'po-tracker') renderTab(); }, 60000);
@@ -381,6 +383,7 @@
                     <button class="tab-btn ${activeTab==='stock'?'active':''}" data-tab="stock">Fabric Stock</button>
                     <button class="tab-btn ${activeTab==='fabrics'?'active':''}" data-tab="fabrics">Fabric List</button>
                     <button class="tab-btn ${activeTab==='development'?'active':''}" data-tab="development">Product Development</button>
+                    <button class="tab-btn ${activeTab==='documents'?'active':''}" data-tab="documents">Key Documents</button>
                 </div>
                 <div id="tab-content"></div>
             </div>`;
@@ -397,6 +400,42 @@
         if (activeTab === 'stock') return renderStock(el);
         if (activeTab === 'development') return renderDevelopment(el);
         if (activeTab === 'po-tracker') return renderPoTracker(el);
+        if (activeTab === 'documents') return renderDocuments(el);
+    }
+
+    async function loadFactoryDocs() {
+        const { data } = await db.from('factory_documents')
+            .select('*')
+            .eq('brand_id', brand.id)
+            .order('sort_order', { ascending: true })
+            .order('created_at', { ascending: false });
+        factoryDocs = data || [];
+    }
+    function fdocIcon(d) {
+        if (d.doc_type === 'url') return '🔗';
+        const t = (d.file_type || '') + ' ' + (d.file_name || '');
+        if (/pdf/i.test(t)) return '📄';
+        if (/(png|jpe?g|gif|webp|svg|image)/i.test(t)) return '🖼️';
+        if (/(xls|sheet|csv)/i.test(t)) return '📊';
+        if (/(doc|word)/i.test(t)) return '📝';
+        if (/(zip|rar|7z)/i.test(t)) return '🗜️';
+        return '📎';
+    }
+    function renderDocuments(el) {
+        if (!factoryDocs.length) {
+            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-slate-500">No documents have been shared yet.</div>';
+            return;
+        }
+        el.innerHTML = '<div class="space-y-2.5">' + factoryDocs.map(d => `
+            <div class="glass rounded-xl p-4" style="display:flex;align-items:center;gap:14px">
+                <div style="font-size:22px;flex-shrink:0">${fdocIcon(d)}</div>
+                <div style="flex:1;min-width:0">
+                    <p class="font-semibold truncate" style="color:#0f172a">${esc(d.title)}</p>
+                    ${d.description ? `<p class="text-sm mt-0.5" style="color:#64748b">${esc(d.description)}</p>` : ''}
+                    ${d.doc_type === 'url' ? `<p class="text-xs mt-1 truncate" style="color:#94a3b8">${esc(d.file_url)}</p>` : (d.file_name ? `<p class="text-xs mt-1 truncate" style="color:#94a3b8">${esc(d.file_name)}</p>` : '')}
+                </div>
+                <a href="${esc(d.file_url)}" target="_blank" rel="noopener" class="text-xs font-semibold px-3 py-2 rounded-lg" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;flex-shrink:0">${d.doc_type === 'url' ? 'Open ↗' : 'Open / Download ↗'}</a>
+            </div>`).join('') + '</div>';
     }
 
     // ---- PO Tracker (factory view: list + Shipped button only) ----

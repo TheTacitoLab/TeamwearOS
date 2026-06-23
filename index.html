@@ -3260,6 +3260,51 @@
             </div>
         </div>
 
+        <!-- MODAL: Factory Key Document -->
+        <div id="factory-doc-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
+            <div class="glass rounded-2xl p-6 w-full max-w-lg mx-4 my-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold" id="fdoc-modal-title">New Document</h3>
+                    <button onclick="hideFactoryDocModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                </div>
+                <input type="hidden" id="fdoc-edit-id">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Title</label>
+                        <input type="text" id="fdoc-title" class="w-full px-3 py-2 rounded-lg text-sm" placeholder="e.g. Size Guide 2026">
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Description <span class="text-gray-600">(optional)</span></label>
+                        <textarea id="fdoc-description" rows="2" class="w-full px-3 py-2 rounded-lg text-sm resize-none" placeholder="A short note about this document…"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-gray-400 text-sm mb-1 block">Type</label>
+                        <div class="flex gap-2">
+                            <label class="flex items-center gap-2 text-sm cursor-pointer px-3 py-2 rounded-lg" style="border:1px solid #e2e8f0">
+                                <input type="radio" name="fdoc-type" value="file" checked onchange="onFactoryDocTypeChange()"> Upload file
+                            </label>
+                            <label class="flex items-center gap-2 text-sm cursor-pointer px-3 py-2 rounded-lg" style="border:1px solid #e2e8f0">
+                                <input type="radio" name="fdoc-type" value="url" onchange="onFactoryDocTypeChange()"> Link / URL
+                            </label>
+                        </div>
+                    </div>
+                    <div id="fdoc-file-box">
+                        <label class="text-gray-400 text-sm mb-1 block">File</label>
+                        <input type="file" id="fdoc-file-input" class="w-full text-sm">
+                        <p id="fdoc-existing-file" class="text-xs mt-1 hide" style="color:#64748b"></p>
+                    </div>
+                    <div id="fdoc-url-box" class="hide">
+                        <label class="text-gray-400 text-sm mb-1 block">URL</label>
+                        <input type="url" id="fdoc-url" class="w-full px-3 py-2 rounded-lg text-sm" placeholder="https://…">
+                    </div>
+                </div>
+                <div class="flex gap-3 justify-end mt-6">
+                    <button onclick="hideFactoryDocModal()" class="btn-secondary px-4 py-2 rounded-lg">Cancel</button>
+                    <button id="fdoc-save-btn" onclick="saveFactoryDoc()" class="btn-primary px-4 py-2 rounded-lg">Save Document</button>
+                </div>
+            </div>
+        </div>
+
         <!-- TOOL: Factory -->
         <div id="tool-factory" class="hide w-full p-6 md:p-8 lg:px-12">
             <div class="sh-topbar">
@@ -3269,6 +3314,7 @@
                     <button id="factory-tab-stock" class="sh-tab" onclick="switchFactoryTab('stock')">Fabric Stock</button>
                     <button id="factory-tab-fabrics" class="sh-tab" onclick="switchFactoryTab('fabrics')">Fabric List <span id="ftab-fabrics-count" class="sh-count">0</span></button>
                     <button id="factory-tab-development" class="sh-tab" onclick="switchFactoryTab('development')">Product Development</button>
+                    <button id="factory-tab-documents" class="sh-tab" onclick="switchFactoryTab('documents')">Key Documents</button>
                 </div>
                 <div class="sh-topbar-right">
                     <button class="sh-action-btn sh-action-btn-secondary" onclick="showFactoryShareModal()" title="Get the public link to send to your factory">
@@ -3286,6 +3332,9 @@
                     <div id="factory-actions-po-tracker" class="sh-actions hide">
                         <button class="btn-primary" onclick="openFactoryPoModal()">+ New PO</button>
                     </div>
+                    <div id="factory-actions-documents" class="sh-actions hide">
+                        <button class="btn-primary" onclick="openFactoryDocModal()">+ New Document</button>
+                    </div>
                 </div>
             </div>
             <div id="factory-view-fabrics"></div>
@@ -3293,6 +3342,7 @@
             <div id="factory-view-stock" class="hide"></div>
             <div id="factory-view-development" class="hide"></div>
             <div id="factory-view-po-tracker" class="hide"></div>
+            <div id="factory-view-documents" class="hide"></div>
         </div>
 
         <!-- Design Task: Edit/Delete dropdown menu (fixed-position, shared) -->
@@ -7548,7 +7598,7 @@
 
         function switchFactoryTab(tab) {
             _factoryActiveTab = tab;
-            ['fabrics','forecast','stock','development','po-tracker'].forEach(t => {
+            ['fabrics','forecast','stock','development','po-tracker','documents'].forEach(t => {
                 const btn = document.getElementById(`factory-tab-${t}`);
                 const view = document.getElementById(`factory-view-${t}`);
                 const actions = document.getElementById(`factory-actions-${t}`);
@@ -7565,6 +7615,7 @@
             if (_factoryActiveTab === 'stock')       loadStockView();
             if (_factoryActiveTab === 'development') renderDevelopmentView();
             if (_factoryActiveTab === 'po-tracker')  loadFactoryPoTracker();
+            if (_factoryActiveTab === 'documents')   loadFactoryDocuments();
         }
 
         // ---- Fabric List ----
@@ -17118,10 +17169,149 @@
             if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
         }
 
+        // =============================================
+        // FACTORY KEY DOCUMENTS
+        // =============================================
+        let factoryDocs = [];
+        async function loadFactoryDocuments() {
+            if (!currentBrand) return;
+            const { data, error } = await supabase
+                .from('factory_documents')
+                .select('*')
+                .eq('brand_id', currentBrand.id)
+                .order('sort_order', { ascending: true })
+                .order('created_at', { ascending: false });
+            if (error) { showToast('Error loading documents: ' + error.message, 'error'); console.error(error); return; }
+            factoryDocs = data || [];
+            renderFactoryDocsList();
+        }
+        function fdocIcon(d) {
+            if (d.doc_type === 'url') return '🔗';
+            const t = (d.file_type || '') + ' ' + (d.file_name || '');
+            if (/pdf/i.test(t)) return '📄';
+            if (/(png|jpe?g|gif|webp|svg|image)/i.test(t)) return '🖼️';
+            if (/(xls|sheet|csv)/i.test(t)) return '📊';
+            if (/(doc|word)/i.test(t)) return '📝';
+            if (/(zip|rar|7z)/i.test(t)) return '🗜️';
+            return '📎';
+        }
+        function renderFactoryDocsList() {
+            const el = document.getElementById('factory-view-documents');
+            if (!el) return;
+            if (!factoryDocs.length) {
+                el.innerHTML = '<div class="glass rounded-2xl p-10 text-center" style="color:#94a3b8">No documents yet. Click <strong>+ New Document</strong> to add a file or link.</div>';
+                return;
+            }
+            el.innerHTML = '<div class="space-y-2.5">' + factoryDocs.map(d => `
+                <div class="glass rounded-xl p-4" style="display:flex;align-items:center;gap:14px">
+                    <div style="font-size:22px;flex-shrink:0">${fdocIcon(d)}</div>
+                    <div style="flex:1;min-width:0">
+                        <p class="font-semibold truncate" style="color:#0f172a">${escHtml(d.title)}</p>
+                        ${d.description ? `<p class="text-sm mt-0.5" style="color:#64748b">${escHtml(d.description)}</p>` : ''}
+                        ${d.doc_type === 'url' ? `<p class="text-xs mt-1 truncate" style="color:#94a3b8">${escHtml(d.file_url)}</p>` : (d.file_name ? `<p class="text-xs mt-1 truncate" style="color:#94a3b8">${escHtml(d.file_name)}</p>` : '')}
+                    </div>
+                    <div style="flex-shrink:0;display:flex;align-items:center;gap:8px">
+                        <a href="${escHtml(d.file_url)}" target="_blank" rel="noopener" class="text-xs font-semibold px-3 py-2 rounded-lg" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe">${d.doc_type === 'url' ? 'Open ↗' : 'Open / Download ↗'}</a>
+                        <button onclick="openFactoryDocModal('${d.id}')" class="text-xs font-medium px-3 py-2 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">Edit</button>
+                        <button onclick="deleteFactoryDoc('${d.id}')" class="text-xs font-medium px-3 py-2 rounded-lg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">Delete</button>
+                    </div>
+                </div>`).join('') + '</div>';
+        }
+        function onFactoryDocTypeChange() {
+            const type = document.querySelector('input[name="fdoc-type"]:checked')?.value || 'file';
+            document.getElementById('fdoc-file-box').classList.toggle('hide', type !== 'file');
+            document.getElementById('fdoc-url-box').classList.toggle('hide', type !== 'url');
+        }
+        function openFactoryDocModal(docId) {
+            const editing = docId && typeof docId === 'string';
+            const d = editing ? factoryDocs.find(x => x.id === docId) : null;
+            document.getElementById('fdoc-edit-id').value = editing ? docId : '';
+            document.getElementById('fdoc-modal-title').textContent = editing ? 'Edit Document' : 'New Document';
+            document.getElementById('fdoc-title').value = d?.title || '';
+            document.getElementById('fdoc-description').value = d?.description || '';
+            document.getElementById('fdoc-file-input').value = '';
+            document.getElementById('fdoc-url').value = d?.doc_type === 'url' ? (d.file_url || '') : '';
+            const type = d?.doc_type || 'file';
+            document.querySelectorAll('input[name="fdoc-type"]').forEach(r => { r.checked = (r.value === type); });
+            const existing = document.getElementById('fdoc-existing-file');
+            if (editing && d?.doc_type === 'file' && d.file_name) {
+                existing.textContent = 'Current: ' + d.file_name + ' (leave empty to keep)';
+                existing.classList.remove('hide');
+            } else {
+                existing.textContent = '';
+                existing.classList.add('hide');
+            }
+            onFactoryDocTypeChange();
+            document.getElementById('factory-doc-modal').classList.remove('hide');
+        }
+        function hideFactoryDocModal() { document.getElementById('factory-doc-modal').classList.add('hide'); }
+        async function saveFactoryDoc() {
+            if (!currentBrand) return;
+            const editId = document.getElementById('fdoc-edit-id').value;
+            const editing = !!editId;
+            const existing = editing ? factoryDocs.find(x => x.id === editId) : null;
+            const title = document.getElementById('fdoc-title').value.trim();
+            const description = document.getElementById('fdoc-description').value.trim() || null;
+            const type = document.querySelector('input[name="fdoc-type"]:checked')?.value || 'file';
+            if (!title) { showToast('Please enter a title', 'error'); return; }
+
+            const btn = document.getElementById('fdoc-save-btn');
+            btn.disabled = true;
+
+            let fileUrl = existing?.file_url || null;
+            let fileName = existing?.file_name || null;
+            let fileType = existing?.file_type || null;
+            let fileSize = existing?.file_size || null;
+
+            try {
+                if (type === 'url') {
+                    const url = document.getElementById('fdoc-url').value.trim();
+                    if (!url) { showToast('Please enter a URL', 'error'); btn.disabled = false; return; }
+                    fileUrl = url; fileName = null; fileType = null; fileSize = null;
+                } else {
+                    const file = document.getElementById('fdoc-file-input').files[0];
+                    if (!file && !editing) { showToast('Please choose a file', 'error'); btn.disabled = false; return; }
+                    if (!file && editing && existing?.doc_type !== 'file') { showToast('Please choose a file', 'error'); btn.disabled = false; return; }
+                    if (file) {
+                        showToast('Uploading…');
+                        const ext = file.name.substring(file.name.lastIndexOf('.'));
+                        const path = `${currentBrand?.slug || 'brand'}/factory-documents/${Date.now()}${ext}`;
+                        const { error: upErr } = await supabase.storage.from('club-images').upload(path, file, { upsert: true });
+                        if (upErr) { showToast('Upload failed: ' + upErr.message, 'error'); btn.disabled = false; return; }
+                        const { data: urlData } = supabase.storage.from('club-images').getPublicUrl(path);
+                        fileUrl = urlData.publicUrl; fileName = file.name; fileType = file.type; fileSize = file.size;
+                    }
+                }
+
+                const payload = { brand_id: currentBrand.id, title, description, doc_type: type, file_url: fileUrl, file_name: fileName, file_type: fileType, file_size: fileSize };
+                let error;
+                if (editing) {
+                    ({ error } = await supabase.from('factory_documents').update(payload).eq('id', editId));
+                } else {
+                    payload.created_by = currentUser?.id || null;
+                    ({ error } = await supabase.from('factory_documents').insert(payload));
+                }
+                if (error) { showToast('Error saving document: ' + error.message, 'error'); btn.disabled = false; return; }
+                showToast(editing ? 'Document updated' : 'Document added');
+                hideFactoryDocModal();
+                await loadFactoryDocuments();
+            } finally {
+                btn.disabled = false;
+            }
+        }
+        async function deleteFactoryDoc(docId) {
+            if (!confirm('Delete this document? This cannot be undone.')) return;
+            const { error } = await supabase.from('factory_documents').delete().eq('id', docId);
+            if (error) { showToast('Error deleting document: ' + error.message, 'error'); return; }
+            showToast('Document deleted');
+            await loadFactoryDocuments();
+        }
+
         document.getElementById('factory-po-modal').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoModal(); });
         document.getElementById('factory-po-record').addEventListener('click', function(e) { if (e.target === this) hideFactoryPoRecord(); });
         document.getElementById('fpo-notes-modal').addEventListener('click', function(e) { if (e.target === this) hidePoNotes(); });
         document.getElementById('fpo-issue-modal').addEventListener('click', function(e) { if (e.target === this) hidePoIssue(); });
+        document.getElementById('factory-doc-modal').addEventListener('click', function(e) { if (e.target === this) hideFactoryDocModal(); });
 
         // =============================================
         // SALES MODULE — STATE
