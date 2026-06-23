@@ -3492,7 +3492,32 @@
                     <input type="text" id="factory-emails" placeholder="factory1@example.com, factory2@example.com" class="w-full px-3 py-2 rounded-lg text-sm">
                     <p class="text-xs text-gray-600 mt-1">Comma-separated. Used to pre-fill the "Email factory" draft on each PO.</p>
                 </div>
-                <button onclick="savePoSettings()" class="mt-4 btn-primary text-sm">Save PO Settings</button>
+
+                <hr class="my-5" style="border:none;border-top:1px solid #e2e8f0">
+                <h4 class="font-semibold mb-1 text-sm">Factory Email Template</h4>
+                <p class="text-gray-500 text-sm mb-3">Edit the wording of the "Email factory" draft. Keep the placeholders below — they auto-fill from each PO when you click the email button.</p>
+                <div class="mb-3 rounded-lg p-3 text-xs" style="background:#f8fafc;border:1px solid #e2e8f0;color:#475569">
+                    <span class="font-semibold">Placeholders:</span>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{po_number}</code>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{title}</code>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{club_team}</code>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{order_date}</code>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{delivery_date}</code>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{drive_assets}</code>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{pps_link}</code>
+                    <code class="px-1 rounded" style="background:#eef2ff;color:#4f46e5">{brand_name}</code>
+                </div>
+                <div class="mb-3">
+                    <label class="text-gray-400 text-sm mb-1 block">Email Subject</label>
+                    <input type="text" id="po-email-subject" placeholder="New PO {po_number} — {title}" class="w-full px-3 py-2 rounded-lg text-sm">
+                </div>
+                <div class="mb-1">
+                    <label class="text-gray-400 text-sm mb-1 block">Email Body</label>
+                    <textarea id="po-email-body" rows="14" class="w-full px-3 py-2 rounded-lg text-sm font-mono" style="resize:vertical" placeholder="Hi,&#10;&#10;Please find the details for our new purchase order below.&#10;..."></textarea>
+                </div>
+                <button type="button" onclick="resetPoEmailTemplate()" class="text-xs" style="color:#4f46e5;background:none;border:none;cursor:pointer;padding:0">Reset to default template</button>
+
+                <div class="mt-4"><button onclick="savePoSettings()" class="btn-primary text-sm">Save PO Settings</button></div>
             </div>
 
             <div class="glass rounded-2xl p-6 mb-6">
@@ -7334,10 +7359,21 @@
             const prefixEl = document.getElementById('po-prefix');
             const nextEl = document.getElementById('po-next-number');
             const emailsEl = document.getElementById('factory-emails');
+            const subjEl = document.getElementById('po-email-subject');
+            const bodyEl = document.getElementById('po-email-body');
             if (prefixEl) prefixEl.value = currentBrand.po_prefix || 'RP';
             if (nextEl) nextEl.value = currentBrand.po_next_number || 1;
             if (emailsEl) emailsEl.value = currentBrand.factory_emails || '';
+            if (subjEl) subjEl.value = currentBrand.po_email_subject || PO_EMAIL_DEFAULT_SUBJECT;
+            if (bodyEl) bodyEl.value = currentBrand.po_email_body || PO_EMAIL_DEFAULT_BODY;
             updatePoNumberExample();
+        }
+        function resetPoEmailTemplate() {
+            const subjEl = document.getElementById('po-email-subject');
+            const bodyEl = document.getElementById('po-email-body');
+            if (subjEl) subjEl.value = PO_EMAIL_DEFAULT_SUBJECT;
+            if (bodyEl) bodyEl.value = PO_EMAIL_DEFAULT_BODY;
+            showToast('Template reset — click Save PO Settings to keep it');
         }
         function updatePoNumberExample() {
             const prefix = (document.getElementById('po-prefix')?.value || 'RP').toUpperCase();
@@ -7350,11 +7386,15 @@
             const prefix = (document.getElementById('po-prefix').value || 'RP').trim().toUpperCase();
             const next = parseInt(document.getElementById('po-next-number').value, 10) || 1;
             const factoryEmails = (document.getElementById('factory-emails')?.value || '').trim() || null;
-            const { error } = await supabase.from('brands').update({ po_prefix: prefix, po_next_number: next, factory_emails: factoryEmails }).eq('id', currentBrand.id);
+            const emailSubject = (document.getElementById('po-email-subject')?.value || '').trim() || null;
+            const emailBody = (document.getElementById('po-email-body')?.value ?? '').trim() || null;
+            const { error } = await supabase.from('brands').update({ po_prefix: prefix, po_next_number: next, factory_emails: factoryEmails, po_email_subject: emailSubject, po_email_body: emailBody }).eq('id', currentBrand.id);
             if (error) { showToast('Error saving PO settings: ' + error.message, 'error'); return; }
             currentBrand.po_prefix = prefix;
             currentBrand.po_next_number = next;
             currentBrand.factory_emails = factoryEmails;
+            currentBrand.po_email_subject = emailSubject;
+            currentBrand.po_email_body = emailBody;
             showToast('PO settings saved');
         }
 
@@ -16542,29 +16582,53 @@
                 && po.order_date && (po.revised_delivery_date || po.delivery_due_date)
                 && po.assets_url);
         }
-        function poEmailHref(po) {
-            const to = (currentBrand?.factory_emails || '').split(',').map(s => s.trim()).filter(Boolean).join(',');
+        const PO_EMAIL_DEFAULT_SUBJECT = 'New PO {po_number} — {title}';
+        const PO_EMAIL_DEFAULT_BODY = [
+            'Hi,',
+            '',
+            'Please find the details for our new purchase order below.',
+            '',
+            'PO Number: {po_number}',
+            'Title: {title}',
+            'Club / Team: {club_team}',
+            'Order Date: {order_date}',
+            'Required Delivery to HQ: {delivery_date}',
+            '',
+            'Order Assets (Google Drive): {drive_assets}',
+            'PPS Photos (Google Drive): {pps_link}',
+            '',
+            'Many thanks,',
+            '{brand_name}'
+        ].join('\n');
+        function poEmailTokens(po) {
             const target = po.revised_delivery_date || po.delivery_due_date;
             const club = po.clubs?.name || po.club_name || '';
-            const subject = `New PO ${po.po_number || ''} — ${po.po_title || ''}`.trim();
-            const lines = [
-                `Hi,`, ``,
-                `Please find the details for our new purchase order below.`, ``,
-                `PO Number: ${po.po_number || '—'}`,
-                `Title: ${po.po_title || '—'}`,
-                `Club / Team: ${[club, po.team_name].filter(Boolean).join(' · ') || '—'}`,
-                `Order Date: ${po.order_date ? fpoDate(po.order_date) : '—'}`,
-                `Required Delivery to HQ: ${target ? fpoDate(target) : '—'}`,
-                ``
-            ];
-            if (po.assets_url) lines.push(`Order Assets (Google Drive): ${po.assets_url}`);
-            if (po.pps_url) lines.push(`PPS Photos (Google Drive): ${po.pps_url}`);
-            lines.push(``, `Many thanks,`, currentBrand?.name || '');
-            return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+            return {
+                '{po_number}':    po.po_number || '',
+                '{title}':        po.po_title || '',
+                '{club_team}':    [club, po.team_name].filter(Boolean).join(' · '),
+                '{order_date}':   po.order_date ? fpoDate(po.order_date) : '',
+                '{delivery_date}': target ? fpoDate(target) : '',
+                '{drive_assets}': po.assets_url || '',
+                '{pps_link}':     po.pps_url || '',
+                '{brand_name}':   currentBrand?.name || ''
+            };
+        }
+        function poEmailFill(template, tokens) {
+            let out = template;
+            Object.keys(tokens).forEach(k => { out = out.split(k).join(tokens[k]); });
+            return out;
+        }
+        function poEmailHref(po) {
+            const to = (currentBrand?.factory_emails || '').split(',').map(s => s.trim()).filter(Boolean).join(',');
+            const tokens = poEmailTokens(po);
+            const subject = poEmailFill(currentBrand?.po_email_subject || PO_EMAIL_DEFAULT_SUBJECT, tokens).trim();
+            const body = poEmailFill(currentBrand?.po_email_body || PO_EMAIL_DEFAULT_BODY, tokens);
+            return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
         function poEmailHtml(po) {
             if (!poReadyToEmail(po)) return '';
-            return `<a href="${poEmailHref(po)}" onclick="event.stopPropagation()" title="Email factory recipients" class="inline-flex items-center justify-center text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>`;
+            return `<a href="${poEmailHref(po)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Email factory recipients" class="inline-flex items-center justify-center text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>`;
         }
         function poPerformanceHtml() {
             const dayDiff = (a, b) => Math.round((new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00')) / 86400000);
@@ -16853,7 +16917,7 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-2">
                         <button onclick="openPoNotes(currentFactoryPoId)" class="btn-secondary text-sm px-4 py-2 rounded-lg">💬 Notes${poNotesMeta[po.id]?.count ? ' (' + poNotesMeta[po.id].count + ')' : ''}</button>
-                        ${poReadyToEmail(po) ? `<a href="${poEmailHref(po)}" title="Email factory recipients" class="inline-flex items-center text-sm px-4 py-2 rounded-lg font-medium" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>` : `<span class="text-xs" style="color:#94a3b8">Fill in title, club/team, dates &amp; Drive link to email the factory</span>`}
+                        ${poReadyToEmail(po) ? `<a href="${poEmailHref(po)}" target="_blank" rel="noopener" title="Email factory recipients" class="inline-flex items-center text-sm px-4 py-2 rounded-lg font-medium" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>` : `<span class="text-xs" style="color:#94a3b8">Fill in title, club/team, dates &amp; Drive link to email the factory</span>`}
                     </div>
                 </div>`;
             renderPoFilesList();
