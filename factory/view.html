@@ -476,7 +476,11 @@
             return { cls: days <= 3 ? 'soon' : 'ok', text: days + ' day' + (days !== 1 ? 's' : '') + ' to ship' };
         }
         const late = Math.floor(-ms / 86400000);
-        return { cls: 'overdue', text: '⚠ LATE by ' + late + ' day' + (late !== 1 ? 's' : '') };
+        const wks = Math.floor(late / 7); const dys = late % 7;
+        const lateStr = wks > 0
+            ? (dys > 0 ? `${wks} Wk${wks !== 1 ? 's' : ''} ${dys} Day${dys !== 1 ? 's' : ''}` : `${wks} Wk${wks !== 1 ? 's' : ''}`)
+            : `${late} Day${late !== 1 ? 's' : ''}`;
+        return { cls: 'overdue', text: '⚠ LATE by ' + lateStr };
     }
     function poStageColor(po, i, done) {
         if (i === 2) {
@@ -1032,7 +1036,7 @@
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="text-left text-slate-500 text-xs border-b border-slate-200 uppercase tracking-wide font-semibold" style="background:#f8fafc">
-                                <th class="px-4 py-3 whitespace-nowrap">Pattern Code</th>
+                                <th class="px-4 py-3 whitespace-nowrap" style="width:70px">Pattern Code</th>
                                 <th class="px-4 py-3 whitespace-nowrap">SKU</th>
                                 <th class="px-4 py-3">Name</th>
                                 <th class="px-4 py-3">Description</th>
@@ -1043,8 +1047,15 @@
                         <tbody>
                             ${_masterProducts.map(p => {
                                 const recipes = _masterProductRecipes[p.id] || [];
-                                const recipeStr = recipes.length
-                                    ? recipes.map(r => {
+                                const seen = new Set();
+                                const uniqueRecipes = recipes.filter(r => {
+                                    const key = (r.component_type || '') + '|' + (r.fabrics?.fabric_name || '');
+                                    if (seen.has(key)) return false;
+                                    seen.add(key);
+                                    return true;
+                                });
+                                const recipeStr = uniqueRecipes.length
+                                    ? uniqueRecipes.map(r => {
                                         if (!r.fabrics?.fabric_name) return null;
                                         const lbl = RECIPE_COMPONENT_LABELS[r.component_type] || r.component_type || '';
                                         const pct = r.allocation_pct ? ` ${r.allocation_pct}%` : '';
@@ -1053,10 +1064,10 @@
                                     : '—';
                                 const unitCostDisplay = p.factory_unit_cost != null ? `£${Number(p.factory_unit_cost).toFixed(2)}` : '—';
                                 return `<tr class="border-b border-slate-100 hover:bg-slate-50">
-                                    <td class="px-4 py-3 font-mono text-violet-600 text-xs whitespace-nowrap font-semibold">${esc(p.pattern_code || '—')}</td>
+                                    <td class="px-4 py-3 font-mono text-violet-600 text-xs whitespace-nowrap font-semibold" style="width:70px">${esc(p.pattern_code || '—')}</td>
                                     <td class="px-4 py-3 font-mono text-slate-500 text-xs whitespace-nowrap">${esc(p.product_code || '—')}</td>
                                     <td class="px-4 py-3 font-medium text-slate-800">${esc(p.item_name || '—')}</td>
-                                    <td class="px-4 py-3 text-slate-600 text-xs">${esc(p.factory_notes || '—')}</td>
+                                    <td class="px-4 py-3" style="min-width:200px;max-width:300px;vertical-align:top"><p style="white-space:pre-wrap;margin:0;font-size:13px;color:#334155;line-height:1.5">${p.factory_notes ? esc(p.factory_notes) : '<span style="color:#94a3b8">—</span>'}</p></td>
                                     <td class="px-4 py-3 text-slate-500 text-xs">${esc(recipeStr)}</td>
                                     <td class="px-4 py-3 text-right font-medium text-slate-700">${esc(unitCostDisplay)}</td>
                                 </tr>`;

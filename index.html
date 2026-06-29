@@ -16526,7 +16526,11 @@
                 return { cls: days <= 3 ? 'soon' : 'ok', text: days + ' day' + (days !== 1 ? 's' : '') + ' to ship' };
             }
             const late = Math.floor(-ms / 86400000);
-            return { cls: 'overdue', text: '⚠ LATE by ' + late + ' day' + (late !== 1 ? 's' : '') };
+            const wks = Math.floor(late / 7); const dys = late % 7;
+            const lateStr = wks > 0
+                ? (dys > 0 ? `${wks} Wk${wks !== 1 ? 's' : ''} ${dys} Day${dys !== 1 ? 's' : ''}` : `${wks} Wk${wks !== 1 ? 's' : ''}`)
+                : `${late} Day${late !== 1 ? 's' : ''}`;
+            return { cls: 'overdue', text: '⚠ LATE by ' + lateStr };
         }
         function renderPoTimelineHtml(po) {
             const stages = poStages(po);
@@ -17253,7 +17257,7 @@
                     <table class="w-full text-sm">
                         <thead>
                             <tr class="text-left text-gray-500 text-xs border-b border-gray-200 uppercase tracking-wide" style="background:#f8fafc">
-                                <th class="px-4 py-3 whitespace-nowrap font-semibold">Pattern Code</th>
+                                <th class="px-4 py-3 whitespace-nowrap font-semibold" style="width:70px">Pattern Code</th>
                                 <th class="px-4 py-3 whitespace-nowrap font-semibold">SKU</th>
                                 <th class="px-4 py-3 font-semibold">Name</th>
                                 <th class="px-4 py-3 font-semibold">Description</th>
@@ -17264,8 +17268,15 @@
                         <tbody>
                             ${_factoryProducts.map(p => {
                                 const recipes = _factoryProductRecipes[p.id] || [];
-                                const recipeStr = recipes.length
-                                    ? recipes.map(r => {
+                                const seen = new Set();
+                                const uniqueRecipes = recipes.filter(r => {
+                                    const key = (r.component_type || '') + '|' + (r.fabrics?.fabric_name || '');
+                                    if (seen.has(key)) return false;
+                                    seen.add(key);
+                                    return true;
+                                });
+                                const recipeStr = uniqueRecipes.length
+                                    ? uniqueRecipes.map(r => {
                                         if (!r.fabrics?.fabric_name) return null;
                                         const lbl = RECIPE_COMPONENT_LABELS[r.component_type] || r.component_type || '';
                                         const pct = r.allocation_pct ? ` ${r.allocation_pct}%` : '';
@@ -17273,16 +17284,16 @@
                                       }).filter(Boolean).join(' · ')
                                     : '—';
                                 return `<tr class="border-b border-gray-100 hover:bg-gray-50">
-                                    <td class="px-4 py-3 font-mono whitespace-nowrap text-xs font-semibold" style="color:#7c3aed">${escHtml(p.pattern_code || '—')}</td>
+                                    <td class="px-4 py-3 font-mono whitespace-nowrap text-xs font-semibold" style="color:#7c3aed;width:70px">${escHtml(p.pattern_code || '—')}</td>
                                     <td class="px-4 py-3 font-mono text-xs whitespace-nowrap" style="color:#64748b">${escHtml(p.product_code || '—')}</td>
                                     <td class="px-4 py-3 font-medium" style="color:#0f172a">${escHtml(p.item_name || '—')}</td>
-                                    <td class="px-4 py-3">
-                                        <input type="text"
-                                            value="${escHtml(p.factory_notes || '')}"
+                                    <td class="px-4 py-3" style="vertical-align:top;min-width:200px">
+                                        <textarea
                                             placeholder="Add description…"
                                             onblur="saveFactoryProductField('${p.id}','factory_notes',this.value)"
-                                            style="width:100%;min-width:160px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;color:#0f172a;padding:3px 8px;font-size:12px;outline:none"
-                                            onfocus="this.style.borderColor='#6d28d9'">
+                                            onfocus="this.style.borderColor='#6d28d9'"
+                                            style="width:100%;min-height:60px;resize:vertical;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;color:#0f172a;padding:4px 8px;font-size:12px;outline:none;font-family:inherit;line-height:1.4"
+                                        >${escHtml(p.factory_notes || '')}</textarea>
                                     </td>
                                     <td class="px-4 py-3 text-xs" style="color:#475569">${escHtml(recipeStr)}</td>
                                     <td class="px-4 py-3 text-right">
