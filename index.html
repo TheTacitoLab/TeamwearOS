@@ -3219,12 +3219,9 @@
 
                 <div id="fpo-rec-body"><!-- Populated by openFactoryPoRecord() --></div>
 
-                <div class="flex gap-3 justify-between mt-6">
-                    <button onclick="deleteFactoryPo()" class="px-5 py-3 rounded-lg font-semibold text-white transition" style="background:#dc2626">Delete PO</button>
-                    <div class="flex gap-3">
-                        <button onclick="openFactoryPoModal(currentFactoryPoId)" class="btn-secondary">Edit Details</button>
-                        <button onclick="hideFactoryPoRecord()" class="btn-primary">Close</button>
-                    </div>
+                <div class="flex gap-3 justify-end mt-6">
+                    <button onclick="openFactoryPoModal(currentFactoryPoId)" class="btn-secondary">Edit Details</button>
+                    <button onclick="hideFactoryPoRecord()" class="btn-primary">Close</button>
                 </div>
             </div>
         </div>
@@ -3315,6 +3312,7 @@
                     <button id="factory-tab-fabrics" class="sh-tab" onclick="switchFactoryTab('fabrics')">Fabric List <span id="ftab-fabrics-count" class="sh-count">0</span></button>
                     <button id="factory-tab-development" class="sh-tab" onclick="switchFactoryTab('development')">Product Development</button>
                     <button id="factory-tab-documents" class="sh-tab" onclick="switchFactoryTab('documents')">Key Documents</button>
+                    <button id="factory-tab-products" class="sh-tab" onclick="switchFactoryTab('products')">Master Products</button>
                 </div>
                 <div class="sh-topbar-right">
                     <button class="sh-action-btn sh-action-btn-secondary" onclick="showFactoryShareModal()" title="Get the public link to send to your factory">
@@ -3335,6 +3333,7 @@
                     <div id="factory-actions-documents" class="sh-actions hide">
                         <button class="btn-primary" onclick="openFactoryDocModal()">+ New Document</button>
                     </div>
+                    <div id="factory-actions-products" class="sh-actions hide"></div>
                 </div>
             </div>
             <div id="factory-view-fabrics"></div>
@@ -3343,6 +3342,7 @@
             <div id="factory-view-development" class="hide"></div>
             <div id="factory-view-po-tracker" class="hide"></div>
             <div id="factory-view-documents" class="hide"></div>
+            <div id="factory-view-products" class="hide"></div>
         </div>
 
         <!-- Design Task: Edit/Delete dropdown menu (fixed-position, shared) -->
@@ -7088,7 +7088,8 @@
                 .from('products')
                 .select('*')
                 .eq('brand_id', currentBrand.id)
-                .order('product_code');
+                .order('pattern_code', { ascending: true, nullsFirst: false })
+                .order('product_code', { ascending: true });
             products = prods || [];
 
             // Load clubs
@@ -7598,7 +7599,7 @@
 
         function switchFactoryTab(tab) {
             _factoryActiveTab = tab;
-            ['fabrics','forecast','stock','development','po-tracker','documents'].forEach(t => {
+            ['fabrics','forecast','stock','development','po-tracker','documents','products'].forEach(t => {
                 const btn = document.getElementById(`factory-tab-${t}`);
                 const view = document.getElementById(`factory-view-${t}`);
                 const actions = document.getElementById(`factory-actions-${t}`);
@@ -7616,6 +7617,7 @@
             if (_factoryActiveTab === 'development') renderDevelopmentView();
             if (_factoryActiveTab === 'po-tracker')  loadFactoryPoTracker();
             if (_factoryActiveTab === 'documents')   loadFactoryDocuments();
+            if (_factoryActiveTab === 'products')    loadFactoryProductsView();
         }
 
         // ---- Fabric List ----
@@ -9076,6 +9078,8 @@
                     <th class="pb-3 pr-3">Range</th>
                     ${priceCols}
                     <th class="pb-3 pr-3 text-right whitespace-nowrap">COGS</th>
+                    <th class="pb-3 pr-3 text-right whitespace-nowrap">Partner Margin</th>
+                    <th class="pb-3 pr-3 text-right whitespace-nowrap">Retail Margin</th>
                     <th class="pb-3 pr-3">Tags</th>
                     <th class="pb-3 text-center">Actions</th>`;
             }
@@ -9118,6 +9122,22 @@
                         <span class="group-hover/inline:underline group-hover/inline:decoration-dotted">${p.cogs ? '£' + Number(p.cogs).toFixed(2) : '—'}</span>
                         <svg class="w-3 h-3 inline-block ml-1 text-gray-700 opacity-0 group-hover/inline:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                     </td>
+                    ${(() => {
+                        const partnerTp = tierPricesObj['partner'] || {};
+                        const partnerPlusTp = tierPricesObj['partner_plus'] || {};
+                        const partnerA = Number(partnerTp.adult || p.adult_partner_price) || 0;
+                        const partnerPlusA = Number(partnerPlusTp.adult) || 0;
+                        const partnerAvg = partnerA && partnerPlusA ? (partnerA + partnerPlusA) / 2 : (partnerA || null);
+                        const retailTp = tierPricesObj['retail'] || {};
+                        const retailA = Number(retailTp.adult || p.adult_retail_price) || 0;
+                        const cogs = Number(p.cogs) || 0;
+                        const partnerMargin = partnerAvg && cogs ? ((partnerAvg - cogs) / partnerAvg * 100) : null;
+                        const retailMargin = retailA && cogs ? ((retailA - cogs) / retailA * 100) : null;
+                        const cell = pct => pct === null
+                            ? '<td class="py-2 pr-3 text-right text-xs" style="color:#94a3b8">—</td>'
+                            : `<td class="py-2 pr-3 text-right text-sm font-medium" style="color:${pct >= 0 ? '#16a34a' : '#dc2626'}">${pct.toFixed(1)}%</td>`;
+                        return cell(partnerMargin) + cell(retailMargin);
+                    })()}
                     <td id="product-tags-${p.id}" class="py-2 pr-3 cursor-pointer group" onclick="openTagEditor(event, '${p.id}')">
                         ${renderProductTagChips(p.shopify_tags)}
                         <svg class="w-3 h-3 inline-block ml-1 -mt-0.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125"/></svg>
@@ -16970,6 +16990,7 @@
                         <button onclick="openPoNotes(currentFactoryPoId)" class="btn-secondary text-sm px-4 py-2 rounded-lg">💬 Notes${poNotesMeta[po.id]?.count ? ' (' + poNotesMeta[po.id].count + ')' : ''}</button>
                         ${poReadyToEmail(po) ? `<a href="${poEmailHref(po)}" target="_blank" rel="noopener" title="Email factory recipients" class="inline-flex items-center text-sm px-4 py-2 rounded-lg font-medium" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>` : `<span class="text-xs" style="color:#94a3b8">Fill in title, club/team, dates &amp; Drive link to email the factory</span>`}
                     </div>
+                    ${isSuperAdmin ? `<div style="margin-top:16px;padding-top:16px;border-top:1px solid #fee2e2"><button onclick="deleteFactoryPo()" class="text-sm px-4 py-2 rounded-lg font-medium" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">🗑 Delete PO</button></div>` : ''}
                 </div>`;
             renderPoFilesList();
             document.getElementById('factory-po-record').classList.remove('hide');
@@ -17185,6 +17206,107 @@
             factoryDocs = data || [];
             renderFactoryDocsList();
         }
+        // ---- Factory Master Products ----
+        let _factoryProducts = [];
+        let _factoryProductRecipes = {};
+
+        async function loadFactoryProductsView() {
+            if (!currentBrand) return;
+            const el = document.getElementById('factory-view-products');
+            if (!el) return;
+            el.innerHTML = '<div class="text-gray-400 text-sm py-8 text-center">Loading products…</div>';
+
+            const { data: prods, error } = await supabase
+                .from('products')
+                .select('id, item_name, product_code, pattern_code, factory_unit_cost, factory_notes')
+                .eq('brand_id', currentBrand.id)
+                .order('pattern_code', { ascending: true, nullsFirst: false })
+                .order('product_code', { ascending: true });
+            if (error) { el.innerHTML = '<div class="text-red-400 text-sm py-8 text-center">Error loading products.</div>'; return; }
+            _factoryProducts = prods || [];
+
+            const productIds = _factoryProducts.map(p => p.id);
+            _factoryProductRecipes = {};
+            if (productIds.length) {
+                const { data: recipes } = await supabase
+                    .from('product_fabric_recipes')
+                    .select('product_id, allocation_pct, fabrics(fabric_name)')
+                    .in('product_id', productIds);
+                (recipes || []).forEach(r => {
+                    if (!_factoryProductRecipes[r.product_id]) _factoryProductRecipes[r.product_id] = [];
+                    _factoryProductRecipes[r.product_id].push(r);
+                });
+            }
+
+            renderFactoryProductsTable();
+        }
+
+        function renderFactoryProductsTable() {
+            const el = document.getElementById('factory-view-products');
+            if (!el) return;
+            if (!_factoryProducts.length) {
+                el.innerHTML = '<div class="text-gray-400 text-sm py-12 text-center">No products in catalogue.</div>';
+                return;
+            }
+            el.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-gray-400 text-xs border-b border-gray-800">
+                                <th class="pb-3 pr-4 whitespace-nowrap">Pattern Code</th>
+                                <th class="pb-3 pr-4 whitespace-nowrap">SKU</th>
+                                <th class="pb-3 pr-4">Name</th>
+                                <th class="pb-3 pr-4">Fabric Recipe</th>
+                                <th class="pb-3 pr-4 text-right whitespace-nowrap">Unit Cost (£)</th>
+                                <th class="pb-3">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${_factoryProducts.map(p => {
+                                const recipes = _factoryProductRecipes[p.id] || [];
+                                const recipeStr = recipes.length
+                                    ? recipes.map(r => r.fabrics?.fabric_name ? (r.allocation_pct ? `${r.fabrics.fabric_name} ${r.allocation_pct}%` : r.fabrics.fabric_name) : null).filter(Boolean).join(', ')
+                                    : '—';
+                                return `<tr class="border-b border-gray-800 hover:bg-gray-900/40">
+                                    <td class="py-2.5 pr-4 font-mono text-brand-400 text-xs whitespace-nowrap">${escHtml(p.pattern_code || '—')}</td>
+                                    <td class="py-2.5 pr-4 font-mono text-gray-400 text-xs whitespace-nowrap">${escHtml(p.product_code || '—')}</td>
+                                    <td class="py-2.5 pr-4 font-medium text-gray-100">${escHtml(p.item_name || '—')}</td>
+                                    <td class="py-2.5 pr-4 text-gray-400 text-xs">${escHtml(recipeStr)}</td>
+                                    <td class="py-2.5 pr-4 text-right">
+                                        <input type="number" step="0.01" min="0"
+                                            value="${p.factory_unit_cost != null ? Number(p.factory_unit_cost).toFixed(2) : ''}"
+                                            placeholder="—"
+                                            onblur="saveFactoryProductField('${p.id}','factory_unit_cost',this.value)"
+                                            style="width:80px;text-align:right;background:#1e293b;border:1px solid #334155;border-radius:5px;color:#e2e8f0;padding:3px 6px;font-size:12px;outline:none"
+                                            onfocus="this.style.borderColor='#3b82f6'">
+                                    </td>
+                                    <td class="py-2.5">
+                                        <input type="text"
+                                            value="${escHtml(p.factory_notes || '')}"
+                                            placeholder="Add notes…"
+                                            onblur="saveFactoryProductField('${p.id}','factory_notes',this.value)"
+                                            style="width:100%;min-width:160px;background:#1e293b;border:1px solid #334155;border-radius:5px;color:#e2e8f0;padding:3px 8px;font-size:12px;outline:none"
+                                            onfocus="this.style.borderColor='#3b82f6'">
+                                    </td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        async function saveFactoryProductField(productId, field, rawValue) {
+            const allowed = ['factory_unit_cost', 'factory_notes'];
+            if (!allowed.includes(field)) return;
+            const value = field === 'factory_unit_cost'
+                ? (rawValue !== '' ? parseFloat(rawValue) : null)
+                : (rawValue.trim() || null);
+            const { error } = await supabase.from('products').update({ [field]: value }).eq('id', productId);
+            if (error) { showToast('Error saving: ' + error.message, 'error'); return; }
+            const p = _factoryProducts.find(x => x.id === productId);
+            if (p) p[field] = value;
+        }
+
         function fdocIcon(d) {
             if (d.doc_type === 'url') return '🔗';
             const t = (d.file_type || '') + ' ' + (d.file_name || '');
@@ -25079,7 +25201,7 @@
             renderDSKanbanBoard();
         }
 
-        function _renderDSKanbanCard(task, unreadCount, draggable = false) {
+        function _renderDSKanbanCard(task, unreadCount, draggable = false, inUpNext = false) {
             const isSelected = task.id === _dsSelectedTaskId;
             const due = task.due_date ? new Date(task.due_date) : null;
             const dueInfo = due ? getDueInfo(due) : null;
@@ -25130,6 +25252,7 @@
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:5px">
                     <div style="font-size:12px;font-weight:700;color:#0f172a;line-height:1.35;flex:1;min-width:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${escHtml(task.task_name || 'Untitled Task')}${unreadDot}</div>
                     ${actionBadge}
+                    ${inUpNext ? `<button onclick="event.stopPropagation();removeFromUpNext('${task.id}')" title="Move back to All New Tasks" style="font-size:10px;padding:2px 6px;border-radius:5px;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;cursor:pointer;flex-shrink:0;line-height:1.4">↓</button>` : ''}
                 </div>
                 <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
                     ${task.task_ref ? `<span style="font-family:monospace;font-size:9px;color:#94a3b8;font-weight:600;background:#f1f5f9;padding:1px 5px;border-radius:4px">${escHtml(task.task_ref)}</span>` : ''}
@@ -25160,6 +25283,12 @@
             localStorage.setItem(_dsRestOrderKey(), JSON.stringify(_dsRestOrder));
         }
 
+        function removeFromUpNext(taskId) {
+            _dsUpNextIds = _dsUpNextIds.filter(id => id !== taskId);
+            saveDSUpNext();
+            renderDSDashboard();
+        }
+
         function _renderDSNewTabSplit(list, unreadMap) {
             // Clean up stale IDs
             const validIds = new Set(list.map(t => t.id));
@@ -25176,7 +25305,7 @@
 
             const upNextCards = upNext.length === 0
                 ? `<div class="ds-up-next-empty">Drag tasks here to queue them</div>`
-                : upNext.map(t => _renderDSKanbanCard(t, unreadMap[t.id] || 0, true)).join('');
+                : upNext.map(t => _renderDSKanbanCard(t, unreadMap[t.id] || 0, true, true)).join('');
 
             const restCards = rest.map(t => _renderDSKanbanCard(t, unreadMap[t.id] || 0, true)).join('');
 

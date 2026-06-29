@@ -101,6 +101,8 @@
     let factoryPos = [];
     let factoryDocs = [];
     let _poCountdownTimer = null;
+    let _masterProducts = [];
+    let _masterProductRecipes = {};
 
     function showToast(msg) {
         const el = document.getElementById('toast');
@@ -168,6 +170,7 @@
         await loadFactoryPos();
         await loadForecast();
         await loadFactoryDocs();
+        await loadMasterProducts();
 
         renderShell();
         if (!_poCountdownTimer) _poCountdownTimer = setInterval(() => { if (activeTab === 'po-tracker') renderTab(); }, 60000);
@@ -384,6 +387,7 @@
                     <button class="tab-btn ${activeTab==='fabrics'?'active':''}" data-tab="fabrics">Fabric List</button>
                     <button class="tab-btn ${activeTab==='development'?'active':''}" data-tab="development">Product Development</button>
                     <button class="tab-btn ${activeTab==='documents'?'active':''}" data-tab="documents">Key Documents</button>
+                    <button class="tab-btn ${activeTab==='master-products'?'active':''}" data-tab="master-products">Master Products</button>
                 </div>
                 <div id="tab-content"></div>
             </div>`;
@@ -401,6 +405,7 @@
         if (activeTab === 'development') return renderDevelopment(el);
         if (activeTab === 'po-tracker') return renderPoTracker(el);
         if (activeTab === 'documents') return renderDocuments(el);
+        if (activeTab === 'master-products') return renderMasterProducts(el);
     }
 
     async function loadFactoryDocs() {
@@ -988,6 +993,71 @@
 
     function renderDevelopment(el) {
         el.innerHTML = '<div class="glass rounded-2xl p-10 text-center"><h3 class="font-semibold mb-2 text-slate-700">Product Development</h3><p class="text-slate-500">Coming soon.</p></div>';
+    }
+
+    async function loadMasterProducts() {
+        if (!brand) return;
+        const { data: prods } = await db
+            .from('products')
+            .select('id, item_name, product_code, pattern_code, factory_unit_cost, factory_notes')
+            .eq('brand_id', brand.id)
+            .order('pattern_code', { ascending: true, nullsFirst: false })
+            .order('product_code', { ascending: true });
+        _masterProducts = prods || [];
+
+        const productIds = _masterProducts.map(p => p.id);
+        _masterProductRecipes = {};
+        if (productIds.length) {
+            const { data: recipes } = await db
+                .from('product_fabric_recipes')
+                .select('product_id, allocation_pct, fabrics(fabric_name)')
+                .in('product_id', productIds);
+            (recipes || []).forEach(r => {
+                if (!_masterProductRecipes[r.product_id]) _masterProductRecipes[r.product_id] = [];
+                _masterProductRecipes[r.product_id].push(r);
+            });
+        }
+    }
+
+    function renderMasterProducts(el) {
+        if (!_masterProducts.length) {
+            el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-slate-500">No products in catalogue.</div>';
+            return;
+        }
+        el.innerHTML = `
+            <div class="glass rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="text-left text-slate-500 text-xs border-b border-slate-200" style="background:#f8fafc">
+                                <th class="px-4 py-3 whitespace-nowrap font-semibold">Pattern Code</th>
+                                <th class="px-4 py-3 whitespace-nowrap font-semibold">SKU</th>
+                                <th class="px-4 py-3 font-semibold">Name</th>
+                                <th class="px-4 py-3 font-semibold">Fabric Recipe</th>
+                                <th class="px-4 py-3 text-right whitespace-nowrap font-semibold">Unit Cost</th>
+                                <th class="px-4 py-3 font-semibold">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${_masterProducts.map(p => {
+                                const recipes = _masterProductRecipes[p.id] || [];
+                                const recipeStr = recipes.length
+                                    ? recipes.map(r => r.fabrics?.fabric_name ? (r.allocation_pct ? `${r.fabrics.fabric_name} ${r.allocation_pct}%` : r.fabrics.fabric_name) : null).filter(Boolean).join(', ')
+                                    : '—';
+                                const unitCostDisplay = p.factory_unit_cost != null ? `£${Number(p.factory_unit_cost).toFixed(2)}` : '—';
+                                return `<tr class="border-b border-slate-100 hover:bg-slate-50">
+                                    <td class="px-4 py-3 font-mono text-violet-600 text-xs whitespace-nowrap font-semibold">${esc(p.pattern_code || '—')}</td>
+                                    <td class="px-4 py-3 font-mono text-slate-500 text-xs whitespace-nowrap">${esc(p.product_code || '—')}</td>
+                                    <td class="px-4 py-3 font-medium text-slate-800">${esc(p.item_name || '—')}</td>
+                                    <td class="px-4 py-3 text-slate-500 text-xs">${esc(recipeStr)}</td>
+                                    <td class="px-4 py-3 text-right font-medium text-slate-700">${esc(unitCostDisplay)}</td>
+                                    <td class="px-4 py-3 text-slate-500 text-xs">${esc(p.factory_notes || '—')}</td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
     }
 
     async function handleStockEdit(e) {
