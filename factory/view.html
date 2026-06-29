@@ -104,6 +104,8 @@
     let _masterProducts = [];
     let _masterProductRecipes = {};
 
+    const RECIPE_COMPONENT_LABELS = { main: 'Main', rear: 'Rear', panels: 'Panels', trimmings: 'Trimmings' };
+
     function showToast(msg) {
         const el = document.getElementById('toast');
         el.textContent = msg;
@@ -1010,7 +1012,7 @@
         if (productIds.length) {
             const { data: recipes } = await db
                 .from('product_fabric_recipes')
-                .select('product_id, allocation_pct, fabrics(fabric_name)')
+                .select('product_id, component_type, allocation_pct, fabrics(fabric_name)')
                 .in('product_id', productIds);
             (recipes || []).forEach(r => {
                 if (!_masterProductRecipes[r.product_id]) _masterProductRecipes[r.product_id] = [];
@@ -1029,29 +1031,34 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
-                            <tr class="text-left text-slate-500 text-xs border-b border-slate-200" style="background:#f8fafc">
-                                <th class="px-4 py-3 whitespace-nowrap font-semibold">Pattern Code</th>
-                                <th class="px-4 py-3 whitespace-nowrap font-semibold">SKU</th>
-                                <th class="px-4 py-3 font-semibold">Name</th>
-                                <th class="px-4 py-3 font-semibold">Fabric Recipe</th>
-                                <th class="px-4 py-3 text-right whitespace-nowrap font-semibold">Unit Cost</th>
-                                <th class="px-4 py-3 font-semibold">Notes</th>
+                            <tr class="text-left text-slate-500 text-xs border-b border-slate-200 uppercase tracking-wide font-semibold" style="background:#f8fafc">
+                                <th class="px-4 py-3 whitespace-nowrap">Pattern Code</th>
+                                <th class="px-4 py-3 whitespace-nowrap">SKU</th>
+                                <th class="px-4 py-3">Name</th>
+                                <th class="px-4 py-3">Description</th>
+                                <th class="px-4 py-3">Fabric Recipe</th>
+                                <th class="px-4 py-3 text-right whitespace-nowrap">Unit Cost</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${_masterProducts.map(p => {
                                 const recipes = _masterProductRecipes[p.id] || [];
                                 const recipeStr = recipes.length
-                                    ? recipes.map(r => r.fabrics?.fabric_name ? (r.allocation_pct ? `${r.fabrics.fabric_name} ${r.allocation_pct}%` : r.fabrics.fabric_name) : null).filter(Boolean).join(', ')
+                                    ? recipes.map(r => {
+                                        if (!r.fabrics?.fabric_name) return null;
+                                        const lbl = RECIPE_COMPONENT_LABELS[r.component_type] || r.component_type || '';
+                                        const pct = r.allocation_pct ? ` ${r.allocation_pct}%` : '';
+                                        return lbl ? `${lbl}: ${r.fabrics.fabric_name}${pct}` : `${r.fabrics.fabric_name}${pct}`;
+                                      }).filter(Boolean).join(' · ')
                                     : '—';
                                 const unitCostDisplay = p.factory_unit_cost != null ? `£${Number(p.factory_unit_cost).toFixed(2)}` : '—';
                                 return `<tr class="border-b border-slate-100 hover:bg-slate-50">
                                     <td class="px-4 py-3 font-mono text-violet-600 text-xs whitespace-nowrap font-semibold">${esc(p.pattern_code || '—')}</td>
                                     <td class="px-4 py-3 font-mono text-slate-500 text-xs whitespace-nowrap">${esc(p.product_code || '—')}</td>
                                     <td class="px-4 py-3 font-medium text-slate-800">${esc(p.item_name || '—')}</td>
+                                    <td class="px-4 py-3 text-slate-600 text-xs">${esc(p.factory_notes || '—')}</td>
                                     <td class="px-4 py-3 text-slate-500 text-xs">${esc(recipeStr)}</td>
                                     <td class="px-4 py-3 text-right font-medium text-slate-700">${esc(unitCostDisplay)}</td>
-                                    <td class="px-4 py-3 text-slate-500 text-xs">${esc(p.factory_notes || '—')}</td>
                                 </tr>`;
                             }).join('')}
                         </tbody>

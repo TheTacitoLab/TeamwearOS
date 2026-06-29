@@ -17230,7 +17230,7 @@
             if (productIds.length) {
                 const { data: recipes } = await supabase
                     .from('product_fabric_recipes')
-                    .select('product_id, allocation_pct, fabrics(fabric_name)')
+                    .select('product_id, component_type, allocation_pct, fabrics(fabric_name)')
                     .in('product_id', productIds);
                 (recipes || []).forEach(r => {
                     if (!_factoryProductRecipes[r.product_id]) _factoryProductRecipes[r.product_id] = [];
@@ -17245,48 +17245,53 @@
             const el = document.getElementById('factory-view-products');
             if (!el) return;
             if (!_factoryProducts.length) {
-                el.innerHTML = '<div class="text-gray-400 text-sm py-12 text-center">No products in catalogue.</div>';
+                el.innerHTML = '<div class="glass rounded-2xl p-10 text-center text-gray-500">No products in catalogue.</div>';
                 return;
             }
             el.innerHTML = `
-                <div class="overflow-x-auto">
+                <div class="glass rounded-2xl overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
-                            <tr class="text-left text-gray-400 text-xs border-b border-gray-800">
-                                <th class="pb-3 pr-4 whitespace-nowrap">Pattern Code</th>
-                                <th class="pb-3 pr-4 whitespace-nowrap">SKU</th>
-                                <th class="pb-3 pr-4">Name</th>
-                                <th class="pb-3 pr-4">Fabric Recipe</th>
-                                <th class="pb-3 pr-4 text-right whitespace-nowrap">Unit Cost (£)</th>
-                                <th class="pb-3">Notes</th>
+                            <tr class="text-left text-gray-500 text-xs border-b border-gray-200 uppercase tracking-wide" style="background:#f8fafc">
+                                <th class="px-4 py-3 whitespace-nowrap font-semibold">Pattern Code</th>
+                                <th class="px-4 py-3 whitespace-nowrap font-semibold">SKU</th>
+                                <th class="px-4 py-3 font-semibold">Name</th>
+                                <th class="px-4 py-3 font-semibold">Description</th>
+                                <th class="px-4 py-3 font-semibold">Fabric Recipe</th>
+                                <th class="px-4 py-3 text-right whitespace-nowrap font-semibold">Unit Cost (£)</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${_factoryProducts.map(p => {
                                 const recipes = _factoryProductRecipes[p.id] || [];
                                 const recipeStr = recipes.length
-                                    ? recipes.map(r => r.fabrics?.fabric_name ? (r.allocation_pct ? `${r.fabrics.fabric_name} ${r.allocation_pct}%` : r.fabrics.fabric_name) : null).filter(Boolean).join(', ')
+                                    ? recipes.map(r => {
+                                        if (!r.fabrics?.fabric_name) return null;
+                                        const lbl = RECIPE_COMPONENT_LABELS[r.component_type] || r.component_type || '';
+                                        const pct = r.allocation_pct ? ` ${r.allocation_pct}%` : '';
+                                        return lbl ? `${lbl}: ${r.fabrics.fabric_name}${pct}` : `${r.fabrics.fabric_name}${pct}`;
+                                      }).filter(Boolean).join(' · ')
                                     : '—';
-                                return `<tr class="border-b border-gray-800 hover:bg-gray-900/40">
-                                    <td class="py-2.5 pr-4 font-mono text-brand-400 text-xs whitespace-nowrap">${escHtml(p.pattern_code || '—')}</td>
-                                    <td class="py-2.5 pr-4 font-mono text-gray-400 text-xs whitespace-nowrap">${escHtml(p.product_code || '—')}</td>
-                                    <td class="py-2.5 pr-4 font-medium text-gray-100">${escHtml(p.item_name || '—')}</td>
-                                    <td class="py-2.5 pr-4 text-gray-400 text-xs">${escHtml(recipeStr)}</td>
-                                    <td class="py-2.5 pr-4 text-right">
+                                return `<tr class="border-b border-gray-100 hover:bg-gray-50">
+                                    <td class="px-4 py-3 font-mono whitespace-nowrap text-xs font-semibold" style="color:#7c3aed">${escHtml(p.pattern_code || '—')}</td>
+                                    <td class="px-4 py-3 font-mono text-xs whitespace-nowrap" style="color:#64748b">${escHtml(p.product_code || '—')}</td>
+                                    <td class="px-4 py-3 font-medium" style="color:#0f172a">${escHtml(p.item_name || '—')}</td>
+                                    <td class="px-4 py-3">
+                                        <input type="text"
+                                            value="${escHtml(p.factory_notes || '')}"
+                                            placeholder="Add description…"
+                                            onblur="saveFactoryProductField('${p.id}','factory_notes',this.value)"
+                                            style="width:100%;min-width:160px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;color:#0f172a;padding:3px 8px;font-size:12px;outline:none"
+                                            onfocus="this.style.borderColor='#6d28d9'">
+                                    </td>
+                                    <td class="px-4 py-3 text-xs" style="color:#475569">${escHtml(recipeStr)}</td>
+                                    <td class="px-4 py-3 text-right">
                                         <input type="number" step="0.01" min="0"
                                             value="${p.factory_unit_cost != null ? Number(p.factory_unit_cost).toFixed(2) : ''}"
                                             placeholder="—"
                                             onblur="saveFactoryProductField('${p.id}','factory_unit_cost',this.value)"
-                                            style="width:80px;text-align:right;background:#1e293b;border:1px solid #334155;border-radius:5px;color:#e2e8f0;padding:3px 6px;font-size:12px;outline:none"
-                                            onfocus="this.style.borderColor='#3b82f6'">
-                                    </td>
-                                    <td class="py-2.5">
-                                        <input type="text"
-                                            value="${escHtml(p.factory_notes || '')}"
-                                            placeholder="Add notes…"
-                                            onblur="saveFactoryProductField('${p.id}','factory_notes',this.value)"
-                                            style="width:100%;min-width:160px;background:#1e293b;border:1px solid #334155;border-radius:5px;color:#e2e8f0;padding:3px 8px;font-size:12px;outline:none"
-                                            onfocus="this.style.borderColor='#3b82f6'">
+                                            style="width:80px;text-align:right;background:#f8fafc;border:1px solid #e2e8f0;border-radius:5px;color:#0f172a;padding:3px 6px;font-size:12px;outline:none"
+                                            onfocus="this.style.borderColor='#6d28d9'">
                                     </td>
                                 </tr>`;
                             }).join('')}
