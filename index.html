@@ -3258,6 +3258,9 @@
             </div>
         </div>
 
+        <!-- Factory PO row "Actions" dropdown (shared, repositioned per row) -->
+        <div id="fpo-actions-dropdown" class="hide" style="position:fixed;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:10px;box-shadow:0 6px 24px rgba(0,0,0,0.12);min-width:190px;overflow:hidden"></div>
+
         <!-- MODAL: Factory Key Document -->
         <div id="factory-doc-modal" class="fixed inset-0 bg-black/80 z-50 flex items-start justify-center overflow-y-auto py-8 hide">
             <div class="glass rounded-2xl p-6 w-full max-w-lg mx-4 my-auto">
@@ -16579,13 +16582,6 @@
             if (!m || !m.latest) return false;
             return !po.brand_last_read_at || m.latest > po.brand_last_read_at;
         }
-        function poNotesButton(po) {
-            const m = poNotesMeta[po.id];
-            const count = m ? m.count : 0;
-            if (!count) return `<button onclick="event.stopPropagation();openPoNotes('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">+ Add note</button>`;
-            const dot = poHasUnread(po) ? '<span style="position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:#ef4444;border:2px solid #fff"></span>' : '';
-            return `<button onclick="event.stopPropagation();openPoNotes('${po.id}')" class="relative text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe">💬 ${count}${dot}</button>`;
-        }
         function poCountdownTick() {
             const tool = document.getElementById('tool-factory');
             if (_factoryActiveTab === 'po-tracker' && tool && !tool.classList.contains('hide')) renderFactoryPoList();
@@ -16634,16 +16630,16 @@
             if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
         }
         async function undoPoPartShipped(poId) {
-            const { error } = await supabase.from('factory_purchase_orders').update({ part_shipped_date: null, completion_status: null }).eq('id', poId);
+            const { error } = await supabase.from('factory_purchase_orders').update({ part_shipped_date: null, completion_status: 'in_progress' }).eq('id', poId);
             if (error) { showToast('Error: ' + error.message, 'error'); return; }
-            const po = factoryPos.find(p => p.id === poId); if (po) { po.part_shipped_date = null; po.completion_status = null; }
+            const po = factoryPos.find(p => p.id === poId); if (po) { po.part_shipped_date = null; po.completion_status = 'in_progress'; }
             showToast('Part-shipped status undone — back to active');
             renderFactoryPoList();
             if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
         }
         async function undoPoShipped(poId) {
             const po = factoryPos.find(p => p.id === poId);
-            const fallbackStatus = po?.part_shipped_date ? 'part_completed' : null;
+            const fallbackStatus = po?.part_shipped_date ? 'part_completed' : 'in_progress';
             const { error } = await supabase.from('factory_purchase_orders').update({ shipped: false, shipped_date: null, completion_status: fallbackStatus }).eq('id', poId);
             if (error) { showToast('Error: ' + error.message, 'error'); return; }
             if (po) { po.shipped = false; po.shipped_date = null; po.completion_status = fallbackStatus; }
@@ -16676,12 +16672,6 @@
             }
             return `<button onclick="event.stopPropagation();markPoPartShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#f97316">Part-Shipped</button>
                 <button onclick="event.stopPropagation();markPoFullShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#16a34a">Mark Shipped</button>`;
-        }
-        function poIssueHtml(po) {
-            if (po.issue_raised) {
-                return `<button onclick="event.stopPropagation();openPoIssue('${po.id}')" class="text-xs font-semibold px-3 py-1.5 rounded-lg" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">⚠ Issue raised</button>`;
-            }
-            return `<button onclick="event.stopPropagation();openRaiseIssue('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">⚠ Raise issue</button>`;
         }
         function poReadyToEmail(po) {
             return !!(po.po_title && (po.club_name || po.clubs?.name || po.team_name)
@@ -16732,10 +16722,50 @@
             const body = poEmailFill(currentBrand?.po_email_body || PO_EMAIL_DEFAULT_BODY, tokens);
             return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         }
-        function poEmailHtml(po) {
-            if (!poReadyToEmail(po)) return '';
-            return `<a href="${poEmailHref(po)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Email factory recipients" class="inline-flex items-center justify-center text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe">✉️ Email factory</a>`;
+        // ---- Actions dropdown (Email factory / Raise issue / Add note) ----
+        function poActionsMenuButton(po) {
+            const alert = po.issue_raised || poHasUnread(po);
+            return `<button onclick="event.stopPropagation();togglePoActionsMenu(event,'${po.id}')" class="relative text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">Actions ▾${alert ? '<span style="position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:#ef4444;border:2px solid #fff"></span>' : ''}</button>`;
         }
+        function poActionsMenuItemsHtml(po) {
+            const itemStyle = 'display:block;width:100%;text-align:left;padding:10px 14px;font-size:13px;font-weight:500;color:#334155;background:#fff;border:none;border-bottom:1px solid #f1f5f9;cursor:pointer';
+            const lastItemStyle = itemStyle.replace('border-bottom:1px solid #f1f5f9', 'border-bottom:none');
+            const emailItem = poReadyToEmail(po)
+                ? `<a href="${poEmailHref(po)}" target="_blank" rel="noopener" onclick="event.stopPropagation();closePoActionsMenu()" style="${itemStyle};text-decoration:none;color:#4f46e5">✉️ Email factory</a>`
+                : `<span style="${itemStyle};color:#cbd5e1;cursor:not-allowed" title="Fill in title, club/team, dates &amp; Drive link to email the factory">✉️ Email factory</span>`;
+            const issueItem = po.issue_raised
+                ? `<button onclick="event.stopPropagation();closePoActionsMenu();openPoIssue('${po.id}')" style="${itemStyle};color:#b91c1c">⚠ Issue raised</button>`
+                : `<button onclick="event.stopPropagation();closePoActionsMenu();openRaiseIssue('${po.id}')" style="${itemStyle}">⚠ Raise issue</button>`;
+            const notesCount = poNotesMeta[po.id]?.count || 0;
+            const notesItem = `<button onclick="event.stopPropagation();closePoActionsMenu();openPoNotes('${po.id}')" style="${lastItemStyle}">💬 ${notesCount ? 'Notes (' + notesCount + ')' : 'Add note'}</button>`;
+            return emailItem + issueItem + notesItem;
+        }
+        function togglePoActionsMenu(event, poId) {
+            event.stopPropagation();
+            const menu = document.getElementById('fpo-actions-dropdown');
+            if (!menu) return;
+            const wasOpenForThis = !menu.classList.contains('hide') && menu.dataset.poId === poId;
+            closePoActionsMenu();
+            if (wasOpenForThis) return;
+            const po = factoryPos.find(p => p.id === poId);
+            if (!po) return;
+            menu.dataset.poId = poId;
+            menu.innerHTML = poActionsMenuItemsHtml(po);
+            const rect = event.currentTarget.getBoundingClientRect();
+            menu.style.top = (rect.bottom + 4) + 'px';
+            menu.style.left = Math.max(8, rect.right - 190) + 'px';
+            menu.classList.remove('hide');
+        }
+        function closePoActionsMenu() {
+            const menu = document.getElementById('fpo-actions-dropdown');
+            if (!menu) return;
+            menu.classList.add('hide');
+            menu.innerHTML = '';
+            delete menu.dataset.poId;
+        }
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#fpo-actions-dropdown')) closePoActionsMenu();
+        });
         function poPerformanceHtml() {
             const dayDiff = (a, b) => Math.round((new Date(a + 'T00:00:00') - new Date(b + 'T00:00:00')) / 86400000);
             const avgDays = arr => arr.length ? Math.round(arr.reduce((s, n) => s + n, 0) / arr.length) : null;
@@ -16784,6 +16814,7 @@
         function renderFactoryPoList() {
             const el = document.getElementById('factory-view-po-tracker');
             if (!el) return;
+            closePoActionsMenu();
             const bar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
                 ${poFilterChip('active', 'Active')}${poFilterChip('due', 'Due soon')}${poFilterChip('overdue', 'Overdue')}${poFilterChip('awaiting', 'Awaiting')}${poFilterChip('shipped', 'In Transit')}${poFilterChip('completed', 'Completed')}
             </div>`;
@@ -16822,9 +16853,7 @@
                     </div>
                     <div style="flex:0 0 20%;min-width:0;border-left:1px solid #e2e8f0;display:flex;flex-direction:column;justify-content:center;gap:6px;padding:14px 16px">
                         ${poActionsHtml(po)}
-                        ${poEmailHtml(po)}
-                        ${poIssueHtml(po)}
-                        ${poNotesButton(po)}
+                        ${poActionsMenuButton(po)}
                     </div>
                 </div>`;
             }).join('') + `</div></div>${perf}</div>`;
