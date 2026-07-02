@@ -990,6 +990,7 @@
         .dt-countdown.soon { background:rgba(249,115,22,0.12); color:#ea580c; }
         .dt-countdown.overdue { background:rgba(239,68,68,0.12); color:#dc2626; }
         .dt-countdown.ok { background:rgba(34,197,94,0.1); color:#16a34a; }
+        .dt-countdown.transit { background:rgba(8,145,178,0.12); color:#0891b2; }
 
         /* Job type selector */
         .dt-job-type-btn { padding:8px 12px; border-radius:10px; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #e2e8f0; background:#f8fafc; color:#64748b; transition:all 0.15s; text-align:center; }
@@ -16517,7 +16518,7 @@
         }
         function poCountdown(po) {
             if (po.received) return { cls: 'ok', text: '✓ Completed' + (po.received_date ? ' · ' + fpoDateShort(po.received_date) : '') };
-            if (po.shipped) return { cls: 'ok', text: '✓ Shipped' + (po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : '') };
+            if (po.shipped) return { cls: 'transit', text: '🚚 In Transit' + (po.shipped_date ? ' · shipped ' + fpoDateShort(po.shipped_date) : '') };
             const target = po.revised_delivery_date || po.delivery_due_date;
             if (!target) return { cls: '', text: 'No due date' };
             const ms = new Date(target + 'T00:00:00') - new Date();
@@ -16599,11 +16600,12 @@
             let list = factoryPos.slice();
             const today = new Date(); today.setHours(0, 0, 0, 0);
             const f = _poFilter;
-            if (f === 'shipped') list = list.filter(p => p.shipped);
-            else if (f === 'active') list = list.filter(p => !p.shipped);
-            else if (f === 'awaiting') list = list.filter(p => !p.shipped);
-            else if (f === 'overdue') list = list.filter(p => !p.shipped && poEffectiveTarget(p) && new Date(poEffectiveTarget(p) + 'T00:00:00') < today);
-            else if (f === 'due') list = list.filter(p => { if (p.shipped) return false; const t = poEffectiveTarget(p); if (!t) return false; const d = (new Date(t + 'T00:00:00') - today) / 86400000; return d >= 0 && d <= 7; });
+            if (f === 'completed') list = list.filter(p => p.received);
+            else if (f === 'shipped') list = list.filter(p => p.shipped && !p.received);
+            else if (f === 'active') list = list.filter(p => !p.received);
+            else if (f === 'awaiting') list = list.filter(p => !p.shipped && !p.received);
+            else if (f === 'overdue') list = list.filter(p => !p.shipped && !p.received && poEffectiveTarget(p) && new Date(poEffectiveTarget(p) + 'T00:00:00') < today);
+            else if (f === 'due') list = list.filter(p => { if (p.shipped || p.received) return false; const t = poEffectiveTarget(p); if (!t) return false; const d = (new Date(t + 'T00:00:00') - today) / 86400000; return d >= 0 && d <= 7; });
             list.sort((a, b) => poNumKey(a) - poNumKey(b));
             return list;
         }
@@ -16631,17 +16633,46 @@
             renderFactoryPoList();
             if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
         }
+        async function undoPoPartShipped(poId) {
+            const { error } = await supabase.from('factory_purchase_orders').update({ part_shipped_date: null, completion_status: null }).eq('id', poId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === poId); if (po) { po.part_shipped_date = null; po.completion_status = null; }
+            showToast('Part-shipped status undone — back to active');
+            renderFactoryPoList();
+            if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
+        }
+        async function undoPoShipped(poId) {
+            const po = factoryPos.find(p => p.id === poId);
+            const fallbackStatus = po?.part_shipped_date ? 'part_completed' : null;
+            const { error } = await supabase.from('factory_purchase_orders').update({ shipped: false, shipped_date: null, completion_status: fallbackStatus }).eq('id', poId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            if (po) { po.shipped = false; po.shipped_date = null; po.completion_status = fallbackStatus; }
+            showToast('Shipped status undone — back to active');
+            renderFactoryPoList();
+            if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
+        }
+        async function undoPoCompleted(poId) {
+            const { error } = await supabase.from('factory_purchase_orders').update({ received: false, received_date: null }).eq('id', poId);
+            if (error) { showToast('Error: ' + error.message, 'error'); return; }
+            const po = factoryPos.find(p => p.id === poId); if (po) { po.received = false; po.received_date = null; }
+            showToast('Completed status undone');
+            renderFactoryPoList();
+            if (currentFactoryPoId === poId && !document.getElementById('factory-po-record').classList.contains('hide')) openFactoryPoRecord(poId);
+        }
         function poActionsHtml(po) {
             if (po.received) {
-                return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="background:#dcfce7;color:#15803d">✓ Completed${po.received_date ? ' · ' + fpoDateShort(po.received_date) : ''}</span>`;
+                return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="background:#dcfce7;color:#15803d">✓ Completed${po.received_date ? ' · ' + fpoDateShort(po.received_date) : ''}</span>
+                    <button onclick="event.stopPropagation();undoPoCompleted('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">↺ Undo</button>`;
             }
             if (po.shipped) {
-                return `<span class="dt-countdown ok" style="justify-content:center">✓ Shipped${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>
-                    <button onclick="event.stopPropagation();markPoCompleted('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#0891b2">✓ Mark Completed</button>`;
+                return `<span class="dt-countdown transit" style="justify-content:center">🚚 In Transit${po.shipped_date ? ' · ' + fpoDateShort(po.shipped_date) : ''}</span>
+                    <button onclick="event.stopPropagation();markPoCompleted('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#0891b2">✓ Mark Completed</button>
+                    <button onclick="event.stopPropagation();undoPoShipped('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">↺ Undo shipped</button>`;
             }
             if (po.completion_status === 'part_completed' || po.part_shipped_date) {
                 return `<span class="text-xs font-semibold px-2 py-1.5 rounded-lg text-center" style="background:#ffedd5;color:#ea580c">◑ Part-shipped${po.part_shipped_date ? ' · ' + fpoDateShort(po.part_shipped_date) : ''}</span>
-                    <button onclick="event.stopPropagation();markPoFullShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#16a34a">Mark Shipped</button>`;
+                    <button onclick="event.stopPropagation();markPoFullShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#16a34a">Mark Shipped</button>
+                    <button onclick="event.stopPropagation();undoPoPartShipped('${po.id}')" class="text-xs font-medium px-3 py-1.5 rounded-lg" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0">↺ Undo</button>`;
             }
             return `<button onclick="event.stopPropagation();markPoPartShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#f97316">Part-Shipped</button>
                 <button onclick="event.stopPropagation();markPoFullShipped('${po.id}')" class="text-xs font-semibold px-3 py-2 rounded-lg text-white" style="background:#16a34a">Mark Shipped</button>`;
@@ -16754,7 +16785,7 @@
             const el = document.getElementById('factory-view-po-tracker');
             if (!el) return;
             const bar = `<div class="flex items-center gap-2 mb-4 flex-wrap">
-                ${poFilterChip('active', 'Active')}${poFilterChip('due', 'Due soon')}${poFilterChip('overdue', 'Overdue')}${poFilterChip('awaiting', 'Awaiting')}${poFilterChip('shipped', 'Shipped')}
+                ${poFilterChip('active', 'Active')}${poFilterChip('due', 'Due soon')}${poFilterChip('overdue', 'Overdue')}${poFilterChip('awaiting', 'Awaiting')}${poFilterChip('shipped', 'In Transit')}${poFilterChip('completed', 'Completed')}
             </div>`;
             const perf = poPerformanceHtml();
             if (!factoryPos.length) {
