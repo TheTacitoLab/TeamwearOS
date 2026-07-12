@@ -8825,9 +8825,11 @@
             renderSubBrandsList();
         }
 
-        // <option> list for any sub-brand selector; empty value = main brand
+        // <option> list for any sub-brand selector; empty value = the parent
+        // (mother) brand, shown by its actual brand name.
         function subBrandOptionsHtml(selectedId, mainLabel) {
-            const opts = [`<option value="">${escHtml(mainLabel || '— Main Brand —')}</option>`];
+            const label = mainLabel || currentBrand?.name || 'Main Brand';
+            const opts = [`<option value="">${escHtml(label)}</option>`];
             subBrands.forEach(sb => {
                 opts.push(`<option value="${sb.id}"${sb.id === selectedId ? ' selected' : ''}>${escHtml(sb.name)}</option>`);
             });
@@ -13408,7 +13410,7 @@
             if (customerBrandScope !== 'all' && customerBrandScope !== 'main' && !subBrands.some(sb => sb.id === customerBrandScope)) {
                 customerBrandScope = 'all';
             }
-            const opts = ['<option value="all">All Brands</option>', '<option value="main">Main Brand</option>'];
+            const opts = ['<option value="all">All Brands</option>', `<option value="main">${escHtml(currentBrand?.name || 'Main Brand')}</option>`];
             subBrands.forEach(sb => opts.push(`<option value="${sb.id}">${escHtml(sb.name)}</option>`));
             sel.innerHTML = opts.join('');
             sel.value = customerBrandScope;
