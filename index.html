@@ -3925,6 +3925,12 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="text-xs text-gray-500 mb-1 block">Brand</label>
+                            <select id="lead-sub-brand" class="w-full px-3 py-2 rounded-lg text-sm">
+                                <option value="">— Main Brand —</option>
+                            </select>
+                        </div>
                         <div>
                             <label class="text-xs text-gray-500 mb-1 block">Owner</label>
                             <div class="owner-dp" id="owner-dp-lead"></div>
@@ -4135,11 +4141,14 @@
             <!-- ── Split-screen layout (Leads / Jobs) ── -->
             <div class="sh-wrapper" id="sh-kanban-wrapper">
                 <div class="sh-left">
-                    <!-- Search -->
-                    <div class="sh-search-wrap">
+                    <!-- Search + brand scope -->
+                    <div class="sh-search-wrap" style="display:flex;gap:8px;align-items:center">
                         <input type="text" id="sh-search" placeholder="Search name or customer…"
                             oninput="renderSalesHome()"
-                            class="sh-search-input">
+                            class="sh-search-input" style="flex:1">
+                        <select id="sales-brand-scope" onchange="setSalesBrandScope(this.value)" class="sh-search-input" style="width:auto;flex:0 0 auto;cursor:pointer">
+                            <option value="all">All Brands</option>
+                        </select>
                     </div>
                     <!-- Kanban board -->
                     <div class="sh-kanban" id="sh-list"></div>
@@ -6846,6 +6855,7 @@
         let _appInitialised = false;  // stays true once app is running; prevents token-refresh from re-running initApp
         let viewScope = localStorage.getItem('teamwear_view_scope') || 'all'; // 'all' | 'mine'
         let customerBrandScope = 'all'; // 'all' | 'main' | <sub_brand_id> — filters the Customers list
+        let salesBrandScope = 'all';    // 'all' | 'main' | <sub_brand_id> — filters the Sales (Leads+Jobs) kanban
         let allBrands = [];
         let isSuperAdmin = false;
         let products = [];
@@ -13416,6 +13426,26 @@
             sel.value = customerBrandScope;
         }
 
+        // Sales Home (Leads + Jobs kanban) brand scope — mirrors the Customers toggle
+        function setSalesBrandScope(v) { salesBrandScope = v || 'all'; renderSalesHome(); }
+        function syncSalesBrandScopeSelect() {
+            const sel = document.getElementById('sales-brand-scope');
+            if (!sel) return;
+            if (salesBrandScope !== 'all' && salesBrandScope !== 'main' && !subBrands.some(sb => sb.id === salesBrandScope)) {
+                salesBrandScope = 'all';
+            }
+            const opts = ['<option value="all">All Brands</option>', `<option value="main">${escHtml(currentBrand?.name || 'Main Brand')}</option>`];
+            subBrands.forEach(sb => opts.push(`<option value="${sb.id}">${escHtml(sb.name)}</option>`));
+            sel.innerHTML = opts.join('');
+            sel.value = salesBrandScope;
+        }
+        // True when a record passes the current sales brand-scope filter
+        function _salesBrandMatch(rec) {
+            if (salesBrandScope === 'main') return !rec.sub_brand_id;
+            if (salesBrandScope !== 'all') return rec.sub_brand_id === salesBrandScope;
+            return true;
+        }
+
         function renderClubsEnhanced(targetContainer) {
             const search = (document.getElementById('clubs-search')?.value || '').toLowerCase();
             const sportFilter = document.getElementById('clubs-filter-sport')?.value || '';
@@ -18633,6 +18663,7 @@
         }
 
         function renderSalesHome() {
+            syncSalesBrandScopeSelect();
             if (_shActiveTab === 'gtm') { _renderGTMDashboard(); return; }
             if (_shActiveTab === 'closed') { _renderSHClosedJobs(); return; }
             const board = document.getElementById('sh-list');
@@ -18689,7 +18720,7 @@
             board.style.flexDirection = '';
             board.style.overflowX = '';
             board.style.padding = '';
-            let activeLeads = leads.filter(l => l.status !== 'converted' && l.status !== 'archived');
+            let activeLeads = leads.filter(l => l.status !== 'converted' && l.status !== 'archived' && _salesBrandMatch(l));
             if (search) activeLeads = activeLeads.filter(l =>
                 l.lead_name?.toLowerCase().includes(search) ||
                 l.club_name?.toLowerCase().includes(search)
@@ -18731,7 +18762,7 @@
             board.style.flexDirection = '';
             board.style.overflowX = '';
             board.style.padding = '';
-            let allJobs = jobs.filter(j => j.stage !== 'completed' && j.stage !== 'lost' && !j.archived);
+            let allJobs = jobs.filter(j => j.stage !== 'completed' && j.stage !== 'lost' && !j.archived && _salesBrandMatch(j));
             if (search) allJobs = allJobs.filter(j =>
                 j.job_name?.toLowerCase().includes(search) ||
                 j.clubs?.name?.toLowerCase().includes(search) ||
@@ -18775,7 +18806,7 @@
 
         function _renderSHClosedJobs() {
             const search = (document.getElementById('sh-search')?.value || '').toLowerCase().trim();
-            let closed = jobs.filter(j => j.stage === 'completed' || j.stage === 'lost');
+            let closed = jobs.filter(j => (j.stage === 'completed' || j.stage === 'lost') && _salesBrandMatch(j));
             if (search) closed = closed.filter(j =>
                 j.job_name?.toLowerCase().includes(search) ||
                 j.clubs?.name?.toLowerCase().includes(search) ||
@@ -22980,6 +23011,7 @@
                 document.getElementById('lead-notes').value = lead.notes || '';
                 document.getElementById('lead-status').value = lead.status || 'not_contacted';
                 document.getElementById('lead-stage').value = lead.kanban_stage_id || '';
+                document.getElementById('lead-sub-brand').innerHTML = subBrandOptionsHtml(lead.sub_brand_id || '');
                 renderOwnerDropdown('lead',
                     lead?.assigned_user_ids || (lead?.assigned_to ? [lead.assigned_to] : []));
                 dangerActions.style.removeProperty('display');
@@ -23017,6 +23049,9 @@
                 document.getElementById('lead-notes').value = '';
                 document.getElementById('lead-status').value = defaultStatus;
                 document.getElementById('lead-stage').value = defaultStatus === 'in_discussion' ? (kanbanStages[0]?.id || '') : '';
+                // Seed new lead's brand from the active sales brand scope (if a specific sub-brand)
+                document.getElementById('lead-sub-brand').innerHTML = subBrandOptionsHtml(
+                    (salesBrandScope !== 'all' && salesBrandScope !== 'main') ? salesBrandScope : '');
                 renderOwnerDropdown('lead', []);
                 dangerActions.style.display = 'none';
                 const convertBanner = document.getElementById('lead-convert-banner');
@@ -23120,6 +23155,7 @@
                 notes: document.getElementById('lead-notes').value.trim() || null,
                 status,
                 kanban_stage_id: stageId,
+                sub_brand_id: document.getElementById('lead-sub-brand')?.value || null,
                 assigned_to: ownerIds[0] || null,
                 assigned_user_ids: ownerIds
             };
@@ -23285,6 +23321,10 @@
                     if (matchedClub) clubSel.value = matchedClub.id;
                 }
             }
+
+            // Carry the lead's brand/sub-brand onto the new job
+            const jobSbSel = document.getElementById('job-sub-brand');
+            if (jobSbSel) jobSbSel.innerHTML = subBrandOptionsHtml(lead.sub_brand_id || '');
 
             // Store the lead ID for post-save conversion marking
             document.getElementById('job-modal')._convertingFromLeadId = leadId;
