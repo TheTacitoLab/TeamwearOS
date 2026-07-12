@@ -32,8 +32,10 @@ DROP POLICY IF EXISTS "factory_po_issues_anon_read" ON factory_po_issues;
 CREATE POLICY "factory_po_issues_anon_read" ON factory_po_issues FOR SELECT TO anon USING (true);
 
 -- Backfill: migrate any currently-open legacy issues into the new table so
--- nothing is lost on rollout.
+-- nothing is lost on rollout. Guarded with NOT EXISTS so re-running this file
+-- (e.g. after a transient gateway error) never creates duplicate rows.
 INSERT INTO factory_po_issues (po_id, brand_id, description, status, created_at)
 SELECT id, brand_id, COALESCE(NULLIF(issue_note, ''), '(no description)'), 'open', created_at
-FROM factory_purchase_orders
-WHERE issue_raised = true;
+FROM factory_purchase_orders po
+WHERE po.issue_raised = true
+  AND NOT EXISTS (SELECT 1 FROM factory_po_issues fi WHERE fi.po_id = po.id);
