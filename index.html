@@ -13524,7 +13524,7 @@
         // ─────────────────────────────────────────────────────────────
         async function generateShopifyCSVForClub(overrideClubId, priceList = 'retail', status = 'draft', blankCollection = false) {
             const club = overrideClubId ? clubs.find(c => c.id === overrideClubId) : currentClub;
-            if (!customer) { showToast('No customer selected', 'error'); return; }
+            if (!club) { showToast('No customer selected', 'error'); return; }
 
             // Fetch club products with full master product data
             let clubProds = currentClubProducts;
